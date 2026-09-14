@@ -11,7 +11,6 @@ from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import redirect
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
 from accounts.models import UserProfile
 
 
@@ -158,100 +157,71 @@ def remove_from_all_org_groups(user):
         user.groups.remove(member_group)
 
 
-def organization_admin_required(view_func=None, redirect_url='admin_dashboard'):
-    """
-    Decorator to ensure user is an organization admin.
+def build_permission_decorator(name, permission, default_message,
+                               default_redirect='admin_dashboard'):
+    """Build a view decorator that gates access on a single permission.
 
-    Usage:
-        @login_required
-        @organization_admin_required
-        def my_view(request):
-            ...
-
-    Or with custom redirect:
-        @login_required
-        @organization_admin_required(redirect_url='home')
-        def my_view(request):
-            ...
-    """
-    def decorator(func):
-        @wraps(func)
-        def wrapper(request, *args, **kwargs):
-            # Check if user has permission
-            if not request.user.has_perm('accounts.can_invite_members'):
-                messages.error(
-                    request,
-                    'You do not have permission to perform this action. '
-                    'Only organization administrators can access this feature.'
-                )
-                return redirect(redirect_url)
-
-            return func(request, *args, **kwargs)
-        return wrapper
-
-    # Handle both @organization_admin_required and @organization_admin_required()
-    if view_func is None:
-        return decorator
-    else:
-        return decorator(view_func)
-
-
-def can_manage_organization_required(view_func=None, redirect_url='admin_dashboard'):
-    """
-    Decorator to ensure user can manage organization settings.
+    Users without the permission get an error message and are redirected
+    rather than shown a 403.
 
     Usage:
         @login_required
         @can_manage_organization_required
         def settings_view(request):
             ...
-    """
-    def decorator(func):
-        @wraps(func)
-        def wrapper(request, *args, **kwargs):
-            if not request.user.has_perm('accounts.can_manage_organization'):
-                messages.error(
-                    request,
-                    'You do not have permission to manage organization settings.'
-                )
-                return redirect(redirect_url)
 
-            return func(request, *args, **kwargs)
-        return wrapper
-
-    if view_func is None:
-        return decorator
-    else:
-        return decorator(view_func)
-
-
-def can_delete_organization_required(view_func=None, redirect_url='admin_dashboard'):
-    """
-    Decorator to ensure user can delete the organization.
-
-    Usage:
-        @login_required
-        @can_delete_organization_required
-        def delete_org_view(request):
+    Or with a redirect and a message specific to the view:
+        @can_manage_organization_required(
+            redirect_url='reviewee_list',
+            message='You do not have permission to edit reviewees.')
+        def reviewee_edit(request, reviewee_id):
             ...
     """
-    def decorator(func):
-        @wraps(func)
-        def wrapper(request, *args, **kwargs):
-            if not request.user.has_perm('accounts.can_delete_organization'):
-                messages.error(
-                    request,
-                    'Only organization administrators can delete the organization.'
-                )
-                return redirect(redirect_url)
 
-            return func(request, *args, **kwargs)
-        return wrapper
+    def decorator_factory(view_func=None, redirect_url=default_redirect,
+                          message=default_message):
+        def decorator(func):
+            @wraps(func)
+            def wrapper(request, *args, **kwargs):
+                if not request.user.has_perm(permission):
+                    messages.error(request, message)
+                    return redirect(redirect_url)
 
-    if view_func is None:
-        return decorator
-    else:
+                return func(request, *args, **kwargs)
+            return wrapper
+
+        # Handle both @foo and @foo()
+        if view_func is None:
+            return decorator
+
         return decorator(view_func)
+
+    # So tracebacks and repr() name the decorator, not the factory.
+    decorator_factory.__name__ = name
+    decorator_factory.__qualname__ = name
+    decorator_factory.__doc__ = f"Require the '{permission}' permission."
+
+    return decorator_factory
+
+
+organization_admin_required = build_permission_decorator(
+    'organization_admin_required',
+    'accounts.can_invite_members',
+    'You do not have permission to perform this action. '
+    'Only organization administrators can access this feature.',
+)
+
+can_manage_organization_required = build_permission_decorator(
+    'can_manage_organization_required',
+    'accounts.can_manage_organization',
+    'You do not have permission to manage organization settings.',
+)
+
+can_delete_organization_required = build_permission_decorator(
+    'can_delete_organization_required',
+    'accounts.can_delete_organization',
+    'Only organization administrators can delete the organization.',
+)
 
 
 def is_organization_admin(user):

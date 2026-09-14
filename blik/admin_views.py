@@ -26,6 +26,7 @@ from accounts.models import Reviewee, UserProfile, OrganizationInvitation
 from accounts.permissions import (
     assign_organization_admin,
     assign_organization_member,
+    can_manage_organization_required,
     is_organization_admin,
     visible_cycles,
 )
@@ -402,16 +403,13 @@ def reviewee_create(request):
 
 
 @login_required
+@can_manage_organization_required(
+    redirect_url='reviewee_list',
+    message='You do not have permission to edit reviewees. '
+            'Only organization administrators can access this feature.'
+)
 def reviewee_edit(request, reviewee_id):
     """Edit an existing reviewee - admin only"""
-    # Check admin permission
-    if not request.user.has_perm('accounts.can_manage_organization'):
-        messages.error(
-            request,
-            'You do not have permission to edit reviewees. Only organization administrators can access this feature.'
-        )
-        return redirect('reviewee_list')
-
     reviewee = get_object_or_404(Reviewee, id=reviewee_id)
 
     if request.method == 'POST':
@@ -435,16 +433,13 @@ def reviewee_edit(request, reviewee_id):
 
 
 @login_required
+@can_manage_organization_required(
+    redirect_url='reviewee_list',
+    message='You do not have permission to delete reviewees. '
+            'Only organization administrators can access this feature.'
+)
 def reviewee_delete(request, reviewee_id):
     """Soft delete a reviewee - admin only"""
-    # Check admin permission
-    if not request.user.has_perm('accounts.can_manage_organization'):
-        messages.error(
-            request,
-            'You do not have permission to delete reviewees. Only organization administrators can access this feature.'
-        )
-        return redirect('reviewee_list')
-
     reviewee = get_object_or_404(Reviewee, id=reviewee_id)
 
     if request.method == 'POST':
@@ -462,6 +457,11 @@ def reviewee_delete(request, reviewee_id):
 
 @login_required
 @require_POST
+@can_manage_organization_required(
+    redirect_url='reviewee_list',
+    message='You do not have permission to create review cycles. '
+            'Only organization administrators can access this feature.'
+)
 def quick_cycle_create(request, reviewee_id):
     """
     Quick cycle creation from reviewee/cycle list.
@@ -469,14 +469,6 @@ def quick_cycle_create(request, reviewee_id):
     Copies token structure and email assignments from the source cycle.
     If no previous cycle exists, creates default tokens (1 self, 3 peers, 1 manager, 0 direct reports).
     """
-    # Check admin permission
-    if not request.user.has_perm('accounts.can_manage_organization'):
-        messages.error(
-            request,
-            'You do not have permission to create review cycles. Only organization administrators can access this feature.'
-        )
-        return redirect('reviewee_list')
-
     org = request.organization
     reviewee = get_object_or_404(Reviewee, id=reviewee_id, organization=org, is_active=True)
     questionnaire_id = request.POST.get('questionnaire_id')
