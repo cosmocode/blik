@@ -1,6 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.test import TestCase
+from django.contrib.messages.storage.cookie import CookieStorage
+from django.http import HttpResponse
+from django.test import RequestFactory, TestCase
+from django.urls import reverse
 
 from core.factories import UserFactory, OrganizationFactory
 from accounts.factories import UserProfileFactory
@@ -9,6 +12,7 @@ from accounts.permissions import (
     ORG_MEMBER_GROUP,
     assign_organization_admin,
     assign_organization_member,
+    can_manage_organization_required,
     ensure_permission_groups,
     remove_from_all_org_groups,
 )
@@ -68,3 +72,59 @@ class PermissionAssignmentTestCase(TestCase):
         # The Group objects themselves must still exist — other users depend on them.
         self.assertTrue(Group.objects.filter(name=ORG_ADMIN_GROUP).exists())
         self.assertTrue(Group.objects.filter(name=ORG_MEMBER_GROUP).exists())
+
+
+class PermissionDecoratorTestCase(TestCase):
+    """The decorators are built by a shared factory in permissions.py.
+
+    Both call styles have to keep working — @decorator is what the codebase
+    uses today, @decorator(redirect_url=...) is not used anywhere and would
+    otherwise break unnoticed.
+    """
+
+    def setUp(self):
+        ensure_permission_groups()
+        self.org = OrganizationFactory()
+        self.user = UserFactory()
+        UserProfileFactory(user=self.user, organization=self.org)
+        self.request = RequestFactory().get('/')
+        self.request.user = self.user
+        # The decorators report denials through the message framework.
+        # CookieStorage, not the configured default: SessionStorage wants a
+        # session, which a RequestFactory request does not have.
+        self.request._messages = CookieStorage(self.request)
+
+    @staticmethod
+    def _view(request):
+        return HttpResponse('reached')
+
+    def test_bare_decorator_lets_a_permitted_user_through(self):
+        assign_organization_admin(self.user)
+        self.request.user = User.objects.get(pk=self.user.pk)
+
+        view = can_manage_organization_required(self._view)
+
+        self.assertEqual(view(self.request).content, b'reached')
+
+    def test_bare_decorator_redirects_without_the_permission(self):
+        assign_organization_member(self.user)
+        self.request.user = User.objects.get(pk=self.user.pk)
+
+        response = can_manage_organization_required(self._view)(self.request)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('admin_dashboard'))
+
+    def test_called_decorator_honours_a_custom_redirect(self):
+        assign_organization_member(self.user)
+        self.request.user = User.objects.get(pk=self.user.pk)
+
+        view = can_manage_organization_required(redirect_url='home')(self._view)
+        response = view(self.request)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('home'))
+
+    def test_decorated_view_keeps_its_name(self):
+        view = can_manage_organization_required(self._view)
+        self.assertEqual(view.__name__, '_view')
