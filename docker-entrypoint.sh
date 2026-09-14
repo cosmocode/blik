@@ -49,6 +49,10 @@ python manage.py migrate --noinput
 echo "Running upgrade steps..."
 python manage.py upgrade
 
+echo "Compiling translations..."
+# Non-fatal: a malformed .po file must not prevent the container from starting.
+python manage.py compilemessages || echo "WARNING: compilemessages failed, using existing .mo files"
+
 echo "Collecting static files..."
 python manage.py collectstatic --noinput --clear
 
