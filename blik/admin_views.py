@@ -8,7 +8,6 @@ from datetime import date
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -28,6 +27,7 @@ from accounts.permissions import (
     assign_organization_member,
     can_manage_organization_required,
     is_organization_admin,
+    login_required,
     visible_cycles,
 )
 from api.models import APIToken, WebhookEndpoint
@@ -1156,7 +1156,7 @@ def questionnaire_edit(request, questionnaire_id):
     return render(request, 'admin_dashboard/questionnaire_form.html', context)
 
 
-@login_required
+@login_required(as_json=True)
 def question_dreyfus_config_api(request, question_id):
     """API endpoint to get Dreyfus/Agency configuration for a question"""
     try:

@@ -7,8 +7,10 @@ This module provides:
 3. Utility functions for permission assignment
 """
 from functools import wraps
+from django.contrib.auth.decorators import login_required as django_login_required
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.contrib import messages
 from accounts.models import UserProfile
@@ -157,6 +159,45 @@ def remove_from_all_org_groups(user):
         user.groups.remove(member_group)
 
 
+def login_required(view_func=None, as_json=False, **kwargs):
+    """Drop-in replacement for django.contrib.auth.decorators.login_required.
+
+    Without as_json it delegates to Django's decorator, keeping login_url
+    and redirect_field_name — so it can be imported in its place.
+
+    as_json=True answers 401 instead. Django's version redirects to the HTML
+    login page; a caller parsing JSON follows that redirect, gets a page of
+    markup and fails on the parse.
+
+    Usage:
+        @login_required
+        def dashboard(request):
+            ...
+
+        @login_required(as_json=True)
+        def some_api(request):
+            ...
+    """
+    def decorator(func):
+        if not as_json:
+            return django_login_required(func, **kwargs)
+
+        @wraps(func)
+        def wrapper(request, *args, **kw):
+            if not request.user.is_authenticated:
+                return JsonResponse(
+                    {'error': 'Authentication required'}, status=401)
+
+            return func(request, *args, **kw)
+        return wrapper
+
+    # Handle both @login_required and @login_required(...)
+    if view_func is None:
+        return decorator
+
+    return decorator(view_func)
+
+
 def build_permission_decorator(name, permission, default_message,
                                default_redirect='admin_dashboard'):
     """Build a view decorator that gates access on a single permission.
@@ -176,6 +217,7 @@ def build_permission_decorator(name, permission, default_message,
             message='You do not have permission to edit reviewees.')
         def reviewee_edit(request, reviewee_id):
             ...
+
     """
 
     def decorator_factory(view_func=None, redirect_url=default_redirect,

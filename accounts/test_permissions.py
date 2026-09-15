@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser, Group
 from django.contrib.messages.storage.cookie import CookieStorage
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
@@ -14,6 +15,7 @@ from accounts.permissions import (
     assign_organization_member,
     can_manage_organization_required,
     ensure_permission_groups,
+    login_required,
     remove_from_all_org_groups,
 )
 
@@ -128,3 +130,46 @@ class PermissionDecoratorTestCase(TestCase):
     def test_decorated_view_keeps_its_name(self):
         view = can_manage_organization_required(self._view)
         self.assertEqual(view.__name__, '_view')
+
+
+class LoginRequiredTestCase(TestCase):
+    """Our login_required stands in for Django's, plus an as_json mode."""
+
+    def setUp(self):
+        self.request = RequestFactory().get('/')
+
+    @staticmethod
+    def _view(request):
+        return JsonResponse({'ok': True})
+
+    def test_bare_decorator_still_redirects_like_djangos(self):
+        self.request.user = AnonymousUser()
+
+        response = login_required(self._view)(self.request)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(settings.LOGIN_URL, response.url)
+
+    def test_login_url_is_still_honoured(self):
+        self.request.user = AnonymousUser()
+
+        view = login_required(login_url='/elsewhere/')(self._view)
+        response = view(self.request)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/elsewhere/', response.url)
+
+    def test_as_json_answers_401_instead_of_redirecting(self):
+        self.request.user = AnonymousUser()
+
+        response = login_required(as_json=True)(self._view)(self.request)
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response['Content-Type'], 'application/json')
+
+    def test_logged_in_user_passes_through(self):
+        self.request.user = UserFactory()
+
+        for view in (login_required(self._view),
+                     login_required(as_json=True)(self._view)):
+            self.assertEqual(view(self.request).status_code, 200)
