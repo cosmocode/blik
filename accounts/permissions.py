@@ -31,6 +31,7 @@ def ensure_permission_groups():
     - Delete organization
     - View all reports
     - Create cycles for others
+    - Create and edit questionnaires
 
     Organization Member group has permissions to:
     - View own data
@@ -69,15 +70,31 @@ def ensure_permission_groups():
         content_type=content_type,
     )
 
+    manage_questionnaires_permission, _ = Permission.objects.get_or_create(
+        codename='can_manage_questionnaires',
+        name='Can create and edit questionnaires',
+        content_type=content_type,
+    )
+
+    admin_permissions = [
+        invite_permission,
+        manage_org_permission,
+        delete_org_permission,
+        view_all_reports_permission,
+        manage_questionnaires_permission,
+    ]
+
     # Create Organization Admin group
     admin_group, created = Group.objects.get_or_create(name=ORG_ADMIN_GROUP)
     if created or admin_group.permissions.count() == 0:
-        admin_group.permissions.set([
-            invite_permission,
-            manage_org_permission,
-            delete_org_permission,
-            view_all_reports_permission,
-        ])
+        admin_group.permissions.set(admin_permissions)
+    else:
+        # Existing installs: add permissions introduced after the group was
+        # created. set() would undo manual grants, add() only fills gaps.
+        existing = set(admin_group.permissions.values_list('id', flat=True))
+        missing = [p for p in admin_permissions if p.id not in existing]
+        if missing:
+            admin_group.permissions.add(*missing)
 
     # Create Organization Member group
     member_group, _ = Group.objects.get_or_create(name=ORG_MEMBER_GROUP)
@@ -218,14 +235,22 @@ def build_permission_decorator(name, permission, default_message,
         def reviewee_edit(request, reviewee_id):
             ...
 
+    Endpoints whose callers parse JSON pass as_json=True to get a 403 with
+    the message in the body; pair it with @login_required(as_json=True).
+    They must not queue a message: it would sit in the session and surface
+    on whatever page the user opens next, long after the request that
+    caused it.
     """
 
     def decorator_factory(view_func=None, redirect_url=default_redirect,
-                          message=default_message):
+                          message=default_message, as_json=False):
         def decorator(func):
             @wraps(func)
             def wrapper(request, *args, **kwargs):
                 if not request.user.has_perm(permission):
+                    if as_json:
+                        return JsonResponse({'error': message}, status=403)
+
                     messages.error(request, message)
                     return redirect(redirect_url)
 
@@ -263,6 +288,13 @@ can_delete_organization_required = build_permission_decorator(
     'can_delete_organization_required',
     'accounts.can_delete_organization',
     'Only organization administrators can delete the organization.',
+)
+
+can_manage_questionnaires_required = build_permission_decorator(
+    'can_manage_questionnaires_required',
+    'accounts.can_manage_questionnaires',
+    'You do not have permission to create or edit questionnaires.',
+    default_redirect='questionnaire_list',
 )
 
 
@@ -303,6 +335,18 @@ def can_view_all_reports(user):
     """
     return (user.has_perm('accounts.can_view_all_reports')
             or user.has_perm('accounts.can_manage_organization'))
+
+
+def can_manage_questionnaires(user):
+    """
+    Check if user can create and edit questionnaires.
+
+    Deliberately a permission of its own rather than a synonym for
+    can_manage_organization: the two are meant to be grantable separately.
+    Existing admins receive it through the Organization Admin group, which
+    migration accounts.0009 backfills.
+    """
+    return user.has_perm('accounts.can_manage_questionnaires')
 
 
 def visible_cycles(user, queryset, email_field='reviewee__email'):
