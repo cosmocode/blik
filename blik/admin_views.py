@@ -13,12 +13,14 @@ from django.core.mail import EmailMultiAlternatives
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.validators import validate_email
 from django.db import transaction
+from django.db.models import ProtectedError
 from django.db.models import Avg, Count, Max, OuterRef, Q, Subquery
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.functional import partition
 from django.views.decorators.http import require_POST
 
 from accounts.models import Reviewee, UserProfile, OrganizationInvitation
@@ -493,7 +495,7 @@ def quick_cycle_create(request, reviewee_id):
         return redirect('reviewee_list')
 
     try:
-        questionnaire = Questionnaire.objects.get(id=questionnaire_id, organization=org)
+        questionnaire = Questionnaire.objects.get(id=questionnaire_id, organization=org, is_active=True)
     except Questionnaire.DoesNotExist:
         messages.error(request, 'Invalid questionnaire selected.')
         return redirect('reviewee_list')
@@ -602,8 +604,14 @@ def questionnaire_list(request):
         'sections__questions'
     ).order_by('-is_default', 'name')
 
+    # Archived ones are kept out of the way but stay reachable: their cycles
+    # and reports still reference them, so they cannot simply disappear.
+    # partition() returns the non-matches first.
+    archived, active = partition(lambda q: q.is_active, questionnaires)
+
     context = {
-        'questionnaires': questionnaires,
+        'questionnaires': active,
+        'archived_questionnaires': archived,
     }
 
     return render(request, 'admin_dashboard/questionnaire_list.html', context)
@@ -1172,6 +1180,71 @@ def questionnaire_edit(request, questionnaire_id):
     return render(request, 'admin_dashboard/questionnaire_form.html', context)
 
 
+@login_required
+@can_manage_questionnaires_required
+def questionnaire_delete(request, questionnaire_id):
+    """Delete a questionnaire, or archive it when review cycles depend on it.
+
+    ReviewCycle.questionnaire is on_delete=PROTECT, so a questionnaire that
+    has been used cannot be deleted at all — its cycles and reports would
+    lose the questions their answers refer to. Those are archived instead:
+    gone from every selection list, still there for the existing reports.
+    """
+    org = getattr(request, 'organization', None)
+    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id, organization=org)
+    cycle_count = questionnaire.review_cycles.count()
+
+    if request.method == 'POST':
+        name = questionnaire.name
+
+        if cycle_count:
+            questionnaire.is_active = False
+            questionnaire.save(update_fields=['is_active'])
+            messages.success(
+                request,
+                f'Questionnaire "{name}" archived. It is used by {cycle_count} '
+                f'review cycle(s) and cannot be deleted.'
+            )
+        else:
+            try:
+                questionnaire.delete()
+            except ProtectedError:
+                # A cycle appeared between the count above and this delete.
+                questionnaire.is_active = False
+                questionnaire.save(update_fields=['is_active'])
+                messages.warning(
+                    request,
+                    f'Questionnaire "{name}" is now in use and was archived '
+                    f'instead of deleted.'
+                )
+            else:
+                messages.success(request, f'Questionnaire "{name}" deleted.')
+
+        return redirect('questionnaire_list')
+
+    context = {
+        'questionnaire': questionnaire,
+        'cycle_count': cycle_count,
+    }
+
+    return render(request, 'admin_dashboard/questionnaire_confirm_delete.html', context)
+
+
+@login_required
+@can_manage_questionnaires_required
+@require_POST
+def questionnaire_restore(request, questionnaire_id):
+    """Put an archived questionnaire back into circulation."""
+    org = getattr(request, 'organization', None)
+    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id, organization=org)
+
+    questionnaire.is_active = True
+    questionnaire.save(update_fields=['is_active'])
+    messages.success(request, f'Questionnaire "{questionnaire.name}" restored.')
+
+    return redirect('questionnaire_list')
+
+
 @login_required(as_json=True)
 @can_manage_questionnaires_required(as_json=True)
 def question_dreyfus_config_api(request, question_id):
@@ -1282,10 +1355,12 @@ def review_cycle_create(request):
             # Get organization from request context
             org = getattr(request, 'organization', None)
 
-            # Filter by organization to prevent cross-org access
+            # Filter by organization to prevent cross-org access; archived
+            # ones are gone from the form and must not come back through POST.
             questionnaire = Questionnaire.objects.get(
                 id=questionnaire_id,
-                organization=org
+                organization=org,
+                is_active=True
             )
             created_cycles = []
 
@@ -1431,6 +1506,7 @@ def review_cycle_create(request):
     # Prefetch sections/questions so report_type_label doesn't N+1 per option.
     questionnaires = (
         Questionnaire.objects.for_organization(org)
+        .filter(is_active=True)
         .prefetch_related('sections__questions')
         .order_by('-is_default', 'name')
     )
