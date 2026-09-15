@@ -27,8 +27,10 @@ from accounts.permissions import (
     assign_organization_member,
     can_manage_organization_required,
     can_manage_questionnaires_required,
+    can_view_all_reports,
     is_organization_admin,
     login_required,
+    set_user_permission,
     visible_cycles,
 )
 from api.models import APIToken, WebhookEndpoint
@@ -188,6 +190,7 @@ def team_list(request):
     # Add permission data as dynamic attribute
     for user_profile in users:
         user_profile.is_org_admin = user_profile.user.has_perm('accounts.can_manage_organization')
+        user_profile.can_read_all_reports = can_view_all_reports(user_profile.user)
 
     # Get pending invitations
     invitations = OrganizationInvitation.objects.filter(
@@ -226,6 +229,7 @@ def update_user_permissions(request):
         user_profile_id = request.POST.get('user_profile_id')
         role = request.POST.get('role')  # 'admin' or 'member'
         can_create_cycles_for_others = request.POST.get('can_create_cycles_for_others') == 'on'
+        can_view_reports = request.POST.get('can_view_all_reports') == 'on'
 
         if not user_profile_id or not role:
             messages.error(request, 'Invalid request: missing required fields.')
@@ -275,6 +279,15 @@ def update_user_permissions(request):
 
         if can_create_cycles_for_others:
             messages.success(request, f'{target_user.username} can now create review cycles for others.')
+
+        # Report access is a permission on the user, not a profile flag. Admins
+        # already hold it through their group, so granting it directly would
+        # only linger after a demotion.
+        grant_reports = can_view_reports and role != 'admin'
+        set_user_permission(target_user, 'can_view_all_reports', grant_reports)
+
+        if grant_reports:
+            messages.success(request, f'{target_user.username} can now view all reports.')
 
     except Exception as e:
         messages.error(request, f'Error updating permissions: {str(e)}')

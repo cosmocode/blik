@@ -166,6 +166,23 @@ def assign_organization_member(user, can_create_cycles_for_others=False):
         user.profile.save()
 
 
+def set_user_permission(user, codename, granted):
+    """Grant or revoke one organization permission on the user itself.
+
+    Groups carry the role. This is the per-user grant that makes a single
+    capability assignable without changing the role — an org member who may
+    read every report, say, without becoming an admin.
+    """
+    ensure_permission_groups()
+    content_type = ContentType.objects.get_for_model(UserProfile)
+    permission = Permission.objects.get(codename=codename, content_type=content_type)
+
+    if granted:
+        user.user_permissions.add(permission)
+    else:
+        user.user_permissions.remove(permission)
+
+
 def remove_from_all_org_groups(user):
     """Remove user from all organization groups (without deleting the groups)."""
     admin_group = Group.objects.filter(name=ORG_ADMIN_GROUP).first()
