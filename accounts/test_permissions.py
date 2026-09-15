@@ -127,6 +127,29 @@ class PermissionDecoratorTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('home'))
 
+    def test_as_json_answers_403_instead_of_redirecting(self):
+        assign_organization_member(self.user)
+        self.request.user = User.objects.get(pk=self.user.pk)
+
+        view = can_manage_organization_required(as_json=True)(self._view)
+        response = view(self.request)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response['Content-Type'], 'application/json')
+
+    def test_as_json_queues_no_message(self):
+        """A queued message would surface on whatever page is opened next."""
+        assign_organization_member(self.user)
+        self.request.user = User.objects.get(pk=self.user.pk)
+
+        can_manage_organization_required(as_json=True)(self._view)(self.request)
+        self.assertEqual(len(self.request._messages), 0)
+
+        # Control, so the assertion above cannot pass for the wrong reason:
+        # the redirecting variant does queue one.
+        can_manage_organization_required(self._view)(self.request)
+        self.assertEqual(len(self.request._messages), 1)
+
     def test_decorated_view_keeps_its_name(self):
         view = can_manage_organization_required(self._view)
         self.assertEqual(view.__name__, '_view')

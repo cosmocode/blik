@@ -26,6 +26,7 @@ from accounts.permissions import (
     assign_organization_admin,
     assign_organization_member,
     can_manage_organization_required,
+    can_manage_questionnaires_required,
     is_organization_admin,
     login_required,
     visible_cycles,
@@ -724,6 +725,7 @@ def questionnaire_sample_report(request, questionnaire_id):
 
 
 @login_required
+@can_manage_questionnaires_required
 def questionnaire_create(request):
     """Create a new questionnaire"""
     if request.method == 'POST':
@@ -758,6 +760,7 @@ def questionnaire_create(request):
 
 
 @login_required
+@can_manage_questionnaires_required
 def questionnaire_edit(request, questionnaire_id):
     """Edit an existing questionnaire"""
     # Get organization from request context
@@ -1157,6 +1160,7 @@ def questionnaire_edit(request, questionnaire_id):
 
 
 @login_required(as_json=True)
+@can_manage_questionnaires_required(as_json=True)
 def question_dreyfus_config_api(request, question_id):
     """API endpoint to get Dreyfus/Agency configuration for a question"""
     try:
