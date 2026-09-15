@@ -94,28 +94,20 @@ def setup_organization(request):
 
             # Create UserProfile for the setup admin if needed
             from accounts.models import UserProfile
-            from django.contrib.auth.models import Permission
-            from django.contrib.contenttypes.models import ContentType
+            from accounts.permissions import assign_organization_admin
 
             if not hasattr(request.user, 'profile'):
-                profile = UserProfile.objects.create(
+                UserProfile.objects.create(
                     user=request.user,
                     organization=organization,
                     can_create_cycles_for_others=True
                 )
 
-                # Grant organization management permissions to setup admin
+                # Through the group, like every other path that creates an
+                # admin. Permissions granted directly here would miss every
+                # permission added to the group later on.
                 try:
-                    content_type = ContentType.objects.get_for_model(UserProfile)
-                    permissions = Permission.objects.filter(
-                        content_type=content_type,
-                        codename__in=[
-                            'can_invite_members',
-                            'can_manage_organization',
-                            'can_view_all_reports',
-                        ]
-                    )
-                    request.user.user_permissions.add(*permissions)
+                    assign_organization_admin(request.user)
                 except Exception as e:
                     # Log but don't fail setup if permissions aren't available yet
                     import logging

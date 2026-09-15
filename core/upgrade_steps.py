@@ -26,7 +26,57 @@ def _reapply_dreyfus_mappings(stdout):
     _apply_dreyfus_mappings(stdout)
 
 
+def _move_setup_admins_into_the_admin_group(stdout):
+    """Put admins that hold their permissions directly into the admin group.
+
+    Until this release the setup page granted three permissions straight to
+    the first user instead of calling assign_organization_admin(). Those
+    accounts are in no group, so every permission added to the group later
+    passes them by, and they never got can_delete_organization at all.
+
+    Only accounts holding can_manage_organization directly are touched — the
+    per-user grants the team UI writes (a member who may read all reports,
+    say) must survive untouched.
+    """
+    from django.contrib.auth.models import Permission, User
+    from django.contrib.contenttypes.models import ContentType
+
+    from accounts.models import UserProfile
+    from accounts.permissions import ORG_ADMIN_GROUP, ensure_permission_groups
+
+    admin_group, _ = ensure_permission_groups()
+    if admin_group is None:
+        stdout.write('  Apps not ready, skipping.')
+        return
+
+    content_type = ContentType.objects.get_for_model(UserProfile)
+    group_permissions = set(admin_group.permissions.values_list('codename', flat=True))
+
+    candidates = User.objects.filter(
+        user_permissions__codename='can_manage_organization',
+        user_permissions__content_type=content_type,
+    ).exclude(groups__name=ORG_ADMIN_GROUP).distinct()
+
+    moved = 0
+    for user in candidates:
+        user.groups.add(admin_group)
+
+        # Drop the direct copies the group now provides, so there is one
+        # source of truth. Anything else the account holds stays.
+        redundant = Permission.objects.filter(
+            content_type=content_type,
+            codename__in=group_permissions,
+        )
+        user.user_permissions.remove(*redundant)
+        moved += 1
+        stdout.write(f'  {user.username} -> {ORG_ADMIN_GROUP}')
+
+    stdout.write(f'Moved {moved} account(s) into {ORG_ADMIN_GROUP}.')
+
+
 STEPS = [
     ('0001_apply_dreyfus_mappings', _apply_dreyfus_mappings),
     ('0002_reapply_dreyfus_mappings', _reapply_dreyfus_mappings),
+    ('0003_move_setup_admins_into_the_admin_group',
+     _move_setup_admins_into_the_admin_group),
 ]
