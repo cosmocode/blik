@@ -508,6 +508,7 @@
     <div class="card-body">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
 
+            {% if is_org_admin %}
             <!-- Export Data -->
             <div>
                 <h3 style="font-size: 0.9375rem; font-weight: 600; margin-bottom: 6px;">Export Organization Data</h3>
@@ -520,7 +521,6 @@
             </div>
 
             <!-- Import Data -->
-            {% if is_org_admin %}
             <div style="padding-left: 1.5rem; border-left: 1px solid var(--border-color);">
                 <h3 style="font-size: 0.9375rem; font-weight: 600; margin-bottom: 6px;">Import Organization Data</h3>
                 <p style="color: var(--text-secondary); margin-bottom: 12px; font-size: 0.8125rem;">
