@@ -15,7 +15,10 @@ from accounts.import_service import (
     validate_import_data,
     generate_import_preview
 )
-from accounts.permissions import can_delete_organization_required
+from accounts.permissions import (
+    can_delete_organization_required,
+    can_manage_organization_required,
+)
 from subscriptions.services import cancel_subscription, reactivate_subscription
 from subscriptions.models import Subscription
 
@@ -85,8 +88,13 @@ def reactivate_subscription_view(request):
 
 
 @login_required
+@can_manage_organization_required(redirect_url='settings')
 def export_data(request):
-    """Export all organization data as JSON."""
+    """Export all organization data as JSON.
+
+    Admins only: the export holds every user and reviewee and the unfiltered
+    report_data of every cycle, before apply_display_anonymization.
+    """
     org = request.organization
     if not org:
         return JsonResponse({'error': 'Organization not found'}, status=404)
