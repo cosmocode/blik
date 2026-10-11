@@ -2,10 +2,10 @@
 {% load static landing_tags %}
 
 {% block meta %}
-    <title>Open Source 360° Feedback — Self-Hosted or EU Hosted | Blik360</title>
+    <title>Honest 360° feedback for small teams | Blik360</title>
 
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Anonymous 360° feedback: self-host free (AGPL-3.0), run one hosted review round for €{{ plan_single_price }}, or subscribe from €{{ plan_saas_price }}/mo for up to {{ plan_saas_max }} employees.">
+    <meta name="description" content="Anonymous 360° feedback from peers, managers and reports, turned into one clear report. Run a single round for €{{ plan_single_price }}, subscribe from €{{ plan_saas_price }}/mo, or self-host the open source version.">
     <meta name="keywords" content="open source 360 feedback, self-hosted performance review, anonymous feedback software, 360 degree feedback platform, employee feedback system, peer review software, performance management tool, GDPR support tools">
     <meta name="author" content="Thijs de Zoete">
     <link rel="canonical" href="{{ site_protocol }}://{{ site_domain }}{% landing_url 'index' %}">
@@ -13,25 +13,25 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ site_protocol }}://{{ site_domain }}{% landing_url 'index' %}">
-    <meta property="og:title" content="Open Source 360° Feedback — Self-Hosted or EU Hosted | Blik360">
-    <meta property="og:description" content="Anonymous 360° feedback: self-host free (AGPL-3.0), run one hosted review round for €{{ plan_single_price }}, or subscribe from €{{ plan_saas_price }}/mo for up to {{ plan_saas_max }} employees.">
+    <meta property="og:title" content="Honest 360° feedback for small teams | Blik360">
+    <meta property="og:description" content="Anonymous 360° feedback from peers, managers and reports, turned into one clear report. Run a single round for €{{ plan_single_price }}, subscribe from €{{ plan_saas_price }}/mo, or self-host the open source version.">
     <meta property="og:site_name" content="{{ site_name }}">
-    <meta property="og:image" content="{{ site_protocol }}://{{ site_domain }}{% landing_url 'og_image' %}?title=Open%20Source%20360%C2%B0%20Feedback&subtitle=Self-Hosted%20or%20EU%20Hosted">
+    <meta property="og:image" content="{{ site_protocol }}://{{ site_domain }}{% landing_url 'og_image' %}?title=Honest%20360%C2%B0%20feedback&subtitle=For%20small%20teams">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:type" content="image/png">
-    <meta property="og:image:alt" content="Open Source 360° Feedback — Self-Hosted or EU Hosted | Blik360">
+    <meta property="og:image:alt" content="Honest 360° feedback for small teams | Blik360">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="{{ site_protocol }}://{{ site_domain }}{% landing_url 'index' %}">
-    <meta name="twitter:title" content="Open Source 360° Feedback — Self-Hosted or EU Hosted | Blik360">
-    <meta name="twitter:description" content="Anonymous 360° feedback: self-host free (AGPL-3.0), run one hosted review round for €{{ plan_single_price }}, or subscribe from €{{ plan_saas_price }}/mo for up to {{ plan_saas_max }} employees.">
-    <meta name="twitter:image" content="{{ site_protocol }}://{{ site_domain }}{% landing_url 'og_image' %}?title=Open%20Source%20360%C2%B0%20Feedback&subtitle=Self-Hosted%20or%20EU%20Hosted">
+    <meta name="twitter:title" content="Honest 360° feedback for small teams | Blik360">
+    <meta name="twitter:description" content="Anonymous 360° feedback from peers, managers and reports, turned into one clear report. Run a single round for €{{ plan_single_price }}, subscribe from €{{ plan_saas_price }}/mo, or self-host the open source version.">
+    <meta name="twitter:image" content="{{ site_protocol }}://{{ site_domain }}{% landing_url 'og_image' %}?title=Honest%20360%C2%B0%20feedback&subtitle=For%20small%20teams">
 {% endblock %}
 
 {% block structured_data %}
-    {% article_schema "landing/index.html" headline="Open Source 360 Feedback Platform - Self-Hosted & Anonymous" description="Open source 360 feedback with four questionnaires and anonymous reviews; running in under 30 minutes with Docker Compose." canonical_url=request.build_absolute_uri author_name="Thijs de Zoete" image_url=request.build_absolute_uri|add:"?title=Blik360&subtitle=Open%20Source%20360%20Feedback" %}
+    {% article_schema "landing/index.html" headline="Honest 360° feedback for small teams" description="Anonymous 360° feedback for small teams: one hosted round for a one-time price, a subscription, or self-hosting under AGPL-3.0." canonical_url=request.build_absolute_uri author_name="Thijs de Zoete" image_url=request.build_absolute_uri|add:"?title=Blik360&subtitle=Open%20Source%20360%20Feedback" %}
 {% endblock %}
 
 {% block extra_head %}
@@ -201,71 +201,176 @@
         }
     }
     </script>
-
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "MobileApplication",
-        "name": "{{ site_name }} 360 Feedback",
-        "operatingSystem": "Web Browser",
-        "applicationCategory": "BusinessApplication",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "EUR"
-        },
-        "description": "Mobile-responsive 360 feedback platform. Complete anonymous reviews on any device - phone, tablet, or desktop."
-    }
-    </script>
 {% endblock %}
 
 {% block nav_links %}
-    <a href="#features">Features</a>
-    <a href="#use-cases">Solutions</a>
+    <a href="#product">Product</a>
+    <a href="#how">How it works</a>
     <a href="#pricing">Pricing</a>
     <a href="{% landing_url 'developers' %}">Developers</a>
-    <a href="{% landing_url 'about' %}">About</a>
-    <a href="https://github.com/thijsdezoete/blik" target="_blank" rel="noopener">GitHub</a>
+    <a href="{% landing_url 'alternatives' %}">Compare</a>
+    <a href="#faq">FAQ</a>
 {% endblock %}
 
 {% block content %}
-    <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero home-hero">
         <div class="container">
             <div class="hero-content">
-                <h1 class="hero-title">Open Source 360 Feedback Platform</h1>
-                <div class="hero-subtitle">
-                    <p class="mb-4"><strong>Self-hosted 360 feedback software with four pre-built questionnaires, anonymous reviews, and Docker deployment.</strong> Get Blik running in under 30 minutes with Docker Compose, with no license fee.</p>
-                </div>
+                <span class="eyebrow">360° feedback</span>
+                <h1 class="hero-title">Honest 360° feedback for small teams</h1>
+                <p class="hero-subtitle">Anonymous reviews from peers, managers and reports, turned into one clear report. Run a single round for €{{ plan_single_price }}, subscribe, or self-host the open source version.</p>
                 <div class="hero-cta">
-                    <a href="#pricing" class="btn btn-primary">Get Started</a>
-                    <a href="https://github.com/thijsdezoete/blik" class="btn btn-secondary" target="_blank" rel="noopener">View on GitHub</a>
+                    <a href="{% landing_url 'signup' %}?plan=single" class="btn btn-primary">Run a review round, €{{ plan_single_price }}</a>
+                    <a href="#how" class="btn btn-secondary">See how it works</a>
+                </div>
+                <p class="hero-note">No subscription · EU hosted · Open source</p>
+            </div>
+            <div class="home-hero-media">
+                <div class="browser-frame">
+                    <div class="browser-frame-bar"><span></span><span></span><span></span></div>
+                    <img class="img-light" src="{% static 'img/screenshots/report_professional_skills_overview_light.webp' %}" alt="A Blik 360 feedback report: overall score, self-assessment gap and skill level" width="1920" height="1080" loading="eager">
+                    <img class="img-dark" src="{% static 'img/screenshots/report_professional_skills_overview_dark.webp' %}" alt="" width="1920" height="1080" loading="eager">
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Name Origin Section -->
-    <section class="section">
+    <section class="section" style="padding-top: 0;">
         <div class="container">
-            <div class="home-story">
-                <h2 class="section-title">Why "Blik"?</h2>
-                <p class="home-story-intro">
-                    <strong>Blik</strong> is Dutch for <em>"view"</em> or <em>"perspective"</em>. Blik360 gives you a fresh view on performance—seeing yourself through the eyes of peers, managers, and direct reports.
-                </p>
-                <p>
-                    Fun fact: in Dutch, "blik" also means "can" (as in tin can). <strong>Yes, we can!</strong> Build better feedback systems without vendor lock-in.
-                </p>
+            <div class="fact-strip">
+                <div class="fact"><span class="fact-value">4</span><span class="fact-label">questionnaires included</span></div>
+                <div class="fact"><span class="fact-value">€{{ plan_single_price }}</span><span class="fact-label">per round, no subscription</span></div>
+                <div class="fact"><span class="fact-value">EU</span><span class="fact-label">hosted in Germany</span></div>
+                <div class="fact"><span class="fact-value">AGPL</span><span class="fact-label">open source, self-host free</span></div>
+                {% if rating_data %}<div class="fact"><span class="fact-value">{{ rating_data.aggregateRating.ratingValue }}/5</span><span class="fact-label">from {{ rating_data.aggregateRating.ratingCount }} reviews</span></div>{% endif %}
             </div>
         </div>
     </section>
 
-    <!-- Comparison Section -->
+    <section id="how" class="section">
+        <div class="container">
+            <h2 class="section-title">How it works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-media"><img src="{% static 'img/screenshots/invitations_desktop_light.webp' %}" alt="Inviting reviewers for a review cycle" loading="lazy"></div>
+                    <h3>Add people, pick a questionnaire</h3>
+                    <p>Add the person being reviewed, choose one of four questionnaires or your own, and list who should give feedback.</p>
+                </div>
+                <div class="step">
+                    <div class="step-media">
+                        <img class="img-light" src="{% static 'img/screenshots/feedback_mobile_light.webp' %}" alt="A reviewer answering questions on a phone" loading="lazy">
+                        <img class="img-dark" src="{% static 'img/screenshots/feedback_mobile_dark.webp' %}" alt="" loading="lazy">
+                    </div>
+                    <h3>Reviewers answer through a link</h3>
+                    <p>Each reviewer gets a private link by email. No account, no app, works on a phone. Reminders go out automatically.</p>
+                </div>
+                <div class="step">
+                    <div class="step-media">
+                        <img class="img-light" src="{% static 'img/screenshots/report_charts_desktop_light.webp' %}" alt="A radar chart comparing self, peer, manager and direct report ratings" loading="lazy">
+                        <img class="img-dark" src="{% static 'img/screenshots/report_charts_desktop_dark.webp' %}" alt="" loading="lazy">
+                    </div>
+                    <h3>Read the report</h3>
+                    <p>Scores per category, self versus others, and a skill and initiative level with concrete next steps. Share it with the person or keep it for the conversation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="product" class="section section-alt">
+        <div class="container">
+            <div class="split">
+                <div class="split-text">
+                    <span class="eyebrow">Reports</span>
+                    <h2>Reports people actually read</h2>
+                    <p>One page per person, with the numbers that matter and the gaps that start a useful conversation.</p>
+                    <ul>
+                        <li>Scores per competency, from every reviewer group</li>
+                        <li>Self-assessment next to what others said, sorted by gap</li>
+                        <li>A skill level on the <a href="{% landing_url 'dreyfus_model' %}">Dreyfus model</a> and an initiative level on the <a href="{% landing_url 'agency_levels' %}">five levels of agency</a></li>
+                        <li>Strengths, development areas and written comments</li>
+                    </ul>
+                </div>
+                <div class="browser-frame">
+                    <div class="browser-frame-bar"><span></span><span></span><span></span></div>
+                    <img class="img-light" src="{% static 'img/screenshots/report_charts_desktop_light.webp' %}" alt="Performance overview radar chart in a Blik report" loading="lazy">
+                    <img class="img-dark" src="{% static 'img/screenshots/report_charts_desktop_dark.webp' %}" alt="" loading="lazy">
+                </div>
+            </div>
+
+            <div class="split split--reverse">
+                <div class="split-text">
+                    <span class="eyebrow">Questionnaires</span>
+                    <h2>A questionnaire for every role</h2>
+                    <p>Four research-backed questionnaires come with Blik. Use them as they are, edit them, or write your own.</p>
+                    <ul>
+                        <li><strong>Professional Skills 360</strong>, for any role</li>
+                        <li><strong>Software Engineering 360</strong>, for engineers</li>
+                        <li><strong>Manager 360</strong>, for people leads</li>
+                        <li><strong>360 Degree Feedback</strong>, twelve questions for a quick round</li>
+                    </ul>
+                    <p>Likert scales, multiple choice and free text. Your own questionnaires stay private to your organisation.</p>
+                </div>
+                <div class="browser-frame">
+                    <div class="browser-frame-bar"><span></span><span></span><span></span></div>
+                    <img class="img-light" src="{% static 'img/screenshots/feedback_desktop_light.webp' %}" alt="A questionnaire section as a reviewer sees it" loading="lazy">
+                    <img class="img-dark" src="{% static 'img/screenshots/feedback_desktop_dark.webp' %}" alt="" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" class="section">
+        <div class="container">
+            <h2 class="section-title">Pay once, subscribe, or self-host</h2>
+            <p class="section-intro">Flat prices, no per-seat fees, reviewers are always free.</p>
+            {% include "landing/includes/pricing_plans.html" %}
+        </div>
+    </section>
+
     <section class="section section-alt">
         <div class="container">
-            <h2 class="section-title">Open Source Alternative to Lattice, Culture Amp, and 15Five</h2>
-            <p class="section-intro">Choose a focused 360° feedback tool or a broader performance suite. Self-host Blik on a small EU VPS (≈€10-50/month), or use managed EU hosting.</p>
+            <h2 class="section-title">Your data</h2>
+            <div class="data-grid">
+                <div class="feature-card">
+                    <h3>Hosted in the EU</h3>
+                    <p>The hosted service runs at Hetzner in Germany with daily backups. Self-host and the data never leaves your servers.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Tools for GDPR obligations</h3>
+                    <p>Export your whole organisation as JSON, delete people and their data, and keep reports only as long as you need them. Your organisation remains responsible for lawful processing, access and retention.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>How anonymity works</h3>
+                    <p>Reviewers answer through token links, never accounts, and reports aggregate by category with a minimum response threshold. A database administrator could in principle link a token to an invitation; nothing in the interface does.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Plug it in</h2>
+            <div class="plug-grid">
+                <div class="feature-card">
+                    <h3>Self-host in minutes</h3>
+                    <p>One Docker Compose file with PostgreSQL and a setup wizard. Runs on a small VPS.</p>
+                    <pre class="code-block"><code>docker compose up</code></pre>
+                </div>
+                <div class="feature-card">
+                    <h3>REST API and webhooks</h3>
+                    <p>Bearer-token API for people, cycles and reports, plus HMAC-signed webhooks for cycle events. <a href="{{ api_swagger_url }}" target="_blank" rel="noopener">API docs</a>.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Your data, in plain JSON</h3>
+                    <p>Full export of every account and organisation. Move to another tool without asking us. <a href="{% landing_url 'developers' %}">For developers</a>.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-alt">
+        <div class="container">
+            <h2 class="section-title">How Blik compares</h2>
             <div class="table-container">
                 <table class="comparison-table">
                     <caption>50-person comparison, as of October 2026. USD and EUR are shown separately.</caption>
@@ -280,514 +385,52 @@
                     </tbody>
                 </table>
             </div>
-            <p>Compare the feature scope as well as the subscription: Blik has no SSO, native HRIS connectors, or native mobile app.</p>
-            <div class="hero-cta">
-                <a href="{% landing_url 'alternatives' %}" class="btn btn-secondary">All alternatives</a>
-                <a href="{% landing_url 'vs_lattice' %}" class="btn btn-secondary">vs Lattice</a>
-                <a href="{% landing_url 'vs_culture_amp' %}" class="btn btn-secondary">vs Culture Amp</a>
-                <a href="{% landing_url 'vs_15five' %}" class="btn btn-secondary">vs 15Five</a>
-            </div>
+            <p class="section-intro">Compare the feature scope as well as the subscription: Blik has no SSO, native HRIS connectors, or native mobile app.</p>
+            <a class="section-link" href="{% landing_url 'alternatives' %}">All alternatives, with dated vendor prices</a>
         </div>
     </section>
 
-    <!-- Product Showcase Section -->
-    <section class="section product-showcase">
+    <section id="faq" class="section">
         <div class="container">
-            <h2 class="section-title">See Blik in Action</h2>
-            <p class="section-intro">Professional 360-degree feedback with rich visualizations and insights</p>
-
-            <!-- Carousel for desktop screenshots -->
-            <div class="screenshot-carousel">
-                <div class="carousel-container">
-                    <div class="carousel-slides">
-                        <div class="carousel-slide active" data-slide="0">
-                            <div class="screenshot-hover-wrapper">
-                                <picture class="screenshot-layer screenshot-light">
-                                    <source srcset="{% static 'img/screenshots/report_header_desktop_light.webp' %}" type="image/webp">
-                                    <img src="{% static 'img/screenshots/report_header_desktop_light.png' %}"
-                                         alt="Open source 360 feedback report showing competency scores and performance summary - Blik platform"
-                                         loading="eager">
-                                </picture>
-                                <picture class="screenshot-layer screenshot-dark">
-                                    <source srcset="{% static 'img/screenshots/report_header_desktop_dark.webp' %}" type="image/webp">
-                                    <img src="{% static 'img/screenshots/report_header_desktop_dark.png' %}"
-                                         alt="Self-hosted 360 degree feedback report with radar chart and competency breakdown"
-                                         loading="eager">
-                                </picture>
-                                <div class="theme-indicator">Hover to toggle theme</div>
-                            </div>
-                            <p class="carousel-caption">Professional feedback reports with clear summaries and overview statistics</p>
-                        </div>
-                        <div class="carousel-slide" data-slide="1">
-                            <div class="screenshot-hover-wrapper">
-                                <picture class="screenshot-layer screenshot-light">
-                                    <source srcset="{% static 'img/screenshots/report_charts_desktop_light.webp' %}" type="image/webp">
-                                    <img src="{% static 'img/screenshots/report_charts_desktop_light.png' %}"
-                                         alt="360 feedback software radar chart comparing self-assessment vs peer and manager ratings"
-                                         loading="lazy">
-                                </picture>
-                                <picture class="screenshot-layer screenshot-dark">
-                                    <source srcset="{% static 'img/screenshots/report_charts_desktop_dark.webp' %}" type="image/webp">
-                                    <img src="{% static 'img/screenshots/report_charts_desktop_dark.png' %}"
-                                         alt="Performance review analytics with competency breakdown and visual charts - open source platform"
-                                         loading="lazy">
-                                </picture>
-                                <div class="theme-indicator">Hover to toggle theme</div>
-                            </div>
-                            <p class="carousel-caption">Rich visualizations with radar charts, competency breakdowns, and detailed analytics</p>
-                        </div>
-                        <div class="carousel-slide" data-slide="2">
-                            <div class="screenshot-hover-wrapper">
-                                <picture class="screenshot-layer screenshot-light">
-                                    <source srcset="{% static 'img/screenshots/dashboard_desktop_light.webp' %}" type="image/webp">
-                                    <img src="{% static 'img/screenshots/dashboard_desktop_light.png' %}"
-                                         alt="Self-hosted 360 feedback platform admin dashboard for managing review cycles and teams"
-                                         loading="lazy">
-                                </picture>
-                                <picture class="screenshot-layer screenshot-dark">
-                                    <source srcset="{% static 'img/screenshots/dashboard_desktop_dark.webp' %}" type="image/webp">
-                                    <img src="{% static 'img/screenshots/dashboard_desktop_dark.png' %}"
-                                         alt="Open source performance management dashboard showing active review cycles and progress"
-                                         loading="lazy">
-                                </picture>
-                                <div class="theme-indicator">Hover to toggle theme</div>
-                            </div>
-                            <p class="carousel-caption">Track review cycles, monitor progress, and manage your team from an intuitive dashboard</p>
-                        </div>
-                        <div class="carousel-slide" data-slide="3">
-                            <div class="screenshot-hover-wrapper">
-                                <picture class="screenshot-layer screenshot-light">
-                                    <source srcset="{% static 'img/screenshots/feedback_desktop_light.webp' %}" type="image/webp">
-                                    <img src="{% static 'img/screenshots/feedback_desktop_light.png' %}"
-                                         alt="Anonymous 360 feedback form with rating scales and competency questions - peer review interface"
-                                         loading="lazy">
-                                </picture>
-                                <picture class="screenshot-layer screenshot-dark">
-                                    <source srcset="{% static 'img/screenshots/feedback_desktop_dark.webp' %}" type="image/webp">
-                                    <img src="{% static 'img/screenshots/feedback_desktop_dark.png' %}"
-                                         alt="Anonymous employee feedback collection interface with progress tracking - self-hosted platform"
-                                         loading="lazy">
-                                </picture>
-                                <div class="theme-indicator">Hover to toggle theme</div>
-                            </div>
-                            <p class="carousel-caption">Anonymous feedback collection with intuitive forms and progress tracking</p>
-                        </div>
-                        <div class="carousel-slide" data-slide="4">
-                            <div class="screenshot-hover-wrapper">
-                                <picture class="screenshot-layer screenshot-light">
-                                    <source srcset="{% static 'img/screenshots/team_desktop_light.webp' %}" type="image/webp">
-                                    <img src="{% static 'img/screenshots/team_desktop_light.png' %}"
-                                         alt="Team Management - Light Theme"
-                                         loading="lazy">
-                                </picture>
-                                <picture class="screenshot-layer screenshot-dark">
-                                    <source srcset="{% static 'img/screenshots/team_desktop_dark.webp' %}" type="image/webp">
-                                    <img src="{% static 'img/screenshots/team_desktop_dark.png' %}"
-                                         alt="Team Management - Dark Theme"
-                                         loading="lazy">
-                                </picture>
-                                <div class="theme-indicator">Hover to toggle theme</div>
-                            </div>
-                            <p class="carousel-caption">Manage team members, assign roles, and control permissions with granular access</p>
-                        </div>
-                    </div>
-                    <button class="carousel-nav carousel-prev" aria-label="Previous screenshot">‹</button>
-                    <button class="carousel-nav carousel-next" aria-label="Next screenshot">›</button>
-                    <div class="carousel-dots">
-                        <button class="carousel-dot active" data-slide="0" aria-label="Show report header"></button>
-                        <button class="carousel-dot" data-slide="1" aria-label="Show report charts"></button>
-                        <button class="carousel-dot" data-slide="2" aria-label="Show dashboard screenshot"></button>
-                        <button class="carousel-dot" data-slide="3" aria-label="Show feedback form"></button>
-                        <button class="carousel-dot" data-slide="4" aria-label="Show team management screenshot"></button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Mobile showcase with phone mockup -->
-            <div class="mobile-showcase">
-                <h3 class="home-showcase-heading">Beautiful on Every Device</h3>
-                <div class="phone-mockup">
-                    <div class="phone-frame">
-                        <div class="phone-notch"></div>
-                        <div class="phone-screen">
-                            <picture>
-                                <source srcset="{% static 'img/screenshots/feedback_mobile_dark.webp' %}" type="image/webp">
-                                <img src="{% static 'img/screenshots/feedback_mobile_dark.png' %}"
-                                     alt="Anonymous Feedback Form on Mobile"
-                                     loading="lazy">
-                            </picture>
-                        </div>
-                    </div>
-                </div>
-                <p class="home-showcase-caption">
-                    Reviewers provide anonymous feedback from any device with a clean, accessible mobile interface
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Questionnaires Section -->
-    <section id="questionnaires" class="section">
-        <div class="container">
-            <h2 class="section-title">Pre-Built Questionnaires for Every Role</h2>
-            <p class="home-questionnaire-intro">Four professional 360° feedback templates ready to use out-of-the-box, or customize to fit your needs</p>
-
-            <p class="home-questionnaire-summary">
-                Blik includes four research-backed 360 degree feedback questionnaires for different team roles and needs. Each performance review template uses proven frameworks like the <a href="{% landing_url 'dreyfus_model' %}">Dreyfus model of skill acquisition</a> (Novice to Expert) and the <a href="{% landing_url 'agency_levels' %}">5 Levels of Agency</a> (measuring proactive problem-solving). Whether you're reviewing software engineers, managers, or measuring employee initiative, these templates give you a structured starting point without having to design questions from scratch.
-            </p>
-
-            <div class="questionnaire-grid">
-                <div class="feature-card questionnaire-card">
-                    <div class="role-badge">ALL ROLES</div>
-                    <h3>Professional Skills 360 Review</h3>
-                    <p class="questionnaire-description">Universal competency-based assessment for any professional role</p>
-                    <p class="questionnaire-caption"><strong>8 Core Competency Areas:</strong></p>
-                    <ul class="questionnaire-topics">
-                        <li>Problem Solving & Decision Making</li>
-                        <li>Communication & Collaboration</li>
-                        <li>Initiative & Ownership</li>
-                        <li>Adaptability & Learning</li>
-                        <li>Quality & Excellence</li>
-                        <li>Leadership & Influence</li>
-                        <li>Professionalism & Attitude</li>
-                        <li>Overall Assessment</li>
-                    </ul>
-                    <p class="questionnaire-footnote">Uses the Dreyfus model of skill acquisition (Novice → Expert) for precise competency assessment.</p>
-                </div>
-
-                <div class="feature-card questionnaire-card">
-                    <div class="role-badge role-badge--engineering">SOFTWARE ENGINEERS</div>
-                    <h3>Software Engineering 360 Review</h3>
-                    <p class="questionnaire-description">Comprehensive technical competency assessment designed for engineering teams</p>
-                    <p class="questionnaire-caption"><strong>10 Engineering Competencies:</strong></p>
-                    <ul class="questionnaire-topics">
-                        <li>Industry Fit & Problem Solving</li>
-                        <li>Collaboration & Personality</li>
-                        <li>Technical Expertise & Skill Level</li>
-                        <li>Motivation & Passion</li>
-                        <li>Maturity & Best Practices</li>
-                        <li>Pragmatism & Execution</li>
-                        <li>Knowledge Sharing & Mentorship</li>
-                        <li>Growth Potential & Adaptability</li>
-                        <li>Strategic Vision & Leadership</li>
-                        <li>Overall Assessment</li>
-                    </ul>
-                    <p class="questionnaire-footnote">Evaluates code quality, technical depth, collaboration, and engineering maturity with Dreyfus-based skill ratings.</p>
-                </div>
-
-                <div class="feature-card questionnaire-card">
-                    <div class="role-badge role-badge--leadership">MANAGERS & LEADS</div>
-                    <h3>Manager 360 Review</h3>
-                    <p class="questionnaire-description">Leadership effectiveness assessment for managers and team leads</p>
-                    <p class="questionnaire-caption"><strong>7 Leadership Dimensions:</strong></p>
-                    <ul class="questionnaire-topics">
-                        <li>Leadership (Visibility, Trust, Communication)</li>
-                        <li>Direction (Goal Setting, Clarity, Autonomy)</li>
-                        <li>Expertise & Judgment</li>
-                        <li>Impact (Team Performance, Results Focus)</li>
-                        <li>Feedback & Recognition</li>
-                        <li>Development (Growth Support, Skill Building)</li>
-                        <li>Overall Feedback</li>
-                    </ul>
-                    <p class="questionnaire-footnote">Measures management effectiveness, team impact, and people development capabilities.</p>
-                </div>
-
-                <div class="feature-card questionnaire-card">
-                    <div class="role-badge role-badge--universal">UNIVERSAL 360</div>
-                    <h3>360 Degree Feedback</h3>
-                    <p class="questionnaire-description">A compact questionnaire with 12 questions in four sections for a general review cycle.</p>
-                    <p class="questionnaire-caption"><strong>4 Essential Areas:</strong></p>
-                    <ul class="questionnaire-topics">
-                        <li>Technical Skills (Problem solving, code quality, expertise)</li>
-                        <li>Collaboration (Teamwork, communication, mentoring)</li>
-                        <li>Work Approach (Initiative, adaptability, reliability)</li>
-                        <li>Overall Feedback (Strengths, improvement areas)</li>
-                    </ul>
-                    <p class="questionnaire-footnote">Use this shorter template for a broad conversation about skills, collaboration, and development.</p>
-                </div>
-            </div>
-
-            <div class="cta-box">
-                <h3>Or Build Your Own</h3>
-                <p class="home-questionnaire-custom">All questionnaires are customizable. Add questions, remove ones you don't need, change the scales. I built in support for ratings, Likert scales, multiple choice, and free text. Make it work for your team.</p>
-            </div>
-
-            <div class="home-framework">
-                <h3>Built on the Dreyfus Model of Skill Acquisition</h3>
-                <div class="home-framework-content">
-                    <div class="home-framework-diagram">
-                        {% include 'components/dreyfus_model_svg.html' %}
-                    </div>
-                    <p class="home-framework-description">
-                        Our questionnaires use research-backed competency levels: <strong>Novice → Advanced Beginner → Competent → Proficient → Expert</strong>.
-                        This framework maps naturally to career progression and helps identify specific growth areas.
-                    </p>
-                    <a href="{% landing_url 'dreyfus_model' %}" class="btn btn-secondary home-framework-action">Learn About the Dreyfus Model →</a>
-                </div>
-            </div>
-
-            <!-- Try Assessment CTA -->
-            <div class="home-assessment">
-                <div class="home-assessment-content">
-                    <h3>Discover Your Developer Skill Level</h3>
-                    <p class="home-assessment-description">
-                        Take our free Developer Skills Assessment to see the Dreyfus and Agency frameworks in action.
-                        Get personalized insights across 10 engineering competencies and discover where you stand on your professional journey.
-                    </p>
-                    <a href="{% landing_url 'dreyfus_assessment_start' %}" class="btn btn-primary home-assessment-action">
-                        Take the Free Assessment →
-                    </a>
-                    <p class="home-assessment-note">
-                        5 minutes • Get instant results • No signup required
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section id="features" class="section section-alt">
-        <div class="container">
-            <h2 class="section-title">Why Choose Blik</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <h3>Token-Based Anonymous Feedback</h3>
-                    <p>Reviewers use token-based links, and reports aggregate feedback by category with configurable thresholds. Responses retain a token reference, which may link to an invitation email. Confidentiality depends on invitation method, permissions, thresholds, and feedback content—not a guarantee against database administrators identifying reviewers.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Self-Hosted Data Control</h3>
-                    <p>Deploy on your own infrastructure with complete data sovereignty. No third-party SaaS provider stores or accesses your team's performance feedback. Host on-premise, private cloud, or any server you control.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>AGPL Open Source License</h3>
-                    <p>Free to use, modify, and deploy under AGPL-3.0 license. Zero licensing costs for any team size. If you host a modified public version, share improvements back to the community. No proprietary vendor lock-in.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Docker Compose Deployment</h3>
-                    <p>Production-ready deployment with single <code>docker compose up</code> command. Includes web-based setup wizard for initial configuration. No DevOps expertise required—runs on any Docker-compatible infrastructure.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>4 Pre-Built Research-Backed Questionnaires</h3>
-                    <p>Includes Professional Skills 360 Review, Software Engineering 360 Review, Manager 360 Review, and 360 Degree Feedback. Customize these templates or use them as supplied.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Full REST API & Webhook Support</h3>
-                    <p>REST API with Bearer token authentication and four HMAC-signed webhook events. Generous limits: 1,000 requests/hour per token; 100/hour for anonymous requests.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Tools to Support GDPR Obligations</h3>
-                    <p>Self-hosting offers infrastructure control, and managed hosting runs in the EU. Export and deletion tools support GDPR obligations; your organization remains responsible for lawful processing, configuration, access, retention, and its compliance processes.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Open Data Standards</h3>
-                    <p>PostgreSQL database with Django ORM. Standard JSON exports for all data. Migrate to other systems without vendor restrictions or export fees. Full database access for custom queries and reporting.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Mobile-Responsive Interface</h3>
-                    <p>Professional web interface works on desktop, tablet, and mobile devices. No app store installation required. Modern web standards with accessibility support (WCAG 2.1 guidelines).</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Use Cases Section -->
-    <section id="use-cases" class="section section-alt">
-        <div class="container">
-            <h2 class="section-title">Use Cases</h2>
-            <div class="use-cases-grid">
-                <div class="use-case-card">
-                    <h3>Startups and SMEs</h3>
-                    <p>Cost-effective performance review solution without SaaS subscriptions. Self-host on existing infrastructure for zero ongoing costs.</p>
-                </div>
-                <div class="use-case-card">
-                    <h3>Remote Teams</h3>
-                    <p>Facilitate structured feedback across distributed teams. Anonymous reviews encourage honest, constructive input.</p>
-                </div>
-                <div class="use-case-card">
-                    <h3>Regulated Industries</h3>
-                    <p>Healthcare, finance, government sectors requiring on-premise data storage. Full audit trail and compliance controls.</p>
-                </div>
-                <div class="use-case-card">
-                    <h3>Educational Institutions</h3>
-                    <p>Faculty peer reviews and student feedback collection. Academic settings with strict data privacy requirements.</p>
-                </div>
-                <div class="use-case-card">
-                    <h3>Non-Profits</h3>
-                    <p>Budget-conscious organizations needing professional feedback tools. Open source means no licensing fees ever.</p>
-                </div>
-                <div class="use-case-card">
-                    <h3>Consulting Firms</h3>
-                    <p>Deploy for multiple clients on isolated instances. White-label capability for professional services.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Pricing Section -->
-    <section id="pricing" class="section">
-        <div class="container">
-            <h2 class="section-title">Pricing</h2>
-            {% include "landing/includes/pricing_plans.html" %}
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section id="faq" class="section section-alt">
-        <div class="container">
-            <h2 class="section-title">Frequently Asked Questions</h2>
+            <h2 class="section-title">Questions</h2>
             <div class="faq-grid">
-                <details class="faq-item">
-                    <summary>What is 360-degree feedback?</summary>
-                    <p>A 360-degree feedback session is where an employee gets feedback from peers, managers, and if applicable, their direct reports. This gives you a better perspective on their performance and areas to develop. When you pair this with a self-assessment, it shows you where there might be gaps. Maybe you're being too hard on yourself in some areas, or too confident in others. Those mismatches are where the real growth opportunities are.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>How does Blik ensure reviewer anonymity?</summary>
-                    <p>Reviewers use token-based links, and reports aggregate feedback by category with configurable thresholds. Responses retain a token reference, which may link to an invitation email. Confidentiality depends on invitation method, permissions, thresholds, and feedback content; it is not guaranteed against administrators with database access.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>What are the system requirements for self-hosting?</summary>
-                    <p>Runs comfortably on a 1 GB VPS for typical team sizes (512 MB minimum). Blik runs on systems supporting Docker; the Docker Compose setup includes a PostgreSQL database.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>What questionnaires does Blik include, and how do I choose the right one for my team?</summary>
-                    <p>There are currently 4 default questionnaires to choose from; ranging from relatively quick & easy to very specific, detailed and advanced. You can also create your own questionnaires, but these 4 should get you started without having to think of all these questions up front.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>Can I customize the questionnaires?</summary>
-                    <p>Yes! The application comes with 4 default questionnaires for different roles and needs, and you can create your own with no restrictions. We have multiple types of answer modes like Likert scales, multiple choice, and free text. The questionnaires can contain multiple segments which work well on mobile devices too.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>Are my custom questionnaires and questions kept private?</summary>
-                    <p>Yes. Questionnaires and questions you add are yours and stay yours. On the hosted service they live in your organization's own account and are never shared with, visible to, or reused for other customers. Nobody on our side reads your questionnaire content either, unless you explicitly ask us to, for example to help with a support request. Self-hosted installs never send anything to us at all. See the <a href="{% landing_url 'privacy_policy' %}">privacy policy</a> and <a href="{% landing_url 'terms' %}">terms</a>.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>Is Blik GDPR compliant?</summary>
-                    <p>EU hosting and self-hosting do not automatically establish GDPR compliance. Blik provides export and deletion tools to support your obligations. Your organization remains responsible for lawful processing, configuration, access controls, retention, and compliance processes.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>How is Blik different from Lattice, Culture Amp, and 15Five?</summary>
-                    <p>Blik is AGPL-3.0 software you can self-host free, with a one-time hosted review round for €{{ plan_single_price }} or managed EU hosting subscriptions from €{{ plan_saas_price }}/month for up to {{ plan_saas_max }} employees. Lattice, Culture Amp, and 15Five offer broader hosted performance-management suites with different modules and pricing. <a href="{% landing_url 'alternatives' %}">Compare features, deployment, and dated vendor prices.</a></p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>What email providers are supported?</summary>
-                    <p>Blik supports almost all email providers. We allow you to use your own credentials or even your own Gmail address.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>Can reviewers save progress and return later?</summary>
-                    <p>Yes, it's actually implicit. Your progress is saved on every step. Reviewers each have their own unique URL, and this allows them to come back later and continue where they left off safely and easily.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>What happens if there are too few responses?</summary>
-                    <p>We try to keep anonymity in mind here, so we have a default (changeable) threshold of required answers in order to not be able to take any one response from someone directly. For super small teams you can just set this value to 1 and you will see all answers always. This setting also doesn't apply to managers, who I believe usually provide feedback which you can (should?) act upon.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>How are reports generated and shared?</summary>
-                    <p>A report gets triggered either by all invited members finalizing the questionnaire, or by an application admin who closes the report manually. The report itself shows an executive overview plus a detailed in-depth view of all the questions and the aggregated answers per group (self, peers, managers). A report can be generated at will even if some reviewers haven't finished answering all their questions yet. It takes whatever they've filled out so far and leaves the rest of the questions blank.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>Can I migrate from another 360 tool to Blik?</summary>
-                    <p>Probably yes, but we don't have a good import and haven't tested this. We didn't end up using any other software, so if you can provide us with samples from other tools, we can try to make this work.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>Is there a mobile app?</summary>
-                    <p>No, you can't find Blik in the app stores, but our web based application works across all modern mobile devices. Benefit is that this also doesn't require installation or setups on user devices.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>What license is Blik released under?</summary>
-                    <p><strong>AGPL-3.0 (GNU Affero General Public License v3.0).</strong> This license grants unlimited rights to use, modify, and deploy Blik commercially or privately. Key requirement: if you host a modified version accessible over a network, you must make your source code changes available. This ensures community improvements (like LDAP integration or SSO support) benefit all users. For private internal deployments, no code sharing is required.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>How do I get support for self-hosted installations?</summary>
-                    <p>The repo's issues and discussion tabs are where the support will most likely be given and found. I try to keep things documented that are important too. Enterprise customers will receive priority updates and a more direct line if they prefer.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>Can I white-label Blik for clients?</summary>
-                    <p>Yes, you can. The AGPL license allows you to white label this if you want to. Most things are pretty easy to modify or built in as variables already.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>What databases are supported?</summary>
-                    <p>Any Django-compatible database is supported. I recommend using Postgres 15 or higher. The built in standalone Dockerfile uses SQLite to make things easier for anyone to get started from the get go.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>How often is Blik updated?</summary>
-                    <p>This depends on my time and paid users as well as feedback from the community. I hope there will be many community updates, which eventually will lead to other maintainers as well. If you self-host you should probably check in every once in a while. There is no mechanism for this yet. For hosted customers, updates go live immediately after a few minutes when I push them.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>Can I run multiple review cycles simultaneously?</summary>
-                    <p>Yes. Cycles are lightly implemented, meaning there is no enforcing of every reviewee having to be on the same cycle. There are no limits on active cycles and no problem having multiple people in different cycles simultaneously.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>What analytics and insights does Blik provide?</summary>
-                    <p>The report after the questionnaire is finished contains an executive overview that highlights gaps between how you see yourself and how others see you. It spots things like impostor syndrome or undervaluation of your own contributions. You'll see key strengths and weaknesses, plus a bar chart showing self vs others comparison. It also contains a radar chart with the different layers (self, peers, managers) averaged responses. The insights differ per person and questionnaire of course, but in general it should provide actionable insights.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>Is there an API for integrations?</summary>
-                    <p>Blik includes a REST API with Bearer token authentication and four HMAC-signed webhook events. Generous limits: 1,000 requests/hour per token; 100/hour for anonymous requests. <a href="{{ api_swagger_url }}">Open interactive API documentation.</a></p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>How do I invite reviewers?</summary>
-                    <p>You can share a link that generates reviewer tokens or send email invitations. Email invitations can associate a token with an email address, and responses retain their token reference. Shared links do not support email reminders. Explain your invitation method and confidentiality limits to reviewers.</p>
-                </details>
-
-                <details class="faq-item">
-                    <summary>Can I export my data?</summary>
-                    <p>Yes. You get a full account and organization JSON export. This makes it easy to back up your data or migrate to another system if you need to.</p>
-                </details>
-
                 <details class="faq-item">
                     <summary>Can I pay for one review round without a subscription?</summary>
                     <p>Yes. The Single Round is €{{ plan_single_price }} once and covers a hosted feedback round for up to {{ plan_single_max }} employees, with no subscription and no charge for reviewers. <a href="{% landing_url 'one_time_360_review' %}">See what's included.</a></p>
                 </details>
-
                 <details class="faq-item">
-                    <summary>What's the difference between the €{{ plan_saas_price }} and €{{ plan_ent_price }} hosted plans?</summary>
-                    <p>The €{{ plan_saas_price }}/month plan covers up to {{ plan_saas_max }} employees. Enterprise is €{{ plan_ent_price }}/month for up to {{ plan_ent_max }} employees and adds priority support and an SLA with uptime commitment. Contact us for larger teams.</p>
+                    <summary>How does Blik ensure reviewer anonymity?</summary>
+                    <p>Reviewers use token-based links, and reports aggregate feedback by category with configurable thresholds. Responses retain a token reference, which may link to an invitation email. Confidentiality depends on invitation method, permissions, thresholds, and feedback content; it is not guaranteed against administrators with database access.</p>
                 </details>
-
                 <details class="faq-item">
-                    <summary>What happens to my data if I cancel my hosted subscription?</summary>
-                    <p>All data will be removed after 30 days. Make sure you export your data before canceling if you want to keep it.</p>
+                    <summary>Is Blik GDPR compliant?</summary>
+                    <p>EU hosting and self-hosting do not automatically establish GDPR compliance. Blik provides export and deletion tools to support your obligations. Your organization remains responsible for lawful processing, configuration, access controls, retention, and compliance processes.</p>
                 </details>
-
                 <details class="faq-item">
-                    <summary>Can I try the hosted version before committing?</summary>
-                    <p>{{ trial_days }}-day free trial — credit card required; cancel before it ends and you won't be charged.</p>
+                    <summary>Can I customize the questionnaires?</summary>
+                    <p>Yes! The application comes with 4 default questionnaires for different roles and needs, and you can create your own with no restrictions. We have multiple types of answer modes like Likert scales, multiple choice, and free text. The questionnaires can contain multiple segments which work well on mobile devices too.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Can I export my data?</summary>
+                    <p>Yes. You get a full account and organization JSON export. This makes it easy to back up your data or migrate to another system if you need to.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>How is Blik different from Lattice, Culture Amp, and 15Five?</summary>
+                    <p>Blik is AGPL-3.0 software you can self-host free, with a one-time hosted review round for €{{ plan_single_price }} or managed EU hosting subscriptions from €{{ plan_saas_price }}/month for up to {{ plan_saas_max }} employees. Lattice, Culture Amp, and 15Five offer broader hosted performance-management suites with different modules and pricing. <a href="{% landing_url 'alternatives' %}">Compare features, deployment, and dated vendor prices.</a></p>
                 </details>
             </div>
+            <a class="section-link" href="{% landing_url 'faq' %}">All questions and answers</a>
         </div>
     </section>
 
-    <!-- CTA Section -->
     <section class="section cta-section">
         <div class="container">
-            <div class="cta-content">
-                <h2>Ready to transform your feedback process?</h2>
+            <div class="cta-card">
+                <h2>Start your first review round today</h2>
                 <p>Self-host for free, run a single hosted round for €{{ plan_single_price }}, or let us handle the infrastructure with an EU-hosted subscription.</p>
                 <div class="cta-buttons">
-                    <a href="{% landing_url 'signup' %}?plan=single" class="btn btn-primary">Start a review round</a>
-                    <a href="https://github.com/thijsdezoete/blik" class="btn btn-secondary" target="_blank" rel="noopener">Self-Host (Free)</a>
+                    <a href="{% landing_url 'signup' %}?plan=single" class="btn btn-primary">Run a review round, €{{ plan_single_price }}</a>
+                    <a href="#how" class="btn btn-secondary">See how it works</a>
                 </div>
             </div>
         </div>
@@ -799,7 +442,6 @@
 {% endblock %}
 
 {% block extra_scripts %}
-    <!-- FAQ Schema JSON-LD -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -807,10 +449,10 @@
         "mainEntity": [
             {
                 "@type": "Question",
-                "name": "What is 360-degree feedback?",
+                "name": "Can I pay for one review round without a subscription?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "A 360-degree feedback session is where an employee gets feedback from peers, managers, and if applicable, their direct reports. This gives you a better perspective on their performance and areas to develop. When you pair this with a self-assessment, it shows you where there might be gaps. Maybe you're being too hard on yourself in some areas, or too confident in others. Those mismatches are where the real growth opportunities are."
+                    "text": "Yes. The Single Round is €{{ plan_single_price }} once and covers a hosted feedback round for up to {{ plan_single_max }} employees, with no subscription and no charge for reviewers."
                 }
             },
             {
@@ -823,38 +465,6 @@
             },
             {
                 "@type": "Question",
-                "name": "What are the system requirements for self-hosting?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Runs comfortably on a 1 GB VPS for typical team sizes (512 MB minimum). Blik runs on systems supporting Docker; the Docker Compose setup includes a PostgreSQL database."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "What questionnaires does Blik include, and how do I choose the right one for my team?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "There are currently 4 default questionnaires to choose from; ranging from relatively quick & easy to very specific, detailed and advanced. You can also create your own questionnaires, but these 4 should get you started without having to think of all these questions up front."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Are my custom questionnaires and questions kept private?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes. Questionnaires and questions you add are yours and stay yours. On the hosted service they live in your organization's own account and are never shared with, visible to, or reused for other customers. Nobody on our side reads your questionnaire content either, unless you explicitly ask us to, for example to help with a support request. Self-hosted installs never send anything to us at all. See the privacy policy and terms."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Can I customize the questionnaires?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes! The application comes with 4 default questionnaires for different roles and needs, and we allow you to create your own with no restrictions. We have multiple types of answer modes like Likert scales, multiple choice, and free text. The questionnaires can contain multiple segments which work well on mobile devices too."
-                }
-            },
-            {
-                "@type": "Question",
                 "name": "Is Blik GDPR compliant?",
                 "acceptedAnswer": {
                     "@type": "Answer",
@@ -863,130 +473,10 @@
             },
             {
                 "@type": "Question",
-                "name": "How is Blik different from Lattice, Culture Amp, and 15Five?",
+                "name": "Can I customize the questionnaires?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Blik is AGPL-3.0 software you can self-host free, with a one-time hosted review round for €{{ plan_single_price }} or managed EU hosting subscriptions from €{{ plan_saas_price }}/month for up to {{ plan_saas_max }} employees. Lattice, Culture Amp, and 15Five offer broader hosted performance-management suites with different modules and pricing."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "What email providers are supported?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Blik supports almost all email providers. We allow you to use your own credentials or even your own Gmail address."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Can reviewers save progress and return later?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes, it's actually implicit. Your progress is saved on every step. Reviewers each have their own unique URL, and this allows them to come back later and continue where they left off safely and easily."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "What happens if there are too few responses?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "We try to keep anonymity in mind here, so we have a default (changeable) threshold of required answers in order to not be able to take any one response from someone directly. For super small teams you can just set this value to 1 and you will see all answers always. This setting also doesn't apply to managers, who I believe usually provide feedback which you can (should?) act upon."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "How are reports generated and shared?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "A report gets triggered either by all invited members finalizing the questionnaire, or by an application admin who closes the report manually. The report itself shows an executive overview plus a detailed in-depth view of all the questions and the aggregated answers per group (self, peers, managers). A report can be generated at will even if some reviewers haven't finished answering all their questions yet. It takes whatever they've filled out so far and leaves the rest of the questions blank."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Can I migrate from another 360 tool to Blik?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Probably yes, but we don't have a good import and haven't tested this. We didn't end up using any other software, so if you can provide us with samples from other tools, we can try to make this work."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Is there a mobile app?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "No, you can't find Blik in the app stores, but our web based application works across all modern mobile devices. Benefit is that this also doesn't require installation or setups on user devices."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "What license is Blik released under?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "AGPL. I chose this license because I want others to be able to use, try, and modify Blik the same way I would have wanted to. You can use the app and make changes freely. The main thing is if you host a modified version, you need to make your changes available. This way, if someone adds something useful like LDAP integration, the community benefits too. I'll be honest, licenses can be confusing, but the spirit here is simple. Freedom to use and modify, with the requirement to share improvements back."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "How do I get support for self-hosted installations?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "The repo's issues and discussion tabs are where the support will most likely be given and found. I try to keep things documented that are important too. Enterprise customers will receive priority updates and a more direct line if they prefer."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Can I white-label Blik for clients?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes, you can. The AGPL license allows you to white label this if you want to. Most things are pretty easy to modify or built in as variables already."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "What databases are supported?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Any Django-compatible database is supported. I recommend using Postgres 15 or higher. The built in standalone Dockerfile uses SQLite to make things easier for anyone to get started from the get go."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "How often is Blik updated?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "This depends on my time and paid users as well as feedback from the community. I hope there will be many community updates, which eventually will lead to other maintainers as well. If you self-host you should probably check in every once in a while. There is no mechanism for this yet. For hosted customers, updates go live immediately after a few minutes when I push them."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Can I run multiple review cycles simultaneously?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes. Cycles are lightly implemented, meaning there is no enforcing of every reviewee having to be on the same cycle. There are no limits on active cycles and no problem having multiple people in different cycles simultaneously."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "What analytics and insights does Blik provide?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "The report after the questionnaire is finished contains an executive overview that highlights gaps between how you see yourself and how others see you. It spots things like impostor syndrome or undervaluation of your own contributions. You'll see key strengths and weaknesses, plus a bar chart showing self vs others comparison. It also contains a radar chart with the different layers (self, peers, managers) averaged responses. The insights differ per person and questionnaire of course, but in general it should provide actionable insights."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Is there an API for integrations?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Blik includes a REST API with Bearer token authentication and four HMAC-signed webhook events. Generous limits: 1,000 requests/hour per token; 100/hour for anonymous requests. Interactive API documentation is available."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "How do I invite reviewers?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "You can share a link that generates reviewer tokens or send email invitations. Email invitations can associate a token with an email address, and responses retain their token reference. Shared links do not support email reminders. Explain your invitation method and confidentiality limits to reviewers."
+                    "text": "Yes! The application comes with 4 default questionnaires for different roles and needs, and you can create your own with no restrictions. We have multiple types of answer modes like Likert scales, multiple choice, and free text. The questionnaires can contain multiple segments which work well on mobile devices too."
                 }
             },
             {
@@ -999,154 +489,13 @@
             },
             {
                 "@type": "Question",
-                "name": "Can I pay for one review round without a subscription?",
+                "name": "How is Blik different from Lattice, Culture Amp, and 15Five?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Yes. The Single Round is €{{ plan_single_price }} once and covers a hosted feedback round for up to {{ plan_single_max }} employees, with no subscription and no charge for reviewers."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "What's the difference between the €{{ plan_saas_price }} and €{{ plan_ent_price }} hosted plans?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "The €{{ plan_saas_price }}/month plan covers up to {{ plan_saas_max }} employees. Enterprise is €{{ plan_ent_price }}/month for up to {{ plan_ent_max }} employees and adds priority support and an SLA with uptime commitment. Contact us for larger teams."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "What happens to my data if I cancel my hosted subscription?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "All data will be removed after 30 days. Make sure you export your data before canceling if you want to keep it."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Can I try the hosted version before committing?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "{{ trial_days }}-day free trial — credit card required; cancel before it ends and you won't be charged."
+                    "text": "Blik is AGPL-3.0 software you can self-host free, with a one-time hosted review round for €{{ plan_single_price }} or managed EU hosting subscriptions from €{{ plan_saas_price }}/month for up to {{ plan_saas_max }} employees. Lattice, Culture Amp, and 15Five offer broader hosted performance-management suites with different modules and pricing."
                 }
             }
         ]
     }
-    </script>
-
-    <script>
-        // Screenshot Carousel functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const slides = document.querySelectorAll('.carousel-slide');
-            const dots = document.querySelectorAll('.carousel-dot');
-            const prevBtn = document.querySelector('.carousel-prev');
-            const nextBtn = document.querySelector('.carousel-next');
-            let currentSlide = 0;
-            let autoplayInterval;
-
-            function showSlide(index) {
-                // Wrap around
-                if (index >= slides.length) index = 0;
-                if (index < 0) index = slides.length - 1;
-
-                // Update slides
-                slides.forEach(slide => slide.classList.remove('active'));
-                slides[index].classList.add('active');
-
-                // Update dots
-                dots.forEach(dot => dot.classList.remove('active'));
-                dots[index].classList.add('active');
-
-                currentSlide = index;
-            }
-
-            function nextSlide() {
-                showSlide(currentSlide + 1);
-            }
-
-            function prevSlide() {
-                showSlide(currentSlide - 1);
-            }
-
-            // Navigation buttons
-            if (nextBtn) nextBtn.addEventListener('click', () => {
-                nextSlide();
-                resetAutoplay();
-            });
-
-            if (prevBtn) prevBtn.addEventListener('click', () => {
-                prevSlide();
-                resetAutoplay();
-            });
-
-            // Dots navigation
-            dots.forEach((dot, index) => {
-                dot.addEventListener('click', () => {
-                    showSlide(index);
-                    resetAutoplay();
-                });
-            });
-
-            // Keyboard navigation
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'ArrowLeft') {
-                    prevSlide();
-                    resetAutoplay();
-                } else if (e.key === 'ArrowRight') {
-                    nextSlide();
-                    resetAutoplay();
-                }
-            });
-
-            // Autoplay with hover tracking
-            let isHovering = false;
-
-            function startAutoplay() {
-                // Only start if not hovering
-                if (!isHovering) {
-                    stopAutoplay(); // Clear any existing interval
-                    autoplayInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
-                }
-            }
-
-            function stopAutoplay() {
-                if (autoplayInterval) {
-                    clearInterval(autoplayInterval);
-                    autoplayInterval = null;
-                }
-            }
-
-            function resetAutoplay() {
-                stopAutoplay();
-                // Restart autoplay only if not hovering
-                if (!isHovering) {
-                    startAutoplay();
-                }
-            }
-
-            // Pause autoplay on hover
-            const carouselContainer = document.querySelector('.carousel-container');
-            if (carouselContainer) {
-                carouselContainer.addEventListener('mouseenter', () => {
-                    isHovering = true;
-                    stopAutoplay();
-                });
-                carouselContainer.addEventListener('mouseleave', () => {
-                    isHovering = false;
-                    startAutoplay();
-                });
-            }
-
-            // Start autoplay
-            startAutoplay();
-
-            // Pause autoplay when page is not visible
-            document.addEventListener('visibilitychange', () => {
-                if (document.hidden) {
-                    stopAutoplay();
-                } else {
-                    startAutoplay();
-                }
-            });
-        });
     </script>
 {% endblock %}
