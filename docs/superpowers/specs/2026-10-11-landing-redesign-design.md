@@ -161,7 +161,7 @@ classes:
   (translucent white) become a bordered card with `--text-primary` and
   `--text-secondary`. Any other `white` or `rgba(255,255,255,…)` colour in
   the landing stylesheet is audited the same way: keep it only where the
-  element still sits on a solid indigo surface.
+  element still sits on a solid `--primary-700` surface in both themes.
 
 New component classes, all prefixed to avoid collisions with the 31 other
 pages: `.home-hero`, `.home-hero-media`, `.browser-frame`, `.fact-strip`,
@@ -172,9 +172,14 @@ pages: `.home-hero`, `.home-hero-media`, `.browser-frame`, `.fact-strip`,
 `.nav`) so other pages keep working; only their values change.
 
 Gradient removal: every `linear-gradient` and `--primary-gradient` use in
-the landing stylesheet becomes a flat colour (the tinted card variants become
-`--primary-50`-style flat tints; the Dreyfus assessment hero and badges
-become `--primary-600`).
+the landing stylesheet becomes a flat colour. Tinted card variants become
+`--primary-50`-style flat tints. Solid indigo surfaces that carry white text
+(the Dreyfus assessment hero, question numbers, progress bar and submit
+button, and any other surface the white audit keeps) use `--primary-700`
+(#4338ca), not `--primary-600`: `main.css` remaps `--primary-600` to #818cf8
+in dark mode, where white text reaches only about 3:1, while `--primary-700`
+is the same in both themes and gives white text over 8:1. Primary buttons
+keep `--primary` from `main.css`, which already passes in both themes.
 
 Expected net size: the file shrinks. Nothing page-specific below the shared
 block is restyled unless a visual check shows it broke.
@@ -204,7 +209,12 @@ and CSS, with no logic unit to test. Verification is:
    templates only reachable through the assessment POST flow
    (`dreyfus_results_preview.html`, `dreyfus_email_captured.html`) are
    rendered with `render_to_string` and a small fixed context from a
-   throwaway script, then screenshotted the same way.
+   throwaway script, then screenshotted the same way. The assessment form
+   (`dreyfus_assessment.html`) is rendered the same way with a fixed
+   questionnaire dict of two sections and three questions, so the check
+   exercises the form and not the "unavailable" fallback that the live view
+   shows when the questionnaire API is unreachable. Both themes, both
+   widths, as for the other pages.
 4. The home page's FAQ JSON-LD contains exactly the six visible questions.
 
 ## Out of scope
