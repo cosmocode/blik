@@ -1544,3 +1544,105 @@ pkill -f "runserver 8777"
 ```
 
 If Step 6 changed nothing, skip the commit and just stop the server.
+
+---
+
+### Task 6: Dreyfus framework block on the home page
+
+Added after the user reviewed the Task 3 home page: the Dreyfus graphic and explanation were missing. It becomes a third text-beside-image block in the "What you get" section (`#product`), after the questionnaires block and before Pricing, using the existing `.split` component and the existing SVG component.
+
+**Files:**
+- Modify: `templates/landing/index.html` (inside `<section id="product">`, after the `split split--reverse` questionnaires block)
+- Modify: `static/css/landing.css` (one small rule pair in the shared block, after `.browser-frame img`)
+
+**Interfaces:**
+- Consumes: `.split`, `.split-text`, `.eyebrow` from Task 1; `templates/components/dreyfus_model_svg.html` (a 912×516 SVG that uses `--text-primary` and other theme tokens, so it renders in both themes); `landing_url` names `dreyfus_model`, `agency_levels`, `performance_matrix`, `dreyfus_assessment_start`.
+- Produces: `.diagram-frame` class.
+
+- [ ] **Step 1: Add the frame rule to the shared block**
+
+In `static/css/landing.css`, directly after the `.landing-page .browser-frame img { … }` rule in the shared components block, add:
+
+```css
+/* Bordered surface for an inline SVG diagram (the Dreyfus model on the home page) */
+.landing-page .diagram-frame {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    padding: var(--space-6);
+}
+
+.landing-page .diagram-frame svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+```
+
+- [ ] **Step 2: Add the block to the home page**
+
+In `templates/landing/index.html`, inside `<section id="product" class="section section-alt">`, immediately after the closing `</div>` of the `<div class="split split--reverse">` questionnaires block and before the section's closing `</div></section>`, insert:
+
+```html
+            <div class="split">
+                <div class="split-text">
+                    <span class="eyebrow">The framework</span>
+                    <h2>A shared language for skill</h2>
+                    <p>Every report places the person on the five stages of the <a href="{% landing_url 'dreyfus_model' %}">Dreyfus model of skill acquisition</a>, from Novice to Expert, and on the <a href="{% landing_url 'agency_levels' %}">five levels of agency</a>. Growth becomes a concrete next stage instead of a vague rating.</p>
+                    <ul>
+                        <li>Skill level, derived from the competency scores</li>
+                        <li>Initiative level, derived from the agency questions</li>
+                        <li>One <a href="{% landing_url 'performance_matrix' %}">performance matrix</a> quadrant that combines the two</li>
+                        <li>Concrete next steps for the stage the person is at</li>
+                    </ul>
+                    <p>Try it on yourself: a <a href="{% landing_url 'dreyfus_assessment_start' %}">free five-minute developer skills assessment</a>, no signup.</p>
+                </div>
+                <div class="diagram-frame" aria-label="The five stages of the Dreyfus model: Novice, Advanced Beginner, Competent, Proficient, Expert" role="img">
+                    {% include 'components/dreyfus_model_svg.html' %}
+                </div>
+            </div>
+```
+
+- [ ] **Step 3: Render check**
+
+```bash
+cd /Users/tdz/projects/blik
+DJANGO_SETTINGS_MODULE=landing_settings .venv/bin/python - <<'EOF'
+import django, re
+django.setup()
+from django.test import RequestFactory
+from django.template.loader import render_to_string
+from django.conf import settings
+html = render_to_string('landing/index.html', {'rating_data': None, 'site_description': settings.SITE_DESCRIPTION, 'site_keywords': settings.SITE_KEYWORDS}, request=RequestFactory().get('/'))
+product = html.split('id="product"')[1].split('id="pricing"')[0]
+assert product.count('class="split') == 3, product.count('class="split')
+assert 'diagram-frame' in product and '<svg class="dreyfus-model' in product
+assert product.index('A shared language for skill') > product.index('A questionnaire for every role')
+print('ok: 3 split blocks, SVG present, framework block last')
+EOF
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8777/
+```
+
+Expected: `ok: 3 split blocks, SVG present, framework block last`, `200`.
+
+- [ ] **Step 4: Screenshot the home page in both themes and check the block**
+
+```bash
+cd /Users/tdz/projects/blik
+S=/private/tmp/claude-501/-Users-tdz-projects-blik/5c232ab0-18df-4f88-8a0d-8015cf083fb7/scratchpad
+C="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+mkdir -p $S/task6
+curl -s http://127.0.0.1:8777/ | sed "s#<head>#<head><base href=\"http://127.0.0.1:8777/\">#" > $S/task6/home.html
+for t in light dark; do sed "s#<head>#<head><script>localStorage.setItem('theme','$t')</script>#" $S/task6/home.html > $S/task6/home_$t.html; done
+```
+
+Then screenshot `file://$S/task6/home_light.html` and `file://$S/task6/home_dark.html` at 1440×5000, and a 375px iframe wrapper of both, the way Task 5 did. Open the PNGs: the SVG must be fully visible inside its frame, text in the SVG legible in both themes, and the block stacked to one column at phone width.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add templates/landing/index.html static/css/landing.css
+git commit -m "Add the Dreyfus framework block to the home page
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+```
