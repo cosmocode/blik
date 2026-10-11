@@ -142,10 +142,26 @@ classes:
 - Homepage block (5134-5331): the story, questionnaire grid, framework
   diagram and showcase styles go; whatever the new sections need is written
   fresh.
-- Screenshot carousels and Phone Mockup (4830-5133) are deleted outright; no
-  other page uses them.
+- Screenshot carousels, the screenshot light/dark swap rules and the Phone
+  Mockup (4830-5133) are kept: hr_managers, people_analytics, eu_tech,
+  privacy, open_source, dreyfus_model and dreyfus_results_preview still use
+  them. Only selectors whose last consumer was the old home page are
+  removed, decided by grepping `templates/landing` for each class before
+  deleting it.
 - The mobile hero overrides inside the two responsive blocks (around 1263
   and 1573) are folded into the new hero rules.
+- Later rules that would override the new shared block are consolidated
+  into it, not left to fight: the `.landing-page .container` rule at 1558
+  (1400px) and its 640px variant, and the two mobile `.landing-page
+  .section` padding rules at 1279 and 1594. After the change there is one
+  container rule and one section rule, each with its own breakpoints.
+- White-on-indigo colours that assumed the old hero and CTA band are
+  replaced with theme tokens: `.faq-hero-link` (white) becomes
+  `--primary-600` underlined; `.cta-section .cta-box` and its `h3` and `p`
+  (translucent white) become a bordered card with `--text-primary` and
+  `--text-secondary`. Any other `white` or `rgba(255,255,255,…)` colour in
+  the landing stylesheet is audited the same way: keep it only where the
+  element still sits on a solid indigo surface.
 
 New component classes, all prefixed to avoid collisions with the 31 other
 pages: `.home-hero`, `.home-hero-media`, `.browser-frame`, `.fact-strip`,
@@ -167,7 +183,8 @@ block is restyled unless a visual check shows it broke.
 
 After the change, these pages are screenshotted in both themes at 1440px and
 at phone width and compared with before: home, pricing, hr_managers,
-developers, vs_lattice, dreyfus_model, one_time_360_review. Fixes are limited
+developers, vs_lattice, dreyfus_model, one_time_360_review, faq,
+people_analytics. Fixes are limited
 to breakage caused by the shared changes (a hero that lost its contrast, a
 grid that overflowed). No copy or structure changes on those pages.
 
@@ -178,9 +195,16 @@ and CSS, with no logic unit to test. Verification is:
 
 1. `.venv/bin/python manage.py test` still passes (template errors surface
    here through the pages that render in other apps' tests).
-2. The standalone landing server renders every landing URL with status 200
-   (one shell loop over `landing/urls.py` paths).
-3. The visual comparison above, light and dark, desktop and phone.
+2. The standalone landing server answers every GET page in
+   `landing/urls.py` with status 200, and the two POST-only endpoints
+   (`dreyfus-assessment/submit/`, `dreyfus-assessment/capture-email/`) with
+   302 on GET, which is their designed behaviour. One shell loop with an
+   expected-status table, not a blanket 200 check.
+3. The visual comparison above, light and dark, desktop and phone. The two
+   templates only reachable through the assessment POST flow
+   (`dreyfus_results_preview.html`, `dreyfus_email_captured.html`) are
+   rendered with `render_to_string` and a small fixed context from a
+   throwaway script, then screenshotted the same way.
 4. The home page's FAQ JSON-LD contains exactly the six visible questions.
 
 ## Out of scope
