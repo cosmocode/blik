@@ -195,6 +195,10 @@
 /* Sections */
 .landing-page .section {
     padding: var(--space-20) 0;
+    margin: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
 }
 
 .landing-page .section-alt {
@@ -428,10 +432,30 @@
     height: auto;
 }
 
+/* Bordered surface for an inline SVG diagram (the Dreyfus model on the home page) */
+.landing-page .diagram-frame {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    padding: var(--space-6);
+}
+
+.landing-page .diagram-frame svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
 /* Theme-dependent screenshot: show one <img> per theme */
-.landing-page .img-dark { display: none; }
-[data-theme="dark"] .landing-page .img-light { display: none; }
-[data-theme="dark"] .landing-page .img-dark { display: block; }
+.landing-page img.img-dark,
+.landing-page .browser-frame img.img-dark,
+.landing-page .step-media img.img-dark { display: none; }
+[data-theme="dark"] .landing-page img.img-light,
+[data-theme="dark"] .landing-page .browser-frame img.img-light,
+[data-theme="dark"] .landing-page .step-media img.img-light { display: none; }
+[data-theme="dark"] .landing-page img.img-dark,
+[data-theme="dark"] .landing-page .browser-frame img.img-dark,
+[data-theme="dark"] .landing-page .step-media img.img-dark { display: block; }
 
 .landing-page .fact-strip {
     display: grid;
@@ -1645,6 +1669,14 @@
 .landing-page .feature-card-info {
     background: var(--primary-50);
     border-left: 4px solid var(--primary);
+}
+
+[data-theme="dark"] .landing-page .feature-card-success,
+[data-theme="dark"] .landing-page .feature-card-warning,
+[data-theme="dark"] .landing-page .feature-card-danger,
+[data-theme="dark"] .landing-page .feature-card-primary,
+[data-theme="dark"] .landing-page .feature-card-info {
+    background: var(--bg-card);
 }
 
 /* Refined table row colors - subtle backgrounds without affecting text */

@@ -316,6 +316,23 @@
                     <img class="img-dark" src="{% static 'img/screenshots/feedback_desktop_dark.webp' %}" alt="" loading="lazy">
                 </div>
             </div>
+            <div class="split">
+                <div class="split-text">
+                    <span class="eyebrow">The framework</span>
+                    <h2>A shared language for skill</h2>
+                    <p>Every report places the person on the five stages of the <a href="{% landing_url 'dreyfus_model' %}">Dreyfus model of skill acquisition</a>, from Novice to Expert, and on the <a href="{% landing_url 'agency_levels' %}">five levels of agency</a>. Growth becomes a concrete next stage instead of a vague rating.</p>
+                    <ul>
+                        <li>Skill level, derived from the competency scores</li>
+                        <li>Initiative level, derived from the agency questions</li>
+                        <li>One <a href="{% landing_url 'performance_matrix' %}">performance matrix</a> quadrant that combines the two</li>
+                        <li>Concrete next steps for the stage the person is at</li>
+                    </ul>
+                    <p>Try it on yourself: a <a href="{% landing_url 'dreyfus_assessment_start' %}">free five-minute developer skills assessment</a>, no signup.</p>
+                </div>
+                <div class="diagram-frame" aria-label="The five stages of the Dreyfus model: Novice, Advanced Beginner, Competent, Proficient, Expert" role="img">
+                    {% include 'components/dreyfus_model_svg.html' %}
+                </div>
+            </div>
         </div>
     </section>
 
