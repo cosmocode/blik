@@ -44,7 +44,7 @@ Rules that apply to every public page, in both themes:
 - The hero sits on the page background. The flat indigo hero banner and the
   indigo closing-CTA band are gone. Closing CTA is a bordered card.
 - Type: system font stack unchanged. Headings use a four-step scale: H1
-  `--text-5xl` (3.5rem on desktop), section H2 `--text-4xl`, card H3
+  3.5rem on desktop (2.25rem on phones), section H2 `--text-4xl`, card H3
   `--text-xl`, eyebrow labels `--text-sm` uppercase with `0.06em` tracking.
   H1 and H2 get `letter-spacing: -0.02em` and `line-height: 1.1`. Body copy
   is capped at 65ch.
@@ -64,7 +64,7 @@ Rules that apply to every public page, in both themes:
   primary button "Run a review round" linking to `signup?plan=single`. The
   button sits outside the `nav_links` block so every page gets it, including
   the 26 pages that override the block with their own anchor links. The
-  default `nav_links` become Product (`#product` on home), Pricing,
+  default `nav_links` become Product (home page `#product` anchor, as an absolute link so it works from any page), Pricing,
   Developers, Compare (alternatives), FAQ.
 - Footer: same five columns and links, minus the embedded "Get Started"
   button. Tighter spacing, smaller type.
