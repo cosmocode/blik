@@ -1288,7 +1288,7 @@
 }
 
 .landing-page .feature-card-gradient {
-    background: var(--primary-600);
+    background: var(--primary-700);
     color: white;
     border: 1px solid var(--primary-700);
 }
@@ -1476,7 +1476,7 @@
 }
 
 .checkout-btn.primary {
-    background: var(--primary-600);
+    background: var(--primary-700);
     color: white;
     border: 1px solid var(--primary-700);
 }
@@ -1614,22 +1614,22 @@
 
 /* Refined feature card variants with subtle, elegant colors */
 .landing-page .feature-card-success {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.02) 100%);
+    background: var(--success-50);
     border-left: 4px solid var(--success);
 }
 
 .landing-page .feature-card-warning {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(245, 158, 11, 0.02) 100%);
+    background: var(--warning-50);
     border-left: 4px solid var(--warning);
 }
 
 .landing-page .feature-card-danger {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(239, 68, 68, 0.02) 100%);
+    background: var(--danger-50);
     border-left: 4px solid var(--danger);
 }
 
 .landing-page .feature-card-info {
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(79, 70, 229, 0.02) 100%);
+    background: var(--primary-50);
     border-left: 4px solid var(--primary);
 }
 
@@ -1732,7 +1732,7 @@
 .landing-page .comparison-cta-box {
     margin-top: 3rem;
     padding: 2rem;
-    background: var(--primary-gradient);
+    background: var(--primary-700);
     border-radius: 8px;
     color: white;
     text-align: center;
@@ -2060,7 +2060,7 @@
 }
 
 .landing-page .audience-highlight {
-    background: var(--primary-600);
+    background: var(--primary-700);
     color: white;
     padding: 2rem;
     text-align: center;
@@ -2306,7 +2306,7 @@
     max-width: 900px;
     margin: 0 auto;
     padding: 3rem;
-    background: linear-gradient(135deg, var(--primary-600) 0%, var(--success-600) 100%);
+    background: var(--primary-700);
     border-radius: 16px;
     text-align: center;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
@@ -3155,7 +3155,7 @@
 .landing-page .framework-page .framework-principle-card,
 .landing-page .framework-page .framework-principle-card--narrow,
 .landing-page .framework-page .framework-principle-card--wide {
-    background: var(--primary-600);
+    background: var(--primary-700);
     color: white;
     padding: var(--space-12);
     text-align: center;
@@ -3322,7 +3322,7 @@
 .landing-page .framework-page .framework-principle-panel--spaced,
 .landing-page .framework-page .framework-principle-panel--wide,
 .landing-page .framework-page .framework-principle-panel {
-    background: var(--primary-600);
+    background: var(--primary-700);
     color: white;
     padding: var(--space-12);
     border-radius: var(--radius-xl);
@@ -3399,7 +3399,7 @@
 .landing-page .framework-page .framework-research-banner {
     max-width: 800px;
     margin: 0 auto 3rem;
-    background: var(--primary-600);
+    background: var(--primary-700);
     color: white;
     padding: 3rem;
     border-radius: var(--radius-xl);
@@ -3783,7 +3783,7 @@
 .landing-page .framework-page .matrix-scenario-prompt {
     text-align: center;
     margin-bottom: var(--space-12);
-    background: var(--primary-600);
+    background: var(--primary-700);
     color: white;
     padding: var(--space-6);
     border-radius: var(--radius-lg);
@@ -4899,7 +4899,7 @@
 .landing-page .framework-page .dreyfus-agency-link {
     display: inline-block;
     padding: var(--space-3) var(--space-6);
-    background: var(--primary-600);
+    background: var(--primary-700);
     color: white;
     text-decoration: none;
     font-weight: 600;
@@ -5555,7 +5555,7 @@
 }
 
 .savings-highlight {
-    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+    background: var(--primary-700);
     color: white;
     padding: 2rem;
     border-radius: 12px;
@@ -6284,7 +6284,7 @@
 }
 
 .landing-page .dreyfus-stages-banner {
-    background: var(--primary-600);
+    background: var(--primary-700);
     color: white;
     border: 1px solid var(--primary-700);
 }
@@ -6303,7 +6303,7 @@
 
 /* Founder story typography is deliberately larger than standard feature copy. */
 .landing-page .hero.about-hero {
-    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+    background: var(--primary-700);
     padding: 4rem 0;
 }
 
@@ -6370,7 +6370,7 @@
 }
 
 .landing-page .about-join-card {
-    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+    background: var(--primary-700);
     border: none;
     padding: 3rem;
     text-align: center;
@@ -6413,7 +6413,7 @@
 
 /* FAQ actions retain their contrast on the hero and card surfaces. */
 .landing-page .faq-hero-link {
-    color: white;
+    color: var(--primary);
     text-decoration: underline;
 }
 
@@ -6436,7 +6436,6 @@
 /* ==================== Dreyfus assessment and results ==================== */
 
 .assessment-page {
-    --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     --success-color: #10b981;
     --warning-color: #f59e0b;
 }
@@ -6450,7 +6449,7 @@
 .assessment-page .hero-section {
     text-align: center;
     padding: 3rem 1rem;
-    background: var(--primary-gradient);
+    background: var(--primary-700);
     border-radius: 1rem;
     color: white;
     margin-bottom: 3rem;
@@ -6504,7 +6503,7 @@
 .assessment-page .section-icon {
     width: 3rem;
     height: 3rem;
-    background: var(--primary-gradient);
+    background: var(--primary-700);
     border-radius: 0.75rem;
     display: flex;
     align-items: center;
@@ -6552,7 +6551,7 @@
 
 .assessment-page .question-number {
     display: inline-block;
-    background: var(--primary-gradient);
+    background: var(--primary-700);
     color: white;
     width: 2rem;
     height: 2rem;
@@ -6713,13 +6712,13 @@
 }
 
 .assessment-progress::-webkit-progress-value {
-    background: var(--primary-gradient);
+    background: var(--primary-700);
     border-radius: 9999px;
     transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .assessment-progress::-moz-progress-bar {
-    background: var(--primary-gradient);
+    background: var(--primary-700);
     border-radius: 9999px;
 }
 
@@ -6737,7 +6736,7 @@
     font-size: 1.25rem;
     font-weight: 700;
     color: white;
-    background: var(--primary-gradient);
+    background: var(--primary-700);
     border: none;
     border-radius: 0.75rem;
     cursor: pointer;
@@ -6901,7 +6900,7 @@
 }
 
 .landing-page .assessment-email-card {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    background: var(--primary-700);
     padding: 2.5rem;
     border-radius: 0.75rem;
     color: white;
@@ -7079,7 +7078,7 @@
 .landing-page .confirmation-cta {
     margin-top: 3rem;
     padding: 2.5rem;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    background: var(--primary-700);
     border-radius: 0.75rem;
     color: white;
 }
