@@ -77,10 +77,11 @@
                 </button>
                 <nav class="nav">
                     {% block nav_links %}
-                    <a href="{% landing_url 'index' %}">Home</a>
-                    <a href="{% landing_url 'hr_managers' %}">For HR Teams</a>
+                    <a href="{% landing_url 'index' %}#product">Product</a>
+                    <a href="{% landing_url 'pricing' %}">Pricing</a>
                     <a href="{% landing_url 'developers' %}">Developers</a>
-                    <a href="https://github.com/thijsdezoete/blik" target="_blank" rel="noopener">GitHub</a>
+                    <a href="{% landing_url 'alternatives' %}">Compare</a>
+                    <a href="{% landing_url 'faq' %}">FAQ</a>
                     {% endblock %}
                     <button class="theme-toggle" aria-label="Toggle theme">
                         <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -90,6 +91,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                         </svg>
                     </button>
+                    <a href="{% landing_url 'signup' %}?plan=single" class="btn btn-primary header-cta">Run a review round</a>
                 </nav>
             </div>
         </div>
@@ -103,8 +105,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h4>{{ site_name|default:"Blik" }}</h4>
-                    <p>Open source 360-degree feedback with token-based review access, transparent pricing, and self-hosted control.</p>
-                    <a href="{% landing_url 'signup' %}" class="btn btn-primary footer-signup">Get Started</a>
+                    <p>Anonymous 360° feedback. Pay once per round, subscribe, or self-host the open source version.</p>
                 </div>
                 <div class="footer-section">
                     <h4>Product</h4>
