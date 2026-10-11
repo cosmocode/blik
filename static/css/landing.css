@@ -91,6 +91,11 @@
     z-index: 100;
 }
 
+.landing-page .header .container {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
 .landing-page .header-content {
     display: flex;
     justify-content: space-between;
@@ -114,6 +119,7 @@
 }
 
 .landing-page .nav a {
+    white-space: nowrap;
     color: var(--text-secondary);
     text-decoration: none;
     font-size: 0.9375rem;
@@ -258,9 +264,6 @@
     border-color: var(--text-tertiary);
     background: var(--bg-card);
 }
-
-/* Cards keep their own rules further down the file (edited in Step 2b
-   to drop shadows and hover lifts). Nothing to override here. */
 
 /* Closing call to action: bordered card instead of an indigo band */
 .landing-page .cta-section {
@@ -457,6 +460,17 @@
 [data-theme="dark"] .landing-page .browser-frame img.img-dark,
 [data-theme="dark"] .landing-page .step-media img.img-dark { display: block; }
 
+@media (hover: hover) {
+    .landing-page .browser-frame:hover img.img-light,
+    .landing-page .step-media:hover img.img-light { display: none; }
+    .landing-page .browser-frame:hover img.img-dark,
+    .landing-page .step-media:hover img.img-dark { display: block; }
+    [data-theme="dark"] .landing-page .browser-frame:hover img.img-dark,
+    [data-theme="dark"] .landing-page .step-media:hover img.img-dark { display: none; }
+    [data-theme="dark"] .landing-page .browser-frame:hover img.img-light,
+    [data-theme="dark"] .landing-page .step-media:hover img.img-light { display: block; }
+}
+
 .landing-page .fact-strip {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -611,6 +625,8 @@
     font-weight: 500;
 }
 
+.landing-page .faq-item a { color: var(--primary); }
+
 /* Responsive: one place for every shared breakpoint */
 @media (max-width: 960px) {
     .landing-page .home-hero .container,
@@ -653,12 +669,6 @@
     .landing-page .cta-buttons .btn {
         width: 100%;
         text-align: center;
-    }
-
-    /* Inside the open mobile menu the button is a list child */
-    .landing-page .nav a.header-cta {
-        margin: 0.75rem 1rem;
-        align-self: flex-start;
     }
 }
 
@@ -864,39 +874,6 @@
     font-size: var(--text-base);
 }
 
-/* Use Cases Grid */
-.landing-page .use-cases-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-    gap: 2rem;
-}
-
-@media (max-width: 640px) {
-    .landing-page .use-cases-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-}
-
-.landing-page .use-case-card {
-    background: var(--bg-light);
-    padding: 2rem;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-}
-
-.landing-page .use-case-card h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-}
-
-.landing-page .use-case-card p {
-    color: var(--text-secondary);
-    line-height: 1.6;
-}
-
 /* Pricing Grid: three plan cards in a row. The single-column breakpoint
    lives after the fold-out rules below. */
 .landing-page .pricing-grid {
@@ -1051,7 +1028,6 @@
 
 /* FAQ Grid */
 .landing-page .faq-grid {
-    max-width: 800px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr;
@@ -1156,6 +1132,8 @@
 .landing-page .feature-card-info h3 {
     color: var(--primary-700);
 }
+
+[data-theme="dark"] .landing-page .feature-card-info h3 { color: var(--primary-600); }
 
 .landing-page .feature-card-info p {
     color: var(--text-primary);
@@ -1570,7 +1548,7 @@
 }
 
 /* Mobile Responsive */
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
     .landing-page .header-content {
         position: relative;
     }
@@ -1617,9 +1595,15 @@
         border-bottom: none;
     }
 
+    /* Inside the open mobile menu the button is a list child */
+    .landing-page .nav a.header-cta {
+        margin: 0.75rem 1rem;
+        align-self: flex-start;
+    }
+}
 
+@media (max-width: 768px) {
     .landing-page .features-grid,
-    .landing-page .use-cases-grid,
     .landing-page .pricing-grid {
         grid-template-columns: 1fr !important;
         gap: 1.5rem;
@@ -1945,11 +1929,6 @@
 .landing-page .header .logo {
     text-decoration: none;
     color: inherit;
-}
-
-.landing-page .footer-signup {
-    display: inline-block;
-    margin-top: 1rem;
 }
 
 .theme-toggle .sun-icon,
