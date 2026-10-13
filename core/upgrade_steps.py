@@ -32,7 +32,8 @@ def _move_setup_admins_into_the_admin_group(stdout):
     Until this release the setup page granted three permissions straight to
     the first user instead of calling assign_organization_admin(). Those
     accounts are in no group, so every permission added to the group later
-    passes them by, and they never got can_delete_organization at all.
+    passes them by, and they never got can_delete_organization at all. The
+    data import did the same with can_manage_organization alone.
 
     Only accounts holding can_manage_organization directly are touched — the
     per-user grants the team UI writes (a member who may read all reports,

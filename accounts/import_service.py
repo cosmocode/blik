@@ -10,7 +10,7 @@ import secrets
 import string
 from datetime import datetime
 from django.db import transaction
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from subscriptions.utils import NoCycleCredits
@@ -469,6 +469,7 @@ def import_users(organization, users_data, conflict_resolution='skip', send_welc
         dict: Import result with counts and warnings
     """
     from accounts.models import UserProfile
+    from accounts.permissions import assign_organization_admin
 
     result = {
         'created': 0,
@@ -531,13 +532,11 @@ def import_users(organization, users_data, conflict_resolution='skip', send_welc
                 can_create_cycles_for_others=user_data.get('can_create_cycles_for_others', False),
             )
 
-            # Set permissions
+            # Through the group, like every other path that creates an admin.
+            # A direct grant of can_manage_organization alone left out the
+            # other admin permissions and every one added to the group later.
             if user_data.get('is_org_admin', False):
-                try:
-                    perm = Permission.objects.get(codename='can_manage_organization')
-                    user.user_permissions.add(perm)
-                except Permission.DoesNotExist:
-                    result['warnings'].append(f"Permission 'can_manage_organization' not found for user {username}")
+                assign_organization_admin(user)
 
             result['created'] += 1
             result['warnings'].append(
