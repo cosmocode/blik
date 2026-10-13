@@ -99,11 +99,14 @@
                             {% else %}
                                 <span class="badge" style="background: #f59e0b; color: white;">Self-only</span>
                             {% endif %}
+                            {% if user_profile.can_read_all_reports %}
+                                <span class="badge" style="background: #8b5cf6; color: white;">All reports</span>
+                            {% endif %}
                         </td>
                         {% if perms.accounts.can_manage_organization %}
                         <td>
                             {% if user_profile.user.id != request.user.id and not user_profile.user.is_superuser %}
-                            <button type="button" class="btn btn-sm btn-secondary" onclick="showManagePermissionsModal({{ user_profile.id }}, '{{ user_profile.user.username }}', {{ user_profile.is_org_admin|lower }}, {{ user_profile.can_create_cycles_for_others|lower }})">
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="showManagePermissionsModal({{ user_profile.id }}, '{{ user_profile.user.username }}', {{ user_profile.is_org_admin|lower }}, {{ user_profile.can_create_cycles_for_others|lower }}, {{ user_profile.can_read_all_reports|lower }})">
                                 Manage
                             </button>
                             {% else %}
@@ -156,11 +159,14 @@
                             {% else %}
                                 <span class="badge" style="background: #f59e0b; color: white; font-size: 11px;">Self-only</span>
                             {% endif %}
+                            {% if user_profile.can_read_all_reports %}
+                                <span class="badge" style="background: #8b5cf6; color: white; font-size: 11px;">All reports</span>
+                            {% endif %}
                         </span>
                     </div>
                     {% if perms.accounts.can_manage_organization %}
                         {% if user_profile.user.id != request.user.id and not user_profile.user.is_superuser %}
-                        <button type="button" class="btn btn-sm btn-secondary" style="width: 100%; margin-top: 0.5rem;" onclick="showManagePermissionsModal({{ user_profile.id }}, '{{ user_profile.user.username }}', {{ user_profile.is_org_admin|lower }}, {{ user_profile.can_create_cycles_for_others|lower }})">
+                        <button type="button" class="btn btn-sm btn-secondary" style="width: 100%; margin-top: 0.5rem;" onclick="showManagePermissionsModal({{ user_profile.id }}, '{{ user_profile.user.username }}', {{ user_profile.is_org_admin|lower }}, {{ user_profile.can_create_cycles_for_others|lower }}, {{ user_profile.can_read_all_reports|lower }})">
                             Manage Permissions
                         </button>
                         {% endif %}
@@ -326,6 +332,19 @@
                         </small>
                     </label>
                 </div>
+                <div class="form-check" style="margin-top: 0.75rem;">
+                    <input type="checkbox" id="can-view-reports" name="can_view_all_reports" class="form-check-input">
+                    <label for="can-view-reports" style="display: inline; font-weight: normal;">
+                        Can view all reports and cycles
+                        <small style="display: block; color: var(--text-secondary);">
+                            Without this, user only sees the reports and cycles they
+                            are the subject of.
+                            <span id="reports-admin-note" style="display: none;">
+                                Organization Admins always have this.
+                            </span>
+                        </small>
+                    </label>
+                </div>
             </div>
 
             <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
@@ -337,7 +356,7 @@
 </div>
 
 <script>
-function showManagePermissionsModal(userId, username, isStaff, canCreateCycles) {
+function showManagePermissionsModal(userId, username, isStaff, canCreateCycles, canViewReports) {
     document.getElementById('modal-user-id').value = userId;
     document.getElementById('modal-username').textContent = username;
 
@@ -351,8 +370,28 @@ function showManagePermissionsModal(userId, username, isStaff, canCreateCycles) 
     // Set can create cycles checkbox
     document.getElementById('can-manage-cycles').checked = canCreateCycles;
 
+    // Set report access checkbox; admins hold it through their role, so the
+    // box is shown ticked and locked while Organization Admin is selected.
+    document.getElementById('can-view-reports').checked = canViewReports;
+    syncReportAccessToRole();
+
     document.getElementById('manage-permissions-modal').style.display = 'flex';
 }
+
+function syncReportAccessToRole() {
+    var isAdmin = document.getElementById('role-admin').checked;
+    var checkbox = document.getElementById('can-view-reports');
+    var note = document.getElementById('reports-admin-note');
+
+    checkbox.disabled = isAdmin;
+    note.style.display = isAdmin ? 'inline' : 'none';
+    if (isAdmin) {
+        checkbox.checked = true;
+    }
+}
+
+document.getElementById('role-admin').addEventListener('change', syncReportAccessToRole);
+document.getElementById('role-member').addEventListener('change', syncReportAccessToRole);
 
 function hideManagePermissionsModal() {
     document.getElementById('manage-permissions-modal').style.display = 'none';
