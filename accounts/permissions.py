@@ -20,6 +20,14 @@ from accounts.models import UserProfile
 ORG_ADMIN_GROUP = 'Organization Admin'
 ORG_MEMBER_GROUP = 'Organization Member'
 
+# The grants that make an account an admin. can_view_all_reports and
+# can_manage_questionnaires are left out: they may be granted per user.
+ADMIN_ROLE_CODENAMES = (
+    'can_invite_members',
+    'can_manage_organization',
+    'can_delete_organization',
+)
+
 
 def ensure_permission_groups():
     """
@@ -48,32 +56,32 @@ def ensure_permission_groups():
     # Create or get permissions
     invite_permission, _ = Permission.objects.get_or_create(
         codename='can_invite_members',
-        name='Can invite team members',
         content_type=content_type,
+        defaults={'name': 'Can invite team members'},
     )
 
     manage_org_permission, _ = Permission.objects.get_or_create(
         codename='can_manage_organization',
-        name='Can manage organization settings',
         content_type=content_type,
+        defaults={'name': 'Can manage organization settings'},
     )
 
     delete_org_permission, _ = Permission.objects.get_or_create(
         codename='can_delete_organization',
-        name='Can delete organization',
         content_type=content_type,
+        defaults={'name': 'Can delete organization'},
     )
 
     view_all_reports_permission, _ = Permission.objects.get_or_create(
         codename='can_view_all_reports',
-        name='Can view all organization reports',
         content_type=content_type,
+        defaults={'name': 'Can view all organization reports'},
     )
 
     manage_questionnaires_permission, _ = Permission.objects.get_or_create(
         codename='can_manage_questionnaires',
-        name='Can create and edit questionnaires',
         content_type=content_type,
+        defaults={'name': 'Can create and edit questionnaires'},
     )
 
     admin_permissions = [
@@ -123,6 +131,10 @@ def assign_organization_admin(user):
     # Add to admin group
     user.groups.add(admin_group)
 
+    # The group grants these now; a direct copy would survive a later demotion.
+    _drop_direct_grants(
+        user, admin_group.permissions.values_list('codename', flat=True))
+
     # Set is_staff flag for backward compatibility
     user.is_staff = True
     user.save()
@@ -156,6 +168,10 @@ def assign_organization_member(user, can_create_cycles_for_others=False):
     # Add to member group
     user.groups.add(member_group)
 
+    # Accounts made admin by a direct grant (the old setup page and import)
+    # would otherwise stay admin.
+    _drop_direct_grants(user, ADMIN_ROLE_CODENAMES)
+
     # Ensure is_staff is False (not an admin)
     user.is_staff = False
     user.save()
@@ -164,6 +180,14 @@ def assign_organization_member(user, can_create_cycles_for_others=False):
     if hasattr(user, 'profile'):
         user.profile.can_create_cycles_for_others = can_create_cycles_for_others
         user.profile.save()
+
+
+def _drop_direct_grants(user, codenames):
+    """Remove the user's direct grants of these accounts permissions."""
+    user.user_permissions.remove(*Permission.objects.filter(
+        content_type=ContentType.objects.get_for_model(UserProfile),
+        codename__in=list(codenames),
+    ))
 
 
 def remove_from_all_org_groups(user):

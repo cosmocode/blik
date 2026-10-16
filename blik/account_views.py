@@ -117,6 +117,8 @@ def export_data(request):
 
 
 @login_required(as_json=True)
+@can_manage_organization_required(
+    as_json=True, message='Only organization administrators can import data')
 @require_POST
 def preview_import(request):
     """
@@ -126,10 +128,6 @@ def preview_import(request):
     org = request.organization
     if not org:
         return JsonResponse({'error': 'Organization not found'}, status=404)
-
-    # Check if user is org admin
-    if not request.user.has_perm('accounts.can_manage_organization'):
-        return JsonResponse({'error': 'Only organization administrators can import data'}, status=403)
 
     try:
         import_file = request.FILES.get('import_file')
@@ -223,6 +221,11 @@ def import_data(request):
             'cycles': request.POST.get('import_cycles') == 'on',
             'reports': request.POST.get('import_reports') == 'on',
         }
+
+        if (import_options['questionnaires']
+                and not request.user.has_perm('accounts.can_manage_questionnaires')):
+            messages.error(request, 'You do not have permission to create or edit questionnaires.')
+            return redirect('settings')
 
         # Get conflict resolution mode
         conflict_resolution = request.POST.get('conflict_resolution', 'skip')

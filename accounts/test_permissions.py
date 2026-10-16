@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, Group
+from django.contrib.auth.models import AnonymousUser, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.storage.cookie import CookieStorage
 from django.http import HttpResponse, JsonResponse
 from django.test import RequestFactory, TestCase
@@ -8,6 +9,7 @@ from django.urls import reverse
 
 from core.factories import UserFactory, OrganizationFactory
 from accounts.factories import UserProfileFactory
+from accounts.models import UserProfile
 from accounts.permissions import (
     ORG_ADMIN_GROUP,
     ORG_MEMBER_GROUP,
@@ -64,6 +66,44 @@ class PermissionAssignmentTestCase(TestCase):
         self.assertTrue(user.groups.filter(name=ORG_ADMIN_GROUP).exists())
         self.assertTrue(user.has_perm('accounts.can_manage_organization'))
         self.assertTrue(user.is_staff)
+
+    def _grant_directly(self, *codenames):
+        content_type = ContentType.objects.get_for_model(UserProfile)
+        self.user.user_permissions.add(*Permission.objects.filter(
+            content_type=content_type, codename__in=codenames))
+
+    def test_demoting_removes_a_direct_admin_grant(self):
+        """The old setup page and import granted admin rights on the user."""
+        self._grant_directly('can_invite_members', 'can_manage_organization')
+
+        assign_organization_member(self.user)
+        user = self._reload_user()
+
+        self.assertFalse(user.has_perm('accounts.can_manage_organization'))
+        self.assertFalse(user.has_perm('accounts.can_invite_members'))
+
+    def test_demoting_keeps_a_per_user_report_grant(self):
+        self._grant_directly('can_view_all_reports')
+
+        assign_organization_member(self.user)
+
+        self.assertTrue(self._reload_user().has_perm('accounts.can_view_all_reports'))
+
+    def test_promoting_drops_direct_grants_the_group_covers(self):
+        self._grant_directly('can_manage_organization')
+
+        assign_organization_admin(self.user)
+
+        self.assertFalse(self._reload_user().user_permissions.exists())
+
+    def test_a_renamed_permission_is_found_by_codename(self):
+        Permission.objects.filter(codename='can_manage_questionnaires').update(
+            name='Something else')
+
+        ensure_permission_groups()
+        assign_organization_admin(self.user)
+
+        self.assertTrue(self._reload_user().has_perm('accounts.can_manage_questionnaires'))
 
     def test_remove_from_all_org_groups_preserves_groups(self):
         assign_organization_admin(self.user)

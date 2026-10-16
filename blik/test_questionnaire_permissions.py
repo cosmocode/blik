@@ -152,3 +152,24 @@ class QuestionnaireListVisibilityTests(QuestionnairePermissionTestCase):
         self.assertContains(response, reverse('questionnaire_create'))
         self.assertContains(
             response, reverse('questionnaire_edit', args=[self.questionnaire.id]))
+
+
+class QuestionnaireImportAccessTests(QuestionnairePermissionTestCase):
+    def test_import_needs_the_questionnaire_permission(self):
+        """can_manage_organization alone must not create questionnaires."""
+        from django.contrib.auth.models import Group, Permission
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from accounts.permissions import ORG_ADMIN_GROUP
+
+        Group.objects.get(name=ORG_ADMIN_GROUP).permissions.remove(
+            Permission.objects.get(codename='can_manage_questionnaires'))
+        upload = SimpleUploadedFile(
+            'data.json',
+            b'{"version": "1.0", "organization": {"name": "Acme"}, "questionnaires": [{"name": "Smuggled", "sections": []}]}',
+            content_type='application/json')
+
+        self.client.force_login(self.admin)
+        self.client.post(reverse('account:import_data'), {
+            'import_file': upload, 'import_questionnaires': 'on'})
+
+        self.assertFalse(Questionnaire.objects.filter(name='Smuggled').exists())
