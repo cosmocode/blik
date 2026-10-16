@@ -35,44 +35,45 @@ def _move_setup_admins_into_the_admin_group(stdout):
     passes them by, and they never got can_delete_organization at all. The
     data import did the same with can_manage_organization alone.
 
-    Only accounts holding can_manage_organization directly are touched — the
-    per-user grants the team UI writes (a member who may read all reports,
-    say) must survive untouched.
+    Only accounts holding can_manage_organization directly are touched. One
+    already in the member group was demoted, and assign_organization_member
+    used to leave the grant behind: it stays a member and loses the grant.
+    Per-user grants the role does not cover (can_view_all_reports, say)
+    survive either way.
     """
-    from django.contrib.auth.models import Permission, User
-    from django.contrib.contenttypes.models import ContentType
+    from django.contrib.auth.models import User
 
-    from accounts.models import UserProfile
-    from accounts.permissions import ORG_ADMIN_GROUP, ensure_permission_groups
+    from accounts.permissions import (
+        ADMIN_ROLE_CODENAMES,
+        ORG_ADMIN_GROUP,
+        ORG_MEMBER_GROUP,
+        _drop_direct_grants,
+        assign_organization_admin,
+        ensure_permission_groups,
+    )
 
-    admin_group, _ = ensure_permission_groups()
-    if admin_group is None:
-        stdout.write('  Apps not ready, skipping.')
-        return
-
-    content_type = ContentType.objects.get_for_model(UserProfile)
-    group_permissions = set(admin_group.permissions.values_list('codename', flat=True))
+    if ensure_permission_groups() == (None, None):
+        # Raise so the runner records a failure and retries next time.
+        raise RuntimeError('Apps not ready')
 
     candidates = User.objects.filter(
         user_permissions__codename='can_manage_organization',
-        user_permissions__content_type=content_type,
+        user_permissions__content_type__app_label='accounts',
     ).exclude(groups__name=ORG_ADMIN_GROUP).distinct()
 
-    moved = 0
+    moved = demoted = 0
     for user in candidates:
-        user.groups.add(admin_group)
+        if user.groups.filter(name=ORG_MEMBER_GROUP).exists():
+            _drop_direct_grants(user, ADMIN_ROLE_CODENAMES)
+            demoted += 1
+            stdout.write(f'  {user.username} stays {ORG_MEMBER_GROUP}')
+        else:
+            assign_organization_admin(user)
+            moved += 1
+            stdout.write(f'  {user.username} -> {ORG_ADMIN_GROUP}')
 
-        # Drop the direct copies the group now provides, so there is one
-        # source of truth. Anything else the account holds stays.
-        redundant = Permission.objects.filter(
-            content_type=content_type,
-            codename__in=group_permissions,
-        )
-        user.user_permissions.remove(*redundant)
-        moved += 1
-        stdout.write(f'  {user.username} -> {ORG_ADMIN_GROUP}')
-
-    stdout.write(f'Moved {moved} account(s) into {ORG_ADMIN_GROUP}.')
+    stdout.write(f'Moved {moved} account(s) into {ORG_ADMIN_GROUP}, '
+                 f'removed stale admin grants from {demoted} member(s).')
 
 
 STEPS = [

@@ -131,6 +131,19 @@ class UpgradeStepTests(TestCase):
         self.assertTrue(member.groups.filter(name=ORG_MEMBER_GROUP).exists())
         self.assertFalse(member.groups.filter(name=ORG_ADMIN_GROUP).exists())
 
+    def test_a_demoted_admin_stays_a_member(self):
+        """Demotion used to leave the direct grant; the step must not undo it."""
+        user = self._make_legacy_admin('demoted')
+        assign_organization_member(user)
+        grant_directly(user, 'can_manage_organization')  # as the old demotion left it
+
+        self._run_step()
+
+        user = User.objects.get(pk=user.pk)
+        self.assertFalse(user.groups.filter(name=ORG_ADMIN_GROUP).exists())
+        self.assertTrue(user.groups.filter(name=ORG_MEMBER_GROUP).exists())
+        self.assertFalse(user.has_perm('accounts.can_manage_organization'))
+
     def test_running_it_twice_changes_nothing(self):
         user = self._make_legacy_admin()
 

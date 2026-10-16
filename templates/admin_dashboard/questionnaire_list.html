@@ -8,7 +8,9 @@
         <h1>Questionnaires</h1>
         <p>Manage 360-degree feedback questionnaires</p>
     </div>
+    {% if perms.accounts.can_manage_questionnaires %}
     <a href="{% url 'questionnaire_create' %}" class="btn btn-primary">Create Questionnaire</a>
+    {% endif %}
 </div>
 
 {% if questionnaires %}
@@ -33,7 +35,9 @@
             <div style="display: flex; gap: 0.5rem;">
                 <a href="{% url 'questionnaire_preview' questionnaire.id %}" class="btn btn-sm btn-secondary">Preview Questions</a>
                 <a href="{% url 'questionnaire_sample_report' questionnaire.id %}" class="btn btn-sm btn-primary">Sample Report</a>
+                {% if perms.accounts.can_manage_questionnaires %}
                 <a href="{% url 'questionnaire_edit' questionnaire.id %}" class="btn btn-sm btn-secondary">Edit</a>
+                {% endif %}
             </div>
         </div>
         <div class="card-body">
@@ -66,10 +70,14 @@
     <div class="card-body">
         <div class="empty-state">
             <h3 style="margin-bottom: 0.5rem;">No questionnaires yet</h3>
+            {% if perms.accounts.can_manage_questionnaires %}
             <p style="margin-bottom: 1.5rem;">Load the default questionnaire or create a custom one</p>
             <div style="display: flex; gap: 1rem; justify-content: center;">
                 <a href="{% url 'questionnaire_create' %}" class="btn btn-primary">Create Questionnaire</a>
             </div>
+            {% else %}
+            <p style="margin-bottom: 1.5rem;">An administrator has not set up a questionnaire yet</p>
+            {% endif %}
         </div>
     </div>
 </div>
