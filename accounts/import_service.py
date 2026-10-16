@@ -484,8 +484,28 @@ def import_users(organization, users_data, conflict_resolution='skip', send_welc
             username = user_data['username']
             email = user_data['email']
 
-            # Check if user exists
+            # Check if user exists. Usernames are global, so a match can be a
+            # user of another organization: never update that user.
             existing_user = User.objects.filter(username=username).first()
+            in_organization = existing_user is not None and UserProfile.objects.filter(
+                user=existing_user,
+                organization=organization
+            ).exists()
+
+            if existing_user and not in_organization and conflict_resolution != 'duplicate':
+                result['skipped'] += 1
+                result['warnings'].append(f"Username '{username}' belongs to another organization - skipped")
+                continue
+
+            # Email is used for login and password reset, so it must stay unique
+            # to one user.
+            email_owner = User.objects.filter(email__iexact=email).first()
+            creates_user = not existing_user or conflict_resolution == 'duplicate'
+
+            if email_owner and creates_user:
+                result['skipped'] += 1
+                result['warnings'].append(f"Email '{email}' is already used by another user - skipped user {username}")
+                continue
 
             if existing_user:
                 if conflict_resolution == 'skip':
@@ -495,6 +515,10 @@ def import_users(organization, users_data, conflict_resolution='skip', send_welc
                 elif conflict_resolution == 'overwrite':
                     # Update email if changed
                     if existing_user.email != email:
+                        if email_owner and email_owner != existing_user:
+                            result['skipped'] += 1
+                            result['warnings'].append(f"Email '{email}' is already used by another user - skipped user {username}")
+                            continue
                         existing_user.email = email
                         existing_user.save()
                     result['updated'] += 1
@@ -512,7 +536,11 @@ def import_users(organization, users_data, conflict_resolution='skip', send_welc
                 elif conflict_resolution == 'duplicate':
                     # Create with modified username
                     original_username = username
-                    username = f"{username}_imported"
+                    username = f"{original_username}_imported"
+                    suffix = 2
+                    while User.objects.filter(username=username).exists():
+                        username = f"{original_username}_imported{suffix}"
+                        suffix += 1
                     result['warnings'].append(f"Created user with modified username: {username} (original: {original_username})")
 
             # Create new user with random password (same method as subscription signup)
