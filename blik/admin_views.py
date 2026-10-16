@@ -39,7 +39,7 @@ from api.models import APIToken, WebhookEndpoint
 from core.env_config import env_managed_fields
 from core.gdpr import GDPRDeletionService
 from core.models import Organization
-from productreviews.models import ProductReview
+from productreviews.models import ProductReview, anonymous_name
 from questionnaires.models import Question, QuestionSection, Questionnaire
 from reports.dreyfus_service import (
     AGENCY_STAGES,
@@ -2646,7 +2646,8 @@ def quick_product_review(request):
 
         # Get user profile info
         user_profile = user.userprofile if hasattr(user, 'userprofile') else None
-        reviewer_name = user.get_full_name() or user.username
+        # The username is often an email; never store that as the public name.
+        reviewer_name = anonymous_name(user.get_full_name() or user.username)
         reviewer_email = user.email
 
         # Create or update review

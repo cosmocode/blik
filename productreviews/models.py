@@ -8,6 +8,11 @@ from core.models import TimeStampedModel, Organization
 from core.managers import OrganizationManager
 
 
+def anonymous_name(name):
+    """Return the name, or a neutral label if the name is an email."""
+    return 'Verified customer' if '@' in name else name
+
+
 class ProductReview(TimeStampedModel):
     """
     Customer reviews of the Blik platform for displaying on landing pages.
@@ -116,10 +121,9 @@ class ProductReview(TimeStampedModel):
     @property
     def public_name(self):
         """Reviewer name safe for public output. Hides names that are emails."""
-        # ponytail: the quick review falls back to username, which is often an email
-        if '@' in self.reviewer_name:
-            return 'Verified customer'
-        return self.reviewer_name
+        # Names are no longer stored as emails (migration 0002), but the
+        # admin form still accepts any text.
+        return anonymous_name(self.reviewer_name)
 
     @property
     def is_published(self):
