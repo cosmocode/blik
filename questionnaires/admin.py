@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 from .models import Questionnaire, QuestionSection, Question
 
 
@@ -40,4 +41,4 @@ class QuestionAdmin(admin.ModelAdmin):
 
     def question_text_short(self, obj):
         return obj.question_text[:60] + '...' if len(obj.question_text) > 60 else obj.question_text
-    question_text_short.short_description = 'Question'
+    question_text_short.short_description = _('Question')

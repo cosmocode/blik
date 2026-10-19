@@ -14,12 +14,12 @@ class Migration(migrations.Migration):
             name='WelcomeEmailFact',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('title', models.CharField(help_text='Short title for the fact (e.g., "The Power of 360 Feedback")', max_length=255)),
-                ('content', models.TextField(help_text='The fact content. Can include HTML tags like <strong> for emphasis.')),
-                ('is_active', models.BooleanField(default=True, help_text='Only active facts will be shown in emails')),
-                ('display_order', models.IntegerField(default=0, help_text='Optional ordering (lower numbers shown first when not randomizing)')),
+                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
+                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='updated at')),
+                ('title', models.CharField(help_text='Short title for the fact (e.g., "The Power of 360 Feedback")', max_length=255, verbose_name='title')),
+                ('content', models.TextField(help_text='The fact content. Can include HTML tags like <strong> for emphasis.', verbose_name='content')),
+                ('is_active', models.BooleanField(default=True, help_text='Only active facts will be shown in emails', verbose_name='active')),
+                ('display_order', models.IntegerField(default=0, help_text='Optional ordering (lower numbers shown first when not randomizing)', verbose_name='display order')),
             ],
             options={
                 'verbose_name': 'Welcome Email Fact',

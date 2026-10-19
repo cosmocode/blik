@@ -13,21 +13,21 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='reviewcycle',
             name='invitation_token_direct_report',
-            field=models.UUIDField(blank=True, db_index=True, null=True, unique=True),
+            field=models.UUIDField(blank=True, db_index=True, null=True, unique=True, verbose_name='direct report review invitation token'),
         ),
         migrations.AddField(
             model_name='reviewcycle',
             name='invitation_token_manager',
-            field=models.UUIDField(blank=True, db_index=True, null=True, unique=True),
+            field=models.UUIDField(blank=True, db_index=True, null=True, unique=True, verbose_name='manager review invitation token'),
         ),
         migrations.AddField(
             model_name='reviewcycle',
             name='invitation_token_peer',
-            field=models.UUIDField(blank=True, db_index=True, null=True, unique=True),
+            field=models.UUIDField(blank=True, db_index=True, null=True, unique=True, verbose_name='peer review invitation token'),
         ),
         migrations.AddField(
             model_name='reviewcycle',
             name='invitation_token_self',
-            field=models.UUIDField(blank=True, db_index=True, null=True, unique=True),
+            field=models.UUIDField(blank=True, db_index=True, null=True, unique=True, verbose_name='self assessment invitation token'),
         ),
     ]

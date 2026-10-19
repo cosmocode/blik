@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='organization',
             name='smtp_password_encrypted',
-            field=models.BinaryField(blank=True, null=True),
+            field=models.BinaryField(blank=True, null=True, verbose_name='encrypted SMTP password'),
         ),
         # Remove old plaintext field
         migrations.RemoveField(

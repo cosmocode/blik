@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils import timezone
+from django.utils.translation import gettext as _, gettext_lazy
 from .models import Plan, Subscription, OneTimeLoginToken, CheckoutFulfilment, RoundPurchase
 
 
@@ -32,45 +33,47 @@ class OneTimeLoginTokenAdmin(admin.ModelAdmin):
     def token_status(self, obj):
         """Display token status with color coding"""
         if obj.used:
-            return format_html('<span style="color: gray;">Used</span>')
+            return format_html('<span style="color: gray;">{}</span>', _('Used'))
 
         now = timezone.now()
         if obj.expires_at < now:
-            return format_html('<span style="color: red; font-weight: bold;">Expired</span>')
+            return format_html('<span style="color: red; font-weight: bold;">{}</span>', _('Expired'))
 
         time_left = obj.expires_at - now
         if time_left.seconds < 3600:  # Less than 1 hour
-            return format_html('<span style="color: orange;">Expires in {} min</span>', time_left.seconds // 60)
+            return format_html('<span style="color: orange;">{}</span>', _('Expires in %(minutes)s min') % {'minutes': time_left.seconds // 60})
 
         if time_left.days < 1:
-            return format_html('<span style="color: orange;">Expires in {} hours</span>', time_left.seconds // 3600)
+            return format_html('<span style="color: orange;">{}</span>', _('Expires in %(hours)s hours') % {'hours': time_left.seconds // 3600})
 
-        return format_html('<span style="color: green;">Valid</span>')
+        return format_html('<span style="color: green;">{}</span>', _('Valid'))
 
-    token_status.short_description = 'Status'
+    token_status.short_description = gettext_lazy('Status')
 
     def token_expiry_status(self, obj):
         """Detailed token expiration info"""
         if obj.used:
-            return format_html('<span style="color: gray;">Token was used and is no longer valid</span>')
+            return format_html('<span style="color: gray;">{}</span>', _('Token was used and is no longer valid'))
 
         now = timezone.now()
         if obj.expires_at < now:
-            return format_html('<span style="color: red; font-weight: bold;">EXPIRED on {}</span>',
-                             obj.expires_at.strftime('%Y-%m-%d %H:%M'))
+            return format_html('<span style="color: red; font-weight: bold;">{}</span>',
+                             _('EXPIRED on %(date)s') % {'date': obj.expires_at.strftime('%Y-%m-%d %H:%M')})
 
         time_left = obj.expires_at - now
         if time_left.days < 1:
-            return format_html('<span style="color: orange;">Expires on {} ({} hours, {} minutes remaining)</span>',
-                             obj.expires_at.strftime('%Y-%m-%d %H:%M'),
-                             time_left.seconds // 3600,
-                             (time_left.seconds % 3600) // 60)
+            return format_html('<span style="color: orange;">{}</span>',
+                             _('Expires on %(date)s (%(hours)s hours, %(minutes)s minutes remaining)') % {
+                                 'date': obj.expires_at.strftime('%Y-%m-%d %H:%M'),
+                                 'hours': time_left.seconds // 3600,
+                                 'minutes': (time_left.seconds % 3600) // 60})
 
-        return format_html('<span style="color: green;">Expires on {} ({} days remaining)</span>',
-                         obj.expires_at.strftime('%Y-%m-%d %H:%M'),
-                         time_left.days)
+        return format_html('<span style="color: green;">{}</span>',
+                         _('Expires on %(date)s (%(days)s days remaining)') % {
+                             'date': obj.expires_at.strftime('%Y-%m-%d %H:%M'),
+                             'days': time_left.days})
 
-    token_expiry_status.short_description = 'Token Expiration'
+    token_expiry_status.short_description = gettext_lazy('Token Expiration')
 
     def has_add_permission(self, request):
         # Tokens should be created through the application, not admin

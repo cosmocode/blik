@@ -1,6 +1,7 @@
 import uuid
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.translation import gettext, gettext_lazy as _
 from django.utils.crypto import get_random_string
 from core.models import TimeStampedModel, Organization
 from core.managers import OrganizationManager
@@ -11,25 +12,31 @@ class UserProfile(TimeStampedModel):
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
-        related_name='profile'
+        related_name='profile',
+        verbose_name=_('user')
     )
     organization = models.ForeignKey(
         Organization,
         on_delete=models.CASCADE,
-        related_name='users'
+        related_name='users',
+        verbose_name=_('organization')
     )
     can_create_cycles_for_others = models.BooleanField(
         default=False,
-        help_text='If False, user can only create cycles for themselves'
+        help_text=_('If False, user can only create cycles for themselves'),
+        verbose_name=_('can create cycles for others')
     )
     has_seen_welcome = models.BooleanField(
         default=False,
-        help_text='Whether user has seen the welcome modal'
+        help_text=_('Whether user has seen the welcome modal'),
+        verbose_name=_('has seen welcome')
     )
 
     objects = OrganizationManager()
 
     class Meta:
+        verbose_name = _('user profile')
+        verbose_name_plural = _('user profiles')
         db_table = 'user_profiles'
         ordering = ['user__username']
         permissions = [
@@ -49,28 +56,32 @@ class OrganizationInvitation(TimeStampedModel):
     organization = models.ForeignKey(
         Organization,
         on_delete=models.CASCADE,
-        related_name='invitations'
+        related_name='invitations',
+        verbose_name=_('organization')
     )
-    email = models.EmailField()
-    token = models.CharField(max_length=64, unique=True, db_index=True)
+    email = models.EmailField(_('email'))
+    token = models.CharField(_('token'), max_length=64, unique=True, db_index=True)
     invited_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='sent_invitations'
+        related_name='sent_invitations',
+        verbose_name=_('invited by')
     )
-    accepted_at = models.DateTimeField(null=True, blank=True)
-    expires_at = models.DateTimeField()
+    accepted_at = models.DateTimeField(_('accepted at'), null=True, blank=True)
+    expires_at = models.DateTimeField(_('expires at'))
 
     objects = OrganizationManager()
 
     class Meta:
+        verbose_name = _('invitation')
+        verbose_name_plural = _('invitations')
         db_table = 'organization_invitations'
         ordering = ['-created_at']
         unique_together = ['organization', 'email']
 
     def __str__(self):
-        return f"Invite {self.email} to {self.organization.name}"
+        return gettext('Invite %(email)s to %(organization)s') % {'email': self.email, 'organization': self.organization.name}
 
     def save(self, *args, **kwargs):
         if not self.token:
@@ -91,18 +102,21 @@ class PasswordResetToken(TimeStampedModel):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='password_reset_tokens'
+        related_name='password_reset_tokens',
+        verbose_name=_('user')
     )
-    token = models.CharField(max_length=64, unique=True, db_index=True)
-    expires_at = models.DateTimeField()
-    used_at = models.DateTimeField(null=True, blank=True)
+    token = models.CharField(_('token'), max_length=64, unique=True, db_index=True)
+    expires_at = models.DateTimeField(_('expires at'))
+    used_at = models.DateTimeField(_('used at'), null=True, blank=True)
 
     class Meta:
+        verbose_name = _('password reset token')
+        verbose_name_plural = _('password reset tokens')
         db_table = 'password_reset_tokens'
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"Password reset for {self.user.email}"
+        return gettext('Password reset for %(email)s') % {'email': self.user.email}
 
     def save(self, *args, **kwargs):
         if not self.token:
@@ -127,22 +141,26 @@ class Reviewee(TimeStampedModel):
         unique=True,
         editable=False,
         db_index=True,
-        help_text="Public identifier for API and URL usage (non-enumerable)"
+        help_text=_('Public identifier for API and URL usage (non-enumerable)'),
+        verbose_name=_('UUID')
     )
 
     organization = models.ForeignKey(
         Organization,
         on_delete=models.CASCADE,
-        related_name='reviewees'
+        related_name='reviewees',
+        verbose_name=_('organization')
     )
-    name = models.CharField(max_length=255)
-    email = models.EmailField()
-    department = models.CharField(max_length=255, blank=True)
-    is_active = models.BooleanField(default=True)
+    name = models.CharField(_('name'), max_length=255)
+    email = models.EmailField(_('email'))
+    department = models.CharField(_('department'), max_length=255, blank=True)
+    is_active = models.BooleanField(_('active'), default=True)
 
     objects = OrganizationManager()
 
     class Meta:
+        verbose_name = _('reviewee')
+        verbose_name_plural = _('reviewees')
         db_table = 'reviewees'
         ordering = ['name']
         unique_together = ['organization', 'email']

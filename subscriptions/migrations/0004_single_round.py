@@ -23,9 +23,9 @@ class Migration(migrations.Migration):
                         auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
                     ),
                 ),
-                ("created_at", models.DateTimeField(auto_now_add=True)),
-                ("updated_at", models.DateTimeField(auto_now=True)),
-                ("stripe_session_id", models.CharField(max_length=255, unique=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True, verbose_name="created at")),
+                ("updated_at", models.DateTimeField(auto_now=True, verbose_name="updated at")),
+                ("stripe_session_id", models.CharField(max_length=255, unique=True, verbose_name="Stripe session ID")),
                 (
                     "outcome",
                     models.CharField(
@@ -39,9 +39,10 @@ class Migration(migrations.Migration):
                         ],
                         default="fulfilled",
                         max_length=40,
+                        verbose_name="outcome",
                     ),
                 ),
-                ("user_created", models.BooleanField(default=False)),
+                ("user_created", models.BooleanField(default=False, verbose_name="user created")),
                 (
                     "organization",
                     models.ForeignKey(
@@ -50,6 +51,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="checkout_fulfilments",
                         to="core.organization",
+                        verbose_name="organization",
                     ),
                 ),
                 (
@@ -60,12 +62,15 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="checkout_fulfilments",
                         to=settings.AUTH_USER_MODEL,
+                        verbose_name="user",
                     ),
                 ),
             ],
             options={
                 "db_table": "checkout_fulfilments",
                 "ordering": ["-created_at"],
+                "verbose_name": "checkout fulfilment",
+                "verbose_name_plural": "checkout fulfilments",
             },
         ),
         migrations.AddField(
@@ -77,6 +82,7 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="login_token",
                 to="subscriptions.checkoutfulfilment",
+                verbose_name="checkout fulfilment",
             ),
         ),
         migrations.CreateModel(
@@ -88,9 +94,9 @@ class Migration(migrations.Migration):
                         auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
                     ),
                 ),
-                ("created_at", models.DateTimeField(auto_now_add=True)),
-                ("updated_at", models.DateTimeField(auto_now=True)),
-                ("cycles_remaining", models.PositiveIntegerField(default=10)),
+                ("created_at", models.DateTimeField(auto_now_add=True, verbose_name="created at")),
+                ("updated_at", models.DateTimeField(auto_now=True, verbose_name="updated at")),
+                ("cycles_remaining", models.PositiveIntegerField(default=10, verbose_name="review cycles remaining")),
                 (
                     "fulfilment",
                     models.OneToOneField(
@@ -99,6 +105,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="round_purchase",
                         to="subscriptions.checkoutfulfilment",
+                        verbose_name="checkout fulfilment",
                     ),
                 ),
                 (
@@ -107,12 +114,15 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="round_purchases",
                         to="core.organization",
+                        verbose_name="organization",
                     ),
                 ),
             ],
             options={
                 "db_table": "round_purchases",
                 "ordering": ["created_at"],
+                "verbose_name": "round purchase",
+                "verbose_name_plural": "round purchases",
             },
         ),
     ]

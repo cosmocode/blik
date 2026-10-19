@@ -17,15 +17,17 @@ class Migration(migrations.Migration):
             name='OneTimeLoginToken',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('token', models.CharField(db_index=True, max_length=64, unique=True)),
-                ('used', models.BooleanField(default=False)),
-                ('expires_at', models.DateTimeField()),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='login_tokens', to=settings.AUTH_USER_MODEL)),
+                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
+                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='updated at')),
+                ('token', models.CharField(db_index=True, max_length=64, unique=True, verbose_name='token')),
+                ('used', models.BooleanField(default=False, verbose_name='used')),
+                ('expires_at', models.DateTimeField(verbose_name='expires at')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='login_tokens', to=settings.AUTH_USER_MODEL, verbose_name='user')),
             ],
             options={
                 'db_table': 'one_time_login_tokens',
+                'verbose_name': 'one-time login token',
+                'verbose_name_plural': 'one-time login tokens',
             },
         ),
     ]

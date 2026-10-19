@@ -1,7 +1,8 @@
 from django.apps import AppConfig
+from django.utils.translation import gettext_lazy as _
 
 
 class ProductreviewsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'productreviews'
-    verbose_name = 'Product Reviews'
+    verbose_name = _('Product Reviews')

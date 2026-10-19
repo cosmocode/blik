@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='reviewertoken',
             name='claimed_at',
-            field=models.DateTimeField(blank=True, help_text='When someone claimed this token by clicking the invitation link', null=True),
+            field=models.DateTimeField(blank=True, help_text='When someone claimed this token by clicking the invitation link', null=True, verbose_name='claimed at'),
         ),
     ]

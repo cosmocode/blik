@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userprofile',
             name='has_seen_welcome',
-            field=models.BooleanField(default=False, help_text='Whether user has seen the welcome modal'),
+            field=models.BooleanField(default=False, help_text='Whether user has seen the welcome modal', verbose_name='has seen welcome'),
         ),
     ]

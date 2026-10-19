@@ -17,6 +17,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 help_text="When the last reminder email was sent to this reviewer",
                 null=True,
+                verbose_name="last reminder sent at",
             ),
         ),
     ]

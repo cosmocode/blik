@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='webhookdelivery',
             name='delivery_id',
-            field=models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, help_text='Public UUID for this delivery (non-enumerable)', unique=True),
+            field=models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, help_text='Public UUID for this delivery (non-enumerable)', unique=True, verbose_name='delivery ID'),
         ),
     ]
