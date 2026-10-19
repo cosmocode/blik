@@ -1,16 +1,17 @@
 {% extends "admin_dashboard/base.html" %}
+{% load i18n %}
 {% load json_filters %}
 
-{% block title %}{{ action }} Questionnaire{% endblock %}
+{% block title %}{% if action == 'Edit' %}{% trans 'Edit Questionnaire' %}{% else %}{% trans 'Create Questionnaire' %}{% endif %}{% endblock %}
 
 {% block content %}
 <div style="margin-bottom: 2rem;">
-    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">{{ action }} Questionnaire</h1>
+    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">{% if action == 'Edit' %}{% trans 'Edit Questionnaire' %}{% else %}{% trans 'Create Questionnaire' %}{% endif %}</h1>
     <p style="color: var(--text-secondary);">
         {% if questionnaire %}
-        Edit questionnaire "{{ questionnaire.name }}"
+        {% blocktrans trimmed with name=questionnaire.name %}Edit questionnaire "{{ name }}"{% endblocktrans %}
         {% else %}
-        Create a new feedback questionnaire
+        {% trans 'Create a new feedback questionnaire' %}
         {% endif %}
     </p>
 </div>
@@ -19,7 +20,7 @@
     <!-- Basic Information -->
     <div class="card mb-2">
         <div class="card-header">
-            <h2 class="card-title">Basic Information</h2>
+            <h2 class="card-title">{% trans 'Basic Information' %}</h2>
         </div>
         <div class="card-body">
             <form method="post">
@@ -27,7 +28,7 @@
                 <input type="hidden" name="action" value="update_info">
 
                 <div class="form-group">
-                    <label for="name" class="form-label">Questionnaire Name *</label>
+                    <label for="name" class="form-label">{% trans 'Questionnaire Name' %} *</label>
                     <input
                         type="text"
                         id="name"
@@ -35,18 +36,18 @@
                         class="form-control"
                         value="{% if questionnaire %}{{ questionnaire.name }}{% endif %}"
                         required
-                        placeholder="360-Degree Performance Review"
+                        placeholder="{% trans '360-Degree Performance Review' %}"
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="description" class="form-label">Description (Optional)</label>
+                    <label for="description" class="form-label">{% trans 'Description (Optional)' %}</label>
                     <textarea
                         id="description"
                         name="description"
                         class="form-control"
                         rows="3"
-                        placeholder="Comprehensive feedback covering leadership, communication, and technical skills"
+                        placeholder="{% trans 'Comprehensive feedback covering leadership, communication, and technical skills' %}"
                     >{% if questionnaire %}{{ questionnaire.description }}{% endif %}</textarea>
                 </div>
 
@@ -57,19 +58,19 @@
                             name="is_default"
                             {% if questionnaire.is_default %}checked{% endif %}
                         >
-                        <span>Set as default questionnaire</span>
+                        <span>{% trans 'Set as default questionnaire' %}</span>
                     </label>
                 </div>
 
                 <div style="display: flex; gap: 1rem; margin-top: 2rem;">
                     {% if questionnaire %}
-                    <button type="submit" class="btn btn-primary">Update Information</button>
+                    <button type="submit" class="btn btn-primary">{% trans 'Update Information' %}</button>
                     {% else %}
-                    <button type="submit" class="btn btn-primary">Create Questionnaire</button>
+                    <button type="submit" class="btn btn-primary">{% trans 'Create Questionnaire' %}</button>
                     {% endif %}
-                    <a href="{% url 'questionnaire_list' %}" class="btn btn-secondary">Cancel</a>
+                    <a href="{% url 'questionnaire_list' %}" class="btn btn-secondary">{% trans 'Cancel' %}</a>
                     {% if questionnaire %}
-                    <a href="{% url 'questionnaire_preview' questionnaire.id %}" class="btn btn-secondary">Preview</a>
+                    <a href="{% url 'questionnaire_preview' questionnaire.id %}" class="btn btn-secondary">{% trans 'Preview' %}</a>
                     {% endif %}
                 </div>
             </form>
@@ -81,7 +82,7 @@
     <div id="edit_section_modal" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeEditSectionModal()">
         <div class="modal-content" style="max-width: 600px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin: 0;">Edit Section</h2>
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin: 0;">{% trans 'Edit Section' %}</h2>
                 <button
                     type="button"
                     onclick="closeEditSectionModal()"
@@ -95,31 +96,31 @@
                 <input type="hidden" name="section_id" id="edit_section_id">
 
                 <div class="form-group">
-                    <label for="edit_section_title" class="form-label">Section Title *</label>
+                    <label for="edit_section_title" class="form-label">{% trans 'Section Title' %} *</label>
                     <input
                         type="text"
                         id="edit_section_title"
                         name="section_title"
                         class="form-control"
                         required
-                        placeholder="e.g., Technical Skills"
+                        placeholder="{% trans 'e.g., Technical Skills' %}"
                     >
                 </div>
 
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label for="edit_section_description" class="form-label">Description (Optional)</label>
+                    <label for="edit_section_description" class="form-label">{% trans 'Description (Optional)' %}</label>
                     <textarea
                         id="edit_section_description"
                         name="section_description"
                         class="form-control"
                         rows="3"
-                        placeholder="Brief description of what this section covers"
+                        placeholder="{% trans 'Brief description of what this section covers' %}"
                     ></textarea>
                 </div>
 
                 <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border);">
-                    <button type="button" onclick="closeEditSectionModal()" class="btn btn-secondary">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" onclick="closeEditSectionModal()" class="btn btn-secondary">{% trans 'Cancel' %}</button>
+                    <button type="submit" class="btn btn-primary">{% trans 'Save Changes' %}</button>
                 </div>
             </form>
         </div>
@@ -130,7 +131,7 @@
         <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; position: sticky; top: 0; background: var(--bg-card); padding-bottom: 1rem; z-index: 10;">
                 <div>
-                    <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin: 0;">Dreyfus/Agency Configuration</h2>
+                    <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin: 0;">{% trans 'Dreyfus/Agency Configuration' %}</h2>
                     <p id="dreyfus_config_question_text" style="color: var(--text-secondary); margin: 0.5rem 0 0 0; font-size: 0.875rem;"></p>
                 </div>
                 <button
@@ -147,9 +148,9 @@
 
                 <!-- Weight Configuration Section -->
                 <div style="margin-bottom: 2rem;">
-                    <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem;">Dreyfus Model Weights</h3>
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem;">{% trans 'Dreyfus Model Weights' %}</h3>
                     <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">
-                        Configure how this question contributes to the Dreyfus skill and agency dimensions. Higher weights (up to 2.0) indicate stronger impact on that dimension.
+                        {% trans 'Configure how this question contributes to the Dreyfus skill and agency dimensions. Higher weights (up to 2.0) indicate stronger impact on that dimension.' %}
                     </p>
 
                     <!-- Visual Grid Selector -->
@@ -157,36 +158,36 @@
                         <!-- Skill Weight -->
                         <div>
                             <label style="display: block; font-weight: 500; margin-bottom: 1rem; color: var(--text-primary);">
-                                Skill Weight
+                                {% trans 'Skill Weight' %}
                                 <span id="skill_weight_value" style="color: var(--primary); font-weight: 700;">0.0</span>
                             </label>
                             <div id="skill_weight_grid" class="weight-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; margin-bottom: 0.5rem;">
                                 <!-- Will be populated by JavaScript -->
                             </div>
                             <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                                <span>None</span>
-                                <span>Low (0.5)</span>
-                                <span>Medium (1.0)</span>
-                                <span>High (1.5)</span>
-                                <span>Very High (2.0)</span>
+                                <span>{% trans 'None' context 'weight level' %}</span>
+                                <span>{% trans 'Low (0.5)' %}</span>
+                                <span>{% trans 'Medium (1.0)' %}</span>
+                                <span>{% trans 'High (1.5)' %}</span>
+                                <span>{% trans 'Very High (2.0)' %}</span>
                             </div>
                         </div>
 
                         <!-- Agency Weight -->
                         <div>
                             <label style="display: block; font-weight: 500; margin-bottom: 1rem; color: var(--text-primary);">
-                                Agency Weight
+                                {% trans 'Agency Weight' %}
                                 <span id="agency_weight_value" style="color: var(--primary); font-weight: 700;">0.0</span>
                             </label>
                             <div id="agency_weight_grid" class="weight-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; margin-bottom: 0.5rem;">
                                 <!-- Will be populated by JavaScript -->
                             </div>
                             <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                                <span>None</span>
-                                <span>Low (0.5)</span>
-                                <span>Medium (1.0)</span>
-                                <span>High (1.5)</span>
-                                <span>Very High (2.0)</span>
+                                <span>{% trans 'None' context 'weight level' %}</span>
+                                <span>{% trans 'Low (0.5)' %}</span>
+                                <span>{% trans 'Medium (1.0)' %}</span>
+                                <span>{% trans 'High (1.5)' %}</span>
+                                <span>{% trans 'Very High (2.0)' %}</span>
                             </div>
                         </div>
                     </div>
@@ -197,15 +198,15 @@
                 <!-- Action Items Section -->
                 <div style="margin-bottom: 2rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin: 0;">Personalized Action Items</h3>
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin: 0;">{% trans 'Personalized Action Items' %}</h3>
                         <button
                             type="button"
                             onclick="addActionItem()"
                             class="btn btn-sm btn-primary"
-                        >+ Add Action Item</button>
+                        >+ {% trans 'Add Action Item' %}</button>
                     </div>
                     <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">
-                        Define action items that will appear in development plans when this question scores below a threshold.
+                        {% trans 'Define action items that will appear in development plans when this question scores below a threshold.' %}
                     </p>
 
                     <div id="action_items_container" style="display: flex; flex-direction: column; gap: 1rem;">
@@ -214,8 +215,8 @@
                 </div>
 
                 <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid var(--border);">
-                    <button type="button" onclick="closeDreyfusConfigModal()" class="btn btn-secondary">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Configuration</button>
+                    <button type="button" onclick="closeDreyfusConfigModal()" class="btn btn-secondary">{% trans 'Cancel' %}</button>
+                    <button type="submit" class="btn btn-primary">{% trans 'Save Configuration' %}</button>
                 </div>
             </form>
         </div>
@@ -225,7 +226,7 @@
     <div id="edit_question_modal" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeEditQuestionModal()">
         <div class="modal-content" style="max-width: 600px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin: 0;">Edit Question</h2>
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin: 0;">{% trans 'Edit Question' %}</h2>
                 <button
                     type="button"
                     onclick="closeEditQuestionModal()"
@@ -239,7 +240,7 @@
                 <input type="hidden" name="question_id" id="edit_question_id">
 
                 <div class="form-group">
-                    <label for="edit_question_text" class="form-label">Question Text *</label>
+                    <label for="edit_question_text" class="form-label">{% trans 'Question Text' %} *</label>
                     <textarea
                         id="edit_question_text"
                         name="question_text"
@@ -250,24 +251,24 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="edit_question_type" class="form-label">Question Type *</label>
+                    <label for="edit_question_type" class="form-label">{% trans 'Question Type' %} *</label>
                     <select
                         id="edit_question_type"
                         name="question_type"
                         class="form-control"
                         onchange="toggleEditChoices()"
                     >
-                        <option value="rating">Rating Scale (1-5)</option>
-                        <option value="likert">Likert Scale</option>
-                        <option value="text">Free Text</option>
-                        <option value="single_choice">Single Choice (Dropdown)</option>
-                        <option value="multiple_choice">Multiple Choice (Checkboxes)</option>
-                        <option value="scale">Numeric Scale</option>
+                        <option value="rating">{% trans 'Rating Scale (1-5)' %}</option>
+                        <option value="likert">{% trans 'Likert Scale' %}</option>
+                        <option value="text">{% trans 'Free Text' %}</option>
+                        <option value="single_choice">{% trans 'Single Choice (Dropdown)' %}</option>
+                        <option value="multiple_choice">{% trans 'Multiple Choice (Checkboxes)' %}</option>
+                        <option value="scale">{% trans 'Numeric Scale' %}</option>
                     </select>
                 </div>
 
                 <div id="edit_likert_container" class="form-group" style="display: none;">
-                    <label for="edit_likert_scale" class="form-label">Likert Scale Items (one per line)</label>
+                    <label for="edit_likert_scale" class="form-label">{% trans 'Likert Scale Items (one per line)' %}</label>
                     <textarea
                         id="edit_likert_scale"
                         name="likert_scale"
@@ -277,33 +278,33 @@
                 </div>
 
                 <div id="edit_scale_container" class="form-group" style="display: none;">
-                    <label class="form-label">Scale Configuration</label>
+                    <label class="form-label">{% trans 'Scale Configuration' %}</label>
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
                         <div>
-                            <label style="font-size: 0.875rem; color: var(--text-secondary);">Min</label>
+                            <label style="font-size: 0.875rem; color: var(--text-secondary);">{% trans 'Min' %}</label>
                             <input type="number" id="edit_scale_min" name="scale_min" class="form-control" value="1" style="font-size: 0.875rem;">
                         </div>
                         <div>
-                            <label style="font-size: 0.875rem; color: var(--text-secondary);">Max</label>
+                            <label style="font-size: 0.875rem; color: var(--text-secondary);">{% trans 'Max' %}</label>
                             <input type="number" id="edit_scale_max" name="scale_max" class="form-control" value="100" style="font-size: 0.875rem;">
                         </div>
                         <div>
-                            <label style="font-size: 0.875rem; color: var(--text-secondary);">Step</label>
+                            <label style="font-size: 0.875rem; color: var(--text-secondary);">{% trans 'Step' context 'scale increment' %}</label>
                             <input type="number" id="edit_scale_step" name="scale_step" class="form-control" value="1" style="font-size: 0.875rem;">
                         </div>
                     </div>
                     <div style="margin-bottom: 0.5rem;">
-                        <label style="font-size: 0.875rem; color: var(--text-secondary);">Min Label (Optional)</label>
-                        <input type="text" id="edit_scale_min_label" name="scale_min_label" class="form-control" placeholder="e.g., Not at all" style="font-size: 0.875rem;">
+                        <label style="font-size: 0.875rem; color: var(--text-secondary);">{% trans 'Min Label (Optional)' %}</label>
+                        <input type="text" id="edit_scale_min_label" name="scale_min_label" class="form-control" placeholder="{% trans 'e.g., Not at all' %}" style="font-size: 0.875rem;">
                     </div>
                     <div>
-                        <label style="font-size: 0.875rem; color: var(--text-secondary);">Max Label (Optional)</label>
-                        <input type="text" id="edit_scale_max_label" name="scale_max_label" class="form-control" placeholder="e.g., Extremely" style="font-size: 0.875rem;">
+                        <label style="font-size: 0.875rem; color: var(--text-secondary);">{% trans 'Max Label (Optional)' %}</label>
+                        <input type="text" id="edit_scale_max_label" name="scale_max_label" class="form-control" placeholder="{% trans 'e.g., Extremely' %}" style="font-size: 0.875rem;">
                     </div>
                 </div>
 
                 <div id="edit_choices_container" class="form-group" style="display: none;">
-                    <label for="edit_choices" class="form-label">Choices (one per line)</label>
+                    <label for="edit_choices" class="form-label">{% trans 'Choices (one per line)' %}</label>
                     <textarea
                         id="edit_choices"
                         name="choices"
@@ -320,12 +321,12 @@
                                 name="enable_scoring"
                                 onchange="toggleEditWeightInputs()"
                             >
-                            <span>Enable numeric scoring for analytics</span>
+                            <span>{% trans 'Enable numeric scoring for analytics' %}</span>
                         </label>
                     </div>
 
                     <div id="edit_weights_container" style="display: none; margin-top: 1rem;">
-                        <label class="form-label">Assign weights to each option (for scoring)</label>
+                        <label class="form-label">{% trans 'Assign weights to each option (for scoring)' %}</label>
                         <div id="edit_weight_inputs"></div>
                     </div>
                 </div>
@@ -333,13 +334,13 @@
                 <div class="form-group" style="margin-bottom: 0;">
                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                         <input type="checkbox" name="required" id="edit_required">
-                        <span>Required question</span>
+                        <span>{% trans 'Required question' %}</span>
                     </label>
                 </div>
 
                 <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border);">
-                    <button type="button" onclick="closeEditQuestionModal()" class="btn btn-secondary">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" onclick="closeEditQuestionModal()" class="btn btn-secondary">{% trans 'Cancel' %}</button>
+                    <button type="submit" class="btn btn-primary">{% trans 'Save Changes' %}</button>
                 </div>
             </form>
         </div>
@@ -348,7 +349,7 @@
     <!-- Sections and Questions -->
     <div class="card mb-2">
         <div class="card-header">
-            <h2 class="card-title">Sections and Questions</h2>
+            <h2 class="card-title">{% trans 'Sections and Questions' %}</h2>
         </div>
         <div class="card-body">
             {% if sections %}
@@ -366,12 +367,12 @@
                             type="button"
                             class="btn btn-sm btn-secondary"
                             onclick="openEditSectionModal({{ section.id }}, '{{ section.title|escapejs }}', '{{ section.description|escapejs }}')"
-                        >Edit</button>
-                        <form method="post" style="margin: 0;" onsubmit="return confirm('Delete section and all its questions?');">
+                        >{% trans 'Edit' %}</button>
+                        <form method="post" style="margin: 0;" onsubmit="return confirm('{{ _('Delete section and all its questions?')|escapejs }}');">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="delete_section">
                             <input type="hidden" name="section_id" value="{{ section.id }}">
-                            <button type="submit" class="btn btn-sm btn-secondary" style="background: var(--danger); border-color: var(--danger); color: white;">Delete Section</button>
+                            <button type="submit" class="btn btn-sm btn-secondary" style="background: var(--danger); border-color: var(--danger); color: white;">{% trans 'Delete Section' %}</button>
                         </form>
                     </div>
                 </div>
@@ -383,49 +384,49 @@
                         {% endfor %}
                     </div>
                     {% else %}
-                    <p id="section-empty-{{ section.id }}" style="color: var(--text-secondary); margin: 0;">No questions in this section yet.</p>
+                    <p id="section-empty-{{ section.id }}" style="color: var(--text-secondary); margin: 0;">{% trans 'No questions in this section yet.' %}</p>
                     <div id="section-questions-{{ section.id }}" style="display: flex; flex-direction: column; gap: 1rem;"></div>
                     {% endif %}
 
                     <!-- Add Question Form -->
                     <details style="margin-top: 1rem;">
-                        <summary style="cursor: pointer; font-weight: 500; color: var(--primary); padding: 0.5rem 0;">Add Question to This Section</summary>
+                        <summary style="cursor: pointer; font-weight: 500; color: var(--primary); padding: 0.5rem 0;">{% trans 'Add Question to This Section' %}</summary>
                         <form method="post" class="add-question-form" data-section-id="{{ section.id }}" style="margin-top: 1rem; padding: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 0.5rem;">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="add_question">
                             <input type="hidden" name="section_id" value="{{ section.id }}">
 
                             <div class="form-group">
-                                <label for="question_text_{{ section.id }}" class="form-label">Question Text *</label>
+                                <label for="question_text_{{ section.id }}" class="form-label">{% trans 'Question Text' %} *</label>
                                 <textarea
                                     id="question_text_{{ section.id }}"
                                     name="question_text"
                                     class="form-control"
                                     rows="2"
                                     required
-                                    placeholder="How effectively does this person communicate complex ideas?"
+                                    placeholder="{% trans 'How effectively does this person communicate complex ideas?' %}"
                                 ></textarea>
                             </div>
 
                             <div class="form-group">
-                                <label for="question_type_{{ section.id }}" class="form-label">Question Type *</label>
+                                <label for="question_type_{{ section.id }}" class="form-label">{% trans 'Question Type' %} *</label>
                                 <select
                                     id="question_type_{{ section.id }}"
                                     name="question_type"
                                     class="form-control"
                                     onchange="toggleChoices{{ section.id }}(this)"
                                 >
-                                    <option value="rating">Rating Scale (1-5)</option>
-                                    <option value="likert">Likert Scale</option>
-                                    <option value="text">Free Text</option>
-                                    <option value="single_choice">Single Choice (Dropdown)</option>
-                                    <option value="multiple_choice">Multiple Choice (Checkboxes)</option>
-                                    <option value="scale">Numeric Scale</option>
+                                    <option value="rating">{% trans 'Rating Scale (1-5)' %}</option>
+                                    <option value="likert">{% trans 'Likert Scale' %}</option>
+                                    <option value="text">{% trans 'Free Text' %}</option>
+                                    <option value="single_choice">{% trans 'Single Choice (Dropdown)' %}</option>
+                                    <option value="multiple_choice">{% trans 'Multiple Choice (Checkboxes)' %}</option>
+                                    <option value="scale">{% trans 'Numeric Scale' %}</option>
                                 </select>
                             </div>
 
                             <div id="likert_container_{{ section.id }}" class="form-group" style="display: none;">
-                                <label for="likert_scale_{{ section.id }}" class="form-label">Likert Scale Items (one per line)</label>
+                                <label for="likert_scale_{{ section.id }}" class="form-label">{% trans 'Likert Scale Items (one per line)' %}</label>
                                 <textarea
                                     id="likert_scale_{{ section.id }}"
                                     name="likert_scale"
@@ -437,46 +438,46 @@ Disagree
 Neutral
 Agree
 Strongly Agree</textarea>
-                                <small style="color: var(--text-secondary); font-size: 0.875rem;">Default 5-point scale provided. Customize or use 3-point, 7-point, etc.</small>
+                                <small style="color: var(--text-secondary); font-size: 0.875rem;">{% trans 'Default 5-point scale provided. Customize or use 3-point, 7-point, etc.' %}</small>
                             </div>
 
                             <div id="scale_container_{{ section.id }}" class="form-group" style="display: none;">
-                                <label class="form-label">Scale Configuration</label>
+                                <label class="form-label">{% trans 'Scale Configuration' %}</label>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
                                     <div>
-                                        <label style="font-size: 0.875rem; color: var(--text-secondary);">Min</label>
+                                        <label style="font-size: 0.875rem; color: var(--text-secondary);">{% trans 'Min' %}</label>
                                         <input type="number" id="scale_min_{{ section.id }}" name="scale_min" class="form-control" value="1" style="font-size: 0.875rem;">
                                     </div>
                                     <div>
-                                        <label style="font-size: 0.875rem; color: var(--text-secondary);">Max</label>
+                                        <label style="font-size: 0.875rem; color: var(--text-secondary);">{% trans 'Max' %}</label>
                                         <input type="number" id="scale_max_{{ section.id }}" name="scale_max" class="form-control" value="100" style="font-size: 0.875rem;">
                                     </div>
                                     <div>
-                                        <label style="font-size: 0.875rem; color: var(--text-secondary);">Step</label>
+                                        <label style="font-size: 0.875rem; color: var(--text-secondary);">{% trans 'Step' context 'scale increment' %}</label>
                                         <input type="number" id="scale_step_{{ section.id }}" name="scale_step" class="form-control" value="1" style="font-size: 0.875rem;">
                                     </div>
                                 </div>
                                 <div style="margin-bottom: 0.5rem;">
-                                    <label style="font-size: 0.875rem; color: var(--text-secondary);">Min Label (Optional)</label>
-                                    <input type="text" id="scale_min_label_{{ section.id }}" name="scale_min_label" class="form-control" placeholder="e.g., Not at all" style="font-size: 0.875rem;">
+                                    <label style="font-size: 0.875rem; color: var(--text-secondary);">{% trans 'Min Label (Optional)' %}</label>
+                                    <input type="text" id="scale_min_label_{{ section.id }}" name="scale_min_label" class="form-control" placeholder="{% trans 'e.g., Not at all' %}" style="font-size: 0.875rem;">
                                 </div>
                                 <div>
-                                    <label style="font-size: 0.875rem; color: var(--text-secondary);">Max Label (Optional)</label>
-                                    <input type="text" id="scale_max_label_{{ section.id }}" name="scale_max_label" class="form-control" placeholder="e.g., Extremely" style="font-size: 0.875rem;">
+                                    <label style="font-size: 0.875rem; color: var(--text-secondary);">{% trans 'Max Label (Optional)' %}</label>
+                                    <input type="text" id="scale_max_label_{{ section.id }}" name="scale_max_label" class="form-control" placeholder="{% trans 'e.g., Extremely' %}" style="font-size: 0.875rem;">
                                 </div>
                                 <small style="color: var(--text-secondary); font-size: 0.875rem; display: block; margin-top: 0.5rem;">
-                                    Creates a slider or numeric input for precise measurement (e.g., 1-100 scale).
+                                    {% trans 'Creates a slider or numeric input for precise measurement (e.g., 1-100 scale).' %}
                                 </small>
                             </div>
 
                             <div id="choices_container_{{ section.id }}" class="form-group" style="display: none;">
-                                <label for="choices_{{ section.id }}" class="form-label">Choices (one per line)</label>
+                                <label for="choices_{{ section.id }}" class="form-label">{% trans 'Choices (one per line)' %}</label>
                                 <textarea
                                     id="choices_{{ section.id }}"
                                     name="choices"
                                     class="form-control"
                                     rows="3"
-                                    placeholder="Option 1&#10;Option 2&#10;Option 3"
+                                    placeholder="{% trans 'Option 1&#10;Option 2&#10;Option 3' %}"
                                     oninput="updateWeightInputs{{ section.id }}()"
                                 ></textarea>
 
@@ -488,24 +489,24 @@ Strongly Agree</textarea>
                                             name="enable_scoring"
                                             onchange="toggleWeightInputs{{ section.id }}()"
                                         >
-                                        <span>Enable numeric scoring for analytics</span>
+                                        <span>{% trans 'Enable numeric scoring for analytics' %}</span>
                                     </label>
                                     <small style="color: var(--text-secondary); font-size: 0.875rem; display: block; margin-top: 0.25rem;">
-                                        When enabled, this question will contribute to section scores and charts
+                                        {% trans 'When enabled, this question will contribute to section scores and charts' %}
                                         <button
                                             type="button"
                                             onclick="showScoringHelpModal{{ section.id }}()"
                                             style="background: none; border: none; color: var(--primary); cursor: pointer; text-decoration: underline; padding: 0; margin-left: 0.25rem; font-size: 0.875rem;"
                                         >
-                                            Learn more about scoring
+                                            {% trans 'Learn more about scoring' %}
                                         </button>
                                     </small>
                                 </div>
 
                                 <div id="weights_container_{{ section.id }}" style="display: none; margin-top: 1rem;">
-                                    <label class="form-label">Assign weights to each option (for scoring)</label>
+                                    <label class="form-label">{% trans 'Assign weights to each option (for scoring)' %}</label>
                                     <small style="color: var(--text-secondary); font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">
-                                        Assign numeric values (e.g., 1-5 scale) to measure this dimension
+                                        {% trans 'Assign numeric values (e.g., 1-5 scale) to measure this dimension' %}
                                     </small>
                                     <div id="weight_inputs_{{ section.id }}"></div>
                                 </div>
@@ -514,57 +515,57 @@ Strongly Agree</textarea>
                             <div class="form-group" style="margin-bottom: 0;">
                                 <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                                     <input type="checkbox" name="required" checked>
-                                    <span>Required question</span>
+                                    <span>{% trans 'Required question' %}</span>
                                 </label>
                             </div>
 
                             <!-- Dreyfus/Agency Configuration (Optional) -->
                             <details style="margin-top: 1rem; padding: 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 0.5rem;">
                                 <summary style="cursor: pointer; font-weight: 600; color: var(--primary); margin-bottom: 1rem;">
-                                    ⚙️ Dreyfus/Agency Configuration (Optional)
+                                    ⚙️ {% trans 'Dreyfus/Agency Configuration (Optional)' %}
                                 </summary>
 
                                 <div style="margin-top: 1rem;">
-                                    <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Model Weights</h4>
+                                    <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">{% trans 'Model Weights' %}</h4>
                                     <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 1rem;">
-                                        Set how this question contributes to Dreyfus skill and agency dimensions
+                                        {% trans 'Set how this question contributes to Dreyfus skill and agency dimensions' %}
                                     </p>
 
                                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
                                         <div>
-                                            <label class="form-label" style="font-size: 0.875rem;">Skill Weight</label>
+                                            <label class="form-label" style="font-size: 0.875rem;">{% trans 'Skill Weight' %}</label>
                                             <select name="add_skill_weight" class="form-control" style="font-size: 0.875rem;">
-                                                <option value="0">None (0)</option>
-                                                <option value="0.5">Low (0.5)</option>
-                                                <option value="1.0" selected>Medium (1.0)</option>
-                                                <option value="1.5">High (1.5)</option>
-                                                <option value="2.0">Very High (2.0)</option>
+                                                <option value="0">{% trans 'None (0)' %}</option>
+                                                <option value="0.5">{% trans 'Low (0.5)' %}</option>
+                                                <option value="1.0" selected>{% trans 'Medium (1.0)' %}</option>
+                                                <option value="1.5">{% trans 'High (1.5)' %}</option>
+                                                <option value="2.0">{% trans 'Very High (2.0)' %}</option>
                                             </select>
                                         </div>
                                         <div>
-                                            <label class="form-label" style="font-size: 0.875rem;">Agency Weight</label>
+                                            <label class="form-label" style="font-size: 0.875rem;">{% trans 'Agency Weight' %}</label>
                                             <select name="add_agency_weight" class="form-control" style="font-size: 0.875rem;">
-                                                <option value="0">None (0)</option>
-                                                <option value="0.5">Low (0.5)</option>
-                                                <option value="1.0" selected>Medium (1.0)</option>
-                                                <option value="1.5">High (1.5)</option>
-                                                <option value="2.0">Very High (2.0)</option>
+                                                <option value="0">{% trans 'None (0)' %}</option>
+                                                <option value="0.5">{% trans 'Low (0.5)' %}</option>
+                                                <option value="1.0" selected>{% trans 'Medium (1.0)' %}</option>
+                                                <option value="1.5">{% trans 'High (1.5)' %}</option>
+                                                <option value="2.0">{% trans 'Very High (2.0)' %}</option>
                                             </select>
                                         </div>
                                     </div>
 
                                     <div id="add_action_items_section_{{ section.id }}">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                            <h4 style="font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--text-primary);">Action Items</h4>
+                                            <h4 style="font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--text-primary);">{% trans 'Action Items' %}</h4>
                                             <button
                                                 type="button"
                                                 onclick="addNewQuestionActionItem{{ section.id }}()"
                                                 class="btn btn-sm btn-primary"
                                                 style="font-size: 0.75rem; padding: 0.25rem 0.5rem;"
-                                            >+ Add</button>
+                                            >+ {% trans 'Add' %}</button>
                                         </div>
                                         <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
-                                            Define action items for development plans when this question scores low
+                                            {% trans 'Define action items for development plans when this question scores low' %}
                                         </p>
                                         <div id="add_action_items_container_{{ section.id }}" style="display: flex; flex-direction: column; gap: 0.5rem;">
                                             <!-- Action items will be added here -->
@@ -573,7 +574,7 @@ Strongly Agree</textarea>
                                 </div>
                             </details>
 
-                            <button type="submit" class="btn btn-sm btn-primary" style="margin-top: 1rem;">Add Question</button>
+                            <button type="submit" class="btn btn-sm btn-primary" style="margin-top: 1rem;">{% trans 'Add Question' %}</button>
 
                             <script>
                                 function toggleChoices{{ section.id }}(select) {
@@ -630,8 +631,8 @@ Strongly Agree</textarea>
                                     const thead = document.createElement('thead');
                                     const headerRow = document.createElement('tr');
                                     headerRow.innerHTML = `
-                                        <th style="text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--border); color: var(--text-secondary); font-weight: 600;">Option</th>
-                                        <th style="text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--border); color: var(--text-secondary); font-weight: 600; width: 100px;">Weight</th>
+                                        <th style="text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--border); color: var(--text-secondary); font-weight: 600;">{{ _('Option')|escapejs }}</th>
+                                        <th style="text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--border); color: var(--text-secondary); font-weight: 600; width: 100px;">{{ _('Weight')|escapejs }}</th>
                                     `;
                                     thead.appendChild(headerRow);
                                     table.appendChild(thead);
@@ -641,7 +642,7 @@ Strongly Agree</textarea>
                                     choices.forEach((choice, index) => {
                                         const row = document.createElement('tr');
                                         row.innerHTML = `
-                                            <td style="padding: 0.5rem; border-bottom: 1px solid var(--border); color: var(--text-primary);">${choice || '(empty)'}</td>
+                                            <td style="padding: 0.5rem; border-bottom: 1px solid var(--border); color: var(--text-primary);">${choice || '{{ _('(empty)')|escapejs }}'}</td>
                                             <td style="padding: 0.5rem; border-bottom: 1px solid var(--border);">
                                                 <input
                                                     type="number"
@@ -674,6 +675,7 @@ Strongly Agree</textarea>
                                 // Add Question Action Items Management
                                 let addActionItemCounter{{ section.id }} = 0;
 
+                                {% blocktrans trimmed asvar action_item_label with number='%(number)s' %}Action Item #{{ number }}{% endblocktrans %}
                                 function addNewQuestionActionItem{{ section.id }}() {
                                     const container = document.getElementById('add_action_items_container_{{ section.id }}');
                                     const itemId = addActionItemCounter{{ section.id }}++;
@@ -689,7 +691,7 @@ Strongly Agree</textarea>
 
                                     itemDiv.innerHTML = `
                                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                                            <strong style="font-size: 0.75rem; color: var(--text-primary);">Action Item #${itemId + 1}</strong>
+                                            <strong style="font-size: 0.75rem; color: var(--text-primary);">${'{{ action_item_label|escapejs }}'.replace('%(number)s', itemId + 1)}</strong>
                                             <button
                                                 type="button"
                                                 onclick="removeNewQuestionActionItem{{ section.id }}(${itemId})"
@@ -700,12 +702,12 @@ Strongly Agree</textarea>
                                             name="add_action_items[${itemId}][text]"
                                             class="form-control"
                                             rows="2"
-                                            placeholder="e.g., Practice pair programming with senior developers"
+                                            placeholder="{{ _('e.g., Practice pair programming with senior developers')|escapejs }}"
                                             style="font-size: 0.75rem; margin-bottom: 0.5rem;"
                                         ></textarea>
                                         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 0.5rem; font-size: 0.75rem;">
                                             <div>
-                                                <label style="font-size: 0.7rem; color: var(--text-secondary);">Threshold</label>
+                                                <label style="font-size: 0.7rem; color: var(--text-secondary);">{{ _('Threshold')|escapejs }}</label>
                                                 <input
                                                     type="number"
                                                     name="add_action_items[${itemId}][threshold]"
@@ -718,7 +720,7 @@ Strongly Agree</textarea>
                                                 >
                                             </div>
                                             <div>
-                                                <label style="font-size: 0.7rem; color: var(--text-secondary);">Stages (optional)</label>
+                                                <label style="font-size: 0.7rem; color: var(--text-secondary);">{{ _('Stages (optional)')|escapejs }}</label>
                                                 <div style="display: flex; gap: 0.25rem; flex-wrap: wrap;">
                                                     ${[1, 2, 3, 4, 5].map(stage => `
                                                         <label style="display: flex; align-items: center; gap: 0.15rem; font-size: 0.7rem;">
@@ -746,7 +748,7 @@ Strongly Agree</textarea>
                             <div id="scoring_help_modal_{{ section.id }}" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeScoringHelpModal{{ section.id }}()">
                                 <div class="modal-content" style="max-width: 700px;">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                                        <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin: 0;">Question Scoring Guide</h2>
+                                        <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin: 0;">{% trans 'Question Scoring Guide' %}</h2>
                                         <button
                                             type="button"
                                             onclick="closeScoringHelpModal{{ section.id }}()"
@@ -755,106 +757,106 @@ Strongly Agree</textarea>
                                     </div>
 
                                     <div style="color: var(--text-primary);">
-                                        <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);">How Question Types Are Scored</h3>
+                                        <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);">{% trans 'How Question Types Are Scored' %}</h3>
 
                                         <div style="background: var(--bg-light); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
                                             <table style="width: 100%; border-collapse: collapse;">
                                                 <tr style="border-bottom: 1px solid var(--border);">
-                                                    <td style="padding: 0.5rem; font-weight: 600;">Question Type</td>
-                                                    <td style="padding: 0.5rem; font-weight: 600;">Scoring Method</td>
+                                                    <td style="padding: 0.5rem; font-weight: 600;">{% trans 'Question Type' %}</td>
+                                                    <td style="padding: 0.5rem; font-weight: 600;">{% trans 'Scoring Method' %}</td>
                                                 </tr>
                                                 <tr style="border-bottom: 1px solid var(--border);">
-                                                    <td style="padding: 0.5rem;">Rating Scale</td>
-                                                    <td style="padding: 0.5rem;">Automatically scored 1-5 ✓</td>
+                                                    <td style="padding: 0.5rem;">{% trans 'Rating Scale' %}</td>
+                                                    <td style="padding: 0.5rem;">{% trans 'Automatically scored 1-5' %} ✓</td>
                                                 </tr>
                                                 <tr style="border-bottom: 1px solid var(--border);">
-                                                    <td style="padding: 0.5rem;">Likert Scale</td>
-                                                    <td style="padding: 0.5rem;">Position-based (1st option=1, 2nd=2, etc.) ✓</td>
+                                                    <td style="padding: 0.5rem;">{% trans 'Likert Scale' %}</td>
+                                                    <td style="padding: 0.5rem;">{% trans 'Position-based (1st option=1, 2nd=2, etc.)' %} ✓</td>
                                                 </tr>
                                                 <tr style="border-bottom: 1px solid var(--border);">
-                                                    <td style="padding: 0.5rem;">Free Text</td>
-                                                    <td style="padding: 0.5rem;">Not scored (qualitative only)</td>
+                                                    <td style="padding: 0.5rem;">{% trans 'Free Text' %}</td>
+                                                    <td style="padding: 0.5rem;">{% trans 'Not scored (qualitative only)' %}</td>
                                                 </tr>
                                                 <tr style="border-bottom: 1px solid var(--border);">
-                                                    <td style="padding: 0.5rem;">Single Choice</td>
-                                                    <td style="padding: 0.5rem;">Optional weighted scoring</td>
+                                                    <td style="padding: 0.5rem;">{% trans 'Single Choice' %}</td>
+                                                    <td style="padding: 0.5rem;">{% trans 'Optional weighted scoring' %}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="padding: 0.5rem;">Multiple Choice</td>
-                                                    <td style="padding: 0.5rem;">Optional weighted scoring</td>
+                                                    <td style="padding: 0.5rem;">{% trans 'Multiple Choice' %}</td>
+                                                    <td style="padding: 0.5rem;">{% trans 'Optional weighted scoring' %}</td>
                                                 </tr>
                                             </table>
                                         </div>
 
-                                        <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);">What is Weighted Scoring?</h3>
+                                        <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);">{% trans 'What is Weighted Scoring?' %}</h3>
                                         <p style="margin-bottom: 1rem; line-height: 1.6;">
-                                            Weighted scoring lets you assign numeric values to each choice option. This allows choice-based questions to contribute to:
+                                            {% trans 'Weighted scoring lets you assign numeric values to each choice option. This allows choice-based questions to contribute to:' %}
                                         </p>
                                         <ul style="margin-bottom: 1.5rem; line-height: 1.8; padding-left: 1.5rem;">
-                                            <li>Section averages and overall scores</li>
-                                            <li>Performance charts and visualizations</li>
-                                            <li>Insights & analytics (strengths/development areas)</li>
-                                            <li>Comparisons across review cycles</li>
+                                            <li>{% trans 'Section averages and overall scores' %}</li>
+                                            <li>{% trans 'Performance charts and visualizations' %}</li>
+                                            <li>{% trans 'Insights & analytics (strengths/development areas)' %}</li>
+                                            <li>{% trans 'Comparisons across review cycles' %}</li>
                                         </ul>
 
-                                        <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);">How It Works</h3>
+                                        <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);">{% trans 'How It Works' %}</h3>
 
                                         <div style="background: var(--bg-light); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                                            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Single Choice (Dropdown)</h4>
-                                            <p style="margin-bottom: 0.5rem; line-height: 1.6;">User selects ONE option. Score = weight of selected option.</p>
+                                            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">{% trans 'Single Choice (Dropdown)' %}</h4>
+                                            <p style="margin-bottom: 0.5rem; line-height: 1.6;">{% trans 'User selects ONE option. Score = weight of selected option.' %}</p>
                                             <div style="background: var(--bg-card); padding: 0.75rem; border-radius: 4px; margin-top: 0.5rem; font-family: monospace; font-size: 0.875rem;">
-                                                <strong>Example:</strong> "How would you rate their communication?"<br>
-                                                • Excellent Communication → 5<br>
-                                                • Good Communication → 4<br>
-                                                • Average Communication → 3<br>
-                                                • Needs Improvement → 2<br>
-                                                • Poor Communication → 1<br>
+                                                <strong>{% trans 'Example:' %}</strong> "{% trans 'How would you rate their communication?' %}"<br>
+                                                • {% trans 'Excellent Communication' %} → 5<br>
+                                                • {% trans 'Good Communication' %} → 4<br>
+                                                • {% trans 'Average Communication' %} → 3<br>
+                                                • {% trans 'Needs Improvement' %} → 2<br>
+                                                • {% trans 'Poor Communication' %} → 1<br>
                                                 <br>
-                                                <em style="color: var(--success);">If user selects "Good" → Score: 4</em>
+                                                <em style="color: var(--success);">{% trans 'If user selects "Good" → Score: 4' %}</em>
                                             </div>
                                         </div>
 
                                         <div style="background: var(--bg-light); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
-                                            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Multiple Choice (Checkboxes)</h4>
-                                            <p style="margin-bottom: 0.5rem; line-height: 1.6;">User selects MULTIPLE options. Score = sum of selected option weights.</p>
+                                            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">{% trans 'Multiple Choice (Checkboxes)' %}</h4>
+                                            <p style="margin-bottom: 0.5rem; line-height: 1.6;">{% trans 'User selects MULTIPLE options. Score = sum of selected option weights.' %}</p>
                                             <div style="background: var(--bg-card); padding: 0.75rem; border-radius: 4px; margin-top: 0.5rem; font-family: monospace; font-size: 0.875rem;">
-                                                <strong>Example:</strong> "Which leadership qualities do they demonstrate?"<br>
-                                                • Strategic thinking → 5<br>
-                                                • Team motivation → 5<br>
-                                                • Clear communication → 4<br>
-                                                • Delegation → 4<br>
-                                                • Time management → 3<br>
+                                                <strong>{% trans 'Example:' %}</strong> "{% trans 'Which leadership qualities do they demonstrate?' %}"<br>
+                                                • {% trans 'Strategic thinking' %} → 5<br>
+                                                • {% trans 'Team motivation' %} → 5<br>
+                                                • {% trans 'Clear communication' %} → 4<br>
+                                                • {% trans 'Delegation' %} → 4<br>
+                                                • {% trans 'Time management' %} → 3<br>
                                                 <br>
-                                                <em style="color: var(--success);">If user selects "Strategic thinking" + "Clear communication" + "Team motivation"<br>
-                                                → Score: 5 + 4 + 5 = 14 (rewards demonstrating more qualities)</em>
+                                                <em style="color: var(--success);">{% blocktrans trimmed %}If user selects "Strategic thinking" + "Clear communication" + "Team motivation"<br>
+                                                → Score: 5 + 4 + 5 = 14 (rewards demonstrating more qualities){% endblocktrans %}</em>
                                             </div>
                                             <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
-                                                <strong>Note:</strong> Multiple choice uses SUM (not average) to reward selecting more positive attributes.
-                                                This makes it ideal for competency checklists where more is better.
+                                                <strong>{% trans 'Note:' %}</strong> {% blocktrans trimmed %}Multiple choice uses SUM (not average) to reward selecting more positive attributes.
+                                                This makes it ideal for competency checklists where more is better.{% endblocktrans %}
                                             </p>
                                         </div>
 
-                                        <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);">Best Practices</h3>
+                                        <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);">{% trans 'Best Practices' %}</h3>
                                         <ul style="margin-bottom: 1.5rem; line-height: 1.8; padding-left: 1.5rem;">
-                                            <li><strong>Use consistent scales:</strong> Stick to 1-5 or 1-10 throughout your questionnaire</li>
-                                            <li><strong>Higher = Better:</strong> Assign higher weights to more positive/desirable options</li>
-                                            <li><strong>Frequency questions:</strong> Daily=5, Weekly=4, Monthly=3, Rarely=2, Never=1</li>
-                                            <li><strong>Competency checklists:</strong> Weight by importance/difficulty level, or set all weights to 1 to simply count how many competencies were selected</li>
-                                            <li><strong>Equal weighting:</strong> For multiple choice questions where all options are equally valuable, set all weights to 1. This creates a simple counter (3 selections = score of 3)</li>
-                                            <li><strong>Skip scoring when:</strong> Choices are purely categorical (e.g., department names, roles)</li>
+                                            <li><strong>{% trans 'Use consistent scales:' %}</strong> {% trans 'Stick to 1-5 or 1-10 throughout your questionnaire' %}</li>
+                                            <li><strong>{% trans 'Higher = Better:' %}</strong> {% trans 'Assign higher weights to more positive/desirable options' %}</li>
+                                            <li><strong>{% trans 'Frequency questions:' %}</strong> {% trans 'Daily=5, Weekly=4, Monthly=3, Rarely=2, Never=1' %}</li>
+                                            <li><strong>{% trans 'Competency checklists:' %}</strong> {% trans 'Weight by importance/difficulty level, or set all weights to 1 to simply count how many competencies were selected' %}</li>
+                                            <li><strong>{% trans 'Equal weighting:' %}</strong> {% trans 'For multiple choice questions where all options are equally valuable, set all weights to 1. This creates a simple counter (3 selections = score of 3)' %}</li>
+                                            <li><strong>{% trans 'Skip scoring when:' %}</strong> {% trans 'Choices are purely categorical (e.g., department names, roles)' %}</li>
                                         </ul>
 
                                         <div style="background: var(--bg-light); border-left: 4px solid var(--primary); padding: 1rem; border-radius: 4px; margin-top: 1.5rem;">
                                             <p style="margin: 0; color: var(--text-primary); line-height: 1.6;">
-                                                <strong>Tip:</strong> You can leave scoring disabled for simple multiple choice questions.
-                                                Enable it only when you need numeric analytics for that specific question.
+                                                <strong>{% trans 'Tip:' %}</strong> {% blocktrans trimmed %}You can leave scoring disabled for simple multiple choice questions.
+                                                Enable it only when you need numeric analytics for that specific question.{% endblocktrans %}
                                             </p>
                                         </div>
                                     </div>
 
                                     <div style="display: flex; justify-content: flex-end; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border);">
                                         <button type="button" onclick="closeScoringHelpModal{{ section.id }}()" class="btn btn-primary">
-                                            Got it!
+                                            {% trans 'Got it!' %}
                                         </button>
                                     </div>
                                 </div>
@@ -865,7 +867,7 @@ Strongly Agree</textarea>
             </div>
             {% endfor %}
             {% else %}
-            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">No sections yet. Add a section to start building your questionnaire.</p>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">{% trans 'No sections yet. Add a section to start building your questionnaire.' %}</p>
             {% endif %}
         </div>
     </div>
@@ -873,7 +875,7 @@ Strongly Agree</textarea>
     <!-- Add Section -->
     <div class="card mb-2">
         <div class="card-header">
-            <h2 class="card-title">Add Section</h2>
+            <h2 class="card-title">{% trans 'Add Section' %}</h2>
         </div>
         <div class="card-body">
             <form method="post">
@@ -881,29 +883,29 @@ Strongly Agree</textarea>
                 <input type="hidden" name="action" value="add_section">
 
                 <div class="form-group">
-                    <label for="section_title" class="form-label">Section Title *</label>
+                    <label for="section_title" class="form-label">{% trans 'Section Title' %} *</label>
                     <input
                         type="text"
                         id="section_title"
                         name="section_title"
                         class="form-control"
                         required
-                        placeholder="Leadership & Management"
+                        placeholder="{% trans 'Leadership & Management' %}"
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="section_description" class="form-label">Section Description (Optional)</label>
+                    <label for="section_description" class="form-label">{% trans 'Section Description (Optional)' %}</label>
                     <textarea
                         id="section_description"
                         name="section_description"
                         class="form-control"
                         rows="2"
-                        placeholder="Questions about leadership style, decision-making, and team management"
+                        placeholder="{% trans 'Questions about leadership style, decision-making, and team management' %}"
                     ></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Add Section</button>
+                <button type="submit" class="btn btn-primary">{% trans 'Add Section' %}</button>
             </form>
         </div>
     </div>
@@ -1005,13 +1007,16 @@ function getCsrfToken(form) {
     return form.querySelector('input[name="csrfmiddlewaretoken"]')?.value || '';
 }
 
+{% blocktrans trimmed asvar type_label with type='%(type)s' %}Type: {{ type }}{% endblocktrans %}
+{% blocktrans trimmed asvar scale_label with min='%(min)s' max='%(max)s' %}Scale: {{ min }}-{{ max }}{% endblocktrans %}
+{% blocktrans trimmed asvar point_scale_label with count='%(count)s' %}{{ count }}-point scale{% endblocktrans %}
 function buildQuestionMeta(question) {
-    let meta = `Type: ${question.question_type_display}`;
+    let meta = '{{ type_label|escapejs }}'.replace('%(type)s', question.question_type_display);
 
     if (question.question_type === 'rating' && question.config?.min !== undefined && question.config?.max !== undefined) {
-        meta += ` | Scale: ${question.config.min}-${question.config.max}`;
+        meta += ' | ' + '{{ scale_label|escapejs }}'.replace('%(min)s', question.config.min).replace('%(max)s', question.config.max);
     } else if (question.question_type === 'likert' && Array.isArray(question.config?.scale)) {
-        meta += ` | ${question.config.scale.length}-point scale`;
+        meta += ' | ' + '{{ point_scale_label|escapejs }}'.replace('%(count)s', question.config.scale.length);
     }
 
     return meta;
@@ -1142,7 +1147,7 @@ async function postFormAsJson(form) {
     const payload = await response.json();
 
     if (!response.ok || !payload.success) {
-        throw new Error(payload.message || 'Request failed.');
+        throw new Error(payload.message || '{{ _('Request failed.')|escapejs }}');
     }
 
     return payload;
@@ -1156,7 +1161,7 @@ async function submitEditQuestionForm(event) {
     const originalLabel = submitButton.textContent;
 
     submitButton.disabled = true;
-    submitButton.textContent = 'Saving...';
+    submitButton.textContent = '{{ _('Saving...')|escapejs }}';
 
     try {
         const payload = await postFormAsJson(form);
@@ -1167,7 +1172,7 @@ async function submitEditQuestionForm(event) {
             showFloatingAlert(questionCard, payload.message, 'success');
         }
     } catch (error) {
-        showFloatingAlert(document.getElementById('edit_question_modal').querySelector('.modal-content'), error.message || 'Failed to update question.', 'error');
+        showFloatingAlert(document.getElementById('edit_question_modal').querySelector('.modal-content'), error.message || '{{ _('Failed to update question.')|escapejs }}', 'error');
     } finally {
         submitButton.disabled = false;
         submitButton.textContent = originalLabel;
@@ -1182,7 +1187,7 @@ async function submitAddQuestionForm(event) {
     const originalLabel = submitButton.textContent;
 
     submitButton.disabled = true;
-    submitButton.textContent = 'Adding...';
+    submitButton.textContent = '{{ _('Adding...')|escapejs }}';
 
     try {
         const payload = await postFormAsJson(form);
@@ -1190,7 +1195,7 @@ async function submitAddQuestionForm(event) {
         const emptyState = document.getElementById(`section-empty-${payload.section_id}`);
 
         if (!questionsContainer) {
-            throw new Error('Question list container not found.');
+            throw new Error('{{ _('Question list container not found.')|escapejs }}');
         }
 
         if (emptyState) {
@@ -1221,7 +1226,7 @@ async function submitAddQuestionForm(event) {
             actionItemsContainer.innerHTML = '';
         }
     } catch (error) {
-        showFloatingAlert(form, error.message || 'Failed to add question.', 'error');
+        showFloatingAlert(form, error.message || '{{ _('Failed to add question.')|escapejs }}', 'error');
     } finally {
         submitButton.disabled = false;
         submitButton.textContent = originalLabel;
@@ -1283,8 +1288,8 @@ function updateEditWeightInputs() {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     headerRow.innerHTML = `
-        <th style="text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--border); color: var(--text-secondary); font-weight: 600;">Option</th>
-        <th style="text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--border); color: var(--text-secondary); font-weight: 600; width: 100px;">Weight</th>
+        <th style="text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--border); color: var(--text-secondary); font-weight: 600;">{{ _('Option')|escapejs }}</th>
+        <th style="text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--border); color: var(--text-secondary); font-weight: 600; width: 100px;">{{ _('Weight')|escapejs }}</th>
     `;
     thead.appendChild(headerRow);
     table.appendChild(thead);
@@ -1294,7 +1299,7 @@ function updateEditWeightInputs() {
     choices.forEach((choice, index) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td style="padding: 0.5rem; border-bottom: 1px solid var(--border); color: var(--text-primary);">${choice || '(empty)'}</td>
+            <td style="padding: 0.5rem; border-bottom: 1px solid var(--border); color: var(--text-primary);">${choice || '{{ _('(empty)')|escapejs }}'}</td>
             <td style="padding: 0.5rem; border-bottom: 1px solid var(--border);">
                 <input
                     type="number"
@@ -1446,7 +1451,7 @@ async function loadDreyfusConfig(questionId) {
             });
         } else {
             // Show empty state
-            container.innerHTML = '<p style="color: var(--text-secondary); font-style: italic; text-align: center; padding: 2rem;">No action items configured. Click "+ Add Action Item" to create one.</p>';
+            container.innerHTML = '<p style="color: var(--text-secondary); font-style: italic; text-align: center; padding: 2rem;">{{ _('No action items configured. Click "+ Add Action Item" to create one.')|escapejs }}</p>';
         }
     } catch (error) {
         console.error('Error loading Dreyfus config:', error);
@@ -1456,6 +1461,8 @@ async function loadDreyfusConfig(questionId) {
     }
 }
 
+{% blocktrans trimmed asvar action_item_label with number='%(number)s' %}Action Item #{{ number }}{% endblocktrans %}
+{% blocktrans trimmed asvar stage_label with stage='%(stage)s' %}Stage {{ stage }}{% endblocktrans %}
 function addActionItem(text = '', threshold = 3.0, stages = []) {
     const container = document.getElementById('action_items_container');
 
@@ -1478,7 +1485,7 @@ function addActionItem(text = '', threshold = 3.0, stages = []) {
 
     itemDiv.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-            <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin: 0;">Action Item #${itemId + 1}</h4>
+            <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin: 0;">${'{{ action_item_label|escapejs }}'.replace('%(number)s', itemId + 1)}</h4>
             <button
                 type="button"
                 onclick="removeActionItem(${itemId})"
@@ -1487,20 +1494,20 @@ function addActionItem(text = '', threshold = 3.0, stages = []) {
         </div>
 
         <div style="margin-bottom: 1rem;">
-            <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-primary); font-size: 0.875rem;">Action Item Text *</label>
+            <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-primary); font-size: 0.875rem;">{{ _('Action Item Text')|escapejs }} *</label>
             <textarea
                 name="action_items[${itemId}][text]"
                 class="form-control"
                 rows="2"
                 required
-                placeholder="e.g., Practice pair programming with senior developers"
+                placeholder="{{ _('e.g., Practice pair programming with senior developers')|escapejs }}"
                 style="font-size: 0.875rem;"
             >${text}</textarea>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem;">
             <div>
-                <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-primary); font-size: 0.875rem;">Threshold Score</label>
+                <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-primary); font-size: 0.875rem;">{{ _('Threshold Score')|escapejs }}</label>
                 <input
                     type="number"
                     name="action_items[${itemId}][threshold]"
@@ -1512,13 +1519,13 @@ function addActionItem(text = '', threshold = 3.0, stages = []) {
                     style="font-size: 0.875rem;"
                 >
                 <small style="color: var(--text-secondary); font-size: 0.75rem; display: block; margin-top: 0.25rem;">
-                    Show if score &lt; this value
+                    {{ _('Show if score &lt; this value')|escapejs }}
                 </small>
             </div>
 
             <div>
                 <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-primary); font-size: 0.875rem;">
-                    Relevant Stages (Optional)
+                    {{ _('Relevant Stages (Optional)')|escapejs }}
                 </label>
                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                     ${[1, 2, 3, 4, 5].map(stage => `
@@ -1529,12 +1536,12 @@ function addActionItem(text = '', threshold = 3.0, stages = []) {
                                 value="${stage}"
                                 ${stages.includes(stage) ? 'checked' : ''}
                             >
-                            <span>Stage ${stage}</span>
+                            <span>${'{{ stage_label|escapejs }}'.replace('%(stage)s', stage)}</span>
                         </label>
                     `).join('')}
                 </div>
                 <small style="color: var(--text-secondary); font-size: 0.75rem; display: block; margin-top: 0.25rem;">
-                    Leave unchecked for all stages
+                    {{ _('Leave unchecked for all stages')|escapejs }}
                 </small>
             </div>
         </div>
@@ -1552,7 +1559,7 @@ function removeActionItem(itemId) {
     // Show empty state if no items left
     const container = document.getElementById('action_items_container');
     if (container.children.length === 0) {
-        container.innerHTML = '<p style="color: var(--text-secondary); font-style: italic; text-align: center; padding: 2rem;">No action items configured. Click "+ Add Action Item" to create one.</p>';
+        container.innerHTML = '<p style="color: var(--text-secondary); font-style: italic; text-align: center; padding: 2rem;">{{ _('No action items configured. Click "+ Add Action Item" to create one.')|escapejs }}</p>';
     }
 }
 </script>

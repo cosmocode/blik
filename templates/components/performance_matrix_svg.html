@@ -1,3 +1,4 @@
+{% load i18n %}
 <!-- Performance Matrix 2x2 Grid SVG - Refined colors for elegance -->
 <svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" class="framework-diagram performance-matrix-diagram">
 
@@ -25,68 +26,68 @@
     <!-- Quadrant Labels -->
     <!-- Force Multipliers (Top-Right) -->
     <text x="550" y="210" text-anchor="middle" font-size="26" font-weight="700" class="pm-success-fill">
-        Force Multipliers
+        {% trans 'Force Multipliers' %}
     </text>
     <text x="550" y="240" text-anchor="middle" font-size="13" class="pm-text-secondary" opacity="0.8">
-        High Skill + High Agency
+        {% trans 'High Skill + High Agency' %}
     </text>
     <text x="550" y="285" text-anchor="middle" font-size="15" font-weight="600" class="pm-success-fill" opacity="0.9">
-        Hire • Promote • Clone
+        {% trans 'Hire • Promote • Clone' %}
     </text>
 
     <!-- Hungry Learners (Top-Left) -->
     <text x="250" y="210" text-anchor="middle" font-size="26" font-weight="700" class="pm-warning-fill">
-        Hungry Learners
+        {% trans 'Hungry Learners' %}
     </text>
     <text x="250" y="240" text-anchor="middle" font-size="13" class="pm-text-secondary" opacity="0.8">
-        Low Skill + High Agency
+        {% trans 'Low Skill + High Agency' %}
     </text>
     <text x="250" y="285" text-anchor="middle" font-size="15" font-weight="600" class="pm-warning-fill" opacity="0.9">
-        Best Junior Hire
+        {% trans 'Best Junior Hire' %}
     </text>
 
     <!-- Brilliant Passengers (Bottom-Right) -->
     <text x="550" y="510" text-anchor="middle" font-size="26" font-weight="700" class="pm-warning-fill">
-        Brilliant Passengers
+        {% trans 'Brilliant Passengers' %}
     </text>
     <text x="550" y="540" text-anchor="middle" font-size="13" class="pm-text-secondary" opacity="0.8">
-        High Skill + Low Agency
+        {% trans 'High Skill + Low Agency' %}
     </text>
     <text x="550" y="585" text-anchor="middle" font-size="15" font-weight="600" class="pm-warning-fill" opacity="0.9">
-        Coach on Ownership
+        {% trans 'Coach on Ownership' %}
     </text>
 
     <!-- Low Performers (Bottom-Left) -->
     <text x="250" y="510" text-anchor="middle" font-size="26" font-weight="700" class="pm-neutral-fill">
-        Low Performers
+        {% trans 'Low Performers' %}
     </text>
     <text x="250" y="540" text-anchor="middle" font-size="13" class="pm-text-secondary" opacity="0.8">
-        Low Skill + Low Agency
+        {% trans 'Low Skill + Low Agency' %}
     </text>
     <text x="250" y="585" text-anchor="middle" font-size="15" font-weight="600" class="pm-neutral-fill" opacity="0.7">
-        3-Month PIP or Exit
+        {% trans '3-Month PIP or Exit' %}
     </text>
 
     <!-- X-Axis Label -->
     <text x="400" y="740" text-anchor="middle" font-size="18" font-weight="600" class="pm-text-primary">
-        Technical Skill (Dreyfus Model)
+        {% trans 'Technical Skill (Dreyfus Model)' %}
     </text>
     <text x="140" y="720" text-anchor="start" font-size="14" class="pm-text-secondary">
-        Novice
+        {% trans 'Novice' %}
     </text>
     <text x="660" y="720" text-anchor="end" font-size="14" class="pm-text-secondary">
-        Expert
+        {% trans 'Expert' %}
     </text>
 
     <!-- Y-Axis Label -->
     <text x="50" y="400" text-anchor="middle" font-size="18" font-weight="600" class="pm-text-primary" transform="rotate(-90 50 400)">
-        Agency Level
+        {% trans 'Agency Level' %}
     </text>
     <text x="120" y="690" text-anchor="start" font-size="14" class="pm-text-secondary">
-        Level 1
+        {% trans 'Level 1' %}
     </text>
     <text x="120" y="130" text-anchor="start" font-size="14" class="pm-text-secondary">
-        Level 5
+        {% trans 'Level 5' %}
     </text>
 
     <!-- Center Dividing Lines -->

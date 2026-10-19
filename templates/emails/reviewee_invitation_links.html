@@ -1,3 +1,4 @@
+{% load i18n %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,56 +18,56 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 style="margin: 0; font-size: 1.75rem;">Share Your Review Links</h1>
+            <h1 style="margin: 0; font-size: 1.75rem;">{% trans 'Share Your Review Links' %}</h1>
         </div>
         <div class="content">
-            <p>Hi <strong>{{ reviewee.name }}</strong>,</p>
+            <p>{% blocktrans trimmed with name=reviewee.name %}Hi <strong>{{ name }}</strong>,{% endblocktrans %}</p>
 
-            <p>Your 360-degree feedback cycle has been created. Please share the following invitation links with your reviewers:</p>
+            <p>{% trans 'Your 360-degree feedback cycle has been created. Please share the following invitation links with your reviewers:' %}</p>
 
             {% if peer_url %}
             <div class="link-box">
-                <h3>🤝 Peer Reviews</h3>
+                <h3>🤝 {% trans 'Peer Reviews' %}</h3>
                 <code>{{ peer_url }}</code>
                 <p style="margin: 10px 0 0 0; font-size: 0.875rem; color: #6b7280;">
-                    Share this link with your colleagues/peers. Each person who clicks will get their own unique review link.
+                    {% trans 'Share this link with your colleagues/peers. Each person who clicks will get their own unique review link.' %}
                 </p>
             </div>
             {% endif %}
 
             {% if manager_url %}
             <div class="link-box">
-                <h3>👔 Manager Review</h3>
+                <h3>👔 {% trans 'Manager Review' %}</h3>
                 <code>{{ manager_url }}</code>
                 <p style="margin: 10px 0 0 0; font-size: 0.875rem; color: #6b7280;">
-                    Share this link with your manager.
+                    {% trans 'Share this link with your manager.' %}
                 </p>
             </div>
             {% endif %}
 
             {% if direct_report_url %}
             <div class="link-box">
-                <h3>👥 Direct Report Reviews</h3>
+                <h3>👥 {% trans 'Direct Report Reviews' %}</h3>
                 <code>{{ direct_report_url }}</code>
                 <p style="margin: 10px 0 0 0; font-size: 0.875rem; color: #6b7280;">
-                    Share this link with your direct reports. Each person who clicks will get their own unique review link.
+                    {% trans 'Share this link with your direct reports. Each person who clicks will get their own unique review link.' %}
                 </p>
             </div>
             {% endif %}
 
             <div class="info-box">
-                <strong>Important:</strong>
+                <strong>{% trans 'Important:' %}</strong>
                 <ul style="margin: 10px 0 0 0; padding-left: 20px;">
-                    <li>Each link can be shared with multiple people</li>
-                    <li>Reviewers remain anonymous</li>
-                    <li>They can save their progress and return later</li>
+                    <li>{% trans 'Each link can be shared with multiple people' %}</li>
+                    <li>{% trans 'Reviewers remain anonymous' %}</li>
+                    <li>{% trans 'They can save their progress and return later' %}</li>
                 </ul>
             </div>
 
-            <p><strong>Questionnaire:</strong> {{ cycle.questionnaire.name }}</p>
+            <p><strong>{% trans 'Questionnaire:' %}</strong> {{ cycle.questionnaire.name }}</p>
         </div>
         <div class="footer">
-            <p>This is an automated email from your feedback system.</p>
+            <p>{% trans 'This is an automated email from your feedback system.' %}</p>
         </div>
     </div>
 </body>

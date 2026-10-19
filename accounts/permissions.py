@@ -13,6 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.contrib import messages
+from django.utils.translation import gettext_lazy as _, gettext
 from accounts.models import UserProfile
 
 
@@ -54,31 +55,31 @@ def ensure_permission_groups():
     content_type = ContentType.objects.get_for_model(UserProfile)
 
     # Create or get permissions
-    invite_permission, _ = Permission.objects.get_or_create(
+    invite_permission, created = Permission.objects.get_or_create(
         codename='can_invite_members',
         content_type=content_type,
         defaults={'name': 'Can invite team members'},
     )
 
-    manage_org_permission, _ = Permission.objects.get_or_create(
+    manage_org_permission, created = Permission.objects.get_or_create(
         codename='can_manage_organization',
         content_type=content_type,
         defaults={'name': 'Can manage organization settings'},
     )
 
-    delete_org_permission, _ = Permission.objects.get_or_create(
+    delete_org_permission, created = Permission.objects.get_or_create(
         codename='can_delete_organization',
         content_type=content_type,
         defaults={'name': 'Can delete organization'},
     )
 
-    view_all_reports_permission, _ = Permission.objects.get_or_create(
+    view_all_reports_permission, created = Permission.objects.get_or_create(
         codename='can_view_all_reports',
         content_type=content_type,
         defaults={'name': 'Can view all organization reports'},
     )
 
-    manage_questionnaires_permission, _ = Permission.objects.get_or_create(
+    manage_questionnaires_permission, created = Permission.objects.get_or_create(
         codename='can_manage_questionnaires',
         content_type=content_type,
         defaults={'name': 'Can create and edit questionnaires'},
@@ -105,7 +106,7 @@ def ensure_permission_groups():
             admin_group.permissions.add(*missing)
 
     # Create Organization Member group
-    member_group, _ = Group.objects.get_or_create(name=ORG_MEMBER_GROUP)
+    member_group, created = Group.objects.get_or_create(name=ORG_MEMBER_GROUP)
     # Members have no special permissions by default
 
     return admin_group, member_group
@@ -123,7 +124,7 @@ def assign_organization_admin(user):
         user: Django User instance
     """
     ensure_permission_groups()
-    admin_group, _ = Group.objects.get_or_create(name=ORG_ADMIN_GROUP)
+    admin_group, created = Group.objects.get_or_create(name=ORG_ADMIN_GROUP)
 
     # Remove from any org group first so role changes are clean
     remove_from_all_org_groups(user)
@@ -159,7 +160,7 @@ def assign_organization_member(user, can_create_cycles_for_others=False):
         can_create_cycles_for_others: Whether member can create cycles for others
     """
     ensure_permission_groups()
-    member_group, _ = Group.objects.get_or_create(name=ORG_MEMBER_GROUP)
+    member_group, created = Group.objects.get_or_create(name=ORG_MEMBER_GROUP)
 
     # Remove from any org group first — otherwise demoting an admin leaves
     # them in ORG_ADMIN_GROUP and they keep all admin permissions.
@@ -244,7 +245,7 @@ def login_required(view_func=None, as_json=False, **kwargs):
         def wrapper(request, *args, **kw):
             if not request.user.is_authenticated:
                 return JsonResponse(
-                    {'error': 'Authentication required'}, status=401)
+                    {'error': gettext('Authentication required')}, status=401)
 
             return func(request, *args, **kw)
         return wrapper
@@ -315,26 +316,26 @@ def build_permission_decorator(name, permission, default_message,
 organization_admin_required = build_permission_decorator(
     'organization_admin_required',
     'accounts.can_invite_members',
-    'You do not have permission to perform this action. '
-    'Only organization administrators can access this feature.',
+    _('You do not have permission to perform this action. '
+      'Only organization administrators can access this feature.'),
 )
 
 can_manage_organization_required = build_permission_decorator(
     'can_manage_organization_required',
     'accounts.can_manage_organization',
-    'You do not have permission to manage organization settings.',
+    _('You do not have permission to manage organization settings.'),
 )
 
 can_delete_organization_required = build_permission_decorator(
     'can_delete_organization_required',
     'accounts.can_delete_organization',
-    'Only organization administrators can delete the organization.',
+    _('Only organization administrators can delete the organization.'),
 )
 
 can_manage_questionnaires_required = build_permission_decorator(
     'can_manage_questionnaires_required',
     'accounts.can_manage_questionnaires',
-    'You do not have permission to create or edit questionnaires.',
+    _('You do not have permission to create or edit questionnaires.'),
     default_redirect='questionnaire_list',
 )
 

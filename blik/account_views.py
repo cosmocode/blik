@@ -8,6 +8,7 @@ from django.contrib.auth import logout
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
+from django.utils.translation import gettext as _, gettext_lazy
 from accounts.services import (
     export_organization_data,
     delete_user_account,
@@ -55,17 +56,17 @@ def cancel_subscription_view(request):
     """Cancel subscription at period end."""
     org = request.organization
     if not org:
-        messages.error(request, 'Organization not found.')
+        messages.error(request, _('Organization not found.'))
         return redirect('account_settings')
 
     try:
         subscription = Subscription.objects.get(organization=org)
         cancel_subscription(subscription)
-        messages.success(request, 'Subscription will be canceled at the end of the current billing period.')
+        messages.success(request, _('Subscription will be canceled at the end of the current billing period.'))
     except Subscription.DoesNotExist:
-        messages.error(request, 'No active subscription found.')
+        messages.error(request, _('No active subscription found.'))
     except Exception as e:
-        messages.error(request, f'Error canceling subscription: {str(e)}')
+        messages.error(request, _('Error canceling subscription: %(error)s') % {'error': str(e)})
 
     return redirect('account_settings')
 
@@ -76,17 +77,17 @@ def reactivate_subscription_view(request):
     """Reactivate a subscription that was set to cancel."""
     org = request.organization
     if not org:
-        messages.error(request, 'Organization not found.')
+        messages.error(request, _('Organization not found.'))
         return redirect('account_settings')
 
     try:
         subscription = Subscription.objects.get(organization=org)
         reactivate_subscription(subscription)
-        messages.success(request, 'Subscription reactivated successfully.')
+        messages.success(request, _('Subscription reactivated successfully.'))
     except Subscription.DoesNotExist:
-        messages.error(request, 'No subscription found.')
+        messages.error(request, _('No subscription found.'))
     except Exception as e:
-        messages.error(request, f'Error reactivating subscription: {str(e)}')
+        messages.error(request, _('Error reactivating subscription: %(error)s') % {'error': str(e)})
 
     return redirect('account_settings')
 
@@ -97,7 +98,7 @@ def export_data(request):
     """Export all organization data as JSON."""
     org = request.organization
     if not org:
-        return JsonResponse({'error': 'Organization not found'}, status=404)
+        return JsonResponse({'error': _('Organization not found')}, status=404)
 
     try:
         data = export_organization_data(org)
@@ -113,12 +114,12 @@ def export_data(request):
 
     except Exception as e:
         logger.exception('Error exporting data')
-        return JsonResponse({'error': 'Export failed. Please try again.'}, status=500)
+        return JsonResponse({'error': _('Export failed. Please try again.')}, status=500)
 
 
 @login_required(as_json=True)
 @can_manage_organization_required(
-    as_json=True, message='Only organization administrators can import data')
+    as_json=True, message=gettext_lazy('Only organization administrators can import data'))
 @require_POST
 def preview_import(request):
     """
@@ -127,27 +128,27 @@ def preview_import(request):
     """
     org = request.organization
     if not org:
-        return JsonResponse({'error': 'Organization not found'}, status=404)
+        return JsonResponse({'error': _('Organization not found')}, status=404)
 
     try:
         import_file = request.FILES.get('import_file')
         if not import_file:
-            return JsonResponse({'error': 'No file uploaded'}, status=400)
+            return JsonResponse({'error': _('No file uploaded')}, status=400)
 
         # Validate file size (max 50MB)
         max_size = 50 * 1024 * 1024
         if import_file.size > max_size:
-            return JsonResponse({'error': f'File too large (max {max_size // (1024*1024)}MB)'}, status=400)
+            return JsonResponse({'error': _('File too large (max %(size)sMB)') % {'size': max_size // (1024*1024)}}, status=400)
 
         # Validate file type
         if not import_file.name.endswith('.json'):
-            return JsonResponse({'error': 'Only JSON files are allowed'}, status=400)
+            return JsonResponse({'error': _('Only JSON files are allowed')}, status=400)
 
         # Parse JSON
         try:
             data = json.load(import_file)
         except json.JSONDecodeError as e:
-            return JsonResponse({'error': 'Invalid JSON format. Please check your file.'}, status=400)
+            return JsonResponse({'error': _('Invalid JSON format. Please check your file.')}, status=400)
 
         # Validate structure
         validation = validate_import_data(data)
@@ -170,7 +171,7 @@ def preview_import(request):
 
     except Exception as e:
         logger.exception('Preview import failed')
-        return JsonResponse({'error': 'Preview failed. Please try again.'}, status=500)
+        return JsonResponse({'error': _('Preview failed. Please try again.')}, status=500)
 
 
 @login_required
@@ -181,36 +182,36 @@ def import_data(request):
     """
     org = request.organization
     if not org:
-        messages.error(request, 'Organization not found')
+        messages.error(request, _('Organization not found'))
         return redirect('settings')
 
     # Check if user is org admin
     if not request.user.has_perm('accounts.can_manage_organization'):
-        messages.error(request, 'Only organization administrators can import data')
+        messages.error(request, _('Only organization administrators can import data'))
         return redirect('settings')
 
     try:
         import_file = request.FILES.get('import_file')
         if not import_file:
-            messages.error(request, 'No file uploaded')
+            messages.error(request, _('No file uploaded'))
             return redirect('settings')
 
         # Validate file size (max 50MB)
         max_size = 50 * 1024 * 1024
         if import_file.size > max_size:
-            messages.error(request, f'File too large (max {max_size // (1024*1024)}MB)')
+            messages.error(request, _('File too large (max %(size)sMB)') % {'size': max_size // (1024*1024)})
             return redirect('settings')
 
         # Validate file type
         if not import_file.name.endswith('.json'):
-            messages.error(request, 'Only JSON files are allowed')
+            messages.error(request, _('Only JSON files are allowed'))
             return redirect('settings')
 
         # Parse JSON
         try:
             data = json.load(import_file)
         except json.JSONDecodeError as e:
-            messages.error(request, f'Invalid JSON format: {str(e)}')
+            messages.error(request, _('Invalid JSON format: %(error)s') % {'error': str(e)})
             return redirect('settings')
 
         # Get import options from form
@@ -224,7 +225,7 @@ def import_data(request):
 
         if (import_options['questionnaires']
                 and not request.user.has_perm('accounts.can_manage_questionnaires')):
-            messages.error(request, 'You do not have permission to create or edit questionnaires.')
+            messages.error(request, _('You do not have permission to create or edit questionnaires.'))
             return redirect('settings')
 
         # Get conflict resolution mode
@@ -241,23 +242,23 @@ def import_data(request):
         )
 
         if result['success']:
-            messages.success(request, f'Import completed successfully: {result["summary"]}')
+            messages.success(request, _('Import completed successfully: %(summary)s') % {'summary': result['summary']})
 
             # Show warnings if any
             if result.get('warnings'):
                 for warning in result['warnings'][:5]:  # Show first 5 warnings
                     messages.warning(request, warning)
                 if len(result['warnings']) > 5:
-                    messages.info(request, f'... and {len(result["warnings"]) - 5} more warnings')
+                    messages.info(request, _('... and %(count)s more warnings') % {'count': len(result['warnings']) - 5})
         else:
-            messages.error(request, 'Import failed')
+            messages.error(request, _('Import failed'))
             for error in result.get('errors', [])[:3]:  # Show first 3 errors
                 messages.error(request, error)
 
         return redirect('settings')
 
     except Exception as e:
-        messages.error(request, f'Import failed: {str(e)}')
+        messages.error(request, _('Import failed: %(error)s') % {'error': str(e)})
         return redirect('settings')
 
 
@@ -270,19 +271,19 @@ def delete_account(request):
     # Confirm with password
     password = request.POST.get('password')
     if not user.check_password(password):
-        messages.error(request, 'Invalid password. Account deletion canceled.')
+        messages.error(request, _('Invalid password. Account deletion canceled.'))
         return redirect('account_settings')
 
     try:
         delete_user_account(user)
         logout(request)
-        messages.success(request, 'Your account has been deleted.')
+        messages.success(request, _('Your account has been deleted.'))
         return redirect('landing:index')
     except ValueError as e:
         messages.error(request, str(e))
         return redirect('account_settings')
     except Exception as e:
-        messages.error(request, f'Error deleting account: {str(e)}')
+        messages.error(request, _('Error deleting account: %(error)s') % {'error': str(e)})
         return redirect('account_settings')
 
 
@@ -302,22 +303,22 @@ def delete_organization(request):
     # Confirm with password
     password = request.POST.get('password')
     if not user.check_password(password):
-        messages.error(request, 'Invalid password. Organization deletion canceled.')
+        messages.error(request, _('Invalid password. Organization deletion canceled.'))
         return redirect('account_settings')
 
     # Confirm with organization name
     org_name = request.POST.get('organization_name')
     if org_name != org.name:
-        messages.error(request, 'Organization name does not match. Deletion canceled.')
+        messages.error(request, _('Organization name does not match. Deletion canceled.'))
         return redirect('account_settings')
 
     try:
         delete_organization_service(org)
         logout(request)
-        messages.success(request, 'Organization and all data have been deleted.')
+        messages.success(request, _('Organization and all data have been deleted.'))
         return redirect('landing:index')
     except Exception as e:
-        messages.error(request, f'Error deleting organization: {str(e)}')
+        messages.error(request, _('Error deleting organization: %(error)s') % {'error': str(e)})
         return redirect('account_settings')
 
 
@@ -332,4 +333,4 @@ def mark_welcome_seen(request):
         return JsonResponse({'success': True})
     except Exception as e:
         logger.exception('Error marking welcome as seen')
-        return JsonResponse({'success': False, 'error': 'Something went wrong.'}, status=500)
+        return JsonResponse({'success': False, 'error': _('Something went wrong.')}, status=500)

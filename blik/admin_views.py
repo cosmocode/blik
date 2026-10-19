@@ -21,6 +21,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import partition
+from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.http import require_POST
 
 from accounts.models import Reviewee, UserProfile, OrganizationInvitation
@@ -170,7 +171,7 @@ def team_list(request):
     org = request.organization
 
     if not org:
-        messages.error(request, 'No organization found.')
+        messages.error(request, _('No organization found.'))
         return redirect('admin_dashboard')
 
     # Get all active (non-anonymized) users in this organization
@@ -225,12 +226,12 @@ def update_user_permissions(request):
     """Update user permissions and role"""
     # Check if requester has permission to manage organization
     if not request.user.has_perm('accounts.can_manage_organization'):
-        messages.error(request, 'You do not have permission to manage user permissions.')
+        messages.error(request, _('You do not have permission to manage user permissions.'))
         return redirect('team_list')
 
     org = request.organization
     if not org:
-        messages.error(request, 'No organization found.')
+        messages.error(request, _('No organization found.'))
         return redirect('admin_dashboard')
 
     try:
@@ -240,7 +241,7 @@ def update_user_permissions(request):
         can_view_reports = request.POST.get('can_view_all_reports') == 'on'
 
         if not user_profile_id or not role:
-            messages.error(request, 'Invalid request: missing required fields.')
+            messages.error(request, _('Invalid request: missing required fields.'))
             return redirect('team_list')
 
         # Get the user profile being updated
@@ -253,11 +254,11 @@ def update_user_permissions(request):
 
         # Prevent self-demotion or demoting superusers
         if target_user.id == request.user.id:
-            messages.error(request, 'You cannot modify your own permissions.')
+            messages.error(request, _('You cannot modify your own permissions.'))
             return redirect('team_list')
 
         if target_user.is_superuser:
-            messages.error(request, 'Cannot modify permissions for super admins.')
+            messages.error(request, _('Cannot modify permissions for super admins.'))
             return redirect('team_list')
 
         # Check if this would be the last admin
@@ -267,17 +268,17 @@ def update_user_permissions(request):
             admin_count = sum(1 for p in admin_profiles if p.user.has_perm('accounts.can_manage_organization'))
 
             if admin_count <= 1:
-                messages.error(request, 'Cannot demote the last organization administrator.')
+                messages.error(request, _('Cannot demote the last organization administrator.'))
                 return redirect('team_list')
 
         # Update role and permissions
         if role == 'admin':
             assign_organization_admin(target_user)
-            messages.success(request, f'Successfully promoted {target_user.username} to Organization Admin.')
+            messages.success(request, _('Successfully promoted %(username)s to Organization Admin.') % {'username': target_user.username})
         else:  # member
             # Remove admin permissions
             assign_organization_member(target_user, can_create_cycles_for_others=False)
-            messages.success(request, f'Successfully updated {target_user.username} to Member role.')
+            messages.success(request, _('Successfully updated %(username)s to Member role.') % {'username': target_user.username})
 
         # Update can_create_cycles_for_others permission separately
         # (this can be set independently of role)
@@ -286,7 +287,7 @@ def update_user_permissions(request):
         user_profile.save()
 
         if can_create_cycles_for_others:
-            messages.success(request, f'{target_user.username} can now create review cycles for others.')
+            messages.success(request, _('%(username)s can now create review cycles for others.') % {'username': target_user.username})
 
         # Report access is a permission on the user, not a profile flag. Admins
         # already hold it through their group, so granting it directly would
@@ -295,10 +296,10 @@ def update_user_permissions(request):
         set_user_permission(target_user, 'can_view_all_reports', grant_reports)
 
         if grant_reports:
-            messages.success(request, f'{target_user.username} can now view all reports.')
+            messages.success(request, _('%(username)s can now view all reports.') % {'username': target_user.username})
 
     except Exception as e:
-        messages.error(request, f'Error updating permissions: {str(e)}')
+        messages.error(request, _('Error updating permissions: %(error)s') % {'error': str(e)})
 
     return redirect('team_list')
 
@@ -392,13 +393,13 @@ def reviewee_create(request):
         if name and email:
             organization = request.organization or Organization.objects.first()
             if not organization:
-                messages.error(request, 'No organization found. Please run setup first.')
+                messages.error(request, _('No organization found. Please run setup first.'))
                 return redirect('admin_dashboard')
 
             # Non-admins can only create reviewees for themselves
             if not is_organization_admin(request.user):
                 if email.lower() != request.user.email.lower():
-                    messages.error(request, 'You can only create a reviewee profile for yourself.')
+                    messages.error(request, _('You can only create a reviewee profile for yourself.'))
                     return redirect('reviewee_list')
 
             # Check employee limit
@@ -414,12 +415,12 @@ def reviewee_create(request):
                     email=email,
                     department=department
                 )
-                messages.success(request, f'Reviewee "{reviewee.name}" created successfully.')
+                messages.success(request, _('Reviewee "%(name)s" created successfully.') % {'name': reviewee.name})
                 return redirect('reviewee_list')
             except Exception as e:
-                messages.error(request, f'Error creating reviewee: {str(e)}')
+                messages.error(request, _('Error creating reviewee: %(error)s') % {'error': str(e)})
         else:
-            messages.error(request, 'Name and email are required.')
+            messages.error(request, _('Name and email are required.'))
 
     return render(request, 'admin_dashboard/reviewee_form.html', {'action': 'Create'})
 
@@ -427,8 +428,8 @@ def reviewee_create(request):
 @login_required
 @can_manage_organization_required(
     redirect_url='reviewee_list',
-    message='You do not have permission to edit reviewees. '
-            'Only organization administrators can access this feature.'
+    message=gettext_lazy('You do not have permission to edit reviewees. '
+                         'Only organization administrators can access this feature.')
 )
 def reviewee_edit(request, reviewee_id):
     """Edit an existing reviewee - admin only"""
@@ -441,10 +442,10 @@ def reviewee_edit(request, reviewee_id):
 
         try:
             reviewee.save()
-            messages.success(request, f'Reviewee "{reviewee.name}" updated successfully.')
+            messages.success(request, _('Reviewee "%(name)s" updated successfully.') % {'name': reviewee.name})
             return redirect('reviewee_list')
         except Exception as e:
-            messages.error(request, f'Error updating reviewee: {str(e)}')
+            messages.error(request, _('Error updating reviewee: %(error)s') % {'error': str(e)})
 
     context = {
         'reviewee': reviewee,
@@ -457,8 +458,8 @@ def reviewee_edit(request, reviewee_id):
 @login_required
 @can_manage_organization_required(
     redirect_url='reviewee_list',
-    message='You do not have permission to delete reviewees. '
-            'Only organization administrators can access this feature.'
+    message=gettext_lazy('You do not have permission to delete reviewees. '
+                         'Only organization administrators can access this feature.')
 )
 def reviewee_delete(request, reviewee_id):
     """Soft delete a reviewee - admin only"""
@@ -467,7 +468,7 @@ def reviewee_delete(request, reviewee_id):
     if request.method == 'POST':
         reviewee.is_active = False
         reviewee.save()
-        messages.success(request, f'Reviewee "{reviewee.name}" deactivated.')
+        messages.success(request, _('Reviewee "%(name)s" deactivated.') % {'name': reviewee.name})
         return redirect('reviewee_list')
 
     context = {
@@ -481,8 +482,8 @@ def reviewee_delete(request, reviewee_id):
 @require_POST
 @can_manage_organization_required(
     redirect_url='reviewee_list',
-    message='You do not have permission to create review cycles. '
-            'Only organization administrators can access this feature.'
+    message=gettext_lazy('You do not have permission to create review cycles. '
+                         'Only organization administrators can access this feature.')
 )
 def quick_cycle_create(request, reviewee_id):
     """
@@ -497,13 +498,13 @@ def quick_cycle_create(request, reviewee_id):
     source_cycle_uuid = request.POST.get('source_cycle_uuid')  # Optional: specific cycle to copy from
 
     if not questionnaire_id:
-        messages.error(request, 'Questionnaire is required.')
+        messages.error(request, _('Questionnaire is required.'))
         return redirect('reviewee_list')
 
     try:
         questionnaire = Questionnaire.objects.get(id=questionnaire_id, organization=org, is_active=True)
     except Questionnaire.DoesNotExist:
-        messages.error(request, 'Invalid questionnaire selected.')
+        messages.error(request, _('Invalid questionnaire selected.'))
         return redirect('reviewee_list')
 
     # Pick the cycle to copy from before creating the new one, so its feedback
@@ -561,15 +562,18 @@ def quick_cycle_create(request, reviewee_id):
 
             messages.success(
                 request,
-                f'Review cycle created for "{reviewee.name}" using "{questionnaire.name}". '
-                f'Copied {total_tokens} reviewer(s) from previous cycle. '
-                f'{send_stats["sent"]} email invitation(s) sent.'
+                _('Review cycle created for "%(name)s" using "%(questionnaire)s". '
+                  'Copied %(count)s reviewer(s) from previous cycle. '
+                  '%(sent)s email invitation(s) sent.')
+                % {'name': reviewee.name, 'questionnaire': questionnaire.name,
+                   'count': total_tokens, 'sent': send_stats['sent']}
             )
         else:
             messages.success(
                 request,
-                f'Review cycle created for "{reviewee.name}" using "{questionnaire.name}" with {total_tokens} reviewer token(s). '
-                f'Go to the cycle details to assign reviewers and send invitations.'
+                _('Review cycle created for "%(name)s" using "%(questionnaire)s" with %(count)s reviewer token(s). '
+                  'Go to the cycle details to assign reviewers and send invitations.')
+                % {'name': reviewee.name, 'questionnaire': questionnaire.name, 'count': total_tokens}
             )
     else:
         # No previous cycle - use default token distribution
@@ -583,7 +587,7 @@ def quick_cycle_create(request, reviewee_id):
         for category, count in token_distribution:
             if not cycle.collects(category):
                 continue
-            for _ in range(count):
+            for i in range(count):
                 ReviewerToken.objects.create(
                     cycle=cycle,
                     category=category
@@ -592,8 +596,9 @@ def quick_cycle_create(request, reviewee_id):
 
         messages.success(
             request,
-            f'Review cycle created for "{reviewee.name}" using "{questionnaire.name}" with {total_tokens} reviewer token(s). '
-            f'Go to the cycle details to assign reviewers and send invitations.'
+            _('Review cycle created for "%(name)s" using "%(questionnaire)s" with %(count)s reviewer token(s). '
+              'Go to the cycle details to assign reviewers and send invitations.')
+            % {'name': reviewee.name, 'questionnaire': questionnaire.name, 'count': total_tokens}
         )
 
     # Redirect to cycle detail page
@@ -716,7 +721,7 @@ def questionnaire_sample_report(request, questionnaire_id):
             stage_info['development_focus'] = _get_development_focus(stage_num, next_stage_num)
         else:
             stage_info['next_stage'] = None
-            stage_info['development_focus'] = ['Continue deepening expertise and innovating']
+            stage_info['development_focus'] = [_('Continue deepening expertise and innovating')]
 
         insights['skill_profile'] = {
             'skill_level': skill_level,
@@ -749,9 +754,9 @@ def questionnaire_sample_report(request, questionnaire_id):
                 'development_focus', []
             ),
             'quick_wins': [
-                'Pair with a more senior teammate on a challenging problem this sprint',
-                'Document one decision you made and why — share it for review',
-                'Pick a weak area from the feedback and book focused practice time',
+                _('Pair with a more senior teammate on a challenging problem this sprint'),
+                _('Document one decision you made and why — share it for review'),
+                _('Pick a weak area from the feedback and book focused practice time'),
             ],
         }
 
@@ -776,7 +781,7 @@ def questionnaire_create(request):
         is_default = request.POST.get('is_default') == 'on'
 
         if not name:
-            messages.error(request, 'Questionnaire name is required.')
+            messages.error(request, _('Questionnaire name is required.'))
             return render(request, 'admin_dashboard/questionnaire_form.html', {'action': 'Create'})
 
         try:
@@ -789,10 +794,10 @@ def questionnaire_create(request):
                 is_default=is_default,
                 organization=org
             )
-            messages.success(request, f'Questionnaire "{questionnaire.name}" created successfully.')
+            messages.success(request, _('Questionnaire "%(name)s" created successfully.') % {'name': questionnaire.name})
             return redirect('questionnaire_edit', questionnaire_id=questionnaire.id)
         except Exception as e:
-            messages.error(request, f'Error creating questionnaire: {str(e)}')
+            messages.error(request, _('Error creating questionnaire: %(error)s') % {'error': str(e)})
 
     context = {
         'action': 'Create',
@@ -825,9 +830,9 @@ def questionnaire_edit(request, questionnaire_id):
 
             try:
                 questionnaire.save()
-                messages.success(request, f'Questionnaire "{questionnaire.name}" updated successfully.')
+                messages.success(request, _('Questionnaire "%(name)s" updated successfully.') % {'name': questionnaire.name})
             except Exception as e:
-                messages.error(request, f'Error updating questionnaire: {str(e)}')
+                messages.error(request, _('Error updating questionnaire: %(error)s') % {'error': str(e)})
 
         elif action == 'add_section':
             section_title = request.POST.get('section_title')
@@ -843,9 +848,9 @@ def questionnaire_edit(request, questionnaire_id):
                         description=section_description,
                         order=next_order
                     )
-                    messages.success(request, f'Section "{section_title}" added.')
+                    messages.success(request, _('Section "%(title)s" added.') % {'title': section_title})
                 except Exception as e:
-                    messages.error(request, f'Error adding section: {str(e)}')
+                    messages.error(request, _('Error adding section: %(error)s') % {'error': str(e)})
 
         elif action == 'edit_section':
             section_id = request.POST.get('section_id')
@@ -858,11 +863,11 @@ def questionnaire_edit(request, questionnaire_id):
                     section.title = section_title
                     section.description = section_description
                     section.save()
-                    messages.success(request, f'Section "{section_title}" updated successfully.')
+                    messages.success(request, _('Section "%(title)s" updated successfully.') % {'title': section_title})
                 except QuestionSection.DoesNotExist:
-                    messages.error(request, 'Section not found.')
+                    messages.error(request, _('Section not found.'))
                 except Exception as e:
-                    messages.error(request, f'Error updating section: {str(e)}')
+                    messages.error(request, _('Error updating section: %(error)s') % {'error': str(e)})
 
         elif action == 'add_question':
             section_id = request.POST.get('section_id')
@@ -915,9 +920,9 @@ def questionnaire_edit(request, questionnaire_id):
                                     config['weights'] = weights
                                     config['scoring_enabled'] = True
                                 else:
-                                    messages.warning(request, 'Weights count did not match choices count. Scoring disabled for this question.')
+                                    messages.warning(request, _('Weights count did not match choices count. Scoring disabled for this question.'))
                             except (ValueError, TypeError):
-                                messages.warning(request, 'Invalid weight values. Scoring disabled for this question.')
+                                messages.warning(request, _('Invalid weight values. Scoring disabled for this question.'))
                     elif question_type == 'scale':
                         try:
                             min_val = int(request.POST.get('scale_min', 1))
@@ -938,7 +943,7 @@ def questionnaire_edit(request, questionnaire_id):
                         except (ValueError, TypeError):
                             # Use defaults if parsing fails
                             config = {'min': 1, 'max': 100, 'step': 1}
-                            messages.warning(request, 'Invalid scale values. Using defaults (1-100, step 1).')
+                            messages.warning(request, _('Invalid scale values. Using defaults (1-100, step 1).'))
 
                     # Add Dreyfus/Agency configuration if provided
                     skill_weight = request.POST.get('add_skill_weight', 0)
@@ -993,21 +998,21 @@ def questionnaire_edit(request, questionnaire_id):
                         )
                         return JsonResponse({
                             'success': True,
-                            'message': 'Question added successfully.',
+                            'message': _('Question added successfully.'),
                             'section_id': section.id,
                             'question_id': question.id,
                             'question_html': question_html,
                         })
 
-                    messages.success(request, 'Question added successfully.')
+                    messages.success(request, _('Question added successfully.'))
                 except Exception as e:
                     logger.exception('Error adding question')
                     if is_ajax:
                         return JsonResponse({
                             'success': False,
-                            'message': 'Error adding question. Please try again.',
+                            'message': _('Error adding question. Please try again.'),
                         }, status=400)
-                    messages.error(request, 'Error adding question. Please try again.')
+                    messages.error(request, _('Error adding question. Please try again.'))
 
         elif action == 'delete_section':
             section_id = request.POST.get('section_id')
@@ -1015,18 +1020,18 @@ def questionnaire_edit(request, questionnaire_id):
                 section = QuestionSection.objects.get(id=section_id, questionnaire=questionnaire)
                 section_title = section.title
                 section.delete()
-                messages.success(request, f'Section "{section_title}" deleted.')
+                messages.success(request, _('Section "%(title)s" deleted.') % {'title': section_title})
             except Exception as e:
-                messages.error(request, f'Error deleting section: {str(e)}')
+                messages.error(request, _('Error deleting section: %(error)s') % {'error': str(e)})
 
         elif action == 'delete_question':
             question_id = request.POST.get('question_id')
             try:
                 question = Question.objects.get(id=question_id, section__questionnaire=questionnaire)
                 question.delete()
-                messages.success(request, 'Question deleted.')
+                messages.success(request, _('Question deleted.'))
             except Exception as e:
-                messages.error(request, f'Error deleting question: {str(e)}')
+                messages.error(request, _('Error deleting question: %(error)s') % {'error': str(e)})
 
         elif action == 'edit_question':
             question_id = request.POST.get('question_id')
@@ -1084,9 +1089,9 @@ def questionnaire_edit(request, questionnaire_id):
                                     config['weights'] = weights
                                     config['scoring_enabled'] = True
                                 else:
-                                    messages.warning(request, 'Weights count did not match choices count. Scoring disabled for this question.')
+                                    messages.warning(request, _('Weights count did not match choices count. Scoring disabled for this question.'))
                             except (ValueError, TypeError):
-                                messages.warning(request, 'Invalid weight values. Scoring disabled for this question.')
+                                messages.warning(request, _('Invalid weight values. Scoring disabled for this question.'))
                     elif question_type == 'scale':
                         try:
                             min_val = int(request.POST.get('scale_min', 1))
@@ -1107,7 +1112,7 @@ def questionnaire_edit(request, questionnaire_id):
                         except (ValueError, TypeError):
                             # Use defaults if parsing fails
                             config = {'min': 1, 'max': 100, 'step': 1}
-                            messages.warning(request, 'Invalid scale values. Using defaults (1-100, step 1).')
+                            messages.warning(request, _('Invalid scale values. Using defaults (1-100, step 1).'))
 
                     # The dialog shows neither the Dreyfus weights nor the labels of a rating scale, so keep them
                     if 'dreyfus_mapping' in previous_config:
@@ -1121,7 +1126,7 @@ def questionnaire_edit(request, questionnaire_id):
                     if is_ajax:
                         return JsonResponse({
                             'success': True,
-                            'message': 'Question updated successfully.',
+                            'message': _('Question updated successfully.'),
                             'question': {
                                 'id': question.id,
                                 'question_text': question.question_text,
@@ -1132,15 +1137,15 @@ def questionnaire_edit(request, questionnaire_id):
                             },
                         })
 
-                    messages.success(request, 'Question updated successfully.')
+                    messages.success(request, _('Question updated successfully.'))
                 except Exception as e:
                     logger.exception('Error updating question')
                     if is_ajax:
                         return JsonResponse({
                             'success': False,
-                            'message': 'Error updating question. Please try again.',
+                            'message': _('Error updating question. Please try again.'),
                         }, status=400)
-                    messages.error(request, 'Error updating question. Please try again.')
+                    messages.error(request, _('Error updating question. Please try again.'))
 
         elif action == 'update_dreyfus_config':
             question_id = request.POST.get('question_id')
@@ -1190,11 +1195,11 @@ def questionnaire_edit(request, questionnaire_id):
                     question.action_items = action_items
                     question.save()
 
-                    messages.success(request, 'Dreyfus/Agency configuration updated successfully.')
+                    messages.success(request, _('Dreyfus/Agency configuration updated successfully.'))
                 except Question.DoesNotExist:
-                    messages.error(request, 'Question not found.')
+                    messages.error(request, _('Question not found.'))
                 except Exception as e:
-                    messages.error(request, f'Error updating Dreyfus configuration: {str(e)}')
+                    messages.error(request, _('Error updating Dreyfus configuration: %(error)s') % {'error': str(e)})
 
         return redirect('questionnaire_edit', questionnaire_id=questionnaire.id)
 
@@ -1231,8 +1236,9 @@ def questionnaire_delete(request, questionnaire_id):
             questionnaire.save(update_fields=['is_active'])
             messages.success(
                 request,
-                f'Questionnaire "{name}" archived. It is used by {cycle_count} '
-                f'review cycle(s) and cannot be deleted.'
+                _('Questionnaire "%(name)s" archived. It is used by %(count)s '
+                  'review cycle(s) and cannot be deleted.')
+                % {'name': name, 'count': cycle_count}
             )
         else:
             try:
@@ -1243,11 +1249,11 @@ def questionnaire_delete(request, questionnaire_id):
                 questionnaire.save(update_fields=['is_active'])
                 messages.warning(
                     request,
-                    f'Questionnaire "{name}" is now in use and was archived '
-                    f'instead of deleted.'
+                    _('Questionnaire "%(name)s" is now in use and was archived '
+                      'instead of deleted.') % {'name': name}
                 )
             else:
-                messages.success(request, f'Questionnaire "{name}" deleted.')
+                messages.success(request, _('Questionnaire "%(name)s" deleted.') % {'name': name})
 
         return redirect('questionnaire_list')
 
@@ -1269,7 +1275,7 @@ def questionnaire_restore(request, questionnaire_id):
 
     questionnaire.is_active = True
     questionnaire.save(update_fields=['is_active'])
-    messages.success(request, f'Questionnaire "{questionnaire.name}" restored.')
+    messages.success(request, _('Questionnaire "%(name)s" restored.') % {'name': questionnaire.name})
 
     return redirect('questionnaire_list')
 
@@ -1298,10 +1304,10 @@ def question_dreyfus_config_api(request, question_id):
         })
 
     except Question.DoesNotExist:
-        return JsonResponse({'error': 'Question not found'}, status=404)
+        return JsonResponse({'error': _('Question not found')}, status=404)
     except Exception as e:
         logger.exception('Error fetching Dreyfus config')
-        return JsonResponse({'error': 'Internal server error'}, status=500)
+        return JsonResponse({'error': _('Internal server error')}, status=500)
 
 
 @login_required
@@ -1394,12 +1400,12 @@ def review_cycle_create(request):
         questionnaire_id = request.POST.get('questionnaire')
 
         if not questionnaire_id:
-            messages.error(request, 'Questionnaire is required.')
+            messages.error(request, _('Questionnaire is required.'))
             return redirect('review_cycle_create')
 
         category_flags = selected_category_flags(request)
         if category_flags and not any(category_flags.values()):
-            messages.error(request, 'Select at least one feedback category.')
+            messages.error(request, _('Select at least one feedback category.'))
             return redirect('review_cycle_create')
 
         try:
@@ -1448,7 +1454,8 @@ def review_cycle_create(request):
 
                 messages.success(
                     request,
-                    f'Created {len(created_cycles)} review cycles. No invitations have been sent yet.'
+                    _('Created %(count)s review cycles. No invitations have been sent yet.')
+                    % {'count': len(created_cycles)}
                 )
                 return redirect('bulk_send_invitations')
 
@@ -1456,7 +1463,7 @@ def review_cycle_create(request):
                 # Single reviewee mode
                 reviewee_id = request.POST.get('reviewee')
                 if not reviewee_id:
-                    messages.error(request, 'Reviewee is required for single cycle creation.')
+                    messages.error(request, _('Reviewee is required for single cycle creation.'))
                     return redirect('review_cycle_create')
 
                 reviewee = Reviewee.objects.for_organization(org).get(id=reviewee_id)
@@ -1501,7 +1508,7 @@ def review_cycle_create(request):
                                     validated_emails.append(e)
                                     has_emails = True
                                 except ValidationError:
-                                    messages.warning(request, f'Invalid email skipped in {category_display}: {e}')
+                                    messages.warning(request, _('Invalid email skipped in %(category)s: %(email)s') % {'category': category_display, 'email': e})
                         email_assignments[category_code] = validated_emails
                     else:
                         email_assignments[category_code] = []
@@ -1511,7 +1518,7 @@ def review_cycle_create(request):
                     # Create tokens dynamically based on email count
                     for category_code, emails in email_assignments.items():
                         if emails:
-                            for _ in range(len(emails)):
+                            for i in range(len(emails)):
                                 ReviewerToken.objects.create(
                                     cycle=cycle,
                                     category=category_code
@@ -1530,13 +1537,15 @@ def review_cycle_create(request):
                         )
                         messages.success(
                             request,
-                            f'Review cycle created for "{reviewee.name}" with {assign_stats["assigned"]} reviewer(s) invited. Invitation emails are being sent.'
+                            _('Review cycle created for "%(name)s" with %(assigned)s reviewer(s) invited. Invitation emails are being sent.')
+                            % {'name': reviewee.name, 'assigned': assign_stats['assigned']}
                         )
                         return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
                     else:
                         messages.success(
                             request,
-                            f'Review cycle created for "{reviewee.name}" with {assign_stats["assigned"]} reviewer(s) assigned. Visit the invitations page to send emails.'
+                            _('Review cycle created for "%(name)s" with %(assigned)s reviewer(s) assigned. Visit the invitations page to send emails.')
+                            % {'name': reviewee.name, 'assigned': assign_stats['assigned']}
                         )
                         # Redirect to invitations page to send emails
                         return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
@@ -1545,7 +1554,8 @@ def review_cycle_create(request):
                     # Reviewee notifications were queued via on_commit above.
                     messages.success(
                         request,
-                        f'Review cycle created for "{reviewee.name}". Notification emails are being sent to the reviewee.'
+                        _('Review cycle created for "%(name)s". Notification emails are being sent to the reviewee.')
+                        % {'name': reviewee.name}
                     )
                     # Redirect to invitations page to add reviewers
                     return redirect('manage_invitations', cycle_uuid=cycle.uuid)
@@ -1554,7 +1564,7 @@ def review_cycle_create(request):
             messages.error(request, str(e))
             return redirect('review_cycle_create')
         except Exception as e:
-            messages.error(request, f'Error creating review cycle: {str(e)}')
+            messages.error(request, _('Error creating review cycle: %(error)s') % {'error': str(e)})
             return redirect('review_cycle_create')
 
     # GET request - show form
@@ -1612,7 +1622,7 @@ def bulk_send_invitations(request):
 
     if request.method == 'POST':
         if not cycles:
-            messages.info(request, 'No pending cycles to send invitations for.')
+            messages.info(request, _('No pending cycles to send invitations for.'))
             return redirect('review_cycle_list')
 
         for cycle in cycles:
@@ -1625,7 +1635,7 @@ def bulk_send_invitations(request):
 
         messages.success(
             request,
-            f'Invitations are being sent for {len(cycles)} review cycle(s).'
+            _('Invitations are being sent for %(count)s review cycle(s).') % {'count': len(cycles)}
         )
         return redirect('review_cycle_list')
 
@@ -1698,15 +1708,15 @@ def generate_report_view(request, cycle_uuid):
         # Send notification email to reviewee
         email_stats = send_report_ready_notification(report, request)
 
-        success_msg = f'Report generated successfully for {cycle.reviewee.name}.'
+        success_msg = _('Report generated successfully for %(name)s.') % {'name': cycle.reviewee.name}
         if email_stats['sent'] > 0:
-            success_msg += ' Notification email sent.'
+            success_msg += ' ' + _('Notification email sent.')
         if email_stats['errors']:
-            success_msg += f' (Email errors: {", ".join(email_stats["errors"])})'
+            success_msg += ' ' + _('(Email errors: %(errors)s)') % {'errors': ', '.join(email_stats['errors'])}
 
         messages.success(request, success_msg)
     except Exception as e:
-        messages.error(request, f'Error generating report: {str(e)}')
+        messages.error(request, _('Error generating report: %(error)s') % {'error': str(e)})
 
     return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
 
@@ -1720,14 +1730,14 @@ def close_cycle(request, cycle_uuid):
     cycle = get_cycle_or_404(request, cycle_uuid)
 
     if cycle.status != 'active':
-        messages.warning(request, 'This cycle is already completed.')
+        messages.warning(request, _('This cycle is already completed.'))
         return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
 
     # Check if there are any completed reviews
     completed_count = cycle.tokens.filter(completed_at__isnull=False).count()
 
     if completed_count == 0:
-        messages.error(request, 'Cannot close cycle: No reviews have been completed yet.')
+        messages.error(request, _('Cannot close cycle: No reviews have been completed yet.'))
         return redirect('review_cycle_detail', cycle_uuid=cycle_uuid)
 
     # Remove unclaimed tokens (tokens that are still active but not claimed)
@@ -1747,13 +1757,13 @@ def close_cycle(request, cycle_uuid):
         # Send notification email to reviewee
         email_stats = send_report_ready_notification(report, request)
 
-        success_msg = f'Cycle closed and report generated for {cycle.reviewee.name}.'
+        success_msg = _('Cycle closed and report generated for %(name)s.') % {'name': cycle.reviewee.name}
         if email_stats['sent'] > 0:
-            success_msg += ' Notification email sent.'
+            success_msg += ' ' + _('Notification email sent.')
 
         messages.success(request, success_msg)
     except Exception as e:
-        messages.error(request, f'Cycle closed but error generating report: {str(e)}')
+        messages.error(request, _('Cycle closed but error generating report: %(error)s') % {'error': str(e)})
 
     return redirect('review_cycle_detail', cycle_uuid=cycle_uuid)
 
@@ -1833,7 +1843,7 @@ def assign_invitations(request, cycle_uuid):
                             validate_email(e)
                             validated_emails.append(e)
                         except ValidationError:
-                            messages.warning(request, f'Invalid email skipped in {category_display}: {e}')
+                            messages.warning(request, _('Invalid email skipped in %(category)s: %(email)s') % {'category': category_display, 'email': e})
                 email_assignments[category_code] = validated_emails
             else:
                 email_assignments[category_code] = []
@@ -1853,7 +1863,7 @@ def assign_invitations(request, cycle_uuid):
 
             # Create additional tokens if needed
             if needed_count > existing_unassigned:
-                for _ in range(needed_count - existing_unassigned):
+                for i in range(needed_count - existing_unassigned):
                     ReviewerToken.objects.create(
                         cycle=cycle,
                         category=category_code
@@ -1874,15 +1884,15 @@ def assign_invitations(request, cycle_uuid):
             send_stats = send_reviewer_invitations(cycle)
 
             if send_stats['sent'] > 0:
-                messages.success(request, f'Successfully invited {stats["assigned"]} reviewer(s) and sent {send_stats["sent"]} email(s).')
+                messages.success(request, _('Successfully invited %(assigned)s reviewer(s) and sent %(sent)s email(s).') % {'assigned': stats['assigned'], 'sent': send_stats['sent']})
             else:
-                messages.success(request, f'Successfully assigned {stats["assigned"]} email(s). Invitations will be sent separately.')
+                messages.success(request, _('Successfully assigned %(assigned)s email(s). Invitations will be sent separately.') % {'assigned': stats['assigned']})
 
             if send_stats['errors']:
                 for error in send_stats['errors']:
                     messages.error(request, error)
         elif stats['assigned'] > 0:
-            messages.success(request, f'Successfully assigned {stats["assigned"]} email(s). No invitations sent yet.')
+            messages.success(request, _('Successfully assigned %(assigned)s email(s). No invitations sent yet.') % {'assigned': stats['assigned']})
 
         return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
 
@@ -1903,9 +1913,9 @@ def send_invitations(request, cycle_uuid):
                 messages.error(request, error)
 
         if stats['sent'] > 0:
-            messages.success(request, f'Successfully sent {stats["sent"]} invitation email(s).')
+            messages.success(request, _('Successfully sent %(sent)s invitation email(s).') % {'sent': stats['sent']})
         elif stats['sent'] == 0 and not stats['errors']:
-            messages.info(request, 'No pending invitations to send.')
+            messages.info(request, _('No pending invitations to send.'))
 
         return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
 
@@ -1926,9 +1936,9 @@ def send_reminder(request, cycle_uuid):
                 messages.error(request, error)
 
         if stats['sent'] > 0:
-            messages.success(request, f'Successfully sent {stats["sent"]} reminder(s).')
+            messages.success(request, _('Successfully sent %(sent)s reminder(s).') % {'sent': stats['sent']})
         elif stats['sent'] == 0 and not stats['errors']:
-            messages.info(request, 'No pending reminders to send.')
+            messages.info(request, _('No pending reminders to send.'))
 
         return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
 
@@ -1947,15 +1957,15 @@ def send_individual_reminder(request, cycle_uuid, token_id):
 
         # Check if token has email and invitation was sent
         if not token.reviewer_email:
-            messages.error(request, 'Cannot send reminder: no email assigned to this reviewer.')
+            messages.error(request, _('Cannot send reminder: no email assigned to this reviewer.'))
             return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
 
         if not token.invitation_sent_at:
-            messages.error(request, 'Cannot send reminder: invitation not sent yet.')
+            messages.error(request, _('Cannot send reminder: invitation not sent yet.'))
             return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
 
         if token.is_completed:
-            messages.info(request, 'This reviewer has already completed their feedback.')
+            messages.info(request, _('This reviewer has already completed their feedback.'))
             return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
 
         # Build feedback URL
@@ -1974,7 +1984,7 @@ def send_individual_reminder(request, cycle_uuid, token_id):
 
         # Send email
         from_email = settings.DEFAULT_FROM_EMAIL
-        subject = f'Reminder: Feedback Request for {cycle.reviewee.name}'
+        subject = _('Reminder: Feedback Request for %(name)s') % {'name': cycle.reviewee.name}
 
         email = EmailMultiAlternatives(
             subject=subject,
@@ -1989,12 +1999,12 @@ def send_individual_reminder(request, cycle_uuid, token_id):
         token.last_reminder_sent_at = timezone.now()
         token.save()
 
-        messages.success(request, f'Reminder sent to reviewer.')
+        messages.success(request, _('Reminder sent to reviewer.'))
 
     except ReviewerToken.DoesNotExist:
-        messages.error(request, 'Reviewer token not found.')
+        messages.error(request, _('Reviewer token not found.'))
     except Exception as e:
-        messages.error(request, f'Error sending reminder: {str(e)}')
+        messages.error(request, _('Error sending reminder: %(error)s') % {'error': str(e)})
 
     return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
 
@@ -2005,7 +2015,7 @@ def remove_reviewer_token(request, cycle_uuid, token_id):
     """Remove a reviewer token from a cycle (only if not started) - Admin only"""
     # Check organization admin permission
     if not request.user.has_perm('accounts.can_manage_organization'):
-        messages.error(request, 'You do not have permission to remove reviewers.')
+        messages.error(request, _('You do not have permission to remove reviewers.'))
         return redirect('review_cycle_detail', cycle_uuid=cycle_uuid)
 
     cycle = get_cycle_or_404(request, cycle_uuid)
@@ -2016,17 +2026,17 @@ def remove_reviewer_token(request, cycle_uuid, token_id):
 
         # Only allow deletion if reviewer hasn't started (no claimed_at or completed_at)
         if token.claimed_at or token.completed_at:
-            messages.error(request, 'Cannot remove: reviewer has already started or completed their feedback.')
+            messages.error(request, _('Cannot remove: reviewer has already started or completed their feedback.'))
             return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
 
         # Store info for success message
         category = token.get_category_display()
-        email = token.reviewer_email if token.reviewer_email else "unclaimed token"
+        email = token.reviewer_email if token.reviewer_email else _('unclaimed token')
 
         # Delete the token
         token.delete()
 
-        messages.success(request, f'Removed {category} reviewer ({email}) from cycle.')
+        messages.success(request, _('Removed %(category)s reviewer (%(email)s) from cycle.') % {'category': category, 'email': email})
 
         # Check if all remaining tokens are completed
         remaining_tokens = cycle.tokens.all()
@@ -2049,16 +2059,16 @@ def remove_reviewer_token(request, cycle_uuid, token_id):
                         if email_stats.get('errors'):
                             logger.error("Errors sending report email for cycle %s: %s", cycle.id, email_stats['errors'])
 
-                    messages.success(request, 'Cycle automatically closed and report generated (all remaining reviewers completed).')
+                    messages.success(request, _('Cycle automatically closed and report generated (all remaining reviewers completed).'))
                 except Exception as e:
                     # Log error but don't fail the removal
                     logger.exception("Error auto-generating report for cycle %s", cycle.id)
-                    messages.warning(request, f'Cycle closed but error generating report: {str(e)}')
+                    messages.warning(request, _('Cycle closed but error generating report: %(error)s') % {'error': str(e)})
 
     except ReviewerToken.DoesNotExist:
-        messages.error(request, 'Reviewer token not found.')
+        messages.error(request, _('Reviewer token not found.'))
     except Exception as e:
-        messages.error(request, f'Error removing reviewer: {str(e)}')
+        messages.error(request, _('Error removing reviewer: %(error)s') % {'error': str(e)})
 
     return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
 
@@ -2073,20 +2083,20 @@ def send_report_email(request, cycle_uuid):
     try:
         report = Report.objects.get(cycle=cycle)
     except Report.DoesNotExist:
-        messages.error(request, 'No report found for this cycle. Please generate the report first.')
+        messages.error(request, _('No report found for this cycle. Please generate the report first.'))
         return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
 
     # Send notification email
     email_stats = send_report_ready_notification(report, request)
 
     if email_stats['sent'] > 0:
-        messages.success(request, f'Report email sent to {cycle.reviewee.name} at {cycle.reviewee.email}.')
+        messages.success(request, _('Report email sent to %(name)s at %(email)s.') % {'name': cycle.reviewee.name, 'email': cycle.reviewee.email})
     else:
         if email_stats['errors']:
             for error in email_stats['errors']:
-                messages.error(request, f'Failed to send email: {error}')
+                messages.error(request, _('Failed to send email: %(error)s') % {'error': error})
         else:
-            messages.error(request, 'Failed to send email.')
+            messages.error(request, _('Failed to send email.'))
 
     return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
 
@@ -2099,7 +2109,7 @@ def settings_view(request):
     organization = request.organization
 
     if not organization:
-        messages.error(request, 'No organization found. Please run setup first.')
+        messages.error(request, _('No organization found. Please run setup first.'))
         return redirect('admin_dashboard')
 
     # Fields the environment owns are read-only here — setup_organization
@@ -2113,7 +2123,7 @@ def settings_view(request):
     if request.method == 'POST':
         # Check permission to modify organization settings
         if not request.user.has_perm('accounts.can_manage_organization'):
-            messages.error(request, 'You do not have permission to modify organization settings.')
+            messages.error(request, _('You do not have permission to modify organization settings.'))
             return redirect('settings')
 
         # Get which section is being updated
@@ -2127,14 +2137,14 @@ def settings_view(request):
                 if editable('email'):
                     organization.email = request.POST.get('email', organization.email)
                 organization.save()
-                messages.success(request, 'Organization details updated successfully.')
+                messages.success(request, _('Organization details updated successfully.'))
 
             elif section == 'registration':
                 # Update registration settings
                 organization.allow_registration = request.POST.get('allow_registration') == 'on'
                 organization.default_users_can_create_cycles = request.POST.get('default_users_can_create_cycles') == 'on'
                 organization.save()
-                messages.success(request, 'Registration settings updated successfully.')
+                messages.success(request, _('Registration settings updated successfully.'))
 
             elif section == 'reports':
                 # Update report settings
@@ -2145,7 +2155,7 @@ def settings_view(request):
                     organization.min_responses_for_anonymity = 3
                 organization.auto_send_report_email = request.POST.get('auto_send_report_email') == 'on'
                 organization.save()
-                messages.success(request, 'Report settings updated successfully.')
+                messages.success(request, _('Report settings updated successfully.'))
 
             elif section == 'email':
                 # Update SMTP settings
@@ -2169,17 +2179,17 @@ def settings_view(request):
                 if editable('from_email'):
                     organization.from_email = request.POST.get('from_email', organization.from_email)
                 organization.save()
-                messages.success(request, 'Email settings updated successfully.')
+                messages.success(request, _('Email settings updated successfully.'))
 
             if locked:
-                messages.info(request, (
+                messages.info(request, _(
                     'Some settings are managed by environment variables and were '
-                    'not changed: ' + ', '.join(sorted(set(locked.values())))
-                ))
+                    'not changed: %(fields)s'
+                ) % {'fields': ', '.join(sorted(set(locked.values())))})
 
             return redirect('settings')
         except Exception as e:
-            messages.error(request, f'Error updating settings: {str(e)}')
+            messages.error(request, _('Error updating settings: %(error)s') % {'error': str(e)})
 
     # Get subscription information if exists
     subscription = None
@@ -2227,12 +2237,12 @@ def gdpr_management(request):
     """GDPR data management and deletion for organization admins"""
     # Check permission
     if not request.user.has_perm('accounts.can_manage_organization'):
-        messages.error(request, 'You do not have permission to access GDPR management.')
+        messages.error(request, _('You do not have permission to access GDPR management.'))
         return redirect('team_list')
 
     org = request.organization
     if not org:
-        messages.error(request, 'No organization found.')
+        messages.error(request, _('No organization found.'))
         return redirect('admin_dashboard')
 
     # Get tab parameter (users or reviewees)
@@ -2313,12 +2323,12 @@ def gdpr_delete_user_view(request, user_id):
     """Delete or anonymize a user (GDPR)"""
     # Check permission
     if not request.user.has_perm('accounts.can_manage_organization'):
-        messages.error(request, 'You do not have permission to delete users.')
+        messages.error(request, _('You do not have permission to delete users.'))
         return redirect('gdpr_management')
 
     org = request.organization
     if not org:
-        messages.error(request, 'No organization found.')
+        messages.error(request, _('No organization found.'))
         return redirect('admin_dashboard')
 
     try:
@@ -2328,12 +2338,12 @@ def gdpr_delete_user_view(request, user_id):
 
         # Prevent self-deletion
         if target_user.id == request.user.id:
-            messages.error(request, 'You cannot delete your own account.')
+            messages.error(request, _('You cannot delete your own account.'))
             return redirect('gdpr_management')
 
         # Prevent deleting superusers
         if target_user.is_superuser:
-            messages.error(request, 'Cannot delete super admin accounts.')
+            messages.error(request, _('Cannot delete super admin accounts.'))
             return redirect('gdpr_management')
 
         # Get deletion type from POST
@@ -2348,12 +2358,12 @@ def gdpr_delete_user_view(request, user_id):
         )
 
         if result['status'] == 'deleted':
-            messages.success(request, f'User {result["username"]} has been permanently deleted.')
+            messages.success(request, _('User %(username)s has been permanently deleted.') % {'username': result['username']})
         else:
-            messages.success(request, f'User {result["username"]} has been anonymized.')
+            messages.success(request, _('User %(username)s has been anonymized.') % {'username': result['username']})
 
     except Exception as e:
-        messages.error(request, f'Error deleting user: {str(e)}')
+        messages.error(request, _('Error deleting user: %(error)s') % {'error': str(e)})
 
     return HttpResponseRedirect(reverse('gdpr_management') + '?tab=users')
 
@@ -2364,12 +2374,12 @@ def gdpr_delete_reviewee_view(request, reviewee_id):
     """Delete or anonymize a reviewee (GDPR)"""
     # Check permission
     if not request.user.has_perm('accounts.can_manage_organization'):
-        messages.error(request, 'You do not have permission to delete reviewees.')
+        messages.error(request, _('You do not have permission to delete reviewees.'))
         return redirect('gdpr_management')
 
     org = request.organization
     if not org:
-        messages.error(request, 'No organization found.')
+        messages.error(request, _('No organization found.'))
         return redirect('admin_dashboard')
 
     try:
@@ -2387,8 +2397,9 @@ def gdpr_delete_reviewee_view(request, reviewee_id):
             )
             messages.success(
                 request,
-                f'Reviewee {result["name"]} and all associated reviewer emails have been anonymized. '
-                f'{result.get("reviewer_emails_anonymized", 0)} reviewer email(s) anonymized.'
+                _('Reviewee %(name)s and all associated reviewer emails have been anonymized. '
+                  '%(count)s reviewer email(s) anonymized.')
+                % {'name': result['name'], 'count': result.get('reviewer_emails_anonymized', 0)}
             )
         else:
             # Soft or hard delete
@@ -2402,18 +2413,20 @@ def gdpr_delete_reviewee_view(request, reviewee_id):
             if result['status'] == 'deleted':
                 messages.success(
                     request,
-                    f'Reviewee {result["name"]} has been permanently deleted along with '
-                    f'{result["review_cycles_affected"]} review cycle(s) and all associated data.'
+                    _('Reviewee %(name)s has been permanently deleted along with '
+                      '%(count)s review cycle(s) and all associated data.')
+                    % {'name': result['name'], 'count': result['review_cycles_affected']}
                 )
             else:
                 messages.success(
                     request,
-                    f'Reviewee {result["name"]} has been anonymized. '
-                    f'{result["review_cycles_affected"]} review cycle(s) preserved.'
+                    _('Reviewee %(name)s has been anonymized. '
+                      '%(count)s review cycle(s) preserved.')
+                    % {'name': result['name'], 'count': result['review_cycles_affected']}
                 )
 
     except Exception as e:
-        messages.error(request, f'Error deleting reviewee: {str(e)}')
+        messages.error(request, _('Error deleting reviewee: %(error)s') % {'error': str(e)})
 
     return redirect('gdpr_management')
 
@@ -2481,7 +2494,7 @@ def product_review_list(request):
 def product_review_create(request):
     """Create a new product review"""
     if not request.user.is_superuser:
-        messages.error(request, 'You do not have permission to create product reviews.')
+        messages.error(request, _('You do not have permission to create product reviews.'))
         return redirect('product_review_list')
 
     if request.method == 'POST':
@@ -2500,7 +2513,7 @@ def product_review_create(request):
 
         # Validation
         if not all([rating, review_title, review_text, reviewer_name, reviewer_email]):
-            messages.error(request, 'Please fill in all required fields.')
+            messages.error(request, _('Please fill in all required fields.'))
             return render(request, 'admin_dashboard/product_review_form.html', {
                 'action': 'Create',
                 'review': request.POST,
@@ -2511,7 +2524,7 @@ def product_review_create(request):
             if rating < 1 or rating > 5:
                 raise ValueError('Rating must be between 1 and 5')
         except (ValueError, TypeError):
-            messages.error(request, 'Invalid rating value.')
+            messages.error(request, _('Invalid rating value.'))
             return render(request, 'admin_dashboard/product_review_form.html', {
                 'action': 'Create',
                 'review': request.POST,
@@ -2535,7 +2548,7 @@ def product_review_create(request):
             published_date=date.today() if status == 'approved' else None,
         )
 
-        messages.success(request, f'Product review from "{reviewer_name}" created successfully.')
+        messages.success(request, _('Product review from "%(name)s" created successfully.') % {'name': reviewer_name})
         return redirect('product_review_detail', review_id=review.id)
 
     return render(request, 'admin_dashboard/product_review_form.html', {'action': 'Create'})
@@ -2560,7 +2573,7 @@ def product_review_detail(request, review_id):
 def product_review_edit(request, review_id):
     """Edit an existing product review"""
     if not request.user.is_superuser:
-        messages.error(request, 'You do not have permission to edit product reviews.')
+        messages.error(request, _('You do not have permission to edit product reviews.'))
         return redirect('product_review_list')
 
     review = get_object_or_404(
@@ -2584,7 +2597,7 @@ def product_review_edit(request, review_id):
 
         # Validation
         if not all([rating, review_title, review_text, reviewer_name, reviewer_email]):
-            messages.error(request, 'Please fill in all required fields.')
+            messages.error(request, _('Please fill in all required fields.'))
             return render(request, 'admin_dashboard/product_review_form.html', {
                 'action': 'Edit',
                 'review': review,
@@ -2595,7 +2608,7 @@ def product_review_edit(request, review_id):
             if rating < 1 or rating > 5:
                 raise ValueError('Rating must be between 1 and 5')
         except (ValueError, TypeError):
-            messages.error(request, 'Invalid rating value.')
+            messages.error(request, _('Invalid rating value.'))
             return render(request, 'admin_dashboard/product_review_form.html', {
                 'action': 'Edit',
                 'review': review,
@@ -2622,7 +2635,7 @@ def product_review_edit(request, review_id):
 
         review.save()
 
-        messages.success(request, f'Product review updated successfully.')
+        messages.success(request, _('Product review updated successfully.'))
         return redirect('product_review_detail', review_id=review.id)
 
     return render(request, 'admin_dashboard/product_review_form.html', {
@@ -2635,7 +2648,7 @@ def product_review_edit(request, review_id):
 def product_review_delete(request, review_id):
     """Delete (soft delete) a product review"""
     if not request.user.is_superuser:
-        messages.error(request, 'You do not have permission to delete product reviews.')
+        messages.error(request, _('You do not have permission to delete product reviews.'))
         return redirect('product_review_list')
 
     review = get_object_or_404(
@@ -2648,7 +2661,7 @@ def product_review_delete(request, review_id):
         review.is_active = False
         review.save()
 
-        messages.success(request, f'Product review from "{review.reviewer_name}" has been deleted.')
+        messages.success(request, _('Product review from "%(name)s" has been deleted.') % {'name': review.reviewer_name})
         return redirect('product_review_list')
 
     return render(request, 'admin_dashboard/product_review_confirm_delete.html', {
@@ -2678,7 +2691,7 @@ def quick_product_review(request):
 
         # Validation - only rating is required
         if not rating:
-            messages.error(request, 'Please select a rating.')
+            messages.error(request, _('Please select a rating.'))
             return render(request, 'admin_dashboard/quick_product_review.html', {
                 'existing_review': existing_review,
             })
@@ -2688,7 +2701,7 @@ def quick_product_review(request):
             if rating < 1 or rating > 5:
                 raise ValueError('Rating must be between 1 and 5')
         except (ValueError, TypeError):
-            messages.error(request, 'Invalid rating value.')
+            messages.error(request, _('Invalid rating value.'))
             return render(request, 'admin_dashboard/quick_product_review.html', {
                 'existing_review': existing_review,
             })
@@ -2712,7 +2725,7 @@ def quick_product_review(request):
             existing_review.review_text = review_text
             existing_review.status = 'pending'  # Reset to pending for re-approval
             existing_review.save()
-            messages.success(request, 'Your review has been updated and is pending approval. Thank you!')
+            messages.success(request, _('Your review has been updated and is pending approval. Thank you!'))
         else:
             # Create new review
             ProductReview.objects.create(
@@ -2726,7 +2739,7 @@ def quick_product_review(request):
                 status='pending',
                 source='Dashboard Quick Review',
             )
-            messages.success(request, 'Thank you for your review! It will be published after approval.')
+            messages.success(request, _('Thank you for your review! It will be published after approval.'))
 
         return redirect('admin_dashboard')
 
@@ -2744,7 +2757,7 @@ def quick_product_review(request):
 def product_review_approve(request, review_id):
     """Quick approve a product review"""
     if not request.user.is_superuser:
-        messages.error(request, 'You do not have permission to approve reviews.')
+        messages.error(request, _('You do not have permission to approve reviews.'))
         return redirect('product_review_list')
 
     review = get_object_or_404(
@@ -2757,7 +2770,7 @@ def product_review_approve(request, review_id):
         review.published_date = date.today()
     review.save()
 
-    messages.success(request, f'Review from "{review.reviewer_name}" approved successfully.')
+    messages.success(request, _('Review from "%(name)s" approved successfully.') % {'name': review.reviewer_name})
     return redirect('product_review_list')
 
 
@@ -2766,7 +2779,7 @@ def product_review_approve(request, review_id):
 def product_review_reject(request, review_id):
     """Quick reject a product review"""
     if not request.user.is_superuser:
-        messages.error(request, 'You do not have permission to reject reviews.')
+        messages.error(request, _('You do not have permission to reject reviews.'))
         return redirect('product_review_list')
 
     review = get_object_or_404(
@@ -2777,7 +2790,7 @@ def product_review_reject(request, review_id):
     review.status = 'rejected'
     review.save()
 
-    messages.success(request, f'Review from "{review.reviewer_name}" rejected.')
+    messages.success(request, _('Review from "%(name)s" rejected.') % {'name': review.reviewer_name})
     return redirect('product_review_list')
 
 
@@ -2793,12 +2806,12 @@ def create_api_token(request):
         return redirect('settings')
 
     if not request.user.has_perm('accounts.can_manage_organization'):
-        messages.error(request, 'Permission denied.')
+        messages.error(request, _('Permission denied.'))
         return redirect('settings')
 
     org = request.organization
     if not org:
-        messages.error(request, 'No organization found.')
+        messages.error(request, _('No organization found.'))
         return redirect('settings')
 
     name = request.POST.get('name')
@@ -2818,7 +2831,7 @@ def create_api_token(request):
         request.session['new_api_token'] = token.token
         request.session['new_api_token_name'] = name
     except Exception as e:
-        messages.error(request, f'Error creating API token: {str(e)}')
+        messages.error(request, _('Error creating API token: %(error)s') % {'error': str(e)})
 
     return redirect('settings')
 
@@ -2831,12 +2844,12 @@ def update_api_token(request, token_id):
         return redirect('settings')
 
     if not request.user.has_perm('accounts.can_manage_organization'):
-        messages.error(request, 'Permission denied.')
+        messages.error(request, _('Permission denied.'))
         return redirect('settings')
 
     org = request.organization
     if not org:
-        messages.error(request, 'No organization found.')
+        messages.error(request, _('No organization found.'))
         return redirect('settings')
 
     try:
@@ -2847,11 +2860,11 @@ def update_api_token(request, token_id):
         token.is_active = request.POST.get('is_active') == 'on'
         token.save()
 
-        messages.success(request, 'API token updated successfully.')
+        messages.success(request, _('API token updated successfully.'))
     except APIToken.DoesNotExist:
-        messages.error(request, 'API token not found.')
+        messages.error(request, _('API token not found.'))
     except Exception as e:
-        messages.error(request, f'Error updating API token: {str(e)}')
+        messages.error(request, _('Error updating API token: %(error)s') % {'error': str(e)})
 
     return redirect('settings')
 
@@ -2864,12 +2877,12 @@ def delete_api_token(request, token_id):
         return redirect('settings')
 
     if not request.user.has_perm('accounts.can_manage_organization'):
-        messages.error(request, 'Permission denied.')
+        messages.error(request, _('Permission denied.'))
         return redirect('settings')
 
     org = request.organization
     if not org:
-        messages.error(request, 'No organization found.')
+        messages.error(request, _('No organization found.'))
         return redirect('settings')
 
     try:
@@ -2877,11 +2890,11 @@ def delete_api_token(request, token_id):
         token_name = token.name
         token.delete()
 
-        messages.success(request, f'API token "{token_name}" revoked successfully.')
+        messages.success(request, _('API token "%(name)s" revoked successfully.') % {'name': token_name})
     except APIToken.DoesNotExist:
-        messages.error(request, 'API token not found.')
+        messages.error(request, _('API token not found.'))
     except Exception as e:
-        messages.error(request, f'Error revoking API token: {str(e)}')
+        messages.error(request, _('Error revoking API token: %(error)s') % {'error': str(e)})
 
     return redirect('settings')
 
@@ -2894,12 +2907,12 @@ def create_webhook(request):
         return redirect('settings')
 
     if not request.user.has_perm('accounts.can_manage_organization'):
-        messages.error(request, 'Permission denied.')
+        messages.error(request, _('Permission denied.'))
         return redirect('settings')
 
     org = request.organization
     if not org:
-        messages.error(request, 'No organization found.')
+        messages.error(request, _('No organization found.'))
         return redirect('settings')
 
     name = request.POST.get('name')
@@ -2917,9 +2930,9 @@ def create_webhook(request):
             is_active=is_active
         )
 
-        messages.success(request, f'Webhook "{name}" created successfully.')
+        messages.success(request, _('Webhook "%(name)s" created successfully.') % {'name': name})
     except Exception as e:
-        messages.error(request, f'Error creating webhook: {str(e)}')
+        messages.error(request, _('Error creating webhook: %(error)s') % {'error': str(e)})
 
     return redirect('settings')
 
@@ -2932,12 +2945,12 @@ def update_webhook(request, webhook_id):
         return redirect('settings')
 
     if not request.user.has_perm('accounts.can_manage_organization'):
-        messages.error(request, 'Permission denied.')
+        messages.error(request, _('Permission denied.'))
         return redirect('settings')
 
     org = request.organization
     if not org:
-        messages.error(request, 'No organization found.')
+        messages.error(request, _('No organization found.'))
         return redirect('settings')
 
     try:
@@ -2949,11 +2962,11 @@ def update_webhook(request, webhook_id):
         webhook.is_active = request.POST.get('is_active') == 'on'
         webhook.save()
 
-        messages.success(request, f'Webhook "{webhook.name}" updated successfully.')
+        messages.success(request, _('Webhook "%(name)s" updated successfully.') % {'name': webhook.name})
     except WebhookEndpoint.DoesNotExist:
-        messages.error(request, 'Webhook not found.')
+        messages.error(request, _('Webhook not found.'))
     except Exception as e:
-        messages.error(request, f'Error updating webhook: {str(e)}')
+        messages.error(request, _('Error updating webhook: %(error)s') % {'error': str(e)})
 
     return redirect('settings')
 
@@ -2966,12 +2979,12 @@ def delete_webhook(request, webhook_id):
         return redirect('settings')
 
     if not request.user.has_perm('accounts.can_manage_organization'):
-        messages.error(request, 'Permission denied.')
+        messages.error(request, _('Permission denied.'))
         return redirect('settings')
 
     org = request.organization
     if not org:
-        messages.error(request, 'No organization found.')
+        messages.error(request, _('No organization found.'))
         return redirect('settings')
 
     try:
@@ -2979,10 +2992,10 @@ def delete_webhook(request, webhook_id):
         webhook_name = webhook.name
         webhook.delete()
 
-        messages.success(request, f'Webhook "{webhook_name}" deleted successfully.')
+        messages.success(request, _('Webhook "%(name)s" deleted successfully.') % {'name': webhook_name})
     except WebhookEndpoint.DoesNotExist:
-        messages.error(request, 'Webhook not found.')
+        messages.error(request, _('Webhook not found.'))
     except Exception as e:
-        messages.error(request, f'Error deleting webhook: {str(e)}')
+        messages.error(request, _('Error deleting webhook: %(error)s') % {'error': str(e)})
 
     return redirect('settings')

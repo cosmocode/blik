@@ -1,6 +1,7 @@
 {% extends "admin_dashboard/base.html" %}
+{% load i18n %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}{% trans 'Dashboard' %}{% endblock %}
 
 {% block content %}
 <!-- Welcome Modal -->
@@ -14,48 +15,48 @@
                     <circle cx="12" cy="12" r="2"></circle>
                 </svg>
             </div>
-            <h2 style="margin: 0 0 0.5rem 0; font-size: 1.75rem;">Welcome to Blik</h2>
-            <p style="color: var(--text-secondary); margin: 0;">Your 360-degree feedback platform</p>
+            <h2 style="margin: 0 0 0.5rem 0; font-size: 1.75rem;">{% trans 'Welcome to Blik' %}</h2>
+            <p style="color: var(--text-secondary); margin: 0;">{% trans 'Your 360-degree feedback platform' %}</p>
         </div>
 
         <div style="background: var(--bg-light); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-            <h3 style="margin: 0 0 1rem 0; font-size: 1.125rem;">How Blik helps you:</h3>
+            <h3 style="margin: 0 0 1rem 0; font-size: 1.125rem;">{% trans 'How Blik helps you:' %}</h3>
             <ul style="margin: 0; padding-left: 1.5rem; line-height: 1.8;">
-                <li>Gather comprehensive feedback from peers, managers, and direct reports</li>
-                <li>Maintain complete anonymity for honest, constructive input</li>
-                <li>Generate actionable insights to drive professional growth</li>
+                <li>{% trans 'Gather comprehensive feedback from peers, managers, and direct reports' %}</li>
+                <li>{% trans 'Maintain complete anonymity for honest, constructive input' %}</li>
+                <li>{% trans 'Generate actionable insights to drive professional growth' %}</li>
             </ul>
         </div>
 
         <div style="margin-bottom: 2rem;">
-            <h3 style="margin: 0 0 1rem 0; font-size: 1.125rem;">Getting started is simple:</h3>
+            <h3 style="margin: 0 0 1rem 0; font-size: 1.125rem;">{% trans 'Getting started is simple:' %}</h3>
             <div style="display: flex; flex-direction: column; gap: 1rem;">
                 <div style="display: flex; gap: 1rem; align-items: start;">
                     <div style="min-width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">1</div>
                     <div>
-                        <strong>Add reviewees</strong>
-                        <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">People who will receive 360° feedback</p>
+                        <strong>{% trans 'Add reviewees' %}</strong>
+                        <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">{% trans 'People who will receive 360° feedback' %}</p>
                     </div>
                 </div>
                 <div style="display: flex; gap: 1rem; align-items: start;">
                     <div style="min-width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">2</div>
                     <div>
-                        <strong>Create a review cycle</strong>
-                        <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">Choose a questionnaire and invite reviewers</p>
+                        <strong>{% trans 'Create a review cycle' %}</strong>
+                        <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">{% trans 'Choose a questionnaire and invite reviewers' %}</p>
                     </div>
                 </div>
                 <div style="display: flex; gap: 1rem; align-items: start;">
                     <div style="min-width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">3</div>
                     <div>
-                        <strong>Share anonymous invite links</strong>
-                        <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">Copy links and share directly, or optionally send via email</p>
+                        <strong>{% trans 'Share anonymous invite links' %}</strong>
+                        <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">{% trans 'Copy links and share directly, or optionally send via email' %}</p>
                     </div>
                 </div>
                 <div style="display: flex; gap: 1rem; align-items: start;">
                     <div style="min-width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">4</div>
                     <div>
-                        <strong>Review the report</strong>
-                        <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">View aggregated insights and share with reviewees</p>
+                        <strong>{% trans 'Review the report' %}</strong>
+                        <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">{% trans 'View aggregated insights and share with reviewees' %}</p>
                     </div>
                 </div>
             </div>
@@ -63,10 +64,10 @@
 
         <div style="display: flex; gap: 1rem; justify-content: flex-end;">
             <button onclick="dismissWelcome(true)" class="btn btn-secondary">
-                Skip for now
+                {% trans 'Skip for now' %}
             </button>
             <a href="{% url 'reviewee_create' %}" onclick="dismissWelcome(false)" class="btn btn-primary" style="text-decoration: none;">
-                Get Started
+                {% trans 'Get Started' %}
             </a>
         </div>
     </div>
@@ -138,8 +139,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <div class="page-header">
     <div>
-        <h1>Dashboard</h1>
-        <p>Manage 360-degree feedback and review cycles</p>
+        <h1>{% trans 'Dashboard' %}</h1>
+        <p>{% trans 'Manage 360-degree feedback and review cycles' %}</p>
     </div>
 </div>
 
@@ -148,28 +149,28 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="card">
         <div class="card-body stat-card-content">
             <div class="stat-number primary">{{ total_reviewees }}</div>
-            <div class="stat-label">Active Reviewees</div>
+            <div class="stat-label">{% trans 'Active Reviewees' %}</div>
         </div>
     </div>
 
     <div class="card">
         <div class="card-body stat-card-content">
             <div class="stat-number warning">{{ active_cycles }}</div>
-            <div class="stat-label">Active Cycles</div>
+            <div class="stat-label">{% trans 'Active Cycles' %}</div>
         </div>
     </div>
 
     <div class="card">
         <div class="card-body stat-card-content">
             <div class="stat-number success">{{ completed_cycles }}</div>
-            <div class="stat-label">Completed Cycles</div>
+            <div class="stat-label">{% trans 'Completed Cycles' %}</div>
         </div>
     </div>
 
     <div class="card">
         <div class="card-body stat-card-content">
             <div class="stat-number secondary">{{ pending_tokens }}</div>
-            <div class="stat-label">Pending Reviews</div>
+            <div class="stat-label">{% trans 'Pending Reviews' %}</div>
         </div>
     </div>
 </div>
@@ -181,15 +182,15 @@ document.addEventListener('DOMContentLoaded', function() {
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 2rem; flex-wrap: wrap;">
             <div style="flex: 1; min-width: 250px;">
                 <h3 style="margin: 0 0 0.5rem 0; font-size: 1.125rem; color: #10b981;">
-                    ⭐ Share Your Experience with Blik
+                    ⭐ {% trans 'Share Your Experience with Blik' %}
                 </h3>
                 <p style="margin: 0; color: #64748b;">
-                    Enjoying Blik? Take 2 minutes to share your feedback and help other teams discover us.
+                    {% trans 'Enjoying Blik? Take 2 minutes to share your feedback and help other teams discover us.' %}
                 </p>
             </div>
             <div>
                 <button onclick="openReviewModal()" class="btn btn-primary" style="white-space: nowrap;">
-                    Submit a Review
+                    {% trans 'Submit a Review' %}
                 </button>
             </div>
         </div>
@@ -201,21 +202,21 @@ document.addEventListener('DOMContentLoaded', function() {
 {% if subscription_status.has_subscription %}
 <div class="card mb-2">
     <div class="card-header">
-        <h2 class="card-title">Subscription & Limits</h2>
+        <h2 class="card-title">{% trans 'Subscription & Limits' %}</h2>
     </div>
     <div class="card-body">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
             <div>
-                <div style="font-weight: 600; margin-bottom: 0.5rem;">Plan</div>
+                <div style="font-weight: 600; margin-bottom: 0.5rem;">{% trans 'Plan' %}</div>
                 <div style="font-size: 1.25rem; color: #4f46e5;">{{ subscription_status.plan_name }}</div>
                 {% if subscription_status.current_period_end %}
                 <div style="font-size: 0.875rem; color: #64748b; margin-top: 0.25rem;">
-                    Renews {{ subscription_status.current_period_end|date:"M d, Y" }}
+                    {% blocktrans trimmed with renewal_date=subscription_status.current_period_end|date:"M d, Y" %}Renews {{ renewal_date }}{% endblocktrans %}
                 </div>
                 {% endif %}
             </div>
             <div>
-                <div style="font-weight: 600; margin-bottom: 0.5rem;">Reviewees</div>
+                <div style="font-weight: 600; margin-bottom: 0.5rem;">{% trans 'Reviewees' %}</div>
                 <div style="font-size: 1.25rem;">
                     <span {% if subscription_status.reviewees_remaining <= 5 %}style="color: #ef4444;"{% endif %}>
                         {{ subscription_status.current_reviewees }}
@@ -223,22 +224,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span style="color: #64748b;"> / {{ subscription_status.max_employees }}</span>
                 </div>
                 <div style="font-size: 0.875rem; color: {% if subscription_status.reviewees_remaining <= 5 %}#ef4444{% else %}#10b981{% endif %}; margin-top: 0.25rem;">
-                    {{ subscription_status.reviewees_remaining }} remaining
+                    {% blocktrans trimmed with remaining=subscription_status.reviewees_remaining %}{{ remaining }} remaining{% endblocktrans %}
                 </div>
             </div>
             <div>
-                <div style="font-weight: 600; margin-bottom: 0.5rem;">Team Members</div>
+                <div style="font-weight: 600; margin-bottom: 0.5rem;">{% trans 'Team Members' %}</div>
                 <div style="font-size: 1.25rem; color: #10b981;">{{ subscription_status.current_users }}</div>
                 <div style="font-size: 0.875rem; color: #64748b; margin-top: 0.25rem;">
-                    Unlimited
+                    {% trans 'Unlimited' %}
                 </div>
             </div>
         </div>
         {% if subscription_status.reviewees_remaining <= 5 %}
         <div style="margin-top: 1rem; padding: 0.75rem; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;">
-            <strong style="color: #dc2626;">Approaching Limit:</strong>
+            <strong style="color: #dc2626;">{% trans 'Approaching Limit:' %}</strong>
             <span style="color: #991b1b;">
-                You're nearing your plan limit of {{ subscription_status.max_employees }} reviewees. Contact us to upgrade your plan.
+                {% blocktrans trimmed with max_employees=subscription_status.max_employees %}You're nearing your plan limit of {{ max_employees }} reviewees. Contact us to upgrade your plan.{% endblocktrans %}
             </span>
         </div>
         {% endif %}
@@ -249,21 +250,21 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Quick Actions -->
 <div class="card mb-2">
     <div class="card-header">
-        <h2 class="card-title">Quick Actions</h2>
+        <h2 class="card-title">{% trans 'Quick Actions' %}</h2>
     </div>
     <div class="card-body">
         <div class="action-grid">
             <a href="{% url 'review_cycle_create' %}" class="btn btn-primary text-center">
-                New Review Cycle
+                {% trans 'New Review Cycle' %}
             </a>
             <a href="{% url 'reviewee_create' %}" class="btn btn-secondary text-center">
-                Add Reviewee
+                {% trans 'Add Reviewee' %}
             </a>
             <a href="{% url 'questionnaire_list' %}" class="btn btn-secondary text-center">
-                Questionnaires
+                {% trans 'Questionnaires' %}
             </a>
             <a href="{% url 'review_cycle_list' %}" class="btn btn-secondary text-center">
-                All Cycles
+                {% trans 'All Cycles' %}
             </a>
         </div>
     </div>
@@ -275,16 +276,16 @@ document.addEventListener('DOMContentLoaded', function() {
     {% if active_cycles_data %}
     <div class="card mb-2">
         <div class="card-header">
-            <h2 class="card-title">Active Cycles</h2>
+            <h2 class="card-title">{% trans 'Active Cycles' %}</h2>
         </div>
         <div class="card-body">
             <div class="table-wrapper">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Reviewee</th>
-                        <th>Progress</th>
-                        <th>Actions</th>
+                        <th>{% trans 'Reviewee' %}</th>
+                        <th>{% trans 'Progress' %}</th>
+                        <th>{% trans 'Actions' %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -303,7 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </td>
                         <td>
-                            <a href="{% url 'review_cycle_detail' item.cycle.uuid %}" class="btn btn-sm btn-secondary">View</a>
+                            <a href="{% url 'review_cycle_detail' item.cycle.uuid %}" class="btn btn-sm btn-secondary">{% trans 'View' %}</a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -318,16 +319,16 @@ document.addEventListener('DOMContentLoaded', function() {
     {% if completed_cycles_data %}
     <div class="card mb-2">
         <div class="card-header">
-            <h2 class="card-title">Completed Cycles</h2>
+            <h2 class="card-title">{% trans 'Completed Cycles' %}</h2>
         </div>
         <div class="card-body">
             <div class="table-wrapper">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Reviewee</th>
-                        <th>Completed</th>
-                        <th>Actions</th>
+                        <th>{% trans 'Reviewee' %}</th>
+                        <th>{% trans 'Completed' %}</th>
+                        <th>{% trans 'Actions' %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -342,9 +343,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         </td>
                         <td>
                             {% if item.report_exists %}
-                            <a href="{% url 'reports:view_report' item.cycle.uuid %}" class="btn btn-sm btn-primary">View Report</a>
+                            <a href="{% url 'reports:view_report' item.cycle.uuid %}" class="btn btn-sm btn-primary">{% trans 'View Report' %}</a>
                             {% else %}
-                            <a href="{% url 'review_cycle_detail' item.cycle.uuid %}" class="btn btn-sm btn-secondary">View</a>
+                            <a href="{% url 'review_cycle_detail' item.cycle.uuid %}" class="btn btn-sm btn-secondary">{% trans 'View' %}</a>
                             {% endif %}
                         </td>
                     </tr>
@@ -361,19 +362,19 @@ document.addEventListener('DOMContentLoaded', function() {
 {% if recent_cycles %}
 <div class="card">
     <div class="card-header">
-        <h2 class="card-title">Recent Review Cycles</h2>
-        <a href="{% url 'review_cycle_list' %}" class="btn btn-sm btn-secondary">View All</a>
+        <h2 class="card-title">{% trans 'Recent Review Cycles' %}</h2>
+        <a href="{% url 'review_cycle_list' %}" class="btn btn-sm btn-secondary">{% trans 'View All' %}</a>
     </div>
     <div class="card-body">
         <div class="table-wrapper">
         <table class="table">
             <thead>
                 <tr>
-                    <th>Reviewee</th>
-                    <th>Questionnaire</th>
-                    <th>Created</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>{% trans 'Reviewee' %}</th>
+                    <th>{% trans 'Questionnaire' %}</th>
+                    <th>{% trans 'Created' %}</th>
+                    <th>{% trans 'Status' %}</th>
+                    <th>{% trans 'Actions' %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -389,13 +390,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     </td>
                     <td>
                         {% if cycle.status == 'active' %}
-                        <span class="badge badge-warning">Active</span>
+                        <span class="badge badge-warning">{% trans 'Active' %}</span>
                         {% else %}
-                        <span class="badge badge-success">Completed</span>
+                        <span class="badge badge-success">{% trans 'Completed' %}</span>
                         {% endif %}
                     </td>
                     <td>
-                        <a href="{% url 'review_cycle_detail' cycle.uuid %}" class="btn btn-sm btn-secondary">View</a>
+                        <a href="{% url 'review_cycle_detail' cycle.uuid %}" class="btn btn-sm btn-secondary">{% trans 'View' %}</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -408,9 +409,9 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="card">
     <div class="card-body">
         <div class="empty-state">
-            <h3 style="margin-bottom: 0.5rem;">No review cycles yet</h3>
-            <p style="margin-bottom: 1.5rem;">Create your first review cycle to get started</p>
-            <a href="{% url 'review_cycle_create' %}" class="btn btn-primary">Create Review Cycle</a>
+            <h3 style="margin-bottom: 0.5rem;">{% trans 'No review cycles yet' %}</h3>
+            <p style="margin-bottom: 1.5rem;">{% trans 'Create your first review cycle to get started' %}</p>
+            <a href="{% url 'review_cycle_create' %}" class="btn btn-primary">{% trans 'Create Review Cycle' %}</a>
         </div>
     </div>
 </div>
@@ -421,15 +422,15 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="modal-content" style="max-width: 700px;">
         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem;">
             <div>
-                <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">Share Your Experience</h2>
-                <p style="margin: 0; color: var(--text-secondary);">Help us improve by sharing your feedback</p>
+                <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">{% trans 'Share Your Experience' %}</h2>
+                <p style="margin: 0; color: var(--text-secondary);">{% trans 'Help us improve by sharing your feedback' %}</p>
             </div>
             <button onclick="closeReviewModal()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">✕</button>
         </div>
 
         <div style="background: var(--bg-light); padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
             <p style="margin: 0; color: #64748b;">
-                <strong>Reviewing as:</strong> {{ user.get_full_name|default:user.username }} ({{ user.email }})
+                <strong>{% trans 'Reviewing as:' %}</strong> {{ user.get_full_name|default:user.username }} ({{ user.email }})
             </p>
         </div>
 
@@ -437,51 +438,51 @@ document.addEventListener('DOMContentLoaded', function() {
             {% csrf_token %}
 
             <div class="form-group">
-                <label class="form-label" for="modal-rating">How would you rate Blik? *</label>
+                <label class="form-label" for="modal-rating">{% trans 'How would you rate Blik?' %} *</label>
                 <select id="modal-rating" name="rating" class="form-control" required style="font-size: 1.1em;">
-                    <option value="">Select your rating...</option>
-                    <option value="5">★★★★★ Excellent - Exceeded expectations</option>
-                    <option value="4">★★★★☆ Good - Met expectations</option>
-                    <option value="3">★★★☆☆ Average - Room for improvement</option>
-                    <option value="2">★★☆☆☆ Below Average - Needs work</option>
-                    <option value="1">★☆☆☆☆ Poor - Major issues</option>
+                    <option value="">{% trans 'Select your rating...' %}</option>
+                    <option value="5">★★★★★ {% trans 'Excellent - Exceeded expectations' %}</option>
+                    <option value="4">★★★★☆ {% trans 'Good - Met expectations' %}</option>
+                    <option value="3">★★★☆☆ {% trans 'Average - Room for improvement' %}</option>
+                    <option value="2">★★☆☆☆ {% trans 'Below Average - Needs work' %}</option>
+                    <option value="1">★☆☆☆☆ {% trans 'Poor - Major issues' %}</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="modal-review-title">Review Headline (Optional)</label>
+                <label class="form-label" for="modal-review-title">{% trans 'Review Headline (Optional)' %}</label>
                 <input
                     type="text"
                     id="modal-review-title"
                     name="review_title"
                     class="form-control"
-                    placeholder="e.g., Great tool for 360 feedback"
+                    placeholder="{% trans 'e.g., Great tool for 360 feedback' %}"
                     maxlength="200"
                 >
-                <small class="form-text">A short, catchy summary of your experience</small>
+                <small class="form-text">{% trans 'A short, catchy summary of your experience' %}</small>
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="modal-review-text">Your Review (Optional)</label>
+                <label class="form-label" for="modal-review-text">{% trans 'Your Review (Optional)' %}</label>
                 <textarea
                     id="modal-review-text"
                     name="review_text"
                     class="form-control"
                     rows="6"
-                    placeholder="Tell us about your experience with Blik..."
+                    placeholder="{% trans 'Tell us about your experience with Blik...' %}"
                 ></textarea>
-                <small class="form-text">Share what you liked, disliked, or found helpful</small>
+                <small class="form-text">{% trans 'Share what you liked, disliked, or found helpful' %}</small>
             </div>
 
             <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 6px; padding: 1rem; margin-bottom: 1.5rem;">
                 <p style="margin: 0; color: #92400e; font-size: 0.875rem;">
-                    <strong>Note:</strong> Your review will be submitted for approval before being published.
+                    <strong>{% trans 'Note:' %}</strong> {% trans 'Your review will be submitted for approval before being published.' %}
                 </p>
             </div>
 
             <div class="form-actions">
-                <button type="button" onclick="closeReviewModal()" class="btn btn-secondary">Cancel</button>
-                <button type="submit" class="btn btn-primary">Submit Review</button>
+                <button type="button" onclick="closeReviewModal()" class="btn btn-secondary">{% trans 'Cancel' %}</button>
+                <button type="submit" class="btn btn-primary">{% trans 'Submit Review' %}</button>
             </div>
         </form>
     </div>

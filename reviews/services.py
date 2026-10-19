@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from core.email import send_email
 from datetime import timedelta
 from django.db.models import Q
@@ -48,7 +49,8 @@ def assign_tokens_to_emails(cycle, email_assignments):
 
         if len(emails) > len(available_tokens):
             stats['errors'].append(
-                f"Not enough tokens for {category}: need {len(emails)}, have {len(available_tokens)}"
+                _('Not enough tokens for %(category)s: need %(needed)s, have %(available)s')
+                % {'category': category, 'needed': len(emails), 'available': len(available_tokens)}
             )
             continue
 
@@ -107,10 +109,10 @@ def send_reviewer_invitations(cycle, token_ids=None):
 
             if token.category == 'self':
                 context.update(reviewee=cycle.reviewee, cycle=cycle, self_assessment_url=feedback_url)
-                subject = f'Complete Your Self-Assessment: {cycle.questionnaire.name}'
+                subject = _('Complete Your Self-Assessment: %(questionnaire)s') % {'questionnaire': cycle.questionnaire.name}
                 template = 'emails/reviewee_self_assessment'
             else:
-                subject = f'360 Feedback Request: {cycle.reviewee.name}'
+                subject = _('360 Feedback Request: %(name)s') % {'name': cycle.reviewee.name}
                 template = 'emails/reviewer_invitation'
 
             html_message = render_to_string(f'{template}.html', context)
@@ -131,7 +133,7 @@ def send_reviewer_invitations(cycle, token_ids=None):
             stats['sent'] += 1
 
         except Exception as e:
-            stats['errors'].append(f"Failed to send to {token.reviewer_email}: {str(e)}")
+            stats['errors'].append(_('Failed to send to %(email)s: %(error)s') % {'email': token.reviewer_email, 'error': str(e)})
 
     return stats
 
@@ -180,7 +182,7 @@ def send_reminder_emails(cycle, token_ids=None):
 
             # Send email
             send_email(
-                subject=f'Reminder: 360 Feedback Request for {cycle.reviewee.name}',
+                subject=_('Reminder: 360 Feedback Request for %(name)s') % {'name': cycle.reviewee.name},
                 message=text_message,
                 recipient_list=[token.reviewer_email],
                 html_message=html_message,
@@ -193,7 +195,7 @@ def send_reminder_emails(cycle, token_ids=None):
             stats['sent'] += 1
 
         except Exception as e:
-            stats['errors'].append(f"Failed to send reminder to {token.reviewer_email}: {str(e)}")
+            stats['errors'].append(_('Failed to send reminder to %(email)s: %(error)s') % {'email': token.reviewer_email, 'error': str(e)})
 
     return stats
 
@@ -217,7 +219,7 @@ def send_reviewee_notifications(cycle, request=None):
     }
 
     if not cycle.reviewee.email:
-        stats['errors'].append(f"No email address for reviewee {cycle.reviewee.name}")
+        stats['errors'].append(_('No email address for reviewee %(name)s') % {'name': cycle.reviewee.name})
         return stats
 
     # Always use SITE_DOMAIN for consistent URLs across all email contexts
@@ -252,7 +254,7 @@ def send_assessment_email(cycle, base_url, stats):
         text_message = render_to_string('emails/reviewee_self_assessment.txt', context)
 
         send_email(
-            subject=f'Complete Your Self-Assessment: {cycle.questionnaire.name}',
+            subject=_('Complete Your Self-Assessment: %(questionnaire)s') % {'questionnaire': cycle.questionnaire.name},
             message=text_message,
             recipient_list=[cycle.reviewee.email],
             html_message=html_message,
@@ -261,7 +263,7 @@ def send_assessment_email(cycle, base_url, stats):
         stats['sent'] += 1
 
     except Exception as e:
-        stats['errors'].append(f"Failed to send self-assessment email: {str(e)}")
+        stats['errors'].append(_('Failed to send self-assessment email: %(error)s') % {'error': str(e)})
 
 
 def send_invitation_links_email(cycle, base_url, categories, stats):
@@ -282,7 +284,7 @@ def send_invitation_links_email(cycle, base_url, categories, stats):
         text_message = render_to_string('emails/reviewee_invitation_links.txt', context)
 
         send_email(
-            subject=f'Share Your 360 Feedback Links: {cycle.questionnaire.name}',
+            subject=_('Share Your 360 Feedback Links: %(questionnaire)s') % {'questionnaire': cycle.questionnaire.name},
             message=text_message,
             recipient_list=[cycle.reviewee.email],
             html_message=html_message,
@@ -291,7 +293,7 @@ def send_invitation_links_email(cycle, base_url, categories, stats):
         stats['sent'] += 1
 
     except Exception as e:
-        stats['errors'].append(f"Failed to send invitation links email: {str(e)}")
+        stats['errors'].append(_('Failed to send invitation links email: %(error)s') % {'error': str(e)})
 
 
 def send_close_check_emails(dry_run=False):
@@ -353,7 +355,7 @@ def send_close_check_emails(dry_run=False):
             text_message = render_to_string('emails/cycle_close_check.txt', context)
 
             send_email(
-                subject=f'Review Check-In: {cycle.questionnaire.name}',
+                subject=_('Review Check-In: %(questionnaire)s') % {'questionnaire': cycle.questionnaire.name},
                 message=text_message,
                 recipient_list=[cycle.reviewee.email],
                 html_message=html_message,

@@ -1,19 +1,19 @@
-360 Feedback Request for {{ reviewee_name }}
+{% load i18n %}{% blocktrans trimmed %}360 Feedback Request for {{ reviewee_name }}{% endblocktrans %}
 
-Hello,
+{% trans 'Hello,' %}
 
-You have been invited to provide {{ category }} feedback for {{ reviewee_name }}.
+{% blocktrans trimmed %}You have been invited to provide {{ category }} feedback for {{ reviewee_name }}.{% endblocktrans %}
 
-Your feedback is anonymous and will help {{ reviewee_name }} grow professionally.
+{% blocktrans trimmed %}Your feedback is anonymous and will help {{ reviewee_name }} grow professionally.{% endblocktrans %}
 
-Click the link below to start your review:
+{% trans 'Click the link below to start your review:' %}
 {{ feedback_url }}
 
-This questionnaire covers: {{ questionnaire_name }}
+{% blocktrans trimmed %}This questionnaire covers: {{ questionnaire_name }}{% endblocktrans %}
 
-You can save your progress and return to complete it later - just bookmark the link above.
+{% trans 'You can save your progress and return to complete it later - just bookmark the link above.' %}
 
-Thank you for your participation.
+{% trans 'Thank you for your participation.' %}
 
 ---
-This is an automated message from the Blik 360 Feedback System.
+{% trans 'This is an automated message from the Blik 360 Feedback System.' %}
