@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='apitoken',
             name='uuid',
-            field=models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True, help_text='Public identifier for API and URL usage (non-enumerable)'),
+            field=models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True, help_text='Public identifier for API and URL usage (non-enumerable)', verbose_name='UUID'),
         ),
 
         # WebhookEndpoint UUID field
@@ -49,6 +49,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='webhookendpoint',
             name='uuid',
-            field=models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True, help_text='Public identifier for API and URL usage (non-enumerable)'),
+            field=models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True, help_text='Public identifier for API and URL usage (non-enumerable)', verbose_name='UUID'),
         ),
     ]

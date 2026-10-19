@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='organization',
             name='min_responses_for_anonymity',
-            field=models.IntegerField(default=3, help_text='Minimum number of responses required to show results (for anonymity). Set to 1 for small teams.'),
+            field=models.IntegerField(default=3, help_text='Minimum number of responses required to show results (for anonymity). Set to 1 for small teams.', verbose_name='minimum responses for anonymity'),
         ),
     ]

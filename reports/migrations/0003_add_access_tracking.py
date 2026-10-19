@@ -13,16 +13,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='report',
             name='access_count',
-            field=models.IntegerField(default=0, help_text='Number of times report has been accessed'),
+            field=models.IntegerField(default=0, help_text='Number of times report has been accessed', verbose_name='access count'),
         ),
         migrations.AddField(
             model_name='report',
             name='access_token_expires',
-            field=models.DateTimeField(blank=True, help_text='Expiration date for access token', null=True),
+            field=models.DateTimeField(blank=True, help_text='Expiration date for access token', null=True, verbose_name='access token expires'),
         ),
         migrations.AddField(
             model_name='report',
             name='last_accessed',
-            field=models.DateTimeField(blank=True, help_text='Last time report was accessed', null=True),
+            field=models.DateTimeField(blank=True, help_text='Last time report was accessed', null=True, verbose_name='last accessed'),
         ),
     ]

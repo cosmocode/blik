@@ -18,11 +18,11 @@ class Migration(migrations.Migration):
             name='UserProfile',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('can_create_cycles_for_others', models.BooleanField(default=False, help_text='If False, user can only create cycles for themselves')),
-                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='users', to='core.organization')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL)),
+                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
+                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='updated at')),
+                ('can_create_cycles_for_others', models.BooleanField(default=False, help_text='If False, user can only create cycles for themselves', verbose_name='can create cycles for others')),
+                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='users', to='core.organization', verbose_name='organization')),
+                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL, verbose_name='user')),
             ],
             options={
                 'db_table': 'user_profiles',

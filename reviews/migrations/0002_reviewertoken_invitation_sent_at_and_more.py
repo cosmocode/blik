@@ -13,11 +13,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='reviewertoken',
             name='invitation_sent_at',
-            field=models.DateTimeField(blank=True, null=True),
+            field=models.DateTimeField(blank=True, null=True, verbose_name='invitation sent at'),
         ),
         migrations.AddField(
             model_name='reviewertoken',
             name='reviewer_email',
-            field=models.EmailField(blank=True, help_text='Email to send invitation to (not stored with responses for anonymity)', max_length=254, null=True),
+            field=models.EmailField(blank=True, help_text='Email to send invitation to (not stored with responses for anonymity)', max_length=254, null=True, verbose_name='reviewer email'),
         ),
     ]

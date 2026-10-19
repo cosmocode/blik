@@ -24,18 +24,19 @@ class Migration(migrations.Migration):
                         auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
                     ),
                 ),
-                ("created_at", models.DateTimeField(auto_now_add=True)),
-                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True, verbose_name="created at")),
+                ("updated_at", models.DateTimeField(auto_now=True, verbose_name="updated at")),
                 (
                     "name",
                     models.CharField(
                         help_text="Descriptive name for the token (e.g., 'Slack Bot', 'Analytics Dashboard')",
                         max_length=255,
+                        verbose_name="name",
                     ),
                 ),
                 (
                     "token",
-                    models.CharField(db_index=True, editable=False, max_length=64, unique=True),
+                    models.CharField(db_index=True, editable=False, max_length=64, unique=True, verbose_name="token"),
                 ),
                 (
                     "permissions",
@@ -43,22 +44,25 @@ class Migration(migrations.Migration):
                         blank=True,
                         default=dict,
                         help_text='Permissions as JSON: {"read:cycles": true, "write:cycles": true}',
+                        verbose_name="permissions",
                     ),
                 ),
-                ("is_active", models.BooleanField(default=True)),
+                ("is_active", models.BooleanField(default=True, verbose_name="active")),
                 (
                     "expires_at",
                     models.DateTimeField(
                         blank=True,
                         help_text="Token expiration date/time (null = never expires)",
                         null=True,
+                        verbose_name="expires at",
                     ),
                 ),
-                ("last_used_at", models.DateTimeField(blank=True, editable=False, null=True)),
+                ("last_used_at", models.DateTimeField(blank=True, editable=False, null=True, verbose_name="last used at")),
                 (
                     "rate_limit",
                     models.IntegerField(
-                        default=1000, help_text="Maximum requests per hour for this token"
+                        default=1000, help_text="Maximum requests per hour for this token",
+                        verbose_name="rate limit",
                     ),
                 ),
                 (
@@ -69,6 +73,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="created_api_tokens",
                         to=settings.AUTH_USER_MODEL,
+                        verbose_name="created by",
                     ),
                 ),
                 (
@@ -77,6 +82,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="api_tokens",
                         to="core.organization",
+                        verbose_name="organization",
                     ),
                 ),
             ],
@@ -96,16 +102,17 @@ class Migration(migrations.Migration):
                         auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
                     ),
                 ),
-                ("created_at", models.DateTimeField(auto_now_add=True)),
-                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True, verbose_name="created at")),
+                ("updated_at", models.DateTimeField(auto_now=True, verbose_name="updated at")),
                 (
                     "name",
-                    models.CharField(help_text="Descriptive name for this webhook", max_length=255),
+                    models.CharField(help_text="Descriptive name for this webhook", max_length=255, verbose_name="name"),
                 ),
                 (
                     "url",
                     models.URLField(
-                        help_text="URL to receive webhook POST requests", max_length=500
+                        help_text="URL to receive webhook POST requests", max_length=500,
+                        verbose_name="URL",
                     ),
                 ),
                 (
@@ -113,20 +120,22 @@ class Migration(migrations.Migration):
                     models.JSONField(
                         default=list,
                         help_text='List of event types to subscribe to: ["cycle.created", "cycle.completed", ...]',
+                        verbose_name="events",
                     ),
                 ),
-                ("is_active", models.BooleanField(default=True)),
+                ("is_active", models.BooleanField(default=True, verbose_name="active")),
                 (
                     "secret",
                     models.CharField(
                         editable=False,
                         help_text="Secret for HMAC signature verification",
                         max_length=64,
+                        verbose_name="secret",
                     ),
                 ),
-                ("last_triggered_at", models.DateTimeField(blank=True, editable=False, null=True)),
-                ("success_count", models.IntegerField(default=0, editable=False)),
-                ("failure_count", models.IntegerField(default=0, editable=False)),
+                ("last_triggered_at", models.DateTimeField(blank=True, editable=False, null=True, verbose_name="last triggered at")),
+                ("success_count", models.IntegerField(default=0, editable=False, verbose_name="success count")),
+                ("failure_count", models.IntegerField(default=0, editable=False, verbose_name="failure count")),
                 (
                     "created_by",
                     models.ForeignKey(
@@ -135,6 +144,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="created_webhooks",
                         to=settings.AUTH_USER_MODEL,
+                        verbose_name="created by",
                     ),
                 ),
                 (
@@ -143,6 +153,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="webhook_endpoints",
                         to="core.organization",
+                        verbose_name="organization",
                     ),
                 ),
             ],
@@ -162,25 +173,27 @@ class Migration(migrations.Migration):
                         auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
                     ),
                 ),
-                ("event_type", models.CharField(db_index=True, max_length=100)),
-                ("payload", models.JSONField(help_text="Event data sent to webhook")),
-                ("created_at", models.DateTimeField(auto_now_add=True, db_index=True)),
-                ("delivered_at", models.DateTimeField(blank=True, null=True)),
-                ("status_code", models.IntegerField(blank=True, null=True)),
+                ("event_type", models.CharField(db_index=True, max_length=100, verbose_name="event type")),
+                ("payload", models.JSONField(help_text="Event data sent to webhook", verbose_name="payload")),
+                ("created_at", models.DateTimeField(auto_now_add=True, db_index=True, verbose_name="created at")),
+                ("delivered_at", models.DateTimeField(blank=True, null=True, verbose_name="delivered at")),
+                ("status_code", models.IntegerField(blank=True, null=True, verbose_name="status code")),
                 (
                     "response_body",
                     models.TextField(
-                        blank=True, help_text="Response body (truncated to 1000 chars)"
+                        blank=True, help_text="Response body (truncated to 1000 chars)",
+                        verbose_name="response body",
                     ),
                 ),
-                ("error_message", models.TextField(blank=True)),
-                ("attempt_count", models.IntegerField(default=0)),
+                ("error_message", models.TextField(blank=True, verbose_name="error message")),
+                ("attempt_count", models.IntegerField(default=0, verbose_name="attempt count")),
                 (
                     "endpoint",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="deliveries",
                         to="api.webhookendpoint",
+                        verbose_name="endpoint",
                     ),
                 ),
             ],

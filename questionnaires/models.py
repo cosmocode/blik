@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.utils.translation import gettext_lazy as _, gettext
 from core.models import TimeStampedModel, Organization
 from core.managers import QuestionnaireManager
 
@@ -12,7 +13,8 @@ class Questionnaire(TimeStampedModel):
         unique=True,
         editable=False,
         db_index=True,
-        help_text="Public identifier for API and URL usage (non-enumerable)"
+        help_text=_('Public identifier for API and URL usage (non-enumerable)'),
+        verbose_name=_('UUID')
     )
 
     organization = models.ForeignKey(
@@ -20,16 +22,19 @@ class Questionnaire(TimeStampedModel):
         on_delete=models.CASCADE,
         related_name='questionnaires',
         null=True,  # Allow null for existing records and default questionnaires
-        blank=True
+        blank=True,
+        verbose_name=_('organization')
     )
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    is_default = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
+    name = models.CharField(_('name'), max_length=255)
+    description = models.TextField(_('description'), blank=True)
+    is_default = models.BooleanField(_('default'), default=False)
+    is_active = models.BooleanField(_('active'), default=True)
 
     objects = QuestionnaireManager()
 
     class Meta:
+        verbose_name = _('questionnaire')
+        verbose_name_plural = _('questionnaires')
         db_table = 'questionnaires'
         ordering = ['-is_default', 'name']
 
@@ -69,12 +74,12 @@ class Questionnaire(TimeStampedModel):
         """Human-readable description of what report this questionnaire produces."""
         has_skill, has_agency = self.dreyfus_dimensions
         if has_skill and has_agency:
-            return "Dreyfus (Skill + Agency)"
+            return gettext('Dreyfus (Skill + Agency)')
         if has_skill:
-            return "Dreyfus (Skill)"
+            return gettext('Dreyfus (Skill)')
         if has_agency:
-            return "Dreyfus (Agency)"
-        return "Standard 360"
+            return gettext('Dreyfus (Agency)')
+        return gettext('Standard 360')
 
 
 class QuestionSection(TimeStampedModel):
@@ -82,13 +87,16 @@ class QuestionSection(TimeStampedModel):
     questionnaire = models.ForeignKey(
         Questionnaire,
         on_delete=models.CASCADE,
-        related_name='sections'
+        related_name='sections',
+        verbose_name=_('questionnaire')
     )
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    order = models.IntegerField(default=0)
+    title = models.CharField(_('title'), max_length=255)
+    description = models.TextField(_('description'), blank=True)
+    order = models.IntegerField(_('sort order'), default=0)
 
     class Meta:
+        verbose_name = _('section')
+        verbose_name_plural = _('sections')
         db_table = 'question_sections'
         ordering = ['questionnaire', 'order']
         unique_together = ['questionnaire', 'order']
@@ -101,12 +109,12 @@ class Question(TimeStampedModel):
     """Individual question within a section"""
 
     QUESTION_TYPES = [
-        ('rating', 'Rating Scale'),
-        ('likert', 'Likert Scale'),
-        ('text', 'Free Text'),
-        ('single_choice', 'Single Choice'),
-        ('multiple_choice', 'Multiple Choice'),
-        ('scale', 'Numeric Scale'),
+        ('rating', _('Rating Scale')),
+        ('likert', _('Likert Scale')),
+        ('text', _('Free Text')),
+        ('single_choice', _('Single Choice')),
+        ('multiple_choice', _('Multiple Choice')),
+        ('scale', _('Numeric Scale')),
     ]
 
     # Public UUID for external references (API, URLs)
@@ -115,16 +123,18 @@ class Question(TimeStampedModel):
         unique=True,
         editable=False,
         db_index=True,
-        help_text="Public identifier for API and URL usage (non-enumerable)"
+        help_text=_('Public identifier for API and URL usage (non-enumerable)'),
+        verbose_name=_('UUID')
     )
 
     section = models.ForeignKey(
         QuestionSection,
         on_delete=models.CASCADE,
-        related_name='questions'
+        related_name='questions',
+        verbose_name=_('section')
     )
-    question_text = models.TextField()
-    question_type = models.CharField(max_length=20, choices=QUESTION_TYPES)
+    question_text = models.TextField(_('question text'))
+    question_type = models.CharField(_('question type'), max_length=20, choices=QUESTION_TYPES)
 
     # JSON field for question configuration
     # For rating: {"min": 1, "max": 5, "labels": {"1": "Poor", "5": "Excellent"}}
@@ -142,7 +152,7 @@ class Question(TimeStampedModel):
     #   "exclude_from_charts": false (default) - Set true to exclude from chart aggregations
     # Optional Dreyfus model configuration:
     #   "dreyfus_mapping": {"skill": 1.5, "agency": 0.5} - Weights for skill/agency dimensions
-    config = models.JSONField(default=dict)
+    config = models.JSONField(_('configuration'), default=dict)
 
     # Personalized action items for development plans
     # Format: [
@@ -152,12 +162,14 @@ class Question(TimeStampedModel):
     #     "stages": [1, 2, 3]  // Optional: Relevant Dreyfus stages (1-5)
     #   }
     # ]
-    action_items = models.JSONField(default=list, blank=True)
+    action_items = models.JSONField(_('action items'), default=list, blank=True)
 
-    required = models.BooleanField(default=True)
-    order = models.IntegerField(default=0)
+    required = models.BooleanField(_('required'), default=True)
+    order = models.IntegerField(_('sort order'), default=0)
 
     class Meta:
+        verbose_name = _('question')
+        verbose_name_plural = _('questions')
         db_table = 'questions'
         ordering = ['section', 'order']
         unique_together = ['section', 'order']

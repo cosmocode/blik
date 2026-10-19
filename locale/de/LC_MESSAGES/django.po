@@ -1,45 +1,130 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 16:56+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
-"MIME-Version: 1.0\n"
+"POT-Creation-Date: 2026-10-19 16:50+0000\n"
+"Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#, fuzzy
-#| msgid "First"
+msgid "GDPR: Soft delete (anonymize identifiable data)"
+msgstr ""
+
+#, python-format
+msgid "Error anonymizing %(name)s: %(error)s"
+msgstr ""
+
+#, python-format
+msgid "Successfully anonymized %(count)s reviewee(s). Personal data removed, review cycles preserved."
+msgstr ""
+
+msgid "GDPR: Hard delete (complete removal with all data)"
+msgstr ""
+
+#, python-format
+msgid "Error deleting %(name)s: %(error)s"
+msgstr ""
+
+#, python-format
+msgid "Successfully deleted %(count)s reviewee(s) and %(cycles)s review cycle(s) with all related data."
+msgstr ""
+
+msgid "GDPR: Full anonymization (reviewee + reviewer emails)"
+msgstr ""
+
+#, python-format
+msgid "Error in full anonymization for %(name)s: %(error)s"
+msgstr ""
+
+#, python-format
+msgid "Successfully fully anonymized %(count)s reviewee(s) including reviewer emails."
+msgstr ""
+
+msgid "Show GDPR data summary"
+msgstr ""
+
+#, python-format
+msgid "Reviewee %(name)s: %(cycles)s cycles, %(tokens)s tokens, %(responses)s responses, %(reports)s reports"
+msgstr ""
+
+#, python-format
+msgid "Error getting summary for %(name)s: %(error)s"
+msgstr ""
+
+msgid "GDPR: Soft delete users (anonymize identifiable data)"
+msgstr ""
+
+#, python-format
+msgid "Error anonymizing user %(username)s: %(error)s"
+msgstr ""
+
+#, python-format
+msgid "Successfully anonymized %(count)s user(s). Personal data removed, profiles preserved."
+msgstr ""
+
+msgid "GDPR: Hard delete users (complete removal)"
+msgstr ""
+
+#, python-format
+msgid "Error deleting user %(username)s: %(error)s"
+msgstr ""
+
+#, python-format
+msgid "Successfully deleted %(count)s user(s) and their profiles."
+msgstr ""
+
+#, python-format
+msgid "User %(username)s: Created %(cycles)s review cycles"
+msgstr ""
+
+msgid "Accepted"
+msgstr ""
+
+msgid "Expired"
+msgstr ""
+
+#, python-format
+msgid "Expires in %(hours)s hours"
+msgstr ""
+
+#, python-format
+msgid "Pending (%(days)s days)"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+#, python-format
+msgid "Accepted on %(date)s"
+msgstr ""
+
+#, python-format
+msgid "EXPIRED on %(date)s"
+msgstr ""
+
+#, python-format
+msgid "Expires on %(date)s (%(days)s days, %(hours)s hours remaining)"
+msgstr ""
+
+msgid "Invitation Expiration"
+msgstr ""
+
+msgid "Accounts"
+msgstr ""
+
 msgid "First name"
-msgstr "Erste"
+msgstr ""
 
-#, fuzzy
-#| msgid "Last"
 msgid "Last name"
-msgstr "Letzte"
+msgstr ""
 
-#, fuzzy
-#| msgid "Email Address"
 msgid "Email address"
-msgstr "E-Mail-Adresse"
+msgstr ""
 
 msgid "This email address is already in use."
 msgstr ""
 
-#, fuzzy
-#| msgid "Email Address"
 msgid "Enter your email address"
-msgstr "E-Mail-Adresse"
+msgstr ""
 
 msgid "New Password"
 msgstr ""
@@ -56,15 +141,11 @@ msgstr ""
 msgid "Passwords do not match."
 msgstr ""
 
-#, fuzzy
-#| msgid "Organization Admin"
 msgid "No organization found."
-msgstr "Organisations-Admin"
+msgstr ""
 
-#, fuzzy
-#| msgid "Email Address"
 msgid "Email address is required."
-msgstr "E-Mail-Adresse"
+msgstr ""
 
 #, python-format
 msgid "Invitation already sent to %(email)s"
@@ -91,6 +172,89 @@ msgstr ""
 
 #, python-format
 msgid "Welcome! Create your account to join %(organization)s"
+msgstr ""
+
+msgid "user"
+msgstr ""
+
+msgid "organization"
+msgstr ""
+
+msgid "If False, user can only create cycles for themselves"
+msgstr ""
+
+msgid "can create cycles for others"
+msgstr ""
+
+msgid "Whether user has seen the welcome modal"
+msgstr ""
+
+msgid "has seen welcome"
+msgstr ""
+
+msgid "user profile"
+msgstr ""
+
+msgid "user profiles"
+msgstr ""
+
+msgid "email"
+msgstr ""
+
+msgid "token"
+msgstr ""
+
+msgid "invited by"
+msgstr ""
+
+msgid "accepted at"
+msgstr ""
+
+msgid "expires at"
+msgstr ""
+
+msgid "invitation"
+msgstr ""
+
+msgid "invitations"
+msgstr ""
+
+#, python-format
+msgid "Invite %(email)s to %(organization)s"
+msgstr ""
+
+msgid "used at"
+msgstr ""
+
+msgid "password reset token"
+msgstr ""
+
+msgid "password reset tokens"
+msgstr ""
+
+#, python-format
+msgid "Password reset for %(email)s"
+msgstr ""
+
+msgid "Public identifier for API and URL usage (non-enumerable)"
+msgstr ""
+
+msgid "UUID"
+msgstr ""
+
+msgid "name"
+msgstr ""
+
+msgid "department"
+msgstr ""
+
+msgid "active"
+msgstr ""
+
+msgid "reviewee"
+msgstr ""
+
+msgid "reviewees"
 msgstr ""
 
 msgid "Authentication required"
@@ -130,10 +294,8 @@ msgstr ""
 msgid "This invitation has expired."
 msgstr ""
 
-#, fuzzy
-#| msgid "Send Invitation"
 msgid "Invalid invitation."
-msgstr "Einladung senden"
+msgstr ""
 
 #, python-format
 msgid "You must use the invited email: %(email)s"
@@ -161,10 +323,133 @@ msgstr ""
 msgid "Your profile has been updated successfully."
 msgstr ""
 
-#, fuzzy
-#| msgid "Organization Admin"
+msgid "Basic Info"
+msgstr ""
+
+msgid "Token"
+msgstr ""
+
+msgid "Permissions"
+msgstr ""
+
+msgid "Stats"
+msgstr ""
+
+msgid "Events"
+msgstr ""
+
+msgid "Security"
+msgstr ""
+
+msgid "Delivery Info"
+msgstr ""
+
+msgid "Payload"
+msgstr ""
+
+msgid "Response"
+msgstr ""
+
+msgid "Success"
+msgstr ""
+
+msgid "API"
+msgstr ""
+
+msgid "created by"
+msgstr ""
+
+#, python-brace-format
+msgid "Permissions as JSON: {example}"
+msgstr ""
+
+msgid "permissions"
+msgstr ""
+
+msgid "last used at"
+msgstr ""
+
+msgid "rate limit"
+msgstr ""
+
+msgid "API Token"
+msgstr ""
+
+msgid "API Tokens"
+msgstr ""
+
+msgid "URL"
+msgstr ""
+
+#, python-brace-format
+msgid "List of event types to subscribe to: {example}"
+msgstr ""
+
+msgid "events"
+msgstr ""
+
+msgid "secret"
+msgstr ""
+
+msgid "last triggered at"
+msgstr ""
+
+msgid "success count"
+msgstr ""
+
+msgid "failure count"
+msgstr ""
+
+msgid "Webhook Endpoint"
+msgstr ""
+
+msgid "Webhook Endpoints"
+msgstr ""
+
+msgid "ID"
+msgstr ""
+
+msgid "Public UUID for this delivery (non-enumerable)"
+msgstr ""
+
+msgid "delivery ID"
+msgstr ""
+
+msgid "endpoint"
+msgstr ""
+
+msgid "event type"
+msgstr ""
+
+msgid "payload"
+msgstr ""
+
+msgid "created at"
+msgstr ""
+
+msgid "delivered at"
+msgstr ""
+
+msgid "status code"
+msgstr ""
+
+msgid "response body"
+msgstr ""
+
+msgid "error message"
+msgstr ""
+
+msgid "attempt count"
+msgstr ""
+
+msgid "Webhook Delivery"
+msgstr ""
+
+msgid "Webhook Deliveries"
+msgstr ""
+
 msgid "Organization not found."
-msgstr "Organisations-Admin"
+msgstr ""
 
 msgid "Subscription will be canceled at the end of the current billing period."
 msgstr ""
@@ -179,19 +464,15 @@ msgstr ""
 msgid "Subscription reactivated successfully."
 msgstr ""
 
-#, fuzzy
-#| msgid "No users found"
 msgid "No subscription found."
-msgstr "Keine Benutzer gefunden"
+msgstr ""
 
 #, python-format
 msgid "Error reactivating subscription: %(error)s"
 msgstr ""
 
-#, fuzzy
-#| msgid "Organization Admin"
 msgid "Organization not found"
-msgstr "Organisations-Admin"
+msgstr ""
 
 msgid "Export failed. Please try again."
 msgstr ""
@@ -283,27 +564,23 @@ msgstr ""
 msgid "Successfully updated %(username)s to Member role."
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Can create review cycles for others"
+#, python-format
 msgid "%(username)s can now create review cycles for others."
-msgstr "Darf Feedback-Zyklen für andere anlegen"
+msgstr ""
 
 #, python-format
 msgid "%(username)s can now view all reports."
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Update permissions for"
+#, python-format
 msgid "Error updating permissions: %(error)s"
-msgstr "Berechtigungen ändern für"
+msgstr ""
 
 msgid "No organization found. Please run setup first."
 msgstr ""
 
-#, fuzzy
-#| msgid "Can create review cycles for others"
 msgid "You can only create a reviewee profile for yourself."
-msgstr "Darf Feedback-Zyklen für andere anlegen"
+msgstr ""
 
 #, python-format
 msgid "Reviewee \"%(name)s\" created successfully."
@@ -495,15 +772,12 @@ msgstr ""
 msgid "Review cycle created for \"%(name)s\". Notification emails are being sent to the reviewee."
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Can create review cycles for others"
+#, python-format
 msgid "Error creating review cycle: %(error)s"
-msgstr "Darf Feedback-Zyklen für andere anlegen"
+msgstr ""
 
-#, fuzzy
-#| msgid "No pending invitations"
 msgid "No pending cycles to send invitations for."
-msgstr "Keine offenen Einladungen"
+msgstr ""
 
 #, python-format
 msgid "Invitations are being sent for %(count)s review cycle(s)."
@@ -554,19 +828,15 @@ msgstr ""
 msgid "Successfully sent %(sent)s invitation email(s)."
 msgstr ""
 
-#, fuzzy
-#| msgid "No pending invitations"
 msgid "No pending invitations to send."
-msgstr "Keine offenen Einladungen"
+msgstr ""
 
 #, python-format
 msgid "Successfully sent %(sent)s reminder(s)."
 msgstr ""
 
-#, fuzzy
-#| msgid "No pending invitations"
 msgid "No pending reminders to send."
-msgstr "Keine offenen Einladungen"
+msgstr ""
 
 msgid "Cannot send reminder: no email assigned to this reviewer."
 msgstr ""
@@ -740,10 +1010,8 @@ msgstr ""
 msgid "Review from \"%(name)s\" rejected."
 msgstr ""
 
-#, fuzzy
-#| msgid "Permissions"
 msgid "Permission denied."
-msgstr "Berechtigungen"
+msgstr ""
 
 #, python-format
 msgid "Error creating API token: %(error)s"
@@ -794,10 +1062,8 @@ msgstr ""
 msgid "Error deleting webhook: %(error)s"
 msgstr ""
 
-#, fuzzy
-#| msgid "Organization Admin"
 msgid "Organization name is required."
-msgstr "Organisations-Admin"
+msgstr ""
 
 msgid "Admin email is required."
 msgstr ""
@@ -824,6 +1090,21 @@ msgstr ""
 
 #, python-format
 msgid "Failed to create organization: %(error)s"
+msgstr ""
+
+msgid "Enter a new SMTP password or leave blank to keep the existing one"
+msgstr ""
+
+msgid "SMTP password"
+msgstr ""
+
+msgid "Basic Information"
+msgstr ""
+
+msgid "Email Settings"
+msgstr ""
+
+msgid "Core"
 msgstr ""
 
 #, python-format
@@ -888,10 +1169,8 @@ msgstr ""
 msgid "Enable TLS encryption (recommended for port 587)"
 msgstr ""
 
-#, fuzzy
-#| msgid "Email Address"
 msgid "From Email Address"
-msgstr "E-Mail-Adresse"
+msgstr ""
 
 msgid "Email address that appears as sender"
 msgstr ""
@@ -909,6 +1188,102 @@ msgid "SMTP Port is required when not skipping email setup."
 msgstr ""
 
 msgid "From Email is required when not skipping email setup."
+msgstr ""
+
+msgid "updated at"
+msgstr ""
+
+msgid "SMTP host"
+msgstr ""
+
+msgid "SMTP port"
+msgstr ""
+
+msgid "SMTP username"
+msgstr ""
+
+msgid "encrypted SMTP password"
+msgstr ""
+
+msgid "use TLS"
+msgstr ""
+
+msgid "from address"
+msgstr ""
+
+msgid "Minimum number of responses required to show results (for anonymity). Set to 1 for small teams."
+msgstr ""
+
+msgid "minimum responses for anonymity"
+msgstr ""
+
+msgid "Automatically send email to reviewee when their report is generated"
+msgstr ""
+
+msgid "automatically send report email"
+msgstr ""
+
+msgid "Allow new users to register for this organization"
+msgstr ""
+
+msgid "allow user registration"
+msgstr ""
+
+msgid "By default, new users can create cycles for others (not just themselves)"
+msgstr ""
+
+msgid "new users can create cycles for others"
+msgstr ""
+
+msgid "organizations"
+msgstr ""
+
+msgid "Short title for the fact (e.g., \"The Power of 360 Feedback\")"
+msgstr ""
+
+msgid "title"
+msgstr ""
+
+msgid "The fact content. Can include HTML tags like <strong> for emphasis."
+msgstr ""
+
+msgid "content"
+msgstr ""
+
+msgid "Only active facts will be shown in emails"
+msgstr ""
+
+msgid "Optional ordering (lower numbers shown first when not randomizing)"
+msgstr ""
+
+msgid "display order"
+msgstr ""
+
+msgid "Welcome Email Fact"
+msgstr ""
+
+msgid "Welcome Email Facts"
+msgstr ""
+
+msgid "applied at"
+msgstr ""
+
+msgid "success"
+msgstr ""
+
+msgid "error"
+msgstr ""
+
+msgid "upgrade step"
+msgstr ""
+
+msgid "upgrade steps"
+msgstr ""
+
+msgid "OK"
+msgstr ""
+
+msgid "FAILED"
 msgstr ""
 
 #, python-format
@@ -945,14 +1320,418 @@ msgstr ""
 msgid "Failed to generate demo data: %(error)s"
 msgstr ""
 
+msgid "Notifications"
+msgstr ""
+
 #, python-format
 msgid "360 Feedback Request for %(name)s"
+msgstr ""
+
+msgid "Review Content"
+msgstr ""
+
+msgid "Reviewer Information"
+msgstr ""
+
+msgid "Status & Publishing"
+msgstr ""
+
+msgid "Organization & Metadata"
+msgstr ""
+
+msgid "Timestamps"
+msgstr ""
+
+msgctxt "product review"
+msgid "Rating"
+msgstr ""
+
+#, python-format
+msgid "%(count)s review(s) approved."
+msgstr ""
+
+msgid "Approve selected reviews"
+msgstr ""
+
+#, python-format
+msgid "%(count)s review(s) rejected."
+msgstr ""
+
+msgid "Reject selected reviews"
+msgstr ""
+
+#, python-format
+msgid "%(count)s review(s) marked as featured."
+msgstr ""
+
+msgid "Mark as featured"
+msgstr ""
+
+msgid "Product Reviews"
+msgstr ""
+
+msgid "Pending Review"
+msgstr ""
+
+msgid "Approved"
+msgstr ""
+
+msgid "Rejected"
+msgstr ""
+
+msgid "Organization this review belongs to"
+msgstr ""
+
+msgid "Rating from 1-5 stars"
+msgstr ""
+
+msgid "rating"
+msgstr ""
+
+msgid "Short title/headline for the review"
+msgstr ""
+
+msgid "review title"
+msgstr ""
+
+msgid "Full review text from the customer"
+msgstr ""
+
+msgid "review text"
+msgstr ""
+
+msgid "Name of the person giving the review"
+msgstr ""
+
+msgid "reviewer name"
+msgstr ""
+
+msgid "Job title of the reviewer (e.g., \"HR Manager\")"
+msgstr ""
+
+msgid "reviewer title"
+msgstr ""
+
+msgid "Company/organization the reviewer works for"
+msgstr ""
+
+msgid "company"
+msgstr ""
+
+msgid "Email address of the reviewer (not shown publicly)"
+msgstr ""
+
+msgid "reviewer email"
+msgstr ""
+
+msgid "Verified as actual customer/subscriber"
+msgstr ""
+
+msgid "verified customer"
+msgstr ""
+
+msgid "Review approval status"
+msgstr ""
+
+msgid "status"
+msgstr ""
+
+msgid "Active reviews can be displayed publicly"
+msgstr ""
+
+msgid "Featured reviews are highlighted on landing pages"
+msgstr ""
+
+msgid "featured"
+msgstr ""
+
+msgid "Date the review was published (shown in JSON-LD)"
+msgstr ""
+
+msgid "published date"
+msgstr ""
+
+msgid "Where the review came from (e.g., \"Email Survey\", \"G2\", \"Direct\")"
+msgstr ""
+
+msgid "source"
+msgstr ""
+
+msgid "Internal notes about this review (not shown publicly)"
+msgstr ""
+
+msgid "internal notes"
+msgstr ""
+
+msgid "Product Review"
+msgstr ""
+
+msgid "Question"
+msgstr ""
+
+msgid "Questionnaires"
+msgstr ""
+
+msgid "description"
+msgstr ""
+
+msgid "default"
+msgstr ""
+
+msgid "questionnaire"
+msgstr ""
+
+msgid "questionnaires"
+msgstr ""
+
+msgid "Dreyfus (Skill + Agency)"
+msgstr ""
+
+msgid "Dreyfus (Skill)"
+msgstr ""
+
+msgid "Dreyfus (Agency)"
+msgstr ""
+
+msgid "Standard 360"
+msgstr ""
+
+msgid "sort order"
+msgstr ""
+
+msgid "section"
+msgstr ""
+
+msgid "sections"
+msgstr ""
+
+msgid "Rating Scale"
+msgstr ""
+
+msgid "Likert Scale"
+msgstr ""
+
+msgid "Free Text"
+msgstr ""
+
+msgid "Single Choice"
+msgstr ""
+
+msgid "Multiple Choice"
+msgstr ""
+
+msgid "Numeric Scale"
+msgstr ""
+
+msgid "question text"
+msgstr ""
+
+msgid "question type"
+msgstr ""
+
+msgid "configuration"
+msgstr ""
+
+msgid "action items"
+msgstr ""
+
+msgid "required"
+msgstr ""
+
+msgid "question"
+msgstr ""
+
+msgid "questions"
+msgstr ""
+
+msgid "No expiry"
+msgstr ""
+
+#, python-format
+msgid "Expires in %(days)s days"
+msgstr ""
+
+#, python-format
+msgid "Valid (%(days)s days)"
+msgstr ""
+
+msgid "Token Status"
+msgstr ""
+
+msgid "No expiration set"
+msgstr ""
+
+msgid "Token Expiration"
+msgstr ""
+
+msgid "Reports"
+msgstr ""
+
+msgid "review cycle"
+msgstr ""
+
+msgid "Secure token for reviewee access to their report"
+msgstr ""
+
+msgid "access token"
+msgstr ""
+
+msgid "report data"
+msgstr ""
+
+msgid "generated at"
+msgstr ""
+
+msgid "available"
+msgstr ""
+
+msgid "Expiration date for access token"
+msgstr ""
+
+msgid "access token expires"
+msgstr ""
+
+msgid "Last time report was accessed"
+msgstr ""
+
+msgid "last accessed"
+msgstr ""
+
+msgid "Number of times report has been accessed"
+msgstr ""
+
+msgid "access count"
+msgstr ""
+
+msgid "report"
+msgstr ""
+
+msgid "reports"
+msgstr ""
+
+#, python-format
+msgid "Report for %(cycle)s"
 msgstr ""
 
 msgid "Your 360 Feedback Report is Ready!"
 msgstr ""
 
 msgid "This report link has expired. Please contact your administrator for a new link."
+msgstr ""
+
+#, python-format
+msgid "Token %(token)s generated. Copy feedback URL and send to reviewer manually: %(url)s"
+msgstr ""
+
+#, python-format
+msgid "Error with token %(token)s: %(error)s"
+msgstr ""
+
+#, python-format
+msgid "Generated %(count)s feedback URLs. Copy and send manually."
+msgstr ""
+
+msgid "Generate feedback URLs for selected tokens"
+msgstr ""
+
+msgid "View Report"
+msgstr ""
+
+msgid "Report"
+msgstr ""
+
+#. Translators: admin app holding review cycles, reviewer tokens and responses (not product reviews)
+msgid "Reviews"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Completed"
+msgstr ""
+
+msgid "When the close check-in email was sent to the reviewee"
+msgstr ""
+
+msgid "close check sent at"
+msgstr ""
+
+msgid "Self assessment"
+msgstr ""
+
+msgid "Peer review"
+msgstr ""
+
+msgid "Manager review"
+msgstr ""
+
+msgid "Direct report review"
+msgstr ""
+
+msgid "self assessment invitation token"
+msgstr ""
+
+msgid "peer review invitation token"
+msgstr ""
+
+msgid "manager review invitation token"
+msgstr ""
+
+msgid "direct report review invitation token"
+msgstr ""
+
+msgid "review cycles"
+msgstr ""
+
+msgid "Self Assessment"
+msgstr ""
+
+msgid "Peer Review"
+msgstr ""
+
+msgid "Manager Review"
+msgstr ""
+
+msgid "Direct Report Review"
+msgstr ""
+
+msgid "feedback category"
+msgstr ""
+
+msgid "Email to send invitation to (not stored with responses for anonymity)"
+msgstr ""
+
+msgid "invitation sent at"
+msgstr ""
+
+msgid "When the last reminder email was sent to this reviewer"
+msgstr ""
+
+msgid "last reminder sent at"
+msgstr ""
+
+msgid "When someone claimed this token by clicking the invitation link"
+msgstr ""
+
+msgid "claimed at"
+msgstr ""
+
+msgid "completed at"
+msgstr ""
+
+msgid "reviewer token"
+msgstr ""
+
+msgid "reviewer tokens"
+msgstr ""
+
+msgid "answer data"
+msgstr ""
+
+msgid "response"
+msgstr ""
+
+msgid "responses"
 msgstr ""
 
 #, python-format
@@ -1032,6 +1811,156 @@ msgstr ""
 msgid "Something went wrong. Please try again."
 msgstr ""
 
+msgid "Used"
+msgstr ""
+
+#, python-format
+msgid "Expires in %(minutes)s min"
+msgstr ""
+
+msgid "Valid"
+msgstr ""
+
+msgid "Token was used and is no longer valid"
+msgstr ""
+
+#, python-format
+msgid "Expires on %(date)s (%(hours)s hours, %(minutes)s minutes remaining)"
+msgstr ""
+
+#, python-format
+msgid "Expires on %(date)s (%(days)s days remaining)"
+msgstr ""
+
+msgid "Subscriptions"
+msgstr ""
+
+msgid "EU SaaS"
+msgstr ""
+
+msgid "Enterprise"
+msgstr ""
+
+msgid "plan type"
+msgstr ""
+
+msgid "monthly price"
+msgstr ""
+
+msgid "Maximum total: reviewees + team members combined"
+msgstr ""
+
+msgid "maximum employees"
+msgstr ""
+
+msgid "Stripe price ID"
+msgstr ""
+
+msgid "features"
+msgstr ""
+
+msgid "plan"
+msgstr ""
+
+msgid "plans"
+msgstr ""
+
+#, python-format
+msgid "%(name)s (€%(price)s/mo)"
+msgstr ""
+
+msgid "Trial"
+msgstr ""
+
+msgid "Past Due"
+msgstr ""
+
+msgid "Canceled"
+msgstr ""
+
+msgid "Unpaid"
+msgstr ""
+
+msgid "Stripe customer ID"
+msgstr ""
+
+msgid "Stripe subscription ID"
+msgstr ""
+
+msgid "current period start"
+msgstr ""
+
+msgid "current period end"
+msgstr ""
+
+msgid "cancel at period end"
+msgstr ""
+
+msgid "canceled at"
+msgstr ""
+
+msgid "trial start"
+msgstr ""
+
+msgid "trial end"
+msgstr ""
+
+msgid "subscription"
+msgstr ""
+
+msgid "subscriptions"
+msgstr ""
+
+msgid "Fulfilled"
+msgstr ""
+
+msgid "Rejected: email already has an account"
+msgstr ""
+
+msgid "Rejected: organization already subscribed"
+msgstr ""
+
+msgid "Stripe session ID"
+msgstr ""
+
+msgid "outcome"
+msgstr ""
+
+msgid "user created"
+msgstr ""
+
+msgid "checkout fulfilment"
+msgstr ""
+
+msgid "checkout fulfilments"
+msgstr ""
+
+msgid "review cycles remaining"
+msgstr ""
+
+msgid "round purchase"
+msgstr ""
+
+msgid "round purchases"
+msgstr ""
+
+#, python-format
+msgid "%(organization)s: %(count)s credit(s) left"
+msgstr ""
+
+msgid "used"
+msgstr ""
+
+msgid "one-time login token"
+msgstr ""
+
+msgid "one-time login tokens"
+msgstr ""
+
+#, python-format
+msgid "Login token for %(email)s"
+msgstr ""
+
 #, python-format
 msgid "This needs %(needed)s review-cycle credit(s) and you have %(available)s. Buy another round or start a subscription under Settings."
 msgstr ""
@@ -1083,7 +2012,7 @@ msgid "Enter your email to receive a password reset link"
 msgstr ""
 
 msgid "Email"
-msgstr "E-Mail"
+msgstr ""
 
 msgid "Send Reset Link"
 msgstr ""
@@ -1143,10 +2072,8 @@ msgstr ""
 msgid "People who will receive 360° feedback"
 msgstr ""
 
-#, fuzzy
-#| msgid "Can create review cycles for others"
 msgid "Create a review cycle"
-msgstr "Darf Feedback-Zyklen für andere anlegen"
+msgstr ""
 
 msgid "Choose a questionnaire and invite reviewers"
 msgstr ""
@@ -1173,15 +2100,11 @@ msgstr ""
 msgid "Personal Information"
 msgstr ""
 
-#, fuzzy
-#| msgid "First"
 msgid "First Name"
-msgstr "Erste"
+msgstr ""
 
-#, fuzzy
-#| msgid "Name"
 msgid "Last Name"
-msgstr "Name"
+msgstr ""
 
 msgid "Username"
 msgstr ""
@@ -1189,28 +2112,17 @@ msgstr ""
 msgid "Username cannot be changed"
 msgstr ""
 
-#, fuzzy
-#| msgid "Update Permissions"
 msgid "Update Profile"
-msgstr "Berechtigungen aktualisieren"
+msgstr ""
 
-#, fuzzy
-#| msgid "Organization Admin"
 msgid "Organization"
-msgstr "Organisations-Admin"
+msgstr ""
 
-msgid "Permissions"
-msgstr "Berechtigungen"
-
-#, fuzzy
-#| msgid "Can create review cycles for others"
 msgid "Can create cycles for others"
-msgstr "Darf Feedback-Zyklen für andere anlegen"
+msgstr ""
 
-#, fuzzy
-#| msgid "Self-only"
 msgid "Self cycles only"
-msgstr "Nur eigene"
+msgstr ""
 
 #, python-format
 msgid "Member since %(joined)s"
@@ -1237,20 +2149,15 @@ msgstr ""
 msgid "Total: %(total)s"
 msgstr ""
 
-msgid "View Report"
-msgstr ""
-
 msgid "Report available when cycle is completed"
 msgstr ""
 
 msgid "No report generated yet"
 msgstr ""
 
-#, fuzzy
-#| msgid "Active"
 msgctxt "cycle status"
 msgid "Active"
-msgstr "Aktiv"
+msgstr ""
 
 msgctxt "cycle status"
 msgid "Completed"
@@ -1318,9 +2225,6 @@ msgstr ""
 msgid "Reviewees"
 msgstr ""
 
-msgid "Questionnaires"
-msgstr ""
-
 msgid "Cycles"
 msgstr ""
 
@@ -1334,10 +2238,8 @@ msgstr ""
 msgid "Create Org"
 msgstr ""
 
-#, fuzzy
-#| msgid "Super Admin"
 msgid "Admin"
-msgstr "Super-Admin"
+msgstr ""
 
 msgid "Profile"
 msgstr ""
@@ -1348,15 +2250,11 @@ msgstr ""
 msgid "Toggle theme"
 msgstr ""
 
-#, fuzzy
-#| msgid "Send Invitation"
 msgid "Send Bulk Invitations"
-msgstr "Einladung senden"
+msgstr ""
 
-#, fuzzy
-#| msgid "Send Invitation"
 msgid "Send invitations"
-msgstr "Einladung senden"
+msgstr ""
 
 msgid "Review the cycles you just created, then send invitation emails."
 msgstr ""
@@ -1382,12 +2280,11 @@ msgstr ""
 msgid "Created"
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Pending Invitations (%(count)s)"
+#, python-format
 msgid "Send invitations for all %(counter)s reviewee"
 msgid_plural "Send invitations for all %(counter)s reviewees"
-msgstr[0] "Offene Einladungen (%(count)s)"
-msgstr[1] "Offene Einladungen (%(count)s)"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Skip — I'll send later"
 msgstr ""
@@ -1405,10 +2302,8 @@ msgstr ""
 msgid "Active Reviewees"
 msgstr ""
 
-#, fuzzy
-#| msgid "Active"
 msgid "Active Cycles"
-msgstr "Aktiv"
+msgstr ""
 
 msgid "Completed Cycles"
 msgstr ""
@@ -1439,10 +2334,8 @@ msgstr ""
 msgid "%(remaining)s remaining"
 msgstr ""
 
-#, fuzzy
-#| msgid "Team Management"
 msgid "Team Members"
-msgstr "Teamverwaltung"
+msgstr ""
 
 msgid "Unlimited"
 msgstr ""
@@ -1454,10 +2347,8 @@ msgstr ""
 msgid "You're nearing your plan limit of %(max_employees)s reviewees. Contact us to upgrade your plan."
 msgstr ""
 
-#, fuzzy
-#| msgid "Actions"
 msgid "Quick Actions"
-msgstr "Aktionen"
+msgstr ""
 
 msgid "New Review Cycle"
 msgstr ""
@@ -1472,12 +2363,9 @@ msgid "Progress"
 msgstr ""
 
 msgid "Actions"
-msgstr "Aktionen"
-
-msgid "View"
 msgstr ""
 
-msgid "Completed"
+msgid "View"
 msgstr ""
 
 msgid "Recent Review Cycles"
@@ -1486,24 +2374,14 @@ msgstr ""
 msgid "View All"
 msgstr ""
 
-msgid "Status"
-msgstr "Status"
-
-msgid "Active"
-msgstr "Aktiv"
-
 msgid "No review cycles yet"
 msgstr ""
 
-#, fuzzy
-#| msgid "Can create review cycles for others"
 msgid "Create your first review cycle to get started"
-msgstr "Darf Feedback-Zyklen für andere anlegen"
+msgstr ""
 
-#, fuzzy
-#| msgid "Can create review cycles for others"
 msgid "Create Review Cycle"
-msgstr "Darf Feedback-Zyklen für andere anlegen"
+msgstr ""
 
 msgid "Share Your Experience"
 msgstr ""
@@ -1560,13 +2438,13 @@ msgid "Your review will be submitted for approval before being published."
 msgstr ""
 
 msgid "Cancel"
-msgstr "Abbrechen"
+msgstr ""
 
 msgid "Submit Review"
 msgstr ""
 
 msgid "GDPR Data Management"
-msgstr "DSGVO-Datenverwaltung"
+msgstr ""
 
 msgid "Manage personal data and handle deletion requests"
 msgstr ""
@@ -1583,13 +2461,12 @@ msgstr ""
 msgid "Users"
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Active Users (%(count)s)"
+#, python-format
 msgid "Reviewees (%(count)s)"
-msgstr "Aktive Benutzer (%(count)s)"
+msgstr ""
 
 msgid "Name"
-msgstr "Name"
+msgstr ""
 
 msgid "Department"
 msgstr ""
@@ -1597,13 +2474,8 @@ msgstr ""
 msgid "Responses"
 msgstr ""
 
-msgid "Reports"
-msgstr ""
-
-#, fuzzy
-#| msgid "Active"
 msgid "Inactive"
-msgstr "Aktiv"
+msgstr ""
 
 msgid "Delete Data"
 msgstr ""
@@ -1615,29 +2487,27 @@ msgstr ""
 msgid "%(cycles)s cycles, %(responses)s responses"
 msgstr ""
 
-#, fuzzy
-#| msgid "No users found"
 msgid "No reviewees found"
-msgstr "Keine Benutzer gefunden"
+msgstr ""
 
 msgid "Items per page:"
-msgstr "Einträge pro Seite:"
+msgstr ""
 
 msgid "First"
-msgstr "Erste"
+msgstr ""
 
 msgid "Previous"
-msgstr "Zurück"
+msgstr ""
 
 #, python-format
 msgid "Page %(num)s of %(total)s"
-msgstr "Seite %(num)s von %(total)s"
+msgstr ""
 
 msgid "Next"
-msgstr "Weiter"
+msgstr ""
 
 msgid "Last"
-msgstr "Letzte"
+msgstr ""
 
 msgid "Delete Reviewee Data"
 msgstr ""
@@ -1681,22 +2551,21 @@ msgstr ""
 msgid "Permanently deletes ALL data including review cycles, responses, and reports. Cannot be undone."
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Active Users (%(count)s)"
+#, python-format
 msgid "Users (%(count)s)"
-msgstr "Aktive Benutzer (%(count)s)"
+msgstr ""
 
 msgid "Joined"
-msgstr "Beigetreten"
+msgstr ""
 
 msgid "Created Cycles"
 msgstr ""
 
 msgid "You"
-msgstr "Sie"
+msgstr ""
 
 msgid "No users found"
-msgstr "Keine Benutzer gefunden"
+msgstr ""
 
 msgid "Delete User Data"
 msgstr ""
@@ -1725,33 +2594,22 @@ msgstr ""
 msgid "Invite Reviewers - %(name)s"
 msgstr ""
 
-#, fuzzy
-#| msgid "Invite User"
 msgid "Invite Reviewers"
-msgstr "Benutzer einladen"
+msgstr ""
 
-#, fuzzy
-#| msgid "Send Invitation"
 msgid "Invitation Status"
-msgstr "Einladung senden"
+msgstr ""
 
-#, fuzzy
-#| msgid "Invited By"
 msgid "Invited"
-msgstr "Eingeladen von"
+msgstr ""
 
-#, fuzzy
-#| msgid "Email"
 msgid "Emails Sent"
-msgstr "E-Mail"
+msgstr ""
 
 msgid "Invite Reviewers by Email"
 msgstr ""
 
 msgid "Enter email addresses for each reviewer category. The system will generate anonymous tokens and send invitations. Separate multiple emails with commas or newlines."
-msgstr ""
-
-msgid "Self Assessment"
 msgstr ""
 
 msgid "Your email is automatically assigned for self-assessment"
@@ -1760,10 +2618,8 @@ msgstr ""
 msgid "Usually the reviewee's own email"
 msgstr ""
 
-#, fuzzy
-#| msgid "Manage Permissions"
 msgid "Manager/Supervisor"
-msgstr "Berechtigungen verwalten"
+msgstr ""
 
 msgid "Direct manager or supervisor"
 msgstr ""
@@ -1780,10 +2636,8 @@ msgstr ""
 msgid "People who report to this reviewee"
 msgstr ""
 
-#, fuzzy
-#| msgid "Send Invitation"
 msgid "Save & Send Invitations"
-msgstr "Einladung senden"
+msgstr ""
 
 msgid "Save Without Sending"
 msgstr ""
@@ -1803,10 +2657,8 @@ msgstr ""
 msgid "Response Status"
 msgstr ""
 
-#, fuzzy
-#| msgid "Invited By"
 msgid "Invited by email"
-msgstr "Eingeladen von"
+msgstr ""
 
 msgid "Via invite link"
 msgstr ""
@@ -1834,10 +2686,8 @@ msgstr ""
 msgid "Send email invitations to reviewers who haven't received one yet"
 msgstr ""
 
-#, fuzzy
-#| msgid "No pending invitations"
 msgid "Send Pending Invitations"
-msgstr "Keine offenen Einladungen"
+msgstr ""
 
 msgid "Back to Cycle Details"
 msgstr ""
@@ -1908,15 +2758,7 @@ msgstr ""
 msgid "Title:"
 msgstr ""
 
-#, fuzzy
-#| msgid "Status"
 msgid "Status:"
-msgstr "Status"
-
-msgid "Approved"
-msgstr ""
-
-msgid "Rejected"
 msgstr ""
 
 msgid "Published:"
@@ -1927,9 +2769,6 @@ msgstr ""
 
 #, python-format
 msgid "Product Review - %(name)s"
-msgstr ""
-
-msgid "Product Review"
 msgstr ""
 
 #, python-format
@@ -2008,10 +2847,6 @@ msgstr ""
 msgid "Update review details"
 msgstr ""
 
-msgctxt "product review"
-msgid "Rating"
-msgstr ""
-
 msgid "Select rating..."
 msgstr ""
 
@@ -2042,9 +2877,6 @@ msgstr ""
 msgid "The complete review content"
 msgstr ""
 
-msgid "Reviewer Information"
-msgstr ""
-
 msgid "Reviewer Name"
 msgstr ""
 
@@ -2073,12 +2905,6 @@ msgid "e.g., jane@example.com"
 msgstr ""
 
 msgid "Email address (not shown publicly, for verification only)"
-msgstr ""
-
-msgid "Status & Publishing"
-msgstr ""
-
-msgid "Pending Review"
 msgstr ""
 
 msgid "Only approved reviews appear in JSON-LD structured data"
@@ -2114,13 +2940,8 @@ msgstr ""
 msgid "Edit Review"
 msgstr ""
 
-msgid "Product Reviews"
-msgstr ""
-
-#, fuzzy
-#| msgid "Manage users and send invitations"
 msgid "Manage customer feedback and testimonials"
-msgstr "Benutzer verwalten und Einladungen versenden"
+msgstr ""
 
 #, python-format
 msgid "Average Rating: %(avg)s★ from %(counter)s approved review"
@@ -2149,15 +2970,13 @@ msgstr ""
 msgid "Reject"
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Page %(num)s of %(total)s"
+#, python-format
 msgid "Page %(num)s of %(total)s (%(items)s total)"
-msgstr "Seite %(num)s von %(total)s"
+msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Items per page:"
+#, python-format
 msgid "%(num)s per page"
-msgstr "Einträge pro Seite:"
+msgstr ""
 
 msgid "No product reviews yet"
 msgstr ""
@@ -2189,10 +3008,8 @@ msgstr ""
 msgid "<strong>Warning:</strong> No review cycle uses this questionnaire, so it will be deleted for good, along with its sections and questions. This cannot be undone."
 msgstr ""
 
-#, fuzzy
-#| msgid "Name"
 msgid "Name:"
-msgstr "Name"
+msgstr ""
 
 msgid "Description:"
 msgstr ""
@@ -2213,9 +3030,6 @@ msgstr ""
 msgid "Create a new feedback questionnaire"
 msgstr ""
 
-msgid "Basic Information"
-msgstr ""
-
 msgid "Questionnaire Name"
 msgstr ""
 
@@ -2231,15 +3045,11 @@ msgstr ""
 msgid "Set as default questionnaire"
 msgstr ""
 
-#, fuzzy
-#| msgid "Update Permissions"
 msgid "Update Information"
-msgstr "Berechtigungen aktualisieren"
+msgstr ""
 
-#, fuzzy
-#| msgid "Previous"
 msgid "Preview"
-msgstr "Zurück"
+msgstr ""
 
 msgid "Edit Section"
 msgstr ""
@@ -2296,10 +3106,8 @@ msgstr ""
 msgid "Define action items that will appear in development plans when this question scores below a threshold."
 msgstr ""
 
-#, fuzzy
-#| msgid "Send Invitation"
 msgid "Save Configuration"
-msgstr "Einladung senden"
+msgstr ""
 
 msgid "Edit Question"
 msgstr ""
@@ -2313,19 +3121,10 @@ msgstr ""
 msgid "Rating Scale (1-5)"
 msgstr ""
 
-msgid "Likert Scale"
-msgstr ""
-
-msgid "Free Text"
-msgstr ""
-
 msgid "Single Choice (Dropdown)"
 msgstr ""
 
 msgid "Multiple Choice (Checkboxes)"
-msgstr ""
-
-msgid "Numeric Scale"
 msgstr ""
 
 msgid "Likert Scale Items (one per line)"
@@ -2416,10 +3215,8 @@ msgstr ""
 msgid "None (0)"
 msgstr ""
 
-#, fuzzy
-#| msgid "Actions"
 msgid "Action Items"
-msgstr "Aktionen"
+msgstr ""
 
 msgid "Add"
 msgstr ""
@@ -2430,10 +3227,8 @@ msgstr ""
 msgid "Add Question"
 msgstr ""
 
-#, fuzzy
-#| msgid "Actions"
 msgid "Option"
-msgstr "Aktionen"
+msgstr ""
 
 msgid "Weight"
 msgstr ""
@@ -2463,9 +3258,6 @@ msgstr ""
 msgid "Scoring Method"
 msgstr ""
 
-msgid "Rating Scale"
-msgstr ""
-
 msgid "Automatically scored 1-5"
 msgstr ""
 
@@ -2475,13 +3267,7 @@ msgstr ""
 msgid "Not scored (qualitative only)"
 msgstr ""
 
-msgid "Single Choice"
-msgstr ""
-
 msgid "Optional weighted scoring"
-msgstr ""
-
-msgid "Multiple Choice"
 msgstr ""
 
 msgid "What is Weighted Scoring?"
@@ -2550,10 +3336,8 @@ msgstr ""
 msgid "Delegation"
 msgstr ""
 
-#, fuzzy
-#| msgid "Team Management"
 msgid "Time management"
-msgstr "Teamverwaltung"
+msgstr ""
 
 msgid "If user selects \"Strategic thinking\" + \"Clear communication\" + \"Team motivation\"<br> → Score: 5 + 4 + 5 = 14 (rewards demonstrating more qualities)"
 msgstr ""
@@ -2612,15 +3396,11 @@ msgstr ""
 msgid "No sections yet. Add a section to start building your questionnaire."
 msgstr ""
 
-#, fuzzy
-#| msgid "Actions"
 msgid "Add Section"
-msgstr "Aktionen"
+msgstr ""
 
-#, fuzzy
-#| msgid "Team Management"
 msgid "Leadership & Management"
-msgstr "Teamverwaltung"
+msgstr ""
 
 msgid "Section Description (Optional)"
 msgstr ""
@@ -2683,10 +3463,8 @@ msgstr ""
 msgid "Archive"
 msgstr ""
 
-#, fuzzy
-#| msgid "Actions"
 msgid "Questions"
-msgstr "Aktionen"
+msgstr ""
 
 msgid "Used in Cycles"
 msgstr ""
@@ -2738,10 +3516,8 @@ msgstr ""
 msgid "Likert scale options:"
 msgstr ""
 
-#, fuzzy
-#| msgid "Actions"
 msgid "Options:"
-msgstr "Aktionen"
+msgstr ""
 
 msgid "Open-ended text response"
 msgstr ""
@@ -2943,10 +3719,8 @@ msgstr ""
 msgid "%(completed_tokens)s of %(total_tokens)s total (%(rate)s%%)"
 msgstr ""
 
-#, fuzzy
-#| msgid "Send Invitation"
 msgid "Invitation Links"
-msgstr "Einladung senden"
+msgstr ""
 
 msgid "Alternative to email invites"
 msgstr ""
@@ -2955,17 +3729,6 @@ msgid "Share these links with reviewers. Each link will randomly assign an avail
 msgstr ""
 
 msgid "Copy Link"
-msgstr ""
-
-msgid "Peer Review"
-msgstr ""
-
-#, fuzzy
-#| msgid "Manage"
-msgid "Manager Review"
-msgstr "Verwalten"
-
-msgid "Direct Report Review"
 msgstr ""
 
 #, python-format
@@ -2978,10 +3741,8 @@ msgstr[1] ""
 msgid "Sent %(date)s"
 msgstr ""
 
-#, fuzzy
-#| msgid "Send Invitation"
 msgid "Send Invite"
-msgstr "Einladung senden"
+msgstr ""
 
 msgid "Remove"
 msgstr ""
@@ -2989,12 +3750,11 @@ msgstr ""
 msgid "Send Reminder"
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid "No pending invitations"
+#, python-format
 msgid "%(counter)s pending invitation"
 msgid_plural "%(counter)s pending invitations"
-msgstr[0] "Keine offenen Einladungen"
-msgstr[1] "Keine offenen Einladungen"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Send invitation emails to all reviewers who have been assigned but not sent invites yet"
 msgstr ""
@@ -3017,25 +3777,19 @@ msgstr ""
 msgid "No reviewers invited yet."
 msgstr ""
 
-#, fuzzy
-#| msgid "Invite User"
 msgid "Invite reviewers"
-msgstr "Benutzer einladen"
+msgstr ""
 
-#, fuzzy
-#| msgid "Send Invitation"
 msgid "Manage Invitations"
-msgstr "Einladung senden"
+msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Pending Invitations (%(count)s)"
+#, python-format
 msgid "Send Pending Invites (%(pending_invites)s)"
-msgstr "Offene Einladungen (%(count)s)"
+msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Active Users (%(count)s)"
+#, python-format
 msgid "Send Reminders (%(count)s)"
-msgstr "Aktive Benutzer (%(count)s)"
+msgstr ""
 
 msgid "Generate Report"
 msgstr ""
@@ -3046,10 +3800,8 @@ msgstr ""
 msgid "Close Cycle & Generate Report"
 msgstr ""
 
-#, fuzzy
-#| msgid "Additional Permissions"
 msgid "Additional Actions"
-msgstr "Zusätzliche Berechtigungen"
+msgstr ""
 
 msgid "Confirm Action"
 msgstr ""
@@ -3073,10 +3825,8 @@ msgstr ""
 msgid "Set up a new 360-degree feedback review cycle"
 msgstr ""
 
-#, fuzzy
-#| msgid "Can create review cycles for others"
 msgid "You have no review cycles left."
-msgstr "Darf Feedback-Zyklen für andere anlegen"
+msgstr ""
 
 msgid "Cycles in progress continue and your reports stay available. To start a new cycle, buy another round or start a subscription."
 msgstr ""
@@ -3091,10 +3841,8 @@ msgstr ""
 msgid "Single Reviewee"
 msgstr ""
 
-#, fuzzy
-#| msgid "Can create review cycles for others"
 msgid "Create cycle for one person"
-msgstr "Darf Feedback-Zyklen für andere anlegen"
+msgstr ""
 
 msgid "Bulk Create"
 msgstr ""
@@ -3132,21 +3880,7 @@ msgstr ""
 msgid "Who gives feedback in this cycle. Categories you clear are left out of the invitation email and the report."
 msgstr ""
 
-msgid "Self assessment"
-msgstr ""
-
 msgid "The reviewee rates themselves"
-msgstr ""
-
-#, fuzzy
-#| msgid "Manage"
-msgid "Manager review"
-msgstr "Verwalten"
-
-msgid "Peer review"
-msgstr ""
-
-msgid "Direct report review"
 msgstr ""
 
 msgid "Select at least one category."
@@ -3195,10 +3929,9 @@ msgstr ""
 msgid "Quick create"
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Page %(num)s of %(total)s"
+#, python-format
 msgid "Page %(number)s of %(num_pages)s"
-msgstr "Seite %(num)s von %(total)s"
+msgstr ""
 
 msgid "Create your first review cycle to start collecting feedback"
 msgstr ""
@@ -3225,10 +3958,8 @@ msgstr ""
 msgid "<strong>Warning:</strong> This will deactivate the reviewee. Their past review cycles will remain accessible, but they will not appear in active lists."
 msgstr ""
 
-#, fuzzy
-#| msgid "Email"
 msgid "Email:"
-msgstr "E-Mail"
+msgstr ""
 
 msgid "Department:"
 msgstr ""
@@ -3242,10 +3973,9 @@ msgstr ""
 msgid "Create Reviewee"
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Update permissions for"
+#, python-format
 msgid "Update information for %(name)s"
-msgstr "Berechtigungen ändern für"
+msgstr ""
 
 msgid "Add a new person who will receive 360-degree feedback"
 msgstr ""
@@ -3273,9 +4003,6 @@ msgid "%(current)s / %(max)s reviewees (%(remaining)s remaining)"
 msgstr ""
 
 msgid "Add Myself"
-msgstr ""
-
-msgid "Report"
 msgstr ""
 
 msgid "View Cycle"
@@ -3318,19 +4045,14 @@ msgstr ""
 msgid "Category"
 msgstr ""
 
-msgid "Token"
-msgstr ""
-
 msgid "Review Link"
 msgstr ""
 
 msgid "Send Reminder Emails"
 msgstr ""
 
-#, fuzzy
-#| msgid "Actions"
 msgid "Instructions:"
-msgstr "Aktionen"
+msgstr ""
 
 msgid "Enter one email address per line (or comma-separated)"
 msgstr ""
@@ -3406,15 +4128,11 @@ msgstr ""
 msgid "When enabled, new users can register at /accounts/register/"
 msgstr ""
 
-#, fuzzy
-#| msgid "Can create review cycles for others"
 msgid "New users can create cycles for others"
-msgstr "Darf Feedback-Zyklen für andere anlegen"
+msgstr ""
 
-#, fuzzy
-#| msgid "Without this, user can only create cycles for themselves"
 msgid "If disabled, new users can only create cycles for themselves"
-msgstr "Ohne diese Berechtigung kann der Benutzer nur eigene Zyklen anlegen"
+msgstr ""
 
 msgid "Subscription & Billing"
 msgstr ""
@@ -3422,17 +4140,6 @@ msgstr ""
 #, python-format
 msgid "€%(price)s/month"
 msgstr ""
-
-msgid "Trial"
-msgstr ""
-
-msgid "Past Due"
-msgstr ""
-
-#, fuzzy
-#| msgid "Cancel"
-msgid "Canceled"
-msgstr "Abbrechen"
 
 msgid "Trial Ends"
 msgstr ""
@@ -3450,10 +4157,8 @@ msgstr ""
 msgid "Ends %(end_date)s"
 msgstr ""
 
-#, fuzzy
-#| msgid "Manage Permissions"
 msgid "Manage Billing"
-msgstr "Berechtigungen verwalten"
+msgstr ""
 
 msgid "Review Rounds"
 msgstr ""
@@ -3485,10 +4190,8 @@ msgstr ""
 msgid "Leave blank to keep current"
 msgstr ""
 
-#, fuzzy
-#| msgid "Email Address"
 msgid "From Address"
-msgstr "E-Mail-Adresse"
+msgstr ""
 
 msgid "Use TLS encryption (port 587)"
 msgstr ""
@@ -3545,15 +4248,11 @@ msgstr ""
 msgid "Add Webhook"
 msgstr ""
 
-#, fuzzy
-#| msgid "GDPR Data Management"
 msgid "Account & Data Management"
-msgstr "DSGVO-Datenverwaltung"
+msgstr ""
 
-#, fuzzy
-#| msgid "Organization Admin"
 msgid "Export Organization Data"
-msgstr "Organisations-Admin"
+msgstr ""
 
 msgid "Download all data in JSON format (GDPR compliant)."
 msgstr ""
@@ -3561,10 +4260,8 @@ msgstr ""
 msgid "Download Export"
 msgstr ""
 
-#, fuzzy
-#| msgid "Organization Admin"
 msgid "Import Organization Data"
-msgstr "Organisations-Admin"
+msgstr ""
 
 msgid "Upload a previously exported JSON file to import data."
 msgstr ""
@@ -3579,10 +4276,8 @@ msgstr ""
 msgid "Scheduled to cancel on %(end_date)s."
 msgstr ""
 
-#, fuzzy
-#| msgid "Active"
 msgid "Reactivate"
-msgstr "Aktiv"
+msgstr ""
 
 #, python-format
 msgid "Cancel subscription. Access until %(end_date)s."
@@ -3603,10 +4298,8 @@ msgstr ""
 msgid "Permanently delete your account. Cannot be undone."
 msgstr ""
 
-#, fuzzy
-#| msgid "Organization Admin"
 msgid "Delete Organization"
-msgstr "Organisations-Admin"
+msgstr ""
 
 #, python-format
 msgid "Permanently delete %(name)s and all data. Cannot be undone."
@@ -3709,23 +4402,11 @@ msgstr ""
 msgid "Error previewing import:"
 msgstr ""
 
-#, fuzzy
-#| msgid "Organization Admin"
 msgid "Organization:"
-msgstr "Organisations-Admin"
+msgstr ""
 
 msgid "Questionnaires:"
 msgstr ""
-
-#, fuzzy
-#| msgid "Actions"
-msgid "sections"
-msgstr "Aktionen"
-
-#, fuzzy
-#| msgid "Actions"
-msgid "questions"
-msgstr "Aktionen"
 
 msgid "Create API Token"
 msgstr ""
@@ -3853,79 +4534,76 @@ msgid "Save Webhook"
 msgstr ""
 
 msgid "Team Management"
-msgstr "Teamverwaltung"
+msgstr ""
 
 msgid "Manage users and send invitations"
-msgstr "Benutzer verwalten und Einladungen versenden"
+msgstr ""
 
 #, python-format
 msgid "%(count)s team members (unlimited)"
-msgstr "%(count)s Teammitglieder (unbegrenzt)"
+msgstr ""
 
 msgid "Invite User"
-msgstr "Benutzer einladen"
+msgstr ""
 
 msgid "Send Invitation"
-msgstr "Einladung senden"
+msgstr ""
 
 msgid "Email Address"
-msgstr "E-Mail-Adresse"
+msgstr ""
 
 msgid "The user will receive an email with instructions to join"
-msgstr "Der Benutzer erhält eine E-Mail mit Anleitung zum Beitritt"
+msgstr ""
 
 #, python-format
 msgid "Active Users (%(count)s)"
-msgstr "Aktive Benutzer (%(count)s)"
+msgstr ""
 
 msgid "Role"
-msgstr "Rolle"
+msgstr ""
 
 msgid "Super Admin"
-msgstr "Super-Admin"
+msgstr ""
 
 msgid "Organization Admin"
-msgstr "Organisations-Admin"
+msgstr ""
 
 msgid "Member"
-msgstr "Mitglied"
+msgstr ""
 
 msgid "Can manage cycles"
-msgstr "Darf Zyklen verwalten"
+msgstr ""
 
 msgid "Self-only"
-msgstr "Nur eigene"
+msgstr ""
 
 msgid "All reports"
 msgstr ""
 
 msgid "Manage"
-msgstr "Verwalten"
+msgstr ""
 
 msgid "Manage Permissions"
-msgstr "Berechtigungen verwalten"
+msgstr ""
 
 #, python-format
 msgid "Pending Invitations (%(count)s)"
-msgstr "Offene Einladungen (%(count)s)"
+msgstr ""
 
 msgid "Invited By"
-msgstr "Eingeladen von"
+msgstr ""
 
 msgid "Sent"
-msgstr "Gesendet"
+msgstr ""
 
 msgid "Expires"
-msgstr "Läuft ab"
-
-msgid "Expired"
-msgstr "Abgelaufen"
+msgstr ""
 
 msgid "No pending invitations"
-msgstr "Keine offenen Einladungen"
+msgstr ""
 
 msgid "Manage User Permissions"
-msgstr "Benutzerberechtigungen verwalten"
+msgstr ""
 
 #, python-format
 msgid "Update permissions for <strong id=\"%(username_id)s\"></strong>"
@@ -3935,32 +4613,28 @@ msgid "Can invite members, manage organization settings, and delete organization
 msgstr ""
 
 msgid "Regular team member with limited permissions"
-msgstr "Normales Teammitglied mit eingeschränkten Berechtigungen"
+msgstr ""
 
 msgid "Additional Permissions"
-msgstr "Zusätzliche Berechtigungen"
+msgstr ""
 
 msgid "Can create review cycles for others"
-msgstr "Darf Feedback-Zyklen für andere anlegen"
+msgstr ""
 
 msgid "Without this, user can only create cycles for themselves"
-msgstr "Ohne diese Berechtigung kann der Benutzer nur eigene Zyklen anlegen"
+msgstr ""
 
 msgid "Can view all reports and cycles"
 msgstr ""
 
-#, fuzzy
-#| msgid "Without this, user can only create cycles for themselves"
 msgid "Without this, user only sees the reports and cycles they are the subject of."
-msgstr "Ohne diese Berechtigung kann der Benutzer nur eigene Zyklen anlegen"
+msgstr ""
 
-#, fuzzy
-#| msgid "Organization Admin"
 msgid "Organization Admins always have this."
-msgstr "Organisations-Admin"
+msgstr ""
 
 msgid "Update Permissions"
-msgstr "Berechtigungen aktualisieren"
+msgstr ""
 
 msgid "Blik 360 Feedback"
 msgstr ""
@@ -4479,10 +5153,8 @@ msgstr ""
 msgid "Add reviewees (employees) to your organization"
 msgstr ""
 
-#, fuzzy
-#| msgid "Can create review cycles for others"
 msgid "Create a review cycle and invite reviewers"
-msgstr "Darf Feedback-Zyklen für andere anlegen"
+msgstr ""
 
 msgid "Monitor progress and generate reports"
 msgstr ""
@@ -4577,10 +5249,8 @@ msgstr ""
 msgid "Ready for development"
 msgstr ""
 
-#, fuzzy
-#| msgid "Organization Admin"
 msgid "Django Admin"
-msgstr "Organisations-Admin"
+msgstr ""
 
 msgid "Version 0.1.0 (Pre-Alpha)"
 msgstr ""
@@ -4646,15 +5316,11 @@ msgstr ""
 msgid "Independent"
 msgstr ""
 
-#, fuzzy
-#| msgid "Active"
 msgid "Proactive"
-msgstr "Aktiv"
+msgstr ""
 
-#, fuzzy
-#| msgid "Self-only"
 msgid "Self-Driven"
-msgstr "Nur eigene"
+msgstr ""
 
 msgid "When reporting problems, investigate root causes"
 msgstr ""
@@ -4812,10 +5478,8 @@ msgstr ""
 msgid "Others see you"
 msgstr ""
 
-#, fuzzy
-#| msgid "Actions"
 msgid "Action:"
-msgstr "Aktionen"
+msgstr ""
 
 msgid "Consider acknowledging your strengths more openly. Your team already recognizes your capabilities."
 msgstr ""
@@ -5000,10 +5664,9 @@ msgstr ""
 msgid "360 Feedback"
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Page %(num)s of %(total)s"
+#, python-format
 msgid "Step 1 of %(total)s"
-msgstr "Seite %(num)s von %(total)s"
+msgstr ""
 
 msgid "Share your thoughts..."
 msgstr ""
@@ -5038,10 +5701,9 @@ msgstr ""
 msgid "Let's get your 360 feedback system ready"
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid "Page %(num)s of %(total)s"
+#, python-format
 msgid "Step %(step)s of %(total_steps)s"
-msgstr "Seite %(num)s von %(total)s"
+msgstr ""
 
 msgid "Setup Complete - Blik"
 msgstr ""
@@ -5112,10 +5774,8 @@ msgstr ""
 msgid "Email Configuration - Blik Setup"
 msgstr ""
 
-#, fuzzy
-#| msgid "Manage users and send invitations"
 msgid "Configure email settings for sending invitations"
-msgstr "Benutzer verwalten und Einladungen versenden"
+msgstr ""
 
 msgid "Email Configuration"
 msgstr ""
@@ -5144,10 +5804,8 @@ msgstr ""
 msgid "Configure your organization details"
 msgstr ""
 
-#, fuzzy
-#| msgid "Organization Admin"
 msgid "Organization Details"
-msgstr "Organisations-Admin"
+msgstr ""
 
 msgid "Tell us about your organization. This information will be used in emails and reports."
 msgstr ""
@@ -5158,23 +5816,17 @@ msgstr ""
 msgid "Continue to Email Setup"
 msgstr ""
 
-#, fuzzy
-#| msgid "Organization Admin"
 msgid "Create Organization"
-msgstr "Organisations-Admin"
+msgstr ""
 
 msgid "Create a new organization without a payment plan for testing"
 msgstr ""
 
-#, fuzzy
-#| msgid "Organization Admin"
 msgid "New Organization Details"
-msgstr "Organisations-Admin"
+msgstr ""
 
-#, fuzzy
-#| msgid "Organization Admin"
 msgid "Organization Name"
-msgstr "Organisations-Admin"
+msgstr ""
 
 msgid "e.g. Acme Corp"
 msgstr ""
@@ -5182,10 +5834,8 @@ msgstr ""
 msgid "The name of the organization to create"
 msgstr ""
 
-#, fuzzy
-#| msgid "Email"
 msgid "Admin Email"
-msgstr "E-Mail"
+msgstr ""
 
 msgid "An invitation will be sent to this email address. The user will be set up as the organization administrator."
 msgstr ""
@@ -5193,19 +5843,13 @@ msgstr ""
 msgid "Create Organization & Send Invitation"
 msgstr ""
 
-#, fuzzy
-#| msgid "Organization Admin"
 msgid "Recent Organizations"
-msgstr "Organisations-Admin"
+msgstr ""
 
-#, fuzzy
-#| msgid "Active"
 msgctxt "organization status"
 msgid "Active"
-msgstr "Aktiv"
+msgstr ""
 
-#, fuzzy
-#| msgid "Active"
 msgctxt "organization status"
 msgid "Inactive"
-msgstr "Aktiv"
+msgstr ""

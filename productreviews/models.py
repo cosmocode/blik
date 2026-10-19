@@ -4,6 +4,7 @@ Used for JSON-LD structured data on landing pages.
 """
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils.translation import gettext_lazy as _
 from core.models import TimeStampedModel, Organization
 from core.managers import OrganizationManager
 
@@ -15,86 +16,101 @@ class ProductReview(TimeStampedModel):
     """
 
     STATUS_CHOICES = [
-        ('pending', 'Pending Review'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
+        ('pending', _('Pending Review')),
+        ('approved', _('Approved')),
+        ('rejected', _('Rejected')),
     ]
 
     organization = models.ForeignKey(
         Organization,
         on_delete=models.CASCADE,
         related_name='product_reviews',
-        help_text='Organization this review belongs to'
+        help_text=_('Organization this review belongs to'),
+        verbose_name=_('organization')
     )
 
     # Review content
     rating = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
-        help_text='Rating from 1-5 stars'
+        help_text=_('Rating from 1-5 stars'),
+        verbose_name=_('rating')
     )
     review_title = models.CharField(
         max_length=200,
-        help_text='Short title/headline for the review'
+        help_text=_('Short title/headline for the review'),
+        verbose_name=_('review title')
     )
     review_text = models.TextField(
-        help_text='Full review text from the customer'
+        help_text=_('Full review text from the customer'),
+        verbose_name=_('review text')
     )
 
     # Reviewer information
     reviewer_name = models.CharField(
         max_length=100,
-        help_text='Name of the person giving the review'
+        help_text=_('Name of the person giving the review'),
+        verbose_name=_('reviewer name')
     )
     reviewer_title = models.CharField(
         max_length=150,
         blank=True,
-        help_text='Job title of the reviewer (e.g., "HR Manager")'
+        help_text=_('Job title of the reviewer (e.g., "HR Manager")'),
+        verbose_name=_('reviewer title')
     )
     reviewer_company = models.CharField(
         max_length=100,
         blank=True,
-        help_text='Company/organization the reviewer works for'
+        help_text=_('Company/organization the reviewer works for'),
+        verbose_name=_('company')
     )
     reviewer_email = models.EmailField(
-        help_text='Email address of the reviewer (not shown publicly)'
+        help_text=_('Email address of the reviewer (not shown publicly)'),
+        verbose_name=_('reviewer email')
     )
 
     # Verification and status
     verified_customer = models.BooleanField(
         default=False,
-        help_text='Verified as actual customer/subscriber'
+        help_text=_('Verified as actual customer/subscriber'),
+        verbose_name=_('verified customer')
     )
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default='pending',
-        help_text='Review approval status'
+        help_text=_('Review approval status'),
+        verbose_name=_('status')
     )
 
     # Publishing
     is_active = models.BooleanField(
         default=True,
-        help_text='Active reviews can be displayed publicly'
+        help_text=_('Active reviews can be displayed publicly'),
+        verbose_name=_('active')
     )
     featured = models.BooleanField(
         default=False,
-        help_text='Featured reviews are highlighted on landing pages'
+        help_text=_('Featured reviews are highlighted on landing pages'),
+        verbose_name=_('featured')
     )
     published_date = models.DateField(
         null=True,
         blank=True,
-        help_text='Date the review was published (shown in JSON-LD)'
+        help_text=_('Date the review was published (shown in JSON-LD)'),
+        verbose_name=_('published date')
     )
 
     # Metadata
     source = models.CharField(
         max_length=100,
         blank=True,
-        help_text='Where the review came from (e.g., "Email Survey", "G2", "Direct")'
+        help_text=_('Where the review came from (e.g., "Email Survey", "G2", "Direct")'),
+        verbose_name=_('source')
     )
     notes = models.TextField(
         blank=True,
-        help_text='Internal notes about this review (not shown publicly)'
+        help_text=_('Internal notes about this review (not shown publicly)'),
+        verbose_name=_('internal notes')
     )
 
     objects = OrganizationManager()
@@ -102,8 +118,8 @@ class ProductReview(TimeStampedModel):
     class Meta:
         db_table = 'product_reviews'
         ordering = ['-published_date', '-created_at']
-        verbose_name = 'Product Review'
-        verbose_name_plural = 'Product Reviews'
+        verbose_name = _('Product Review')
+        verbose_name_plural = _('Product Reviews')
 
     def __str__(self):
         return f"{self.reviewer_name} - {self.rating}★ ({self.get_status_display()})"
