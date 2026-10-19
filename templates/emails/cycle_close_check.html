@@ -1,3 +1,4 @@
+{% load i18n %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,25 +16,25 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 style="margin: 0; font-size: 1.75rem;">Review Check-In</h1>
+            <h1 style="margin: 0; font-size: 1.75rem;">{% trans 'Review Check-In' %}</h1>
         </div>
         <div class="content">
-            <p>Hi <strong>{{ reviewee.name }}</strong>,</p>
+            <p>{% blocktrans trimmed with name=reviewee.name %}Hi <strong>{{ name }}</strong>,{% endblocktrans %}</p>
 
-            <p><strong>{{ completed_count }}</strong> review{{ completed_count|pluralize }} {{ completed_count|pluralize:"has,have" }} been completed for your <strong>{{ questionnaire_name }}</strong> cycle.</p>
+            <p>{% blocktrans trimmed count counter=completed_count %}<strong>{{ counter }}</strong> review has been completed for your <strong>{{ questionnaire_name }}</strong> cycle.{% plural %}<strong>{{ counter }}</strong> reviews have been completed for your <strong>{{ questionnaire_name }}</strong> cycle.{% endblocktrans %}</p>
 
-            <p>If everyone has submitted their feedback, you can close the cycle and generate your report from your dashboard.</p>
+            <p>{% trans 'If everyone has submitted their feedback, you can close the cycle and generate your report from your dashboard.' %}</p>
 
             <p style="text-align: center;">
-                <a href="{{ dashboard_url }}" class="cta-button">View Cycle</a>
+                <a href="{{ dashboard_url }}" class="cta-button">{% trans 'View Cycle' %}</a>
             </p>
 
             <div class="info-box">
-                <strong>Note:</strong> Your cycle will stay open until you manually close it, so additional reviewers can still submit feedback via the invite link.
+                <strong>{% trans 'Note:' %}</strong> {% trans 'Your cycle will stay open until you manually close it, so additional reviewers can still submit feedback via the invite link.' %}
             </div>
         </div>
         <div class="footer">
-            <p>This is an automated email from your feedback system.</p>
+            <p>{% trans 'This is an automated email from your feedback system.' %}</p>
         </div>
     </div>
 </body>

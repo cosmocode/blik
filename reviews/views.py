@@ -4,6 +4,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.db import transaction
+from django.utils.translation import gettext as _
 from django_ratelimit.decorators import ratelimit
 from .models import ReviewerToken, Response, ReviewCycle
 from questionnaires.models import Question
@@ -33,7 +34,7 @@ def claim_token(request, invitation_token):
 
     if not cycle or not category:
         return render(request, 'reviews/claim_error.html', {
-            'error': 'Invalid or expired invitation link.'
+            'error': _('Invalid or expired invitation link.')
         }, status=404)
 
     # The token exists for every category, but the cycle may not collect this
@@ -41,7 +42,7 @@ def claim_token(request, invitation_token):
     # dropped, otherwise the report gains answers it does not report on.
     if not cycle.collects(category):
         return render(request, 'reviews/claim_error.html', {
-            'error': 'This feedback cycle no longer collects this kind of review.'
+            'error': _('This feedback cycle no longer collects this kind of review.')
         }, status=404)
 
     # If coming from redirect page (has force_claim param), skip localStorage check
@@ -98,7 +99,7 @@ def feedback_form(request, token):
     # Check if the cycle is closed/completed
     if cycle.status == 'completed':
         return render(request, 'reviews/claim_error.html', {
-            'error': 'This review cycle has been closed. Feedback can no longer be submitted.'
+            'error': _('This review cycle has been closed. Feedback can no longer be submitted.')
         }, status=410)
 
     # Mark token as claimed on first access (for email-invited users)
@@ -141,13 +142,13 @@ def submit_feedback(request, token):
 
     # Check if already completed
     if reviewer_token.is_completed:
-        return JsonResponse({'error': 'Feedback already submitted'}, status=400)
+        return JsonResponse({'error': _('Feedback already submitted')}, status=400)
 
     cycle = reviewer_token.cycle
 
     # Check if the cycle is closed/completed
     if cycle.status == 'completed':
-        return JsonResponse({'error': 'This review cycle has been closed. Feedback can no longer be submitted.'}, status=410)
+        return JsonResponse({'error': _('This review cycle has been closed. Feedback can no longer be submitted.')}, status=410)
 
     questionnaire = cycle.questionnaire
 
@@ -169,7 +170,7 @@ def submit_feedback(request, token):
 
             # Check required fields
             if question.required and not answer_values:
-                errors.append(f'Question "{question.question_text[:50]}" is required')
+                errors.append(_('Question "%(question)s" is required') % {'question': question.question_text[:50]})
                 continue
 
             # Skip empty optional fields
@@ -183,7 +184,7 @@ def submit_feedback(request, token):
 
             # Check required fields
             if question.required and not answer_value:
-                errors.append(f'Question "{question.question_text[:50]}" is required')
+                errors.append(_('Question "%(question)s" is required') % {'question': question.question_text[:50]})
                 continue
 
             # Skip empty optional fields
@@ -197,11 +198,11 @@ def submit_feedback(request, token):
                     min_val = question.config.get('min', 1)
                     max_val = question.config.get('max', 5)
                     if rating < min_val or rating > max_val:
-                        errors.append(f'Rating must be between {min_val} and {max_val}')
+                        errors.append(_('Rating must be between %(min)s and %(max)s') % {'min': min_val, 'max': max_val})
                         continue
                     answer_data = {'value': rating}
                 except ValueError:
-                    errors.append(f'Invalid rating value')
+                    errors.append(_('Invalid rating value'))
                     continue
             elif question.question_type == 'scale':
                 try:
@@ -209,11 +210,11 @@ def submit_feedback(request, token):
                     min_val = question.config.get('min', 1)
                     max_val = question.config.get('max', 100)
                     if scale_value < min_val or scale_value > max_val:
-                        errors.append(f'Scale value must be between {min_val} and {max_val}')
+                        errors.append(_('Scale value must be between %(min)s and %(max)s') % {'min': min_val, 'max': max_val})
                         continue
                     answer_data = {'value': scale_value}
                 except ValueError:
-                    errors.append(f'Invalid scale value')
+                    errors.append(_('Invalid scale value'))
                     continue
             else:
                 # text, single_choice, likert
@@ -290,7 +291,7 @@ def submit_feedback(request, token):
 
     except Exception as e:
         logger.exception('Error submitting feedback')
-        return JsonResponse({'error': 'Something went wrong. Please try again.'}, status=500)
+        return JsonResponse({'error': _('Something went wrong. Please try again.')}, status=500)
 
 
 def feedback_complete(request, token):

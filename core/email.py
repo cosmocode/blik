@@ -6,6 +6,7 @@ import logging
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.backends.smtp import EmailBackend
 from django.conf import settings
+from django.utils.translation import gettext as _
 from .models import Organization
 
 logger = logging.getLogger(__name__)
@@ -99,7 +100,7 @@ def send_password_reset_email(user, token):
     # Build reset URL
     reset_url = f'{settings.SITE_PROTOCOL}://{settings.SITE_DOMAIN}{reverse("reset_password", args=[token.token])}'
 
-    subject = f'Reset your {settings.SITE_NAME} password'
+    subject = _('Reset your %(site_name)s password') % {'site_name': settings.SITE_NAME}
 
     context = {
         'user': user,
@@ -154,19 +155,19 @@ def send_welcome_email(user, organization, password=None):
     else:
         # Fallback if no facts in database
         selected_fact = {
-            'title': 'The Power of 360 Feedback',
-            'content': 'Research shows that <strong>360-degree feedback increases self-awareness by up to 30%</strong> and significantly improves leadership effectiveness.'
+            'title': _('The Power of 360 Feedback'),
+            'content': _('Research shows that <strong>360-degree feedback increases self-awareness by up to 30%</strong> and significantly improves leadership effectiveness.')
         }
 
     # Use different templates based on whether password is provided
     if password:
         # Admin-created account with credentials
-        subject = f'Welcome to {settings.SITE_NAME} - Your Account is Ready'
+        subject = _('Welcome to %(site_name)s - Your Account is Ready') % {'site_name': settings.SITE_NAME}
         html_template = 'emails/welcome.html'
         text_template = 'emails/welcome.txt'
     else:
         # Invited member (already set their own password)
-        subject = f'Welcome to {organization.name}!'
+        subject = _('Welcome to %(organization)s!') % {'organization': organization.name}
         html_template = 'emails/welcome_member.html'
         text_template = 'emails/welcome_member.txt'
 

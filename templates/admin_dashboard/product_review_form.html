@@ -1,12 +1,13 @@
 {% extends "admin_dashboard/base.html" %}
+{% load i18n %}
 
-{% block title %}{{ action }} Product Review{% endblock %}
+{% block title %}{% if action == 'Create' %}{% trans 'Create Product Review' %}{% else %}{% trans 'Edit Product Review' %}{% endif %}{% endblock %}
 
 {% block content %}
 <div class="page-header">
     <div>
-        <h1>{{ action }} Product Review</h1>
-        <p>{% if action == 'Create' %}Add a new customer review{% else %}Update review details{% endif %}</p>
+        <h1>{% if action == 'Create' %}{% trans 'Create Product Review' %}{% else %}{% trans 'Edit Product Review' %}{% endif %}</h1>
+        <p>{% if action == 'Create' %}{% trans 'Add a new customer review' %}{% else %}{% trans 'Update review details' %}{% endif %}</p>
     </div>
 </div>
 
@@ -16,117 +17,117 @@
             {% csrf_token %}
 
             <div class="form-group">
-                <label class="form-label" for="rating">Rating *</label>
+                <label class="form-label" for="rating">{% trans 'Rating' context 'product review' %} *</label>
                 <select id="rating" name="rating" class="form-control" required>
-                    <option value="">Select rating...</option>
-                    <option value="5" {% if review.rating == 5 or review.rating == '5' %}selected{% endif %}>★★★★★ (5 - Excellent)</option>
-                    <option value="4" {% if review.rating == 4 or review.rating == '4' %}selected{% endif %}>★★★★☆ (4 - Good)</option>
-                    <option value="3" {% if review.rating == 3 or review.rating == '3' %}selected{% endif %}>★★★☆☆ (3 - Average)</option>
-                    <option value="2" {% if review.rating == 2 or review.rating == '2' %}selected{% endif %}>★★☆☆☆ (2 - Poor)</option>
-                    <option value="1" {% if review.rating == 1 or review.rating == '1' %}selected{% endif %}>★☆☆☆☆ (1 - Very Poor)</option>
+                    <option value="">{% trans 'Select rating...' %}</option>
+                    <option value="5" {% if review.rating == 5 or review.rating == '5' %}selected{% endif %}>★★★★★ ({% trans '5 - Excellent' %})</option>
+                    <option value="4" {% if review.rating == 4 or review.rating == '4' %}selected{% endif %}>★★★★☆ ({% trans '4 - Good' %})</option>
+                    <option value="3" {% if review.rating == 3 or review.rating == '3' %}selected{% endif %}>★★★☆☆ ({% trans '3 - Average' %})</option>
+                    <option value="2" {% if review.rating == 2 or review.rating == '2' %}selected{% endif %}>★★☆☆☆ ({% trans '2 - Poor' %})</option>
+                    <option value="1" {% if review.rating == 1 or review.rating == '1' %}selected{% endif %}>★☆☆☆☆ ({% trans '1 - Very Poor' %})</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="review_title">Review Title *</label>
+                <label class="form-label" for="review_title">{% trans 'Review Title' %} *</label>
                 <input
                     type="text"
                     id="review_title"
                     name="review_title"
                     class="form-control"
                     value="{{ review.review_title|default:'' }}"
-                    placeholder="e.g., Great tool for 360 feedback"
+                    placeholder="{% trans 'e.g., Great tool for 360 feedback' %}"
                     required
                     maxlength="200"
                 >
-                <small class="form-text">Short headline for the review (max 200 characters)</small>
+                <small class="form-text">{% trans 'Short headline for the review (max 200 characters)' %}</small>
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="review_text">Review Text *</label>
+                <label class="form-label" for="review_text">{% trans 'Review Text' %} *</label>
                 <textarea
                     id="review_text"
                     name="review_text"
                     class="form-control"
                     rows="6"
-                    placeholder="Full review text from the customer..."
+                    placeholder="{% trans 'Full review text from the customer...' %}"
                     required
                 >{{ review.review_text|default:'' }}</textarea>
-                <small class="form-text">The complete review content</small>
+                <small class="form-text">{% trans 'The complete review content' %}</small>
             </div>
 
             <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">
 
-            <h3 style="margin-bottom: 1rem; font-size: 1.125rem;">Reviewer Information</h3>
+            <h3 style="margin-bottom: 1rem; font-size: 1.125rem;">{% trans 'Reviewer Information' %}</h3>
 
             <div class="form-group">
-                <label class="form-label" for="reviewer_name">Reviewer Name *</label>
+                <label class="form-label" for="reviewer_name">{% trans 'Reviewer Name' %} *</label>
                 <input
                     type="text"
                     id="reviewer_name"
                     name="reviewer_name"
                     class="form-control"
                     value="{{ review.reviewer_name|default:'' }}"
-                    placeholder="e.g., Jane Smith"
+                    placeholder="{% trans 'e.g., Jane Smith' %}"
                     required
                     maxlength="100"
                 >
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="reviewer_title">Reviewer Title</label>
+                <label class="form-label" for="reviewer_title">{% trans 'Reviewer Title' %}</label>
                 <input
                     type="text"
                     id="reviewer_title"
                     name="reviewer_title"
                     class="form-control"
                     value="{{ review.reviewer_title|default:'' }}"
-                    placeholder="e.g., HR Manager"
+                    placeholder="{% trans 'e.g., HR Manager' %}"
                     maxlength="150"
                 >
-                <small class="form-text">Job title (optional)</small>
+                <small class="form-text">{% trans 'Job title (optional)' %}</small>
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="reviewer_company">Company</label>
+                <label class="form-label" for="reviewer_company">{% trans 'Company' %}</label>
                 <input
                     type="text"
                     id="reviewer_company"
                     name="reviewer_company"
                     class="form-control"
                     value="{{ review.reviewer_company|default:'' }}"
-                    placeholder="e.g., Acme Corp"
+                    placeholder="{% trans 'e.g., Acme Corp' %}"
                     maxlength="100"
                 >
-                <small class="form-text">Company name (optional)</small>
+                <small class="form-text">{% trans 'Company name (optional)' %}</small>
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="reviewer_email">Reviewer Email *</label>
+                <label class="form-label" for="reviewer_email">{% trans 'Reviewer Email' %} *</label>
                 <input
                     type="email"
                     id="reviewer_email"
                     name="reviewer_email"
                     class="form-control"
                     value="{{ review.reviewer_email|default:'' }}"
-                    placeholder="e.g., jane@example.com"
+                    placeholder="{% trans 'e.g., jane@example.com' %}"
                     required
                 >
-                <small class="form-text">Email address (not shown publicly, for verification only)</small>
+                <small class="form-text">{% trans 'Email address (not shown publicly, for verification only)' %}</small>
             </div>
 
             <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">
 
-            <h3 style="margin-bottom: 1rem; font-size: 1.125rem;">Status & Publishing</h3>
+            <h3 style="margin-bottom: 1rem; font-size: 1.125rem;">{% trans 'Status & Publishing' %}</h3>
 
             <div class="form-group">
-                <label class="form-label" for="status">Status *</label>
+                <label class="form-label" for="status">{% trans 'Status' %} *</label>
                 <select id="status" name="status" class="form-control" required>
-                    <option value="pending" {% if review.status == 'pending' or not review.status %}selected{% endif %}>Pending Review</option>
-                    <option value="approved" {% if review.status == 'approved' %}selected{% endif %}>Approved</option>
-                    <option value="rejected" {% if review.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                    <option value="pending" {% if review.status == 'pending' or not review.status %}selected{% endif %}>{% trans 'Pending Review' %}</option>
+                    <option value="approved" {% if review.status == 'approved' %}selected{% endif %}>{% trans 'Approved' %}</option>
+                    <option value="rejected" {% if review.status == 'rejected' %}selected{% endif %}>{% trans 'Rejected' %}</option>
                 </select>
-                <small class="form-text">Only approved reviews appear in JSON-LD structured data</small>
+                <small class="form-text">{% trans 'Only approved reviews appear in JSON-LD structured data' %}</small>
             </div>
 
             <div class="form-group">
@@ -139,10 +140,10 @@
                         style="margin-right: 0.5rem;"
                     >
                     <label for="verified_customer" style="margin: 0; cursor: pointer;">
-                        Verified Customer
+                        {% trans 'Verified Customer' %}
                     </label>
                 </div>
-                <small class="form-text">Mark this reviewer as a verified customer/subscriber</small>
+                <small class="form-text">{% trans 'Mark this reviewer as a verified customer/subscriber' %}</small>
             </div>
 
             <div class="form-group">
@@ -155,45 +156,45 @@
                         style="margin-right: 0.5rem;"
                     >
                     <label for="featured" style="margin: 0; cursor: pointer;">
-                        Featured Review
+                        {% trans 'Featured Review' %}
                     </label>
                 </div>
-                <small class="form-text">Highlight this review on landing pages</small>
+                <small class="form-text">{% trans 'Highlight this review on landing pages' %}</small>
             </div>
 
             <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">
 
-            <h3 style="margin-bottom: 1rem; font-size: 1.125rem;">Metadata</h3>
+            <h3 style="margin-bottom: 1rem; font-size: 1.125rem;">{% trans 'Metadata' %}</h3>
 
             <div class="form-group">
-                <label class="form-label" for="source">Source</label>
+                <label class="form-label" for="source">{% trans 'Source' %}</label>
                 <input
                     type="text"
                     id="source"
                     name="source"
                     class="form-control"
                     value="{{ review.source|default:'' }}"
-                    placeholder="e.g., Email Survey, G2, Direct Contact"
+                    placeholder="{% trans 'e.g., Email Survey, G2, Direct Contact' %}"
                     maxlength="100"
                 >
-                <small class="form-text">Where this review came from (optional)</small>
+                <small class="form-text">{% trans 'Where this review came from (optional)' %}</small>
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="notes">Internal Notes</label>
+                <label class="form-label" for="notes">{% trans 'Internal Notes' %}</label>
                 <textarea
                     id="notes"
                     name="notes"
                     class="form-control"
                     rows="3"
-                    placeholder="Internal notes (not shown publicly)..."
+                    placeholder="{% trans 'Internal notes (not shown publicly)...' %}"
                 >{{ review.notes|default:'' }}</textarea>
-                <small class="form-text">Private notes for internal reference only</small>
+                <small class="form-text">{% trans 'Private notes for internal reference only' %}</small>
             </div>
 
             <div class="form-actions">
-                <a href="{% url 'product_review_list' %}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">{{ action }} Review</button>
+                <a href="{% url 'product_review_list' %}" class="btn btn-secondary">{% trans 'Cancel' %}</a>
+                <button type="submit" class="btn btn-primary">{% if action == 'Create' %}{% trans 'Create Review' %}{% else %}{% trans 'Edit Review' %}{% endif %}</button>
             </div>
         </form>
     </div>

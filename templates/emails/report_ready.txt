@@ -1,21 +1,21 @@
-Hi {{ reviewee.name }},
+{% load i18n %}{% blocktrans trimmed with name=reviewee.name %}Hi {{ name }},{% endblocktrans %}
 
-Your 360-degree feedback report is now ready!
+{% trans 'Your 360-degree feedback report is now ready!' %}
 
-View your report here:
+{% trans 'View your report here:' %}
 {{ report_url }}
 
-This report contains feedback from {{ response_count }} reviewer(s) across different categories.
+{% blocktrans trimmed %}This report contains feedback from {{ response_count }} reviewer(s) across different categories.{% endblocktrans %}
 
-The report includes:
-- Overall performance insights
-- Strength areas and development opportunities
-- Perception gap analysis (if applicable)
-- Detailed feedback by competency area
+{% trans 'The report includes:' %}
+- {% trans 'Overall performance insights' %}
+- {% trans 'Strength areas and development opportunities' %}
+- {% trans 'Perception gap analysis (if applicable)' %}
+- {% trans 'Detailed feedback by competency area' %}
 
-Your report is completely confidential and accessible only through the secure link above.
+{% trans 'Your report is completely confidential and accessible only through the secure link above.' %}
 
-Questionnaire: {{ cycle.questionnaire.name }}
+{% trans 'Questionnaire:' %} {{ cycle.questionnaire.name }}
 
-Best regards,
-Your Feedback Team
+{% trans 'Best regards,' %}
+{% trans 'Your Feedback Team' %}

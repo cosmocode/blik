@@ -1,12 +1,13 @@
 {% extends "admin_dashboard/base.html" %}
+{% load i18n %}
 
-{% block title %}Create Organization{% endblock %}
+{% block title %}{% trans 'Create Organization' %}{% endblock %}
 
 {% block content %}
 <div class="page-header">
     <div>
-        <h1>Create Organization</h1>
-        <p class="page-description">Create a new organization without a payment plan for testing</p>
+        <h1>{% trans 'Create Organization' %}</h1>
+        <p class="page-description">{% trans 'Create a new organization without a payment plan for testing' %}</p>
     </div>
 </div>
 
@@ -16,25 +17,25 @@
 
         <div class="card" style="margin-bottom: 1.5rem;">
             <div class="card-header">
-                <h2 class="card-title">New Organization Details</h2>
+                <h2 class="card-title">{% trans 'New Organization Details' %}</h2>
             </div>
             <div class="card-body">
                 <div class="form-group">
-                    <label class="form-label" for="org_name">Organization Name</label>
+                    <label class="form-label" for="org_name">{% trans 'Organization Name' %}</label>
                     <input
                         type="text"
                         id="org_name"
                         name="org_name"
                         class="form-control"
-                        placeholder="e.g. Acme Corp"
+                        placeholder="{% trans 'e.g. Acme Corp' %}"
                         required
                         autofocus
                     >
-                    <small class="form-text">The name of the organization to create</small>
+                    <small class="form-text">{% trans 'The name of the organization to create' %}</small>
                 </div>
 
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label" for="admin_email">Admin Email</label>
+                    <label class="form-label" for="admin_email">{% trans 'Admin Email' %}</label>
                     <input
                         type="email"
                         id="admin_email"
@@ -43,31 +44,31 @@
                         placeholder="admin@example.com"
                         required
                     >
-                    <small class="form-text">An invitation will be sent to this email address. The user will be set up as the organization administrator.</small>
+                    <small class="form-text">{% trans 'An invitation will be sent to this email address. The user will be set up as the organization administrator.' %}</small>
                 </div>
             </div>
         </div>
 
         <div style="display: flex; gap: 1rem;">
-            <button type="submit" class="btn btn-primary">Create Organization & Send Invitation</button>
-            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">{% trans 'Create Organization & Send Invitation' %}</button>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">{% trans 'Cancel' %}</a>
         </div>
     </form>
 
     {% if recent_orgs %}
     <div class="card" style="margin-top: 2rem;">
         <div class="card-header">
-            <h2 class="card-title">Recent Organizations</h2>
+            <h2 class="card-title">{% trans 'Recent Organizations' %}</h2>
         </div>
         <div class="card-body">
             <div class="table-container">
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Active</th>
-                            <th>Created</th>
+                            <th>{% trans 'Name' %}</th>
+                            <th>{% trans 'Email' %}</th>
+                            <th>{% trans 'Active' context 'organization status' %}</th>
+                            <th>{% trans 'Created' %}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -77,9 +78,9 @@
                             <td>{{ org.email }}</td>
                             <td>
                                 {% if org.is_active %}
-                                <span class="badge badge-success">Active</span>
+                                <span class="badge badge-success">{% trans 'Active' context 'organization status' %}</span>
                                 {% else %}
-                                <span class="badge badge-danger">Inactive</span>
+                                <span class="badge badge-danger">{% trans 'Inactive' context 'organization status' %}</span>
                                 {% endif %}
                             </td>
                             <td>{{ org.created_at|date:"Y-m-d H:i" }}</td>

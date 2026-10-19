@@ -12,6 +12,7 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.utils.translation import gettext as _
 from django_ratelimit.decorators import ratelimit
 from .models import Subscription, OneTimeLoginToken
 from .fulfilment import _period, _ts, fulfil_checkout
@@ -79,10 +80,10 @@ def create_checkout_session(request):
     except ValueError:
         if plan_type in ('saas', 'enterprise', 'single'):
             logger.error('Checkout for plan %r failed: its Stripe price setting is empty', plan_type)
-        return JsonResponse({'error': 'Unknown plan'}, status=400)
+        return JsonResponse({'error': _('Unknown plan')}, status=400)
     except Exception:
         logger.exception('Error creating checkout session')
-        return JsonResponse({'error': 'Could not create checkout session. Please try again.'}, status=400)
+        return JsonResponse({'error': _('Could not create checkout session. Please try again.')}, status=400)
     return JsonResponse({'session_id': session.id, 'url': session.url})
 
 
@@ -94,12 +95,12 @@ def start_checkout(request):
     profile = getattr(request.user, 'profile', None)
     if (not organization or profile is None or profile.organization_id != organization.pk
             or not request.user.has_perm('accounts.can_manage_organization')):
-        messages.error(request, 'Only organization administrators can manage billing.')
+        messages.error(request, _('Only organization administrators can manage billing.'))
         return redirect('settings')
 
     plan_type = request.POST.get('plan_type')
     if plan_type != 'single' and Subscription.objects.filter(organization=organization).exists():
-        messages.error(request, 'This organization already has a subscription.')
+        messages.error(request, _('This organization already has a subscription.'))
         return redirect('settings')
 
     base_url = _base_url(request)
@@ -110,7 +111,7 @@ def start_checkout(request):
         )
     except Exception:
         logger.exception('Error starting in-app checkout')
-        messages.error(request, 'Could not start checkout. Please try again.')
+        messages.error(request, _('Could not start checkout. Please try again.'))
         return redirect('settings')
     return redirect(session.url)
 
@@ -247,14 +248,14 @@ def checkout_success(request):
         fulfilment = fulfil_checkout(session)
     except Exception:
         logger.exception("[CHECKOUT SUCCESS] Fulfilment failed for %s", session_id)
-        messages.info(request, "Payment received. We're finishing your setup; "
-                               "you'll get an email shortly.")
+        messages.info(request, _("Payment received. We're finishing your setup; "
+                                 "you'll get an email shortly."))
         return redirect('login')
 
     if fulfilment is None:
         if session.get('status') == 'complete' and session.get('payment_status') == 'unpaid':
-            messages.info(request, "Your payment is being processed. You'll get an email "
-                                   "as soon as it arrives and your account is ready.")
+            messages.info(request, _("Your payment is being processed. You'll get an email "
+                                     "as soon as it arrives and your account is ready."))
         return redirect('login')
 
     signed_in = request.user.is_authenticated
@@ -268,16 +269,16 @@ def checkout_success(request):
             return redirect('subscriptions:auto_login', token=token.token)
 
     if fulfilment.outcome == 'fulfilled':
-        messages.success(request, 'Payment received. Your purchase has been added to your account.')
+        messages.success(request, _('Payment received. Your purchase has been added to your account.'))
         return redirect('admin_dashboard' if signed_in else 'login')
 
     if fulfilment.outcome == 'rejected_existing_account':
-        messages.error(request, 'This email address already has an account. The new subscription '
-                                'was cancelled and nothing was charged. Sign in and choose a plan '
-                                'under Settings.')
+        messages.error(request, _('This email address already has an account. The new subscription '
+                                  'was cancelled and nothing was charged. Sign in and choose a plan '
+                                  'under Settings.'))
     else:
-        messages.error(request, 'This organization already has a subscription. The new one was '
-                                'cancelled and nothing was charged.')
+        messages.error(request, _('This organization already has a subscription. The new one was '
+                                  'cancelled and nothing was charged.'))
     return redirect('settings' if signed_in else 'login')
 
 

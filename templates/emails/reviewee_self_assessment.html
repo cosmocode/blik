@@ -1,3 +1,4 @@
+{% load i18n %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,25 +15,25 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 style="margin: 0; font-size: 1.75rem;">360° Feedback Cycle Started</h1>
+            <h1 style="margin: 0; font-size: 1.75rem;">{% trans '360° Feedback Cycle Started' %}</h1>
         </div>
         <div class="content">
-            <p>Hi <strong>{{ reviewee.name }}</strong>,</p>
+            <p>{% blocktrans trimmed with name=reviewee.name %}Hi <strong>{{ name }}</strong>,{% endblocktrans %}</p>
 
-            <p>A new 360-degree feedback cycle has been created for you!</p>
+            <p>{% trans 'A new 360-degree feedback cycle has been created for you!' %}</p>
 
-            <p>Please complete your <strong>self-assessment</strong> by clicking the button below:</p>
+            <p>{% trans 'Please complete your <strong>self-assessment</strong> by clicking the button below:' %}</p>
 
             <div style="text-align: center;">
-                <a href="{{ self_assessment_url }}" class="button">Complete Self-Assessment</a>
+                <a href="{{ self_assessment_url }}" class="button">{% trans 'Complete Self-Assessment' %}</a>
             </div>
 
-            <p>This is your opportunity to reflect on your own performance before receiving feedback from others.</p>
+            <p>{% trans 'This is your opportunity to reflect on your own performance before receiving feedback from others.' %}</p>
 
-            <p><strong>Questionnaire:</strong> {{ cycle.questionnaire.name }}</p>
+            <p><strong>{% trans 'Questionnaire:' %}</strong> {{ cycle.questionnaire.name }}</p>
         </div>
         <div class="footer">
-            <p>This is an automated email from your feedback system.</p>
+            <p>{% trans 'This is an automated email from your feedback system.' %}</p>
         </div>
     </div>
 </body>

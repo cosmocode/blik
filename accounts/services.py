@@ -2,6 +2,7 @@
 import json
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from core.models import Organization
 from accounts.models import UserProfile, Reviewee
 from reviews.models import ReviewCycle, ReviewerToken, Response
@@ -139,7 +140,7 @@ def delete_user_account(user):
         admin_count = sum(1 for p in admin_profiles if p.user.has_perm('accounts.can_manage_organization'))
 
         if admin_count == 1 and user.has_perm('accounts.can_manage_organization'):
-            raise ValueError("Cannot delete the last admin user. Delete the organization instead.")
+            raise ValueError(_('Cannot delete the last admin user. Delete the organization instead.'))
 
     # Delete user (cascades to profile, tokens, etc.)
     user.delete()
@@ -198,11 +199,11 @@ def create_user_with_email_as_username(email, password=None, **extra_fields):
         ValueError: If email is not provided or user already exists
     """
     if not email:
-        raise ValueError("Email is required")
+        raise ValueError(_('Email is required'))
 
     # Check if user with this email already exists
     if User.objects.filter(email=email).exists():
-        raise ValueError(f"User with email {email} already exists")
+        raise ValueError(_('User with email %(email)s already exists') % {'email': email})
 
     # Use email as username
     username = email
@@ -213,7 +214,7 @@ def create_user_with_email_as_username(email, password=None, **extra_fields):
         import secrets
         import string
         alphabet = string.ascii_letters + string.digits
-        password = ''.join(secrets.choice(alphabet) for _ in range(16))
+        password = ''.join(secrets.choice(alphabet) for i in range(16))
         generated_password = password  # Store for return value
 
     # Create user

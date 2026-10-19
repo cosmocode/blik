@@ -1,3 +1,4 @@
+{% load i18n %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,7 +13,7 @@
                     <!-- Header -->
                     <tr>
                         <td style="background-color: #f59e0b; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 40px; text-align: center; border-radius: 8px 8px 0 0;">
-                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700;">Reminder: Feedback Request</h1>
+                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700;">{% trans 'Reminder: Feedback Request' %}</h1>
                         </td>
                     </tr>
 
@@ -20,15 +21,15 @@
                     <tr>
                         <td style="padding: 40px;">
                             <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #374151;">
-                                Hello,
+                                {% trans 'Hello,' %}
                             </p>
 
                             <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #374151;">
-                                This is a friendly reminder that you have a pending <strong>{{ category }}</strong> feedback request for <strong>{{ reviewee_name }}</strong>.
+                                {% blocktrans trimmed %}This is a friendly reminder that you have a pending <strong>{{ category }}</strong> feedback request for <strong>{{ reviewee_name }}</strong>.{% endblocktrans %}
                             </p>
 
                             <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #374151;">
-                                Your feedback is important and will help {{ reviewee_name }} grow professionally. If you've already started, you can continue where you left off.
+                                {% blocktrans trimmed %}Your feedback is important and will help {{ reviewee_name }} grow professionally. If you've already started, you can continue where you left off.{% endblocktrans %}
                             </p>
 
                             <!-- CTA Button -->
@@ -36,22 +37,22 @@
                                 <tr>
                                     <td align="center" style="padding: 20px 0;">
                                         <a href="{{ feedback_url }}" style="display: inline-block; background-color: #f59e0b; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">
-                                            Continue Your Review
+                                            {% trans 'Continue Your Review' %}
                                         </a>
                                     </td>
                                 </tr>
                             </table>
 
                             <p style="margin: 30px 0 0; font-size: 14px; line-height: 1.6; color: #6b7280;">
-                                <strong>Questionnaire:</strong> {{ questionnaire_name }}
+                                <strong>{% trans 'Questionnaire:' %}</strong> {{ questionnaire_name }}
                             </p>
 
                             <p style="margin: 20px 0 0; font-size: 14px; line-height: 1.6; color: #6b7280;">
-                                Your progress is saved automatically, so you can complete the review at your convenience.
+                                {% trans 'Your progress is saved automatically, so you can complete the review at your convenience.' %}
                             </p>
 
                             <p style="margin: 30px 0 0; font-size: 14px; line-height: 1.6; color: #6b7280;">
-                                Thank you for your time.
+                                {% trans 'Thank you for your time.' %}
                             </p>
                         </td>
                     </tr>
@@ -60,7 +61,7 @@
                     <tr>
                         <td style="background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 8px 8px; border-top: 1px solid #e5e7eb;">
                             <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                                This is an automated reminder from the Blik 360 Feedback System.
+                                {% trans 'This is an automated reminder from the Blik 360 Feedback System.' %}
                             </p>
                         </td>
                     </tr>

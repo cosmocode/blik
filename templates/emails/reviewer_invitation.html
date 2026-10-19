@@ -1,3 +1,4 @@
+{% load i18n %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,7 +13,7 @@
                     <!-- Header -->
                     <tr>
                         <td style="background-color: #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; text-align: center; border-radius: 8px 8px 0 0;">
-                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700;">360 Feedback Request</h1>
+                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700;">{% trans '360 Feedback Request' %}</h1>
                         </td>
                     </tr>
 
@@ -20,15 +21,15 @@
                     <tr>
                         <td style="padding: 40px;">
                             <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #374151;">
-                                Hello,
+                                {% trans 'Hello,' %}
                             </p>
 
                             <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #374151;">
-                                You have been invited to provide <strong>{{ category }}</strong> feedback for <strong>{{ reviewee_name }}</strong>.
+                                {% blocktrans trimmed %}You have been invited to provide <strong>{{ category }}</strong> feedback for <strong>{{ reviewee_name }}</strong>.{% endblocktrans %}
                             </p>
 
                             <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #374151;">
-                                Your feedback is anonymous and will help {{ reviewee_name }} grow professionally.
+                                {% blocktrans trimmed %}Your feedback is anonymous and will help {{ reviewee_name }} grow professionally.{% endblocktrans %}
                             </p>
 
                             <!-- CTA Button -->
@@ -36,22 +37,22 @@
                                 <tr>
                                     <td align="center" style="padding: 20px 0;">
                                         <a href="{{ feedback_url }}" style="display: inline-block; background-color: #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">
-                                            Start Your Review
+                                            {% trans 'Start Your Review' %}
                                         </a>
                                     </td>
                                 </tr>
                             </table>
 
                             <p style="margin: 30px 0 0; font-size: 14px; line-height: 1.6; color: #6b7280;">
-                                <strong>Questionnaire:</strong> {{ questionnaire_name }}
+                                <strong>{% trans 'Questionnaire:' %}</strong> {{ questionnaire_name }}
                             </p>
 
                             <p style="margin: 20px 0 0; font-size: 14px; line-height: 1.6; color: #6b7280;">
-                                You can save your progress and return to complete it later - just bookmark the link above.
+                                {% trans 'You can save your progress and return to complete it later - just bookmark the link above.' %}
                             </p>
 
                             <p style="margin: 30px 0 0; font-size: 14px; line-height: 1.6; color: #6b7280;">
-                                Thank you for your participation.
+                                {% trans 'Thank you for your participation.' %}
                             </p>
                         </td>
                     </tr>
@@ -60,7 +61,7 @@
                     <tr>
                         <td style="background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 8px 8px; border-top: 1px solid #e5e7eb;">
                             <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                                This is an automated message from the Blik 360 Feedback System.
+                                {% trans 'This is an automated message from the Blik 360 Feedback System.' %}
                             </p>
                         </td>
                     </tr>

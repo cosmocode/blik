@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Sum
+from django.utils.translation import gettext as _
 
 from accounts.models import Reviewee, UserProfile
 from .models import RoundPurchase, Subscription
@@ -13,8 +14,9 @@ class NoCycleCredits(Exception):
         self.needed = needed
         self.available = available
         super().__init__(
-            f"This needs {needed} review-cycle credit(s) and you have {available}. "
-            "Buy another round or start a subscription under Settings."
+            _('This needs %(needed)s review-cycle credit(s) and you have %(available)s. '
+              'Buy another round or start a subscription under Settings.')
+            % {'needed': needed, 'available': available}
         )
 
 
@@ -90,14 +92,15 @@ def check_employee_limit(organization):
         return True, None  # single-tenant mode
     mode = entitlement(organization)
     if mode == 'lapsed':
-        return False, "Your subscription is not active. Please update your payment information."
+        return False, _('Your subscription is not active. Please update your payment information.')
     if mode == 'subscription':
         max_employees = organization.subscription.plan.max_employees
         active = Reviewee.objects.filter(organization=organization, is_active=True).count()
         if active >= max_employees:
             return False, (
-                f"You've reached your plan limit of {max_employees} reviewees. "
-                "Please upgrade your plan."
+                _("You've reached your plan limit of %(max_employees)s reviewees. "
+                  "Please upgrade your plan.")
+                % {'max_employees': max_employees}
             )
     return True, None
 

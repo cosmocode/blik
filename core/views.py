@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model, login
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
+from django.utils.translation import gettext as _
 from .models import Organization
 from .forms import SetupAdminForm, SetupOrganizationForm, SetupEmailForm
 from accounts.services import create_user_with_email_as_username
@@ -39,12 +40,12 @@ def setup_admin(request):
         if form.is_valid():
             # Create regular user (organization admin via permissions)
             try:
-                user, _ = create_user_with_email_as_username(
+                user, generated_password = create_user_with_email_as_username(
                     email=form.cleaned_data['email'],
                     password=form.cleaned_data['password']
                 )
             except ValueError as e:
-                messages.error(request, f'Failed to create user: {e}')
+                messages.error(request, _('Failed to create user: %(error)s') % {'error': e})
                 return render(request, 'setup/admin.html', {
                     'form': form,
                     'step': 1,
@@ -53,7 +54,7 @@ def setup_admin(request):
                 })
             # Log the user in with explicit backend
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            messages.success(request, f'Admin account "{user.email}" created successfully!')
+            messages.success(request, _('Admin account "%(email)s" created successfully!') % {'email': user.email})
             return redirect('setup_organization')
     else:
         form = SetupAdminForm()
@@ -114,7 +115,7 @@ def setup_organization(request):
                     logger = logging.getLogger(__name__)
                     logger.warning(f"Could not assign permissions during setup: {e}")
 
-            messages.success(request, f'Organization "{organization.name}" configured successfully!')
+            messages.success(request, _('Organization "%(name)s" configured successfully!') % {'name': organization.name})
             return redirect('setup_email')
     else:
         # Pre-fill form with existing organization data if available
@@ -137,7 +138,7 @@ def setup_email(request):
     """Step 3: Configure email settings."""
     organization = request.organization
     if not organization:
-        messages.error(request, 'No organization found. Please complete organization setup first.')
+        messages.error(request, _('No organization found. Please complete organization setup first.'))
         return redirect('setup_organization')
 
     # Managed email is offered to every hosted customer: subscribers and
@@ -153,7 +154,7 @@ def setup_email(request):
 
         if use_blik_mailer and is_hosted:
             # Use default Blik email settings (already configured in Django settings)
-            messages.success(request, 'Using Blik\'s managed email service. All set!')
+            messages.success(request, _("Using Blik's managed email service. All set!"))
             return redirect('setup_complete')
 
         if form.is_valid():
@@ -166,9 +167,9 @@ def setup_email(request):
                 organization.smtp_use_tls = form.cleaned_data.get('smtp_use_tls', True)
                 organization.from_email = form.cleaned_data['from_email']
                 organization.save()
-                messages.success(request, 'Email settings configured successfully!')
+                messages.success(request, _('Email settings configured successfully!'))
             else:
-                messages.info(request, 'Email setup skipped. You can configure it later in the admin panel.')
+                messages.info(request, _('Email setup skipped. You can configure it later in the admin panel.'))
 
             return redirect('setup_complete')
     else:
@@ -201,7 +202,7 @@ def setup_complete(request):
     # Use the organization from the user's profile
     organization = request.organization
     if not organization:
-        messages.error(request, 'No organization found. Please run setup first.')
+        messages.error(request, _('No organization found. Please run setup first.'))
         return redirect('setup_welcome')
 
     # Load default questionnaire on first visit
@@ -212,9 +213,9 @@ def setup_complete(request):
         try:
             call_command('loaddata', 'professional_skills_questionnaire')
             call_command('loaddata', 'software_engineering_questionnaire')
-            messages.success(request, 'Default questionnaires loaded successfully!')
+            messages.success(request, _('Default questionnaires loaded successfully!'))
         except Exception as e:
-            messages.warning(request, f'Could not load default questionnaires: {e}')
+            messages.warning(request, _('Could not load default questionnaires: %(error)s') % {'error': e})
 
     # Handle test data generation
     if request.method == 'POST' and request.POST.get('generate_test_data'):
@@ -231,9 +232,9 @@ def setup_complete(request):
             )
 
             # Show success message
-            messages.success(request, 'Demo data generated successfully! Created 15 reviewees with diverse review cycles in various states. Check the dashboard to explore.')
+            messages.success(request, _('Demo data generated successfully! Created 15 reviewees with diverse review cycles in various states. Check the dashboard to explore.'))
         except Exception as e:
-            messages.error(request, f'Failed to generate demo data: {e}')
+            messages.error(request, _('Failed to generate demo data: %(error)s') % {'error': e})
 
         return redirect('admin_dashboard')
 

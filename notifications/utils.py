@@ -1,6 +1,7 @@
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.utils.translation import gettext as _
 from reviews.models import ReviewerToken
 
 
@@ -16,7 +17,7 @@ def send_feedback_invitation(token, reviewer_email=None):
         'token': token,
     }
 
-    subject = f"360 Feedback Request for {token.cycle.reviewee.name}"
+    subject = _('360 Feedback Request for %(name)s') % {'name': token.cycle.reviewee.name}
 
     # Render text email
     message = render_to_string('notifications/feedback_invitation.txt', context)

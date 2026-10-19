@@ -3,6 +3,7 @@ from collections import defaultdict
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from core.email import send_email
 from .models import Report
 from reviews.models import CATEGORY_ORDER, Response, ReviewCycle
@@ -839,7 +840,7 @@ def send_report_ready_notification(report, request=None):
         text_message = render_to_string('emails/report_ready.txt', context)
 
         send_email(
-            subject=f'Your 360 Feedback Report is Ready!',
+            subject=_('Your 360 Feedback Report is Ready!'),
             message=text_message,
             recipient_list=[reviewee.email],
             html_message=html_message,
