@@ -4,9 +4,9 @@ Update the translation catalogues.
 Usage:
     python manage.py update_translations
 
-makemessages with the project's defaults: every language in LANGUAGES except the source
-language, no locations and no line wrapping, so a run only changes a catalogue where its
-messages changed. All makemessages options still apply.
+makemessages with the project's defaults: the django and djangojs domains unless --domain names
+one, every language in LANGUAGES except the source language, no locations and no line wrapping,
+so a run only changes a catalogue where its messages changed. All makemessages options still apply.
 """
 
 from django.conf import settings
@@ -24,13 +24,29 @@ IGNORE_PATTERNS = [
 class Command(MakeMessagesCommand):
     help = 'Update the translation catalogues without locations and line wrapping'
 
-    def handle(self, *args, **options):
-        source_language = settings.LANGUAGE_CODE
-        translated = [to_locale(code) for code, name in settings.LANGUAGES if code != source_language]
+    def add_arguments(self, parser):
+        super().add_arguments(parser)
+        # Without --domain, every domain is updated.
+        parser.set_defaults(domain=None)
 
-        options['locale'] = options['locale'] or translated
-        options['ignore_patterns'] = [*options['ignore_patterns'], *IGNORE_PATTERNS]
+    def handle(self, *args, domain, locale, ignore_patterns, **options):
+        options['locale'] = self.get_locale(locale)
+        options['ignore_patterns'] = [*ignore_patterns, *IGNORE_PATTERNS]
         options['no_location'] = True
         options['no_wrap'] = True
 
-        return super().handle(*args, **options)
+        domains = [domain] if domain else ['django', 'djangojs']
+
+        for domain in domains:
+            super().handle(*args, domain=domain, **options)
+
+    @staticmethod
+    def get_locale(locale):
+        """Returns the given locale or all locales except the source locale."""
+
+        if locale:
+            return locale
+
+        source_language = settings.LANGUAGE_CODE
+
+        return [to_locale(code) for code, name in settings.LANGUAGES if code != source_language]
