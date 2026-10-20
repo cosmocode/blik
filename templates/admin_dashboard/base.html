@@ -73,6 +73,10 @@
                         <button type="submit" class="nav-logout-btn">{% trans 'Logout' %}</button>
                     </form>
                 </li>
+                <li>
+                    {% url 'set_language' as language_url %}
+                    {% include 'components/language_switcher.html' with action=language_url %}
+                </li>
                 <li><button id="theme-toggle" class="theme-toggle-btn" aria-label="{% trans 'Toggle theme' %}">
                     <svg id="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="5"></circle>

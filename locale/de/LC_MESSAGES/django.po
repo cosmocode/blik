@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-20 15:23+0000\n"
+"POT-Creation-Date: 2026-10-20 15:33+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -119,6 +119,9 @@ msgstr "Nachname"
 
 msgid "Email address"
 msgstr "E-Mail-Adresse"
+
+msgid "Browser language"
+msgstr "Sprache des Browsers"
 
 msgid "This email address is already in use."
 msgstr "Diese E-Mail-Adresse wird bereits verwendet."
@@ -396,6 +399,12 @@ msgstr "Ob die Person den Willkommensdialog bereits gesehen hat"
 msgid "has seen welcome"
 msgstr "hat Willkommensdialog gesehen"
 
+msgid "Language of the dashboard and of emails to this user. Empty: the browser language."
+msgstr "Sprache des Dashboards und der E-Mails an diese Person. Leer: die Sprache des Browsers."
+
+msgid "language"
+msgstr "Sprache"
+
 msgid "user profile"
 msgstr "Benutzerprofil"
 
@@ -451,6 +460,9 @@ msgstr "Name"
 
 msgid "department"
 msgstr "Abteilung"
+
+msgid "Language of emails to this person. Empty: the organization's default language."
+msgstr "Sprache der E-Mails an diese Person. Leer: die Standardsprache der Organisation."
 
 msgid "active"
 msgstr "aktiv"
@@ -1048,10 +1060,6 @@ msgstr "Erinnerung nicht möglich: Die Einladung wurde noch nicht gesendet."
 msgid "This reviewer has already completed their feedback."
 msgstr "Diese beurteilende Person hat ihr Feedback bereits abgegeben."
 
-#, python-format
-msgid "Reminder: Feedback Request for %(name)s"
-msgstr "Erinnerung: Feedbackanfrage für %(name)s"
-
 msgid "Reminder sent to reviewer."
 msgstr "Erinnerung an die beurteilende Person gesendet."
 
@@ -1435,6 +1443,12 @@ msgstr "Neue Benutzer:innen dürfen standardmäßig Feedbackrunden für andere a
 
 msgid "new users can create cycles for others"
 msgstr "neue Benutzer:innen dürfen Feedbackrunden für andere anlegen"
+
+msgid "Language of emails and feedback forms, unless a person has their own"
+msgstr "Sprache der E-Mails und Feedbackformulare, sofern eine Person keine eigene hat"
+
+msgid "default language"
+msgstr "Standardsprache"
 
 msgid "organizations"
 msgstr "Organisationen"
@@ -1929,6 +1943,9 @@ msgstr "übernommen am"
 msgid "completed at"
 msgstr "abgeschlossen am"
 
+msgid "Language of the form and of emails to this reviewer. Empty until the form is first opened."
+msgstr "Sprache des Formulars und der E-Mails an diese beurteilende Person. Leer, bis das Formular zum ersten Mal geöffnet wird."
+
 msgid "reviewer token"
 msgstr "Token für Beurteilende"
 
@@ -2322,6 +2339,12 @@ msgstr "Vorname"
 
 msgid "Last Name"
 msgstr "Nachname"
+
+msgid "Language"
+msgstr "Sprache"
+
+msgid "Used for the dashboard and for emails to you."
+msgstr "Gilt für das Dashboard und für E-Mails an Sie."
 
 msgid "Username"
 msgstr "Benutzername"
@@ -2843,6 +2866,13 @@ msgstr "Unterstellte"
 
 msgid "People who report to this reviewee"
 msgstr "Personen, die der beurteilten Person unterstellt sind"
+
+#, python-format
+msgid "Organization default (%(language)s)"
+msgstr "Standard der Organisation (%(language)s)"
+
+msgid "Language of the invitations and reminders to the reviewers above, and of their form"
+msgstr "Sprache der Einladungen und Erinnerungen an die oben eingetragenen Beurteilenden und ihres Formulars"
 
 msgid "Save & Send Invitations"
 msgstr "Speichern & Einladungen senden"
@@ -4200,6 +4230,9 @@ msgstr "Abteilung (optional)"
 msgid "Engineering, Marketing, etc."
 msgstr "Entwicklung, Marketing usw."
 
+msgid "Language of the emails to this person and of their self-assessment."
+msgstr "Sprache der E-Mails an diese Person und ihrer Selbsteinschätzung."
+
 msgid "Update Reviewee"
 msgstr "Beurteilte:n aktualisieren"
 
@@ -4311,6 +4344,12 @@ msgstr "Wird über <code>%(env_var)s</code> in der Umgebung festgelegt"
 
 msgid "Contact Email"
 msgstr "Kontakt-E-Mail"
+
+msgid "Default Language"
+msgstr "Standardsprache"
+
+msgid "Emails and feedback forms use this language unless a person has their own."
+msgstr "E-Mails und Feedbackformulare verwenden diese Sprache, sofern eine Person keine eigene hat."
 
 msgid "Report Settings"
 msgstr "Berichtseinstellungen"
@@ -4766,6 +4805,9 @@ msgstr "E-Mail-Adresse"
 
 msgid "The user will receive an email with instructions to join"
 msgstr "Die eingeladene Person erhält eine E-Mail mit einer Anleitung zum Beitritt"
+
+msgid "Language of the invitation email"
+msgstr "Sprache der Einladungs-E-Mail"
 
 #, python-format
 msgid "Active Users (%(count)s)"

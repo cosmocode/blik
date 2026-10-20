@@ -97,6 +97,7 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
     'core.middleware.SetupMiddleware',
     'core.middleware.OrganizationMiddleware',
+    'core.middleware.LanguageMiddleware',
 ]
 
 ROOT_URLCONF = 'blik.urls'
@@ -186,7 +187,7 @@ USE_TZ = True
 
 LANGUAGES = [
     ('en', 'English'),
-    ('de', 'Deutsch'),
+    ('de', 'Deutsch (Sie)'),
     ('de-informal', 'Deutsch (Du)'),
 ]
 

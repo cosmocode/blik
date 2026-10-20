@@ -1,0 +1,10 @@
+{% load i18n %}{% get_current_language as current_language %}
+<form method="post" action="{{ action }}" class="language-switcher{% if corner %} language-switcher--corner{% endif %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <select name="language" aria-label="{% trans 'Language' %}" onchange="this.form.submit()">
+        {% for code, name in LANGUAGES %}
+        <option value="{{ code }}"{% if code == current_language %} selected{% endif %}>{{ name }}</option>
+        {% endfor %}
+    </select>
+</form>

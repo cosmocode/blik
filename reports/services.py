@@ -3,7 +3,9 @@ from collections import defaultdict
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.urls import reverse
+from django.utils import translation
 from django.utils.translation import gettext as _
+from core.languages import recipient_language
 from core.email import send_email
 from .models import Report
 from reviews.models import CATEGORY_ORDER, Response, ReviewCycle
@@ -829,22 +831,23 @@ def send_report_ready_notification(report, request=None):
     response_count = summary.get('total_responses', 0)
 
     try:
-        context = {
-            'reviewee': reviewee,
-            'cycle': cycle,
-            'report_url': report_url,
-            'response_count': response_count,
-        }
+        with translation.override(recipient_language(reviewee.language, organization=reviewee.organization)):
+            context = {
+                'reviewee': reviewee,
+                'cycle': cycle,
+                'report_url': report_url,
+                'response_count': response_count,
+            }
 
-        html_message = render_to_string('emails/report_ready.html', context)
-        text_message = render_to_string('emails/report_ready.txt', context)
+            html_message = render_to_string('emails/report_ready.html', context)
+            text_message = render_to_string('emails/report_ready.txt', context)
 
-        send_email(
-            subject=_('Your 360 Feedback Report is Ready!'),
-            message=text_message,
-            recipient_list=[reviewee.email],
-            html_message=html_message,
-        )
+            send_email(
+                subject=_('Your 360 Feedback Report is Ready!'),
+                message=text_message,
+                recipient_list=[reviewee.email],
+                html_message=html_message,
+            )
 
         stats['sent'] += 1
 

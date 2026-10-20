@@ -160,6 +160,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
 
                         <div class="mb-3">
+                            <label for="{{ form.language.id_for_label }}" class="form-label">{% trans 'Language' %}</label>
+                            {{ form.language }}
+                            <small class="text-muted">{% trans 'Used for the dashboard and for emails to you.' %}</small>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label">{% trans 'Username' %}</label>
                             <input type="text" class="form-control" value="{{ user.username }}" disabled>
                             <small class="text-muted">{% trans 'Username cannot be changed' %}</small>

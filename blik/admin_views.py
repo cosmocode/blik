@@ -9,7 +9,6 @@ from datetime import date
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.core.mail import EmailMultiAlternatives
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.validators import validate_email
 from django.db import transaction
@@ -38,6 +37,7 @@ from accounts.permissions import (
 )
 from api.models import APIToken, WebhookEndpoint
 from core.env_config import env_managed_fields
+from core.languages import default_language, is_language, language_name
 from core.gdpr import GDPRDeletionService
 from core.models import Organization
 from productreviews.models import ProductReview
@@ -215,6 +215,7 @@ def team_list(request):
         'invitations': invitations,
         'subscription_status': subscription_status,
         'per_page': per_page,
+        'default_language_name': language_name(default_language(org)),
     }
 
     return render(request, 'admin_dashboard/team.html', context)
@@ -389,6 +390,7 @@ def reviewee_create(request):
         name = request.POST.get('name')
         email = request.POST.get('email')
         department = request.POST.get('department', '')
+        language = request.POST.get('language', '')
 
         if name and email:
             organization = request.organization or Organization.objects.first()
@@ -413,7 +415,8 @@ def reviewee_create(request):
                     organization=organization,
                     name=name,
                     email=email,
-                    department=department
+                    department=department,
+                    language=language if is_language(language) else '',
                 )
                 messages.success(request, _('Reviewee "%(name)s" created successfully.') % {'name': reviewee.name})
                 return redirect('reviewee_list')
@@ -422,7 +425,10 @@ def reviewee_create(request):
         else:
             messages.error(request, _('Name and email are required.'))
 
-    return render(request, 'admin_dashboard/reviewee_form.html', {'action': 'Create'})
+    return render(request, 'admin_dashboard/reviewee_form.html', {
+        'action': 'Create',
+        'default_language_name': language_name(default_language(request.organization)),
+    })
 
 
 @login_required
@@ -439,6 +445,8 @@ def reviewee_edit(request, reviewee_id):
         reviewee.name = request.POST.get('name', reviewee.name)
         reviewee.email = request.POST.get('email', reviewee.email)
         reviewee.department = request.POST.get('department', '')
+        language = request.POST.get('language', '')
+        reviewee.language = language if is_language(language) else ''
 
         try:
             reviewee.save()
@@ -450,6 +458,7 @@ def reviewee_edit(request, reviewee_id):
     context = {
         'reviewee': reviewee,
         'action': 'Edit',
+        'default_language_name': language_name(reviewee.organization.default_language),
     }
 
     return render(request, 'admin_dashboard/reviewee_form.html', context)
@@ -1811,6 +1820,7 @@ def manage_invitations(request, cycle_uuid):
         'sent_tokens': sent_tokens,
         'unsent_tokens': assigned_tokens - sent_tokens,
         'completed_tokens': completed_tokens,
+        'default_language_name': language_name(cycle.organization.default_language),
     }
 
     return render(request, 'admin_dashboard/manage_invitations.html', context)
@@ -1871,7 +1881,8 @@ def assign_invitations(request, cycle_uuid):
                     tokens_created += 1
 
         # Assign tokens to emails with randomization
-        stats = assign_tokens_to_emails(cycle, email_assignments)
+        language = request.POST.get('language', '')
+        stats = assign_tokens_to_emails(cycle, email_assignments, language=language if is_language(language) else '')
 
         if stats['errors']:
             for error in stats['errors']:
@@ -1968,38 +1979,13 @@ def send_individual_reminder(request, cycle_uuid, token_id):
             messages.info(request, _('This reviewer has already completed their feedback.'))
             return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
 
-        # Build feedback URL
-        feedback_url = f'{settings.SITE_URL}/feedback/{token.token}/'
+        # The shared reminder picks the reviewer's language and the organization's mail server
+        stats = send_reminder_emails(cycle, token_ids=[token.id])
 
-        # Render email
-        context = {
-            'reviewee_name': cycle.reviewee.name,
-            'questionnaire_name': cycle.questionnaire.name,
-            'feedback_url': feedback_url,
-            'category': token.get_category_display(),
-        }
-
-        html_content = render_to_string('emails/reviewer_reminder.html', context)
-        text_content = render_to_string('emails/reviewer_reminder.txt', context)
-
-        # Send email
-        from_email = settings.DEFAULT_FROM_EMAIL
-        subject = _('Reminder: Feedback Request for %(name)s') % {'name': cycle.reviewee.name}
-
-        email = EmailMultiAlternatives(
-            subject=subject,
-            body=text_content,
-            from_email=from_email,
-            to=[token.reviewer_email]
-        )
-        email.attach_alternative(html_content, "text/html")
-        email.send()
-
-        # Update last reminder sent timestamp
-        token.last_reminder_sent_at = timezone.now()
-        token.save()
-
-        messages.success(request, _('Reminder sent to reviewer.'))
+        if stats['sent']:
+            messages.success(request, _('Reminder sent to reviewer.'))
+        for error in stats['errors']:
+            messages.error(request, error)
 
     except ReviewerToken.DoesNotExist:
         messages.error(request, _('Reviewer token not found.'))
@@ -2136,6 +2122,8 @@ def settings_view(request):
                     organization.name = request.POST.get('name', organization.name)
                 if editable('email'):
                     organization.email = request.POST.get('email', organization.email)
+                if editable('default_language') and is_language(request.POST.get('default_language')):
+                    organization.default_language = request.POST['default_language']
                 organization.save()
                 messages.success(request, _('Organization details updated successfully.'))
 

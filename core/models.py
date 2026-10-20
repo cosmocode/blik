@@ -50,6 +50,15 @@ class Organization(TimeStampedModel):
         verbose_name=_('new users can create cycles for others')
     )
 
+    # Validated against settings.LANGUAGES where it is set, so the language list is never frozen
+    # into a migration.
+    default_language = models.CharField(
+        max_length=20,
+        default=settings.LANGUAGE_CODE,
+        help_text=_('Language of emails and feedback forms, unless a person has their own'),
+        verbose_name=_('default language')
+    )
+
     is_active = models.BooleanField(_('active'), default=True)
 
     class Meta:

@@ -168,6 +168,13 @@ class ReviewerToken(TimeStampedModel):
         verbose_name=_('claimed at')
     )
     completed_at = models.DateTimeField(_('completed at'), null=True, blank=True)
+    language = models.CharField(
+        max_length=20,
+        blank=True,
+        default='',
+        help_text=_('Language of the form and of emails to this reviewer. Empty until the form is first opened.'),
+        verbose_name=_('language')
+    )
 
     objects = ReviewerTokenManager()
 

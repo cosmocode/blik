@@ -383,6 +383,28 @@ body.setup-page {
     background: var(--bg-light);
 }
 
+.language-switcher {
+    margin: 0;
+    padding: 0.5rem 1rem;
+}
+
+.language-switcher select {
+    padding: 0.375rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.language-switcher--corner {
+    position: fixed;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 100;
+    padding: 0;
+}
+
 /* Desktop navbar */
 @media (min-width: 768px) {
     .navbar {

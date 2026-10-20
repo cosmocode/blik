@@ -101,6 +101,8 @@ deriving links from it would send recipients a URL they cannot open. Set
 #### Organization Settings
 ```env
 ORGANIZATION_NAME=Your Company Name
+# Default language of emails and feedback forms: en, de or de-informal
+ORGANIZATION_LANGUAGE=en
 ```
 
 #### Port Configuration (Optional)
