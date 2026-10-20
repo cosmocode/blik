@@ -1,5 +1,7 @@
 import uuid
 from django.db import models
+from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import gettext, gettext_lazy as _
 from core.models import TimeStampedModel
 from core.managers import ReportManager
@@ -75,3 +77,7 @@ class Report(TimeStampedModel):
 
     def __str__(self):
         return gettext('Report for %(cycle)s') % {'cycle': self.cycle}
+
+    @cached_property
+    def access_token_expired(self):
+        return self.access_token_expires is not None and self.access_token_expires < timezone.now()

@@ -97,7 +97,7 @@ def reviewee_report(request, access_token):
         return render(request, 'reports/access_denied.html', status=403)
 
     # Check if access token has expired
-    if report.access_token_expires and report.access_token_expires < timezone.now():
+    if report.access_token_expired:
         return render(request, 'reports/access_denied.html', {
             'error': _('This report link has expired. Please contact your administrator for a new link.')
         }, status=403)
