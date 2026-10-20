@@ -9,9 +9,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.urls import reverse
+from django.utils import translation
 from django.utils.translation import gettext as _
 from accounts.models import OrganizationInvitation
 from accounts.permissions import organization_admin_required
+from core.languages import recipient_language
 from core.email import send_email
 from subscriptions.utils import check_user_limit
 
@@ -70,14 +72,16 @@ def send_invitation(request):
 
         # Send invitation email
         try:
-            context = {'organization': org, 'invite_url': invite_url}
-            send_email(
-                subject=_('Invitation to join %(organization)s on Blik') % {'organization': org.name},
-                message=render_to_string('emails/team_invitation.txt', context),
-                recipient_list=[email],
-                html_message=render_to_string('emails/team_invitation.html', context),
-                from_email=org.from_email if org.from_email else None
-            )
+            # There is no profile yet: the language chosen in the invitation form, else the organization's
+            with translation.override(recipient_language(request.POST.get('language'), organization=org)):
+                context = {'organization': org, 'invite_url': invite_url}
+                send_email(
+                    subject=_('Invitation to join %(organization)s on Blik') % {'organization': org.name},
+                    message=render_to_string('emails/team_invitation.txt', context),
+                    recipient_list=[email],
+                    html_message=render_to_string('emails/team_invitation.html', context),
+                    from_email=org.from_email if org.from_email else None
+                )
             messages.success(request, _('Invitation sent to %(email)s') % {'email': email})
         except Exception as e:
             messages.error(request, _('Failed to send invitation: %(error)s') % {'error': e})

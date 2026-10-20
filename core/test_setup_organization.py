@@ -21,6 +21,7 @@ CONFIG_ENV_VARS = (
     'EMAIL_HOST_USER',
     'EMAIL_HOST_PASSWORD',
     'EMAIL_USE_TLS',
+    'ORGANIZATION_LANGUAGE',
 )
 
 
@@ -76,6 +77,20 @@ class SetupOrganizationCommandTests(TestCase):
             org.smtp_host, 'smtp.acme.example.com',
             'Unset env vars must not touch their fields',
         )
+
+    def test_organization_language_sets_the_default_language(self):
+        self._run(ORGANIZATION_LANGUAGE='de-informal')
+        self.assertEqual(Organization.objects.get(id=1).default_language, 'de-informal')
+
+        self._run(ORGANIZATION_LANGUAGE='de')
+        self.assertEqual(Organization.objects.get(id=1).default_language, 'de')
+
+    def test_unknown_organization_language_keeps_the_current_one(self):
+        self._run(ORGANIZATION_LANGUAGE='de')
+
+        self._run(ORGANIZATION_LANGUAGE='xx')
+
+        self.assertEqual(Organization.objects.get(id=1).default_language, 'de')
 
     def test_invalid_email_port_falls_back_instead_of_crashing(self):
         """A typo in EMAIL_PORT must not take the container down on boot."""

@@ -31,6 +31,13 @@ class UserProfile(TimeStampedModel):
         help_text=_('Whether user has seen the welcome modal'),
         verbose_name=_('has seen welcome')
     )
+    language = models.CharField(
+        max_length=20,
+        blank=True,
+        default='',
+        help_text=_('Language of the dashboard and of emails to this user. Empty: the browser language.'),
+        verbose_name=_('language')
+    )
 
     objects = OrganizationManager()
 
@@ -154,6 +161,13 @@ class Reviewee(TimeStampedModel):
     name = models.CharField(_('name'), max_length=255)
     email = models.EmailField(_('email'))
     department = models.CharField(_('department'), max_length=255, blank=True)
+    language = models.CharField(
+        max_length=20,
+        blank=True,
+        default='',
+        help_text=_("Language of emails to this person. Empty: the organization's default language."),
+        verbose_name=_('language')
+    )
     is_active = models.BooleanField(_('active'), default=True)
 
     objects = OrganizationManager()

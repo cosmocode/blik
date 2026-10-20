@@ -11,4 +11,5 @@ urlpatterns = [
     path('feedback/<uuid:token>/', views.feedback_form, name='feedback_form'),
     path('feedback/<uuid:token>/submit/', views.submit_feedback, name='submit_feedback'),
     path('feedback/<uuid:token>/complete/', views.feedback_complete, name='feedback_complete'),
+    path('feedback/<uuid:token>/language/', views.feedback_language, name='feedback_language'),
 ]

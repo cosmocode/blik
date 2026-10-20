@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -35,6 +36,12 @@ class ProfileEditForm(forms.ModelForm):
         })
     )
 
+    # Stored on the profile, not on the user
+    language = forms.ChoiceField(
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'email']
@@ -47,12 +54,27 @@ class ProfileEditForm(forms.ModelForm):
             self.fields['last_name'].initial = self.instance.last_name
             self.fields['email'].initial = self.instance.email
 
+        self.fields['language'].choices = [('', _('Browser language'))] + list(settings.LANGUAGES)
+        profile = getattr(self.instance, 'profile', None)
+        if profile:
+            self.fields['language'].initial = profile.language
+
     def clean_email(self):
         email = self.cleaned_data.get('email')
         # Check if email is already taken by another user
         if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError(gettext('This email address is already in use.'))
         return email
+
+    def save(self, commit=True):
+        user = super().save(commit)
+        profile = getattr(user, 'profile', None)
+
+        if commit and profile:
+            profile.language = self.cleaned_data['language']
+            profile.save(update_fields=['language'])
+
+        return user
 
 
 class ForgotPasswordForm(forms.Form):

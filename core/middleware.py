@@ -1,10 +1,13 @@
 import logging
 
 logger = logging.getLogger(__name__)
+from django.conf import settings
 from django.shortcuts import redirect
+from django.utils import translation
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
+from .languages import request_language
 from .models import Organization
 
 User = get_user_model()
@@ -89,5 +92,28 @@ class OrganizationMiddleware:
                     request.organization = Organization.objects.first()
             except Exception as e:
                 logger.exception("Error getting organization for user %s", request.user)
+
+        return self.get_response(request)
+
+
+class LanguageMiddleware:
+    """
+    Activate the language for the request: the user's profile, then the language cookie the
+    switcher sets, then the browser, then the organization's default (core/languages.py).
+    Runs after OrganizationMiddleware; the feedback form chooses by its token instead.
+    """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        profile = getattr(request.user, 'profile', None)
+        language = request_language(
+            request,
+            getattr(profile, 'language', ''),
+            request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME),
+            organization=getattr(request, 'organization', None) or getattr(profile, 'organization', None),
+        )
+        translation.activate(language)
+        request.LANGUAGE_CODE = language
 
         return self.get_response(request)

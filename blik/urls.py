@@ -5,7 +5,6 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.i18n import JavaScriptCatalog
 from . import views, admin_views, seo_views, superuser_views
 from productreviews import api_views as review_api
 
@@ -18,7 +17,8 @@ urlpatterns = [
     path('health/', views.health_check, name='health_check'),
     path('sitemap.xml', seo_views.sitemap, name='sitemap'),
     path('robots.txt', seo_views.robots, name='robots'),
-    path('i18n/js/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+    path('i18n/js/', views.JavaScriptCatalog.as_view(), name='javascript-catalog'),
+    path('i18n/setlang/', views.set_language, name='set_language'),
     path('admin/', admin.site.urls),
 
     # Superuser tools

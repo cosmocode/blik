@@ -1,6 +1,9 @@
 import os
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
+
+from core.languages import is_language
 from core.models import Organization
 
 
@@ -23,6 +26,16 @@ class Command(BaseCommand):
                 f'falling back to {DEFAULT_SMTP_PORT}'
             ))
             return DEFAULT_SMTP_PORT
+
+    def language(self, raw, fallback):
+        """Parse ORGANIZATION_LANGUAGE: warn and keep the fallback when it is not in LANGUAGES."""
+        if is_language(raw):
+            return raw
+
+        self.stderr.write(self.style.WARNING(
+            f'ORGANIZATION_LANGUAGE={raw!r} is not in LANGUAGES - keeping {fallback}'
+        ))
+        return fallback
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -55,6 +68,8 @@ class Command(BaseCommand):
             org.smtp_password = os.getenv('EMAIL_HOST_PASSWORD', '')
             org.smtp_use_tls = os.getenv('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 'yes')
             org.from_email = os.getenv('DEFAULT_FROM_EMAIL', org.email)
+            if os.environ.get('ORGANIZATION_LANGUAGE'):
+                org.default_language = self.language(os.environ['ORGANIZATION_LANGUAGE'], settings.LANGUAGE_CODE)
             org.is_active = True
             org.save()
             self.stdout.write(
@@ -99,6 +114,10 @@ class Command(BaseCommand):
                 org.smtp_use_tls = os.environ['EMAIL_USE_TLS'].lower() in ('true', '1', 'yes')
                 updated_fields.append('smtp_use_tls')
 
+            if os.environ.get('ORGANIZATION_LANGUAGE'):
+                org.default_language = self.language(os.environ['ORGANIZATION_LANGUAGE'], org.default_language)
+                updated_fields.append('default_language')
+
             if updated_fields:
                 org.save(update_fields=updated_fields)
                 self.stdout.write(
@@ -117,3 +136,4 @@ class Command(BaseCommand):
         self.stdout.write(f'  SMTP Port: {org.smtp_port}')
         self.stdout.write(f'  SMTP TLS: {org.smtp_use_tls}')
         self.stdout.write(f'  From Email: {org.from_email}')
+        self.stdout.write(f'  Language: {org.default_language}')

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-20 15:23+0000\n"
+"POT-Creation-Date: 2026-10-20 15:33+0000\n"
 "Language: de_Informal\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -118,6 +118,9 @@ msgid "Last name"
 msgstr ""
 
 msgid "Email address"
+msgstr ""
+
+msgid "Browser language"
 msgstr ""
 
 msgid "This email address is already in use."
@@ -396,6 +399,12 @@ msgstr ""
 msgid "has seen welcome"
 msgstr ""
 
+msgid "Language of the dashboard and of emails to this user. Empty: the browser language."
+msgstr ""
+
+msgid "language"
+msgstr ""
+
 msgid "user profile"
 msgstr ""
 
@@ -450,6 +459,9 @@ msgid "name"
 msgstr ""
 
 msgid "department"
+msgstr ""
+
+msgid "Language of emails to this person. Empty: the organization's default language."
 msgstr ""
 
 msgid "active"
@@ -1048,10 +1060,6 @@ msgstr ""
 msgid "This reviewer has already completed their feedback."
 msgstr ""
 
-#, python-format
-msgid "Reminder: Feedback Request for %(name)s"
-msgstr ""
-
 msgid "Reminder sent to reviewer."
 msgstr ""
 
@@ -1434,6 +1442,12 @@ msgid "By default, new users can create cycles for others (not just themselves)"
 msgstr ""
 
 msgid "new users can create cycles for others"
+msgstr ""
+
+msgid "Language of emails and feedback forms, unless a person has their own"
+msgstr ""
+
+msgid "default language"
 msgstr ""
 
 msgid "organizations"
@@ -1929,6 +1943,9 @@ msgstr ""
 msgid "completed at"
 msgstr ""
 
+msgid "Language of the form and of emails to this reviewer. Empty until the form is first opened."
+msgstr ""
+
 msgid "reviewer token"
 msgstr ""
 
@@ -2322,6 +2339,12 @@ msgstr ""
 
 msgid "Last Name"
 msgstr ""
+
+msgid "Language"
+msgstr ""
+
+msgid "Used for the dashboard and for emails to you."
+msgstr "Gilt für das Dashboard und für E-Mails an dich."
 
 msgid "Username"
 msgstr ""
@@ -2842,6 +2865,13 @@ msgid "Direct Reports"
 msgstr ""
 
 msgid "People who report to this reviewee"
+msgstr ""
+
+#, python-format
+msgid "Organization default (%(language)s)"
+msgstr ""
+
+msgid "Language of the invitations and reminders to the reviewers above, and of their form"
 msgstr ""
 
 msgid "Save & Send Invitations"
@@ -4200,6 +4230,9 @@ msgstr ""
 msgid "Engineering, Marketing, etc."
 msgstr ""
 
+msgid "Language of the emails to this person and of their self-assessment."
+msgstr ""
+
 msgid "Update Reviewee"
 msgstr ""
 
@@ -4310,6 +4343,12 @@ msgid "Managed by <code>%(env_var)s</code> in the environment"
 msgstr ""
 
 msgid "Contact Email"
+msgstr ""
+
+msgid "Default Language"
+msgstr ""
+
+msgid "Emails and feedback forms use this language unless a person has their own."
 msgstr ""
 
 msgid "Report Settings"
@@ -4765,6 +4804,9 @@ msgid "Email Address"
 msgstr ""
 
 msgid "The user will receive an email with instructions to join"
+msgstr ""
+
+msgid "Language of the invitation email"
 msgstr ""
 
 #, python-format

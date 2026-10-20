@@ -2,16 +2,39 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
-from django.utils import timezone
+from django.utils import timezone, translation
 from django.db import transaction
 from django.utils.translation import gettext as _
 from django_ratelimit.decorators import ratelimit
+from core.languages import is_language, request_language
 from .models import ReviewerToken, Response, ReviewCycle
 from questionnaires.models import Question
 import secrets
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def activate_token_language(request, reviewer_token):
+    """
+    The reviewer's language: the token's (for the self-assessment, else the reviewee's), else the
+    browser's, else the organization's default. Stored on the token the first time, so reminders
+    go out in the language the form was shown in.
+    """
+    reviewee = reviewer_token.cycle.reviewee
+    language = request_language(
+        request,
+        reviewer_token.language,
+        reviewee.language if reviewer_token.category == 'self' else '',
+        organization=reviewee.organization,
+    )
+
+    if not reviewer_token.language:
+        reviewer_token.language = language
+        reviewer_token.save(update_fields=['language'])
+
+    translation.activate(language)
+    request.LANGUAGE_CODE = language
 
 
 def claim_token(request, invitation_token):
@@ -86,6 +109,7 @@ def claim_token(request, invitation_token):
 def feedback_form(request, token):
     """Token-based feedback form view"""
     reviewer_token = get_object_or_404(ReviewerToken, token=token)
+    activate_token_language(request, reviewer_token)
 
     # Check if already completed
     if reviewer_token.is_completed:
@@ -139,6 +163,7 @@ def feedback_form(request, token):
 def submit_feedback(request, token):
     """Handle feedback form submission"""
     reviewer_token = get_object_or_404(ReviewerToken, token=token)
+    activate_token_language(request, reviewer_token)
 
     # Check if already completed
     if reviewer_token.is_completed:
@@ -297,6 +322,7 @@ def submit_feedback(request, token):
 def feedback_complete(request, token):
     """Confirmation page after feedback submission"""
     reviewer_token = get_object_or_404(ReviewerToken, token=token)
+    activate_token_language(request, reviewer_token)
 
     if not reviewer_token.is_completed:
         return redirect('feedback_form', token=token)
@@ -305,3 +331,16 @@ def feedback_complete(request, token):
         'token': reviewer_token,
         'cycle': reviewer_token.cycle,
     })
+
+
+@require_http_methods(["POST"])
+def feedback_language(request, token):
+    """The language switcher on the form: the reviewer's choice is stored on the token."""
+    reviewer_token = get_object_or_404(ReviewerToken, token=token)
+    language = request.POST.get('language')
+
+    if is_language(language):
+        reviewer_token.language = language
+        reviewer_token.save(update_fields=['language'])
+
+    return redirect('reviews:feedback_form', token=token)

@@ -6,14 +6,31 @@ from django.utils import timezone
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.urls import reverse
+from django.utils import translation
 from django.utils.translation import gettext as _
 from core.email import send_email
+from core.languages import recipient_language
 from datetime import timedelta
 from django.db.models import Q
 from .models import ReviewCycle, ReviewerToken
 
 
-def assign_tokens_to_emails(cycle, email_assignments):
+def token_language(token):
+    """The language of emails to a reviewer (for the self-assessment, else the reviewee's)."""
+    reviewee = token.cycle.reviewee
+    return recipient_language(
+        token.language,
+        reviewee.language if token.category == 'self' else '',
+        organization=reviewee.organization,
+    )
+
+
+def reviewee_language(reviewee):
+    """The language of emails to a reviewee."""
+    return recipient_language(reviewee.language, organization=reviewee.organization)
+
+
+def assign_tokens_to_emails(cycle, email_assignments, language=''):
     """
     Assign reviewer tokens to email addresses with smart randomization.
 
@@ -25,6 +42,7 @@ def assign_tokens_to_emails(cycle, email_assignments):
             'manager': ['manager@example.com'],
             'direct_report': []
         }
+        language: Language for the assigned reviewers, empty for the organization's default
 
     Returns:
         dict: Statistics about assignments
@@ -60,6 +78,8 @@ def assign_tokens_to_emails(cycle, email_assignments):
         # Assign emails to tokens
         for email, token in zip(emails, available_tokens):
             token.reviewer_email = email.strip().lower()
+            if language:
+                token.language = language
             token.save()
             stats['assigned'] += 1
 
@@ -96,35 +116,36 @@ def send_reviewer_invitations(cycle, token_ids=None):
 
     for token in tokens:
         try:
-            # Generate feedback URL
-            feedback_url = f"{settings.SITE_PROTOCOL}://{settings.SITE_DOMAIN}/feedback/{token.token}/"
+            with translation.override(token_language(token)):
+                # Generate feedback URL
+                feedback_url = f"{settings.SITE_PROTOCOL}://{settings.SITE_DOMAIN}/feedback/{token.token}/"
 
-            # Render email templates
-            context = {
-                'reviewee_name': cycle.reviewee.name,
-                'category': token.get_category_display(),
-                'feedback_url': feedback_url,
-                'questionnaire_name': cycle.questionnaire.name,
-            }
+                # Render email templates
+                context = {
+                    'reviewee_name': cycle.reviewee.name,
+                    'category': token.get_category_display(),
+                    'feedback_url': feedback_url,
+                    'questionnaire_name': cycle.questionnaire.name,
+                }
 
-            if token.category == 'self':
-                context.update(reviewee=cycle.reviewee, cycle=cycle, self_assessment_url=feedback_url)
-                subject = _('Complete Your Self-Assessment: %(questionnaire)s') % {'questionnaire': cycle.questionnaire.name}
-                template = 'emails/reviewee_self_assessment'
-            else:
-                subject = _('360 Feedback Request: %(name)s') % {'name': cycle.reviewee.name}
-                template = 'emails/reviewer_invitation'
+                if token.category == 'self':
+                    context.update(reviewee=cycle.reviewee, cycle=cycle, self_assessment_url=feedback_url)
+                    subject = _('Complete Your Self-Assessment: %(questionnaire)s') % {'questionnaire': cycle.questionnaire.name}
+                    template = 'emails/reviewee_self_assessment'
+                else:
+                    subject = _('360 Feedback Request: %(name)s') % {'name': cycle.reviewee.name}
+                    template = 'emails/reviewer_invitation'
 
-            html_message = render_to_string(f'{template}.html', context)
-            text_message = render_to_string(f'{template}.txt', context)
+                html_message = render_to_string(f'{template}.html', context)
+                text_message = render_to_string(f'{template}.txt', context)
 
-            # Send email
-            send_email(
-                subject=subject,
-                message=text_message,
-                recipient_list=[token.reviewer_email],
-                html_message=html_message,
-            )
+                # Send email
+                send_email(
+                    subject=subject,
+                    message=text_message,
+                    recipient_list=[token.reviewer_email],
+                    html_message=html_message,
+                )
 
             # Mark as sent
             token.invitation_sent_at = timezone.now()
@@ -166,27 +187,28 @@ def send_reminder_emails(cycle, token_ids=None):
 
     for token in tokens:
         try:
-            # Generate feedback URL
-            feedback_url = f"{settings.SITE_PROTOCOL}://{settings.SITE_DOMAIN}/feedback/{token.token}/"
+            with translation.override(token_language(token)):
+                # Generate feedback URL
+                feedback_url = f"{settings.SITE_PROTOCOL}://{settings.SITE_DOMAIN}/feedback/{token.token}/"
 
-            # Render email templates
-            context = {
-                'reviewee_name': cycle.reviewee.name,
-                'category': token.get_category_display(),
-                'feedback_url': feedback_url,
-                'questionnaire_name': cycle.questionnaire.name,
-            }
+                # Render email templates
+                context = {
+                    'reviewee_name': cycle.reviewee.name,
+                    'category': token.get_category_display(),
+                    'feedback_url': feedback_url,
+                    'questionnaire_name': cycle.questionnaire.name,
+                }
 
-            html_message = render_to_string('emails/reviewer_reminder.html', context)
-            text_message = render_to_string('emails/reviewer_reminder.txt', context)
+                html_message = render_to_string('emails/reviewer_reminder.html', context)
+                text_message = render_to_string('emails/reviewer_reminder.txt', context)
 
-            # Send email
-            send_email(
-                subject=_('Reminder: 360 Feedback Request for %(name)s') % {'name': cycle.reviewee.name},
-                message=text_message,
-                recipient_list=[token.reviewer_email],
-                html_message=html_message,
-            )
+                # Send email
+                send_email(
+                    subject=_('Reminder: 360 Feedback Request for %(name)s') % {'name': cycle.reviewee.name},
+                    message=text_message,
+                    recipient_list=[token.reviewer_email],
+                    html_message=html_message,
+                )
 
             # Update last reminder sent timestamp
             token.last_reminder_sent_at = timezone.now()
@@ -242,23 +264,24 @@ def send_reviewee_notifications(cycle, request=None):
 def send_assessment_email(cycle, base_url, stats):
     """Send the reviewee their own self-assessment link. Records into `stats`."""
     try:
-        self_assessment_url = f"{base_url}{reverse('reviews:claim_token', kwargs={'invitation_token': cycle.invitation_token_self})}"
+        with translation.override(reviewee_language(cycle.reviewee)):
+            self_assessment_url = f"{base_url}{reverse('reviews:claim_token', kwargs={'invitation_token': cycle.invitation_token_self})}"
 
-        context = {
-            'reviewee': cycle.reviewee,
-            'cycle': cycle,
-            'self_assessment_url': self_assessment_url,
-        }
+            context = {
+                'reviewee': cycle.reviewee,
+                'cycle': cycle,
+                'self_assessment_url': self_assessment_url,
+            }
 
-        html_message = render_to_string('emails/reviewee_self_assessment.html', context)
-        text_message = render_to_string('emails/reviewee_self_assessment.txt', context)
+            html_message = render_to_string('emails/reviewee_self_assessment.html', context)
+            text_message = render_to_string('emails/reviewee_self_assessment.txt', context)
 
-        send_email(
-            subject=_('Complete Your Self-Assessment: %(questionnaire)s') % {'questionnaire': cycle.questionnaire.name},
-            message=text_message,
-            recipient_list=[cycle.reviewee.email],
-            html_message=html_message,
-        )
+            send_email(
+                subject=_('Complete Your Self-Assessment: %(questionnaire)s') % {'questionnaire': cycle.questionnaire.name},
+                message=text_message,
+                recipient_list=[cycle.reviewee.email],
+                html_message=html_message,
+            )
 
         stats['sent'] += 1
 
@@ -269,26 +292,27 @@ def send_assessment_email(cycle, base_url, stats):
 def send_invitation_links_email(cycle, base_url, categories, stats):
     """Send the reviewee the links to share, one per category. Records into `stats`."""
     try:
-        context = {
-            'reviewee': cycle.reviewee,
-            'cycle': cycle,
-        }
-        for category in categories:
-            token = cycle.get_invitation_token(category)
-            context[f'{category}_url'] = (
-                f"{base_url}"
-                f"{reverse('reviews:claim_token', kwargs={'invitation_token': token})}"
+        with translation.override(reviewee_language(cycle.reviewee)):
+            context = {
+                'reviewee': cycle.reviewee,
+                'cycle': cycle,
+            }
+            for category in categories:
+                token = cycle.get_invitation_token(category)
+                context[f'{category}_url'] = (
+                    f"{base_url}"
+                    f"{reverse('reviews:claim_token', kwargs={'invitation_token': token})}"
+                )
+
+            html_message = render_to_string('emails/reviewee_invitation_links.html', context)
+            text_message = render_to_string('emails/reviewee_invitation_links.txt', context)
+
+            send_email(
+                subject=_('Share Your 360 Feedback Links: %(questionnaire)s') % {'questionnaire': cycle.questionnaire.name},
+                message=text_message,
+                recipient_list=[cycle.reviewee.email],
+                html_message=html_message,
             )
-
-        html_message = render_to_string('emails/reviewee_invitation_links.html', context)
-        text_message = render_to_string('emails/reviewee_invitation_links.txt', context)
-
-        send_email(
-            subject=_('Share Your 360 Feedback Links: %(questionnaire)s') % {'questionnaire': cycle.questionnaire.name},
-            message=text_message,
-            recipient_list=[cycle.reviewee.email],
-            html_message=html_message,
-        )
 
         stats['sent'] += 1
 
@@ -342,24 +366,25 @@ def send_close_check_emails(dry_run=False):
             total_count = cycle.tokens.count()
             dashboard_url = f"{base_url}/dashboard/cycles/{cycle.uuid}/"
 
-            context = {
-                'reviewee': cycle.reviewee,
-                'cycle': cycle,
-                'questionnaire_name': cycle.questionnaire.name,
-                'completed_count': completed_count,
-                'total_count': total_count,
-                'dashboard_url': dashboard_url,
-            }
+            with translation.override(reviewee_language(cycle.reviewee)):
+                context = {
+                    'reviewee': cycle.reviewee,
+                    'cycle': cycle,
+                    'questionnaire_name': cycle.questionnaire.name,
+                    'completed_count': completed_count,
+                    'total_count': total_count,
+                    'dashboard_url': dashboard_url,
+                }
 
-            html_message = render_to_string('emails/cycle_close_check.html', context)
-            text_message = render_to_string('emails/cycle_close_check.txt', context)
+                html_message = render_to_string('emails/cycle_close_check.html', context)
+                text_message = render_to_string('emails/cycle_close_check.txt', context)
 
-            send_email(
-                subject=_('Review Check-In: %(questionnaire)s') % {'questionnaire': cycle.questionnaire.name},
-                message=text_message,
-                recipient_list=[cycle.reviewee.email],
-                html_message=html_message,
-            )
+                send_email(
+                    subject=_('Review Check-In: %(questionnaire)s') % {'questionnaire': cycle.questionnaire.name},
+                    message=text_message,
+                    recipient_list=[cycle.reviewee.email],
+                    html_message=html_message,
+                )
 
             cycle.close_check_sent_at = timezone.now()
             cycle.save(update_fields=['close_check_sent_at'])

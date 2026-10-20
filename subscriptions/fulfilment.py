@@ -14,7 +14,10 @@ from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.utils import translation
 from django.utils.translation import gettext as _
+
+from core.languages import user_language
 
 from accounts.models import UserProfile
 from accounts.permissions import assign_organization_admin
@@ -180,14 +183,15 @@ def _send_emails(fulfilment, account):
             send_welcome_email(account.user, account.organization, password=account.password)
         elif fulfilment.outcome == 'rejected_existing_account':
             from core.email import send_email
-            send_email(
-                subject=_('You already have a Blik360 account'),
-                message=render_to_string('emails/existing_account.txt', {
-                    'user': account.user,
-                    'site_url': settings.SITE_URL,
-                }),
-                recipient_list=[account.user.email],
-            )
+            with translation.override(user_language(account.user)):
+                send_email(
+                    subject=_('You already have a Blik360 account'),
+                    message=render_to_string('emails/existing_account.txt', {
+                        'user': account.user,
+                        'site_url': settings.SITE_URL,
+                    }),
+                    recipient_list=[account.user.email],
+                )
     except Exception:
         logger.exception("Checkout %s was fulfilled but its email failed",
                          fulfilment.stripe_session_id)

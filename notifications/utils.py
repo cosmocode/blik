@@ -1,8 +1,10 @@
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.utils import translation
 from django.utils.translation import gettext as _
 from reviews.models import ReviewerToken
+from reviews.services import token_language
 
 
 def send_feedback_invitation(token, reviewer_email=None):
@@ -10,20 +12,21 @@ def send_feedback_invitation(token, reviewer_email=None):
 
     full_url = f"{settings.SITE_URL}/feedback/{token.token}/"
 
-    context = {
-        'reviewee_name': token.cycle.reviewee.name,
-        'category': token.get_category_display(),
-        'feedback_url': full_url,
-        'token': token,
-    }
+    with translation.override(token_language(token)):
+        context = {
+            'reviewee_name': token.cycle.reviewee.name,
+            'category': token.get_category_display(),
+            'feedback_url': full_url,
+            'token': token,
+        }
 
-    subject = _('360 Feedback Request for %(name)s') % {'name': token.cycle.reviewee.name}
+        subject = _('360 Feedback Request for %(name)s') % {'name': token.cycle.reviewee.name}
 
-    # Render text email
-    message = render_to_string('notifications/feedback_invitation.txt', context)
+        # Render text email
+        message = render_to_string('notifications/feedback_invitation.txt', context)
 
-    # Render HTML email
-    html_message = render_to_string('notifications/feedback_invitation.html', context)
+        # Render HTML email
+        html_message = render_to_string('notifications/feedback_invitation.html', context)
 
     # Send email
     if reviewer_email:

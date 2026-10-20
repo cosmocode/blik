@@ -62,6 +62,23 @@
                         {% if locked_fields.email %}<small class="form-text" style="color: var(--text-muted, #6b7280); font-size: 0.75rem;">{% blocktrans trimmed with env_var=locked_fields.email %}Managed by <code>{{ env_var }}</code> in the environment{% endblocktrans %}</small>{% endif %}
                     </div>
 
+                    <div class="form-group">
+                        <label class="form-label" for="default_language">{% trans 'Default Language' %}</label>
+                        <select
+                            id="default_language"
+                            name="default_language"
+                            class="form-control"
+                            {% if not perms.accounts.can_manage_organization %}disabled{% endif %}
+                            {% if locked_fields.default_language %}disabled{% endif %}
+                        >
+                            {% for code, name in LANGUAGES %}
+                            <option value="{{ code }}"{% if code == organization.default_language %} selected{% endif %}>{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="help-text">{% trans 'Emails and feedback forms use this language unless a person has their own.' %}</small>
+                        {% if locked_fields.default_language %}<small class="form-text" style="color: var(--text-muted, #6b7280); font-size: 0.75rem;">{% blocktrans trimmed with env_var=locked_fields.default_language %}Managed by <code>{{ env_var }}</code> in the environment{% endblocktrans %}</small>{% endif %}
+                    </div>
+
                     {% if perms.accounts.can_manage_organization %}
                     <div style="margin-top: 1rem;">
                         <button type="submit" class="btn btn-primary btn-sm">{% trans 'Save Changes' %}</button>
