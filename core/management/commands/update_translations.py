@@ -5,8 +5,9 @@ Usage:
     python manage.py update_translations
 
 makemessages with the project's defaults: the django and djangojs domains unless --domain names
-one, every language in LANGUAGES except the source language, no locations and no line wrapping,
-so a run only changes a catalogue where its messages changed. All makemessages options still apply.
+one, every language in LANGUAGES except the source language, no locations, no obsolete entries
+and no line wrapping, so a run only changes a catalogue where its messages changed. All
+makemessages options still apply.
 """
 
 from django.conf import settings
@@ -33,6 +34,7 @@ class Command(MakeMessagesCommand):
         options['locale'] = self.get_locale(locale)
         options['ignore_patterns'] = [*ignore_patterns, *IGNORE_PATTERNS]
         options['no_location'] = True
+        options['no_obsolete'] = True
         options['no_wrap'] = True
 
         domains = [domain] if domain else ['django', 'djangojs']
