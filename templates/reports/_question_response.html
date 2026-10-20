@@ -144,7 +144,8 @@
                             {# Calculate sentiment (positive = agree/strongly agree) #}
                             {% with scale=question_data.question_config.scale %}
                             {% with total_responses=cat_data.count %}
-                            {% with positive_count=cat_data.distribution|get_item:"Strongly Agree"|default:0|add:cat_data.distribution|get_item:"Agree"|default:0 %}
+                            {% with strongly_agree=cat_data.distribution|get_item:'Strongly Agree'|default:0 agree=cat_data.distribution|get_item:'Agree'|default:0 %}
+                            {% with positive_count=strongly_agree|add:agree %}
                             {% with positive_pct=positive_count|percentage:total_responses %}
 
                             {% if positive_pct >= 70 %}
@@ -175,6 +176,7 @@
                                     {% endwith %}
                                 {% endfor %}
                             </div>
+                            {% endwith %}
                             {% endwith %}
                             {% endwith %}
                             {% endwith %}

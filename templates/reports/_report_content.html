@@ -219,7 +219,7 @@
                     <div style="margin: 0.75rem 0; padding: 0.75rem; background: var(--bg-light); border-radius: 6px; font-size: 0.875rem;">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
                             <span style="color: var(--text-secondary);">Strong performance</span>
-                            <span class="percentile-badge">Top {{ 100|add:"-"|add:benchmark.percentile|add:"0" }}% in organization</span>
+                            <span class="percentile-badge">Top {{ 100|subtract:benchmark.percentile|floatformat:0 }}% in organization</span>
                         </div>
                         <div style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.8125rem;">
                             You scored {{ benchmark.current_score }}/5.0, higher than {{ benchmark.percentile }}% of peers

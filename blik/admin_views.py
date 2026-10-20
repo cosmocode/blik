@@ -1536,6 +1536,7 @@ def review_cycle_detail(request, cycle_uuid):
         'tokens_by_category': tokens_by_category,
         'total_tokens': total_tokens,
         'completed_tokens': completed_tokens,
+        'pending_tokens': total_tokens - completed_tokens,
         'claimed_tokens': claimed_tokens,
         'pending_invites': pending_invites,
         'pending_reminders': pending_reminders,
@@ -1660,6 +1661,7 @@ def manage_invitations(request, cycle_uuid):
         'total_tokens': total_tokens,
         'assigned_tokens': assigned_tokens,
         'sent_tokens': sent_tokens,
+        'unsent_tokens': assigned_tokens - sent_tokens,
         'completed_tokens': completed_tokens,
     }
 
