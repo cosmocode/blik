@@ -2,6 +2,7 @@
 import json
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 from django.utils.translation import gettext as _
 from core.models import Organization
 from accounts.models import UserProfile, Reviewee
@@ -211,10 +212,7 @@ def create_user_with_email_as_username(email, password=None, **extra_fields):
     # Generate random password if not provided
     generated_password = None
     if password is None:
-        import secrets
-        import string
-        alphabet = string.ascii_letters + string.digits
-        password = ''.join(secrets.choice(alphabet) for i in range(16))
+        password = get_random_string(16)
         generated_password = password  # Store for return value
 
     # Create user
