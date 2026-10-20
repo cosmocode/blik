@@ -1,8 +1,17 @@
 from django import template
+from django.utils.translation import gettext_lazy as _
 
+from questionnaires.models import Question
 from reviews.models import CATEGORY_ORDER
 
 register = template.Library()
+
+CATEGORY_LABELS = {
+    'self': _('Self'),
+    'peer': _('Peer'),
+    'manager': _('Manager'),
+    'direct_report': _('Direct Report'),
+}
 
 
 @register.filter
@@ -106,6 +115,18 @@ def personalize(text, name):
     text = text.replace("This person", first_name)
     text = text.replace("this person", first_name)
     return text
+
+
+@register.filter
+def category_label(category):
+    """Short label for a feedback category code"""
+    return CATEGORY_LABELS.get(category, category)
+
+
+@register.filter
+def question_type_label(question_type):
+    """Label for a question type code"""
+    return dict(Question.QUESTION_TYPES).get(question_type, question_type)
 
 
 @register.filter

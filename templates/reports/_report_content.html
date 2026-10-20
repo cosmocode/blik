@@ -53,7 +53,7 @@
 <div class="insight-card perception-gap">
     <div class="insight-title">
         {% if gap.type == 'imposter_syndrome' %}{% if is_admin_view %}{% trans 'Blind Spot: Better Than Self-Perception' %}{% else %}{% trans "Blind Spot: You're Better Than You Think" %}{% endif %}{% else %}{% trans 'Calibration Opportunity' %}{% endif %}
-        <span class="severity-badge severity-{{ gap.severity }}">{{ gap.severity|upper }}</span>
+        <span class="severity-badge severity-{{ gap.severity }}">{% if gap.severity == 'high' %}{% trans 'high' context 'severity' %}{% else %}{% trans 'moderate' context 'severity' %}{% endif %}</span>
     </div>
     <div class="insight-message">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
@@ -115,7 +115,7 @@
             <div style="flex: 1;">
                 <div>
                     <span class="area-name">{{ area.area }}</span>
-                    <span class="priority-badge priority-{{ area.priority }}">{% blocktrans trimmed with priority=area.priority %}{{ priority }} priority{% endblocktrans %}</span>
+                    <span class="priority-badge priority-{{ area.priority }}">{% if area.priority == 'high' %}{% trans 'high priority' %}{% else %}{% trans 'medium priority' %}{% endif %}</span>
                 </div>
                 <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
                     {% trans "Others' avg:" %} <strong>{{ area.others_avg }}/5.0</strong>

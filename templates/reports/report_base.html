@@ -68,7 +68,7 @@
                 {% if is_admin_view %}
                 <div class="meta-item">
                     <span class="meta-label">{% trans 'Status' %}</span>
-                    <span class="meta-value">{{ cycle.status|title }}</span>
+                    <span class="meta-value">{{ cycle.get_status_display }}</span>
                 </div>
                 {% endif %}
                 <div class="meta-item">
