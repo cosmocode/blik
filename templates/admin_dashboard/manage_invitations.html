@@ -172,7 +172,7 @@
                             </td>
                             <td style="padding: 0.75rem;">
                                 {% if token.invitation_sent_at %}
-                                <span style="color: var(--success);">{% blocktrans trimmed with date=token.invitation_sent_at|date:"M d, Y" %}Sent {{ date }}{% endblocktrans %}</span>
+                                <span style="color: var(--success);">{% blocktrans trimmed with date=token.invitation_sent_at|date:'SHORT_DATE_FORMAT' %}Sent {{ date }}{% endblocktrans %}</span>
                                 {% elif token.reviewer_email %}
                                 <span style="color: var(--text-secondary);">{% trans 'Ready to send' %}</span>
                                 {% else %}
@@ -181,7 +181,7 @@
                             </td>
                             <td style="padding: 0.75rem;">
                                 {% if token.completed_at %}
-                                <span style="color: var(--insight-perception); font-weight: 500;">✓ {% blocktrans trimmed with date=token.completed_at|date:"M d, Y" %}Completed {{ date }}{% endblocktrans %}</span>
+                                <span style="color: var(--insight-perception); font-weight: 500;">✓ {% blocktrans trimmed with date=token.completed_at|date:'SHORT_DATE_FORMAT' %}Completed {{ date }}{% endblocktrans %}</span>
                                 {% elif token.claimed_at %}
                                 <span style="color: var(--warning); font-weight: 500;">{% trans 'In Progress' %}</span>
                                 {% elif token.invitation_sent_at %}
@@ -189,7 +189,7 @@
                                     <span style="color: var(--text-secondary);">{% trans 'Pending' %}</span>
                                     {% if token.last_reminder_sent_at %}
                                     <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
-                                        {% blocktrans trimmed with date=token.last_reminder_sent_at|date:"M d, Y" %}Reminder sent {{ date }}{% endblocktrans %}
+                                        {% blocktrans trimmed with date=token.last_reminder_sent_at|date:'SHORT_DATE_FORMAT' %}Reminder sent {{ date }}{% endblocktrans %}
                                     </div>
                                     {% endif %}
                                 </div>

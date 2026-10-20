@@ -89,7 +89,7 @@
                 <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">{% trans 'Published' %}</h4>
                 <div>
                     {% if review.published_date %}
-                    {{ review.published_date|date:"F d, Y" }}
+                    {{ review.published_date|date:'DATE_FORMAT' }}
                     {% else %}
                     <span style="color: #cbd5e1;">{% trans 'Not Published' %}</span>
                     {% endif %}
@@ -141,11 +141,11 @@
         <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); font-size: 0.875rem; color: #64748b;">
             <div>
                 <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">{% trans 'Created' %}</h4>
-                <div>{{ review.created_at|date:"F d, Y g:i A" }}</div>
+                <div>{{ review.created_at|date:'DATETIME_FORMAT' }}</div>
             </div>
             <div>
                 <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">{% trans 'Last Updated' %}</h4>
-                <div>{{ review.updated_at|date:"F d, Y g:i A" }}</div>
+                <div>{{ review.updated_at|date:'DATETIME_FORMAT' }}</div>
             </div>
         </div>
     </div>

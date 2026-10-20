@@ -61,7 +61,7 @@
                 <div>
                     <div style="font-size: 0.875rem; color: #64748b; margin-bottom: 0.25rem;">{% trans 'Created' %}</div>
                     <div style="font-size: 1.125rem; font-weight: 500; color: #1e293b;">
-                        {{ questionnaire.created_at|date:"M d, Y" }}
+                        {{ questionnaire.created_at|date:'SHORT_DATE_FORMAT' }}
                     </div>
                 </div>
             </div>

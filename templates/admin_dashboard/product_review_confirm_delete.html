@@ -57,7 +57,7 @@
 
             {% if review.published_date %}
             <div>
-                <strong>{% trans 'Published:' %}</strong> {{ review.published_date|date:"F d, Y" }}
+                <strong>{% trans 'Published:' %}</strong> {{ review.published_date|date:'DATE_FORMAT' }}
             </div>
             {% endif %}
         </div>

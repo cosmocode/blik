@@ -43,7 +43,7 @@
                         {{ cycle.questionnaire.name }}
                         <div style="font-size: 0.75rem; color: var(--text-secondary);">{{ cycle.questionnaire.report_type_label }}</div>
                     </td>
-                    <td style="color: var(--text-secondary); font-size: 0.875rem;">{{ cycle.created_at|date:"M d, Y H:i" }}</td>
+                    <td style="color: var(--text-secondary); font-size: 0.875rem;">{{ cycle.created_at|date:'SHORT_DATETIME_FORMAT' }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

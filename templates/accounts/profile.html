@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <hr>
 
                     <div class="text-muted small mb-2">
-                        {% blocktrans trimmed with joined=user.date_joined|date:"F Y" %}Member since {{ joined }}{% endblocktrans %}
+                        {% blocktrans trimmed with joined=user.date_joined|date:'YEAR_MONTH_FORMAT' %}Member since {{ joined }}{% endblocktrans %}
                     </div>
 
                     <button onclick="showWelcomeModal()" class="btn btn-sm btn-secondary w-100" style="margin-top: 1rem;">
@@ -228,9 +228,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <h5 class="mb-1">{{ cycle_data.cycle.questionnaire.name }}</h5>
                                         <p class="mb-1 text-muted small">
                                             {% if cycle_data.cycle.created_by %}
-                                                {% blocktrans trimmed with created=cycle_data.cycle.created_at|date:"F d, Y" creator=cycle_data.cycle.created_by.get_full_name|default:cycle_data.cycle.created_by.username %}Created {{ created }} by {{ creator }}{% endblocktrans %}
+                                                {% blocktrans trimmed with created=cycle_data.cycle.created_at|date:'DATE_FORMAT' creator=cycle_data.cycle.created_by.get_full_name|default:cycle_data.cycle.created_by.username %}Created {{ created }} by {{ creator }}{% endblocktrans %}
                                             {% else %}
-                                                {% blocktrans trimmed with created=cycle_data.cycle.created_at|date:"F d, Y" %}Created {{ created }}{% endblocktrans %}
+                                                {% blocktrans trimmed with created=cycle_data.cycle.created_at|date:'DATE_FORMAT' %}Created {{ created }}{% endblocktrans %}
                                             {% endif %}
                                         </p>
 
