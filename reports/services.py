@@ -168,7 +168,7 @@ def apply_display_anonymization(report_data, min_threshold, exempt_categories=No
                 if category not in exempt_categories and count < min_threshold:
                     # Mark as insufficient for display
                     cat_data['insufficient'] = True
-                    cat_data['message'] = f'Insufficient responses (minimum {min_threshold} required)'
+                    cat_data['message'] = _('Insufficient responses (minimum %(count)s required)') % {'count': min_threshold}
                     # Remove detailed responses and distributions for privacy
                     if 'responses' in cat_data:
                         del cat_data['responses']
@@ -810,11 +810,11 @@ def send_report_ready_notification(report, request=None):
     reviewee = cycle.reviewee
 
     if not reviewee.email:
-        stats['errors'].append(f"No email address for reviewee {reviewee.name}")
+        stats['errors'].append(_('No email address for reviewee %(name)s') % {'name': reviewee.name})
         return stats
 
     if not report.access_token:
-        stats['errors'].append("Report does not have an access token")
+        stats['errors'].append(_('Report does not have an access token'))
         return stats
 
     # Always use SITE_DOMAIN for consistent URLs across all email contexts.
@@ -849,6 +849,6 @@ def send_report_ready_notification(report, request=None):
         stats['sent'] += 1
 
     except Exception as e:
-        stats['errors'].append(f"Failed to send report ready email: {str(e)}")
+        stats['errors'].append(_('Failed to send report ready email: %(error)s') % {'error': str(e)})
 
     return stats

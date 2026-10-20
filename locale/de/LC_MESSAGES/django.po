@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-20 08:33+0000\n"
+"POT-Creation-Date: 2026-10-20 08:58+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1613,7 +1613,22 @@ msgstr ""
 msgid "Report for %(cycle)s"
 msgstr ""
 
+#, python-format
+msgid "Insufficient responses (minimum %(count)s required)"
+msgstr ""
+
+#, python-format
+msgid "No email address for reviewee %(name)s"
+msgstr ""
+
+msgid "Report does not have an access token"
+msgstr ""
+
 msgid "Your 360 Feedback Report is Ready!"
+msgstr ""
+
+#, python-format
+msgid "Failed to send report ready email: %(error)s"
 msgstr ""
 
 msgid "This report link has expired. Please contact your administrator for a new link."
@@ -1756,10 +1771,6 @@ msgstr ""
 
 #, python-format
 msgid "Failed to send reminder to %(email)s: %(error)s"
-msgstr ""
-
-#, python-format
-msgid "No email address for reviewee %(name)s"
 msgstr ""
 
 #, python-format
