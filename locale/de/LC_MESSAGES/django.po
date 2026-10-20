@@ -3790,10 +3790,6 @@ msgstr "Leistung aufgeschlüsselt nach Kompetenzbereichen"
 msgid "Overall score (excluding self-assessment)"
 msgstr "Gesamtwert (ohne Selbsteinschätzung)"
 
-msgctxt "reviewer category"
-msgid "direct report"
-msgstr "unterstellte"
-
 msgid "Submit Your Review"
 msgstr "Bewertung abgeben"
 
@@ -5821,9 +5817,6 @@ msgstr "Top %(top)s %% in der Organisation"
 #, python-format
 msgid "You scored %(score)s/5.0, higher than %(percentile)s%% of peers"
 msgstr "Sie haben %(score)s/5,0 erreicht – mehr als %(percentile)s %% der Kolleg:innen"
-
-msgid "direct report"
-msgstr "Unterstellte:r"
 
 msgid "Privacy Notice:"
 msgstr "Datenschutzhinweis:"
