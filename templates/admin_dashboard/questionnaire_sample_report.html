@@ -1,6 +1,7 @@
 {% extends "admin_dashboard/base.html" %}
 {% load i18n %}
 {% load static %}
+{% load feedback_tags %}
 
 {% block title %}{% blocktrans trimmed with name=questionnaire.name %}Sample Report — {{ name }}{% endblocktrans %}{% endblock %}
 
@@ -100,7 +101,7 @@
             <div class="section-performance-categories">
                 {% for category, value in section.category_scores %}
                 <div class="category-score-item">
-                    <span class="badge badge-{{ category }}" style="text-transform: capitalize;">{% if category == 'direct_report' %}{% trans 'direct report' context 'reviewer category' %}{% else %}{{ category }}{% endif %}</span>
+                    <span class="badge badge-{{ category }}">{{ category|category_label }}</span>
                     <span class="category-score-value">{{ value|floatformat:1 }}</span>
                 </div>
                 {% endfor %}

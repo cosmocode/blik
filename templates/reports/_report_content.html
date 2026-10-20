@@ -233,7 +233,7 @@
             <div class="section-performance-categories">
                 {% for category, score in categories|sort_categories %}
                 <div class="category-score-item">
-                    <span class="badge badge-{{ category }}" style="text-transform: capitalize;">{% if category == "direct_report" %}{% trans 'direct report' %}{% else %}{{ category }}{% endif %}</span>
+                    <span class="badge badge-{{ category }}">{{ category|category_label }}</span>
                     <span class="category-score-value">{{ score|floatformat:1 }}</span>
                 </div>
                 {% endfor %}
