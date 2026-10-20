@@ -1,11 +1,10 @@
-{% load i18n %}{% blocktrans trimmed with org_name=organization.name %}Welcome to {{ org_name }}!{% endblocktrans %}
+{% load i18n email_tags %}{% blocktrans trimmed with org_name=organization.name %}Welcome to {{ org_name }}!{% endblocktrans %}
 
 {% trans 'Hi there,' %}
 
 {% trans "Your account has been successfully created. You're all set to start your feedback journey." %}
 
-{% trans 'GETTING STARTED' %}
-───────────────
+{% headline '─' %}{% trans 'GETTING STARTED' %}{% endheadline %}
 
 1. {% blocktrans trimmed %}Log in to your dashboard: {{ login_url }}{% endblocktrans %}
 2. {% trans 'Complete your profile' %}
