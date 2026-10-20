@@ -125,7 +125,7 @@
                     </td>
                     <td style="color: #64748b; font-size: 0.875rem;">
                         {% if review.published_date %}
-                        {{ review.published_date|date:"M d, Y" }}
+                        {{ review.published_date|date:'SHORT_DATE_FORMAT' }}
                         {% else %}
                         <span style="color: #cbd5e1;">—</span>
                         {% endif %}

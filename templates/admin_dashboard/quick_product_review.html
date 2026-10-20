@@ -19,7 +19,7 @@
             <div>
                 <h3 style="margin: 0; font-size: 1rem; color: #3b82f6;">{% trans "You've already submitted a review" %}</h3>
                 <p style="margin: 0.5rem 0 0 0; color: #64748b;">
-                    {% blocktrans trimmed with rating=existing_review.rating date=existing_review.created_at|date:"M d, Y" %}You submitted a {{ rating }}-star review on {{ date }}.{% endblocktrans %}
+                    {% blocktrans trimmed with rating=existing_review.rating date=existing_review.created_at|date:'SHORT_DATE_FORMAT' %}You submitted a {{ rating }}-star review on {{ date }}.{% endblocktrans %}
                     {% if existing_review.status == 'approved' %}
                     {% trans 'Your review has been approved and is live!' %}
                     {% elif existing_review.status == 'pending' %}

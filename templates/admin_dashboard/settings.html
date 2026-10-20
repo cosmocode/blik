@@ -216,7 +216,7 @@
                             {% if subscription.trial_end %}
                             <div>
                                 <label class="form-label" style="font-size: 0.8125rem; margin-bottom: 0.25rem;">{% trans 'Trial Ends' %}</label>
-                                <p style="margin: 0; font-size: 0.875rem;">{{ subscription.trial_end|date:"M d, Y" }}</p>
+                                <p style="margin: 0; font-size: 0.875rem;">{{ subscription.trial_end|date:'SHORT_DATE_FORMAT' }}</p>
                             </div>
                             {% endif %}
                             <div>
@@ -227,13 +227,13 @@
 
                         <div style="padding-top: 1rem; border-top: 1px solid var(--border-color);">
                             <label class="form-label" style="font-size: 0.8125rem; margin-bottom: 0.25rem;">{% trans 'Current Period' %}</label>
-                            <p style="margin: 0; font-size: 0.875rem;">{{ subscription.current_period_start|date:"M d, Y" }} - {{ subscription.current_period_end|date:"M d, Y" }}</p>
+                            <p style="margin: 0; font-size: 0.875rem;">{{ subscription.current_period_start|date:'SHORT_DATE_FORMAT' }} - {{ subscription.current_period_end|date:'SHORT_DATE_FORMAT' }}</p>
                         </div>
                     </div>
 
                     {% if subscription.cancel_at_period_end %}
                     <div style="padding: 12px; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 6px; color: #991b1b; font-size: 0.875rem; margin-bottom: 1rem;">
-                        <strong>⚠️ {% trans 'Subscription Canceling:' %}</strong> {% blocktrans trimmed with end_date=subscription.current_period_end|date:"M d, Y" %}Ends {{ end_date }}{% endblocktrans %}
+                        <strong>⚠️ {% trans 'Subscription Canceling:' %}</strong> {% blocktrans trimmed with end_date=subscription.current_period_end|date:'SHORT_DATE_FORMAT' %}Ends {{ end_date }}{% endblocktrans %}
                     </div>
                     {% endif %}
 
@@ -560,7 +560,7 @@
                 <h3 style="font-size: 0.9375rem; font-weight: 600; margin-bottom: 6px;">{% trans 'Subscription' %}</h3>
                 {% if subscription.cancel_at_period_end %}
                     <p style="color: var(--text-secondary); margin-bottom: 12px; font-size: 0.8125rem;">
-                        {% blocktrans trimmed with end_date=subscription.current_period_end|date:"M d, Y" %}Scheduled to cancel on {{ end_date }}.{% endblocktrans %}
+                        {% blocktrans trimmed with end_date=subscription.current_period_end|date:'SHORT_DATE_FORMAT' %}Scheduled to cancel on {{ end_date }}.{% endblocktrans %}
                     </p>
                     <form method="post" action="{% url 'account:reactivate_subscription' %}" style="display: inline;">
                         {% csrf_token %}
@@ -568,7 +568,7 @@
                     </form>
                 {% else %}
                     <p style="color: var(--text-secondary); margin-bottom: 12px; font-size: 0.8125rem;">
-                        {% blocktrans trimmed with end_date=subscription.current_period_end|date:"M d, Y" %}Cancel subscription. Access until {{ end_date }}.{% endblocktrans %}
+                        {% blocktrans trimmed with end_date=subscription.current_period_end|date:'SHORT_DATE_FORMAT' %}Cancel subscription. Access until {{ end_date }}.{% endblocktrans %}
                     </p>
                     <form method="post" action="{% url 'account:cancel_subscription' %}"
                           onsubmit="return confirm('{{ _("Cancel subscription? You'll retain access until end of billing period.")|escapejs }}');">

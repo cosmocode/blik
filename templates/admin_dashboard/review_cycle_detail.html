@@ -18,7 +18,7 @@
             <p style="color: #64748b; margin-bottom: 0.25rem;">
                 <strong>{% trans 'Questionnaire:' %}</strong> {{ cycle.questionnaire.name }}
             </p>
-            <p style="color: #64748b; margin-bottom: 0.25rem;">{% blocktrans trimmed with date=cycle.created_at|date:"F d, Y" %}Created on {{ date }}{% endblocktrans %}</p>
+            <p style="color: #64748b; margin-bottom: 0.25rem;">{% blocktrans trimmed with date=cycle.created_at|date:'DATE_FORMAT' %}Created on {{ date }}{% endblocktrans %}</p>
             <details style="margin-top: 0.5rem;">
                 <summary style="cursor: pointer; color: #64748b; font-size: 0.875rem; user-select: none; display: inline-flex; align-items: center; gap: 0.25rem;">
                     <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
@@ -68,9 +68,9 @@
                     <strong style="color: {% if report.access_token_expired %}#991B1B{% else %}#92400E{% endif %};">{% trans 'Report Access Token' %}</strong>
                     <div style="font-size: 0.875rem; color: {% if report.access_token_expired %}#991B1B{% else %}#92400E{% endif %}; margin-top: 0.25rem;">
                         {% if report.access_token_expired %}
-                            {% blocktrans trimmed with date=report.access_token_expires|date:"M d, Y" time=report.access_token_expires|time:"H:i" %}Expired on {{ date }} at {{ time }}{% endblocktrans %}
+                            {% blocktrans trimmed with date=report.access_token_expires|date:'SHORT_DATE_FORMAT' time=report.access_token_expires|time:'H:i' %}Expired on {{ date }} at {{ time }}{% endblocktrans %}
                         {% else %}
-                            {% blocktrans trimmed with until=report.access_token_expires|timeuntil date=report.access_token_expires|date:"M d, Y" time=report.access_token_expires|time:"H:i" %}Expires in {{ until }} ({{ date }} at {{ time }}){% endblocktrans %}
+                            {% blocktrans trimmed with until=report.access_token_expires|timeuntil date=report.access_token_expires|date:'SHORT_DATE_FORMAT' time=report.access_token_expires|time:'H:i' %}Expires in {{ until }} ({{ date }} at {{ time }}){% endblocktrans %}
                         {% endif %}
                     </div>
                     {% if report.last_accessed %}
@@ -325,7 +325,7 @@
                                 </td>
                                 <td style="border-bottom: 1px solid var(--border); font-size: 0.875rem;">
                                     {% if token.invitation_sent_at %}
-                                    <span style="color: var(--success);">{% blocktrans trimmed with date=token.invitation_sent_at|date:"M d, Y" %}Sent {{ date }}{% endblocktrans %}</span>
+                                    <span style="color: var(--success);">{% blocktrans trimmed with date=token.invitation_sent_at|date:'SHORT_DATE_FORMAT' %}Sent {{ date }}{% endblocktrans %}</span>
                                     {% elif token.reviewer_email %}
                                     <span style="color: var(--text-secondary);">{% trans 'Ready to send' %}</span>
                                     {% else %}
@@ -334,13 +334,13 @@
                                 </td>
                                 <td style="border-bottom: 1px solid var(--border); font-size: 0.875rem;">
                                     {% if token.completed_at %}
-                                    <span style="color: var(--insight-perception); font-weight: 500;">✓ {% blocktrans trimmed with date=token.completed_at|date:"M d, Y" %}Completed {{ date }}{% endblocktrans %}</span>
+                                    <span style="color: var(--insight-perception); font-weight: 500;">✓ {% blocktrans trimmed with date=token.completed_at|date:'SHORT_DATE_FORMAT' %}Completed {{ date }}{% endblocktrans %}</span>
                                     {% elif token.claimed_at %}
                                     <div>
                                         <span style="color: var(--warning); font-weight: 500;">{% trans 'In Progress' %}</span>
                                         {% if token.last_reminder_sent_at %}
                                         <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
-                                            {% blocktrans trimmed with date=token.last_reminder_sent_at|date:"M d, Y" %}Reminder sent {{ date }}{% endblocktrans %}
+                                            {% blocktrans trimmed with date=token.last_reminder_sent_at|date:'SHORT_DATE_FORMAT' %}Reminder sent {{ date }}{% endblocktrans %}
                                         </div>
                                         {% endif %}
                                     </div>
@@ -349,7 +349,7 @@
                                         <span style="color: var(--text-secondary);">{% trans 'Pending' %}</span>
                                         {% if token.last_reminder_sent_at %}
                                         <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
-                                            {% blocktrans trimmed with date=token.last_reminder_sent_at|date:"M d, Y" %}Reminder sent {{ date }}{% endblocktrans %}
+                                            {% blocktrans trimmed with date=token.last_reminder_sent_at|date:'SHORT_DATE_FORMAT' %}Reminder sent {{ date }}{% endblocktrans %}
                                         </div>
                                         {% endif %}
                                     </div>

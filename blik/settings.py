@@ -191,6 +191,7 @@ LANGUAGES = [
 ]
 
 LOCALE_PATHS = [BASE_DIR / 'locale']
+FORMAT_MODULE_PATH = ['blik.formats']
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'

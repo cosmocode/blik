@@ -276,7 +276,7 @@
                             {% endif %}
                         </td>
                         <td>{{ user_profile.user.email }}</td>
-                        <td>{{ user_profile.user.date_joined|date:"M d, Y" }}</td>
+                        <td>{{ user_profile.user.date_joined|date:'SHORT_DATE_FORMAT' }}</td>
                         <td>
                             {% if user_profile.gdpr_summary %}
                                 {{ user_profile.gdpr_summary.created_cycles }}
@@ -334,7 +334,7 @@
                     </div>
                     <div class="mobile-card-row">
                         <span class="mobile-card-label">{% trans 'Joined' %}</span>
-                        <span>{{ user_profile.user.date_joined|date:"M d, Y" }}</span>
+                        <span>{{ user_profile.user.date_joined|date:'SHORT_DATE_FORMAT' }}</span>
                     </div>
                     {% if user_profile.gdpr_summary %}
                     <div class="mobile-card-row">
