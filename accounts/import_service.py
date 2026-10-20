@@ -6,12 +6,11 @@ enabling backup restoration, data migration, and organization cloning.
 """
 
 import json
-import secrets
-import string
 from datetime import datetime
 from django.db import transaction
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.utils.crypto import get_random_string
 from django.utils import timezone
 from subscriptions.utils import NoCycleCredits
 
@@ -543,9 +542,8 @@ def import_users(organization, users_data, conflict_resolution='skip', send_welc
                         suffix += 1
                     result['warnings'].append(f"Created user with modified username: {username} (original: {original_username})")
 
-            # Create new user with random password (same method as subscription signup)
-            alphabet = string.ascii_letters + string.digits
-            password = ''.join(secrets.choice(alphabet) for _ in range(16))
+            # Create new user with random password
+            password = get_random_string(16)
 
             user = User.objects.create_user(
                 username=username,
