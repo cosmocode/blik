@@ -1,0 +1,402 @@
+{
+ "by_section": {
+  "94": {
+   "questions": {
+    "283": {
+     "by_category": {
+      "peer": {
+       "avg": 4.33,
+       "count": 3,
+       "distribution": {
+        "4": 2,
+        "5": 1
+       },
+       "responses": [
+        4,
+        5,
+        4
+       ]
+      },
+      "self": {
+       "avg": 2.0,
+       "count": 1,
+       "distribution": {
+        "2": 1
+       },
+       "responses": [
+        2
+       ]
+      }
+     },
+     "category_order": [
+      "self",
+      "peer"
+     ],
+     "question_config": {
+      "dreyfus_mapping": {
+       "agency": 0.0,
+       "skill": 1.0
+      },
+      "labels": {
+       "1": "Strongly Disagree",
+       "2": "Disagree",
+       "3": "Neutral",
+       "4": "Agree",
+       "5": "Strongly Agree"
+      },
+      "max": 5,
+      "min": 1
+     },
+     "question_text": "Shares knowledge",
+     "question_type": "rating"
+    },
+    "284": {
+     "by_category": {
+      "peer": {
+       "count": 3,
+       "distribution": {
+        "Agree": 1,
+        "Neutral": 1,
+        "Strongly Agree": 1
+       },
+       "responses": [
+        "Neutral",
+        "Agree",
+        "Strongly Agree"
+       ]
+      },
+      "self": {
+       "count": 1,
+       "distribution": {
+        "Disagree": 1
+       },
+       "responses": [
+        "Disagree"
+       ]
+      }
+     },
+     "category_order": [
+      "self",
+      "peer"
+     ],
+     "question_config": {
+      "scale": [
+       "Strongly Disagree",
+       "Disagree",
+       "Neutral",
+       "Agree",
+       "Strongly Agree"
+      ]
+     },
+     "question_text": "Gives useful feedback",
+     "question_type": "likert"
+    },
+    "285": {
+     "by_category": {
+      "peer": {
+       "count": 3,
+       "distribution": {
+        "Always": 1,
+        "Often": 2
+       },
+       "responses": [
+        "Always",
+        "Often",
+        "Often"
+       ]
+      },
+      "self": {
+       "count": 1,
+       "distribution": {
+        "Never": 1
+       },
+       "responses": [
+        "Never"
+       ]
+      }
+     },
+     "category_order": [
+      "self",
+      "peer"
+     ],
+     "question_config": {
+      "scale": [
+       "Never",
+       "Sometimes",
+       "Often",
+       "Always"
+      ]
+     },
+     "question_text": "Asks for help",
+     "question_type": "likert"
+    },
+    "286": {
+     "by_category": {
+      "peer": {
+       "avg": 3.67,
+       "count": 3,
+       "distribution": {
+        "Advanced": 2,
+        "Expert": 1
+       },
+       "responses": [
+        "Advanced",
+        "Expert",
+        "Advanced"
+       ]
+      },
+      "self": {
+       "avg": 1.0,
+       "count": 1,
+       "distribution": {
+        "Novice": 1
+       },
+       "responses": [
+        "Novice"
+       ]
+      }
+     },
+     "category_order": [
+      "self",
+      "peer"
+     ],
+     "question_config": {
+      "choices": [
+       "Novice",
+       "Advanced",
+       "Expert"
+      ],
+      "scoring_enabled": true,
+      "weights": [
+       1.0,
+       3.0,
+       5.0
+      ]
+     },
+     "question_text": "Seniority",
+     "question_type": "single_choice"
+    },
+    "287": {
+     "by_category": {
+      "peer": {
+       "count": 3,
+       "distribution": {
+        "Code": 2,
+        "Docs": 1,
+        "Talks": 1
+       },
+       "responses": [
+        [
+         "Code",
+         "Docs"
+        ],
+        [
+         "Code"
+        ],
+        [
+         "Talks"
+        ]
+       ]
+      },
+      "self": {
+       "count": 1,
+       "distribution": {
+        "Docs": 1
+       },
+       "responses": [
+        [
+         "Docs"
+        ]
+       ]
+      }
+     },
+     "category_order": [
+      "self",
+      "peer"
+     ],
+     "question_config": {
+      "choices": [
+       "Code",
+       "Docs",
+       "Talks"
+      ]
+     },
+     "question_text": "Strong areas",
+     "question_type": "multiple_choice"
+    },
+    "288": {
+     "by_category": {
+      "peer": {
+       "avg": 8.0,
+       "count": 3,
+       "responses": [
+        8,
+        7,
+        9
+       ]
+      },
+      "self": {
+       "avg": 3.0,
+       "count": 1,
+       "responses": [
+        3
+       ]
+      }
+     },
+     "category_order": [
+      "self",
+      "peer"
+     ],
+     "question_config": {
+      "max": 10,
+      "max_label": "Energised",
+      "min": 0,
+      "min_label": "Drained",
+      "step": 1
+     },
+     "question_text": "Energy",
+     "question_type": "scale"
+    },
+    "289": {
+     "by_category": {
+      "peer": {
+       "count": 3,
+       "responses": [
+        "Keeps the team calm",
+        "Great mentor",
+        "Very reliable"
+       ]
+      },
+      "self": {
+       "count": 1,
+       "responses": [
+        "Self note"
+       ]
+      }
+     },
+     "category_order": [
+      "self",
+      "peer"
+     ],
+     "question_config": {},
+     "question_text": "Anything else?",
+     "question_type": "text"
+    }
+   },
+   "title": "Collaboration"
+  }
+ },
+ "charts": {
+  "overall": {
+   "others_avg": 4.07,
+   "peer": 4.07,
+   "self": 1.73
+  },
+  "section_scores": {
+   "Collaboration": {
+    "others_avg": 4.07,
+    "peer": 4.07,
+    "self": 1.73
+   }
+  }
+ },
+ "comparison": {
+  "has_previous": false,
+  "show_trends": false
+ },
+ "insights": {
+  "agency_profile": null,
+  "development_areas": [],
+  "development_plan": {
+   "long_term_goals": [
+    "Develop capabilities of a Expert: Intuitive, creates new approaches",
+    "Build experience across diverse situations",
+    "Continuously reflect on your practice and learning"
+   ],
+   "next_level_requirements": [
+    "Trust your intuition based on deep experience",
+    "Create novel approaches and solutions",
+    "Become a recognized authority in your domain"
+   ],
+   "primary_focus": "Deepen intuition through extensive practice and begin creating novel approaches.",
+   "quick_wins": [
+    "Pair with a colleague every week",
+    "Mentor someone less experienced",
+    "Share your knowledge through documentation or talks",
+    "Tackle a novel problem in your domain"
+   ],
+   "resources": [
+    "Research and innovation projects",
+    "Teaching and mentoring opportunities",
+    "Speaking at conferences or writing articles"
+   ]
+  },
+  "dreyfus_quadrant": null,
+  "overall_sentiment": {
+   "based_on": "others",
+   "rating": "Outstanding",
+   "score": 5.33,
+   "self_avg": 2.0
+  },
+  "perception_gaps": [
+   {
+    "gap": -3.33,
+    "interpretation": "Strong performance but may undervalue own contributions",
+    "message": "Self-assessment (2.0) significantly lower than others' perception (5.3)",
+    "others_score": 5.33,
+    "self_score": 2.0,
+    "severity": "high",
+    "type": "imposter_syndrome"
+   }
+  ],
+  "skill_profile": {
+   "confidence": 0.07,
+   "contributing_questions": [
+    "283"
+   ],
+   "skill_level": 4.33,
+   "skill_stage": "Proficient",
+   "stage_info": {
+    "behaviors": [
+     "Quickly identifies root causes",
+     "Anticipates problems before they occur",
+     "Adapts approaches to context",
+     "Mentors less experienced team members"
+    ],
+    "description": "Sees the big picture, recognizes patterns quickly, handles complexity",
+    "development_focus": [
+     "Trust your intuition based on deep experience",
+     "Create novel approaches and solutions",
+     "Become a recognized authority in your domain"
+    ],
+    "name": "Proficient",
+    "next_stage": "Expert",
+    "short_description": "Sees the big picture, learns from others",
+    "traits": [
+     "Sees the big picture and context",
+     "Recognizes patterns and deviations quickly",
+     "Learns from others experiences",
+     "Handles complex situations effectively",
+     "Knows when to break the rules"
+    ]
+   }
+  },
+  "strengths": [
+   {
+    "area": "Collaboration",
+    "gap": -3.33,
+    "level": "exceptional",
+    "others_avg": 5.33,
+    "self_score": 2.0
+   }
+  ]
+ },
+ "peer_benchmarks": null,
+ "questionnaire_id": 15,
+ "section_summary": {
+  "Collaboration": {
+   "peer": 5.33,
+   "self": 2.0
+  }
+ }
+}
