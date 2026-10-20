@@ -784,6 +784,7 @@
 </div>
 {% endif %}
 
+{% blocktrans trimmed asvar questionnaire_counts with sections='%(sections)s' questions='%(questions)s' %}{{ sections }} sections, {{ questions }} questions{% endblocktrans %}
 <script>
 // Modal control functions
 function showDeleteAccountModal() {
@@ -912,7 +913,7 @@ function displayPreview(preview, warnings) {
                     <strong>{{ _('Questionnaires:')|escapejs }}</strong>
                     <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem; font-size: 0.875rem;">
                         ${preview.questionnaire_details.map(q =>
-                            `<li>${q.name} (${q.sections} {{ _('sections')|escapejs }}, ${q.questions} {{ _('questions')|escapejs }})</li>`
+                            `<li>${q.name} (${'{{ questionnaire_counts|escapejs }}'.replace('%(sections)s', q.sections).replace('%(questions)s', q.questions)})</li>`
                         ).join('')}
                     </ul>
                 </div>
