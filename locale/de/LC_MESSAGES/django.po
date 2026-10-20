@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-20 12:00+0000\n"
+"POT-Creation-Date: 2026-10-20 15:23+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -485,9 +485,6 @@ msgstr "E-Mail-Adresse ist erforderlich"
 #, python-format
 msgid "User with email %(email)s already exists"
 msgstr "Ein Konto mit der E-Mail-Adresse %(email)s existiert bereits"
-
-msgid "Invalid username or password."
-msgstr "Ungültiger Benutzername oder ungültiges Passwort."
 
 msgid "Please use the signup page to create an account."
 msgstr "Bitte legen Sie Ihr Konto über die Registrierungsseite an."
@@ -2261,10 +2258,6 @@ msgstr "Anmelden"
 
 msgid "Forgot your password?"
 msgstr "Passwort vergessen?"
-
-#, python-format
-msgid "Don't have an account? <a href=\"%(signup_url)s\">Create one</a>"
-msgstr "Noch kein Konto? <a href=\"%(signup_url)s\">Jetzt registrieren</a>"
 
 msgid "My Profile"
 msgstr "Mein Profil"
