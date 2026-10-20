@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-20 09:31+0000\n"
+"POT-Creation-Date: 2026-10-20 09:38+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -139,6 +139,206 @@ msgid "Confirm new password"
 msgstr ""
 
 msgid "Passwords do not match."
+msgstr ""
+
+msgid "Import data must be a JSON object"
+msgstr ""
+
+#, python-format
+msgid "Missing required top-level key: '%(key)s'"
+msgstr ""
+
+#, python-format
+msgid "'%(key)s' must be an object"
+msgstr ""
+
+#, python-format
+msgid "Organization missing required field: '%(field)s'"
+msgstr ""
+
+#, python-format
+msgid "Organization missing '%(field)s' field"
+msgstr ""
+
+#, python-format
+msgid "'%(key)s' must be an array"
+msgstr ""
+
+#, python-format
+msgid "User at index %(index)s must be an object"
+msgstr ""
+
+#, python-format
+msgid "User at index %(index)s missing required field: '%(field)s'"
+msgstr ""
+
+#, python-format
+msgid "Reviewee at index %(index)s must be an object"
+msgstr ""
+
+#, python-format
+msgid "Reviewee at index %(index)s missing required field: '%(field)s'"
+msgstr ""
+
+#, python-format
+msgid "Questionnaire at index %(index)s must be an object"
+msgstr ""
+
+#, python-format
+msgid "Questionnaire at index %(index)s missing '%(field)s'"
+msgstr ""
+
+#, python-format
+msgid "Questionnaire at index %(index)s missing '%(field)s' (empty questionnaire)"
+msgstr ""
+
+#, python-format
+msgid "Questionnaire at index %(index)s '%(field)s' must be an array"
+msgstr ""
+
+#, python-format
+msgid "Questionnaire %(index)s section %(section)s missing '%(field)s'"
+msgstr ""
+
+#, python-format
+msgid "Questionnaire %(index)s section %(section)s '%(field)s' must be an array"
+msgstr ""
+
+#, python-format
+msgid "Review cycle at index %(index)s must be an object"
+msgstr ""
+
+#, python-format
+msgid "Review cycle at index %(index)s missing '%(field)s'"
+msgstr ""
+
+#, python-format
+msgid "Report at index %(index)s must be an object"
+msgstr ""
+
+#, python-format
+msgid "Report at index %(index)s missing '%(field)s'"
+msgstr ""
+
+#, python-format
+msgid "Report at index %(index)s missing '%(field)s' (empty report)"
+msgstr ""
+
+msgid "Unknown"
+msgstr ""
+
+msgid "Not specified"
+msgstr ""
+
+msgid "Unnamed"
+msgstr ""
+
+#, python-format
+msgid "Created duplicate reviewee: %(name)s with email %(email)s (original: %(original)s)"
+msgstr ""
+
+#, python-format
+msgid "Failed to import reviewee %(reviewee)s: %(error)s"
+msgstr ""
+
+msgid "unknown"
+msgstr ""
+
+#, python-format
+msgid "%(name)s (imported)"
+msgstr ""
+
+#, python-format
+msgid "Created duplicate questionnaire: %(name)s (original: %(original)s)"
+msgstr ""
+
+#, python-format
+msgid "Failed to import questionnaire %(questionnaire)s: %(error)s"
+msgstr ""
+
+#, python-format
+msgid "Reviewee '%(name)s' not found - skipping cycle"
+msgstr ""
+
+#, python-format
+msgid "Questionnaire '%(name)s' not found - skipping cycle"
+msgstr ""
+
+#, python-format
+msgid "Skipped %(count)s responses for cycle - response import requires UUID-based question matching"
+msgstr ""
+
+#, python-format
+msgid "Failed to import review cycle: %(error)s"
+msgstr ""
+
+#, python-format
+msgid "Username '%(username)s' belongs to another organization - skipped"
+msgstr ""
+
+#, python-format
+msgid "Email '%(email)s' is already used by another user - skipped user %(username)s"
+msgstr ""
+
+#, python-format
+msgid "Created user with modified username: %(username)s (original: %(original)s)"
+msgstr ""
+
+#, python-format
+msgid "User '%(username)s' created with random password. They will need to use password reset to access their account."
+msgstr ""
+
+#, python-format
+msgid "Failed to import user %(username)s: %(error)s"
+msgstr ""
+
+#, python-format
+msgid "Reviewee '%(name)s' not found for report - skipping"
+msgstr ""
+
+#, python-format
+msgid "No questionnaire found for report (reviewee: %(name)s) - skipping"
+msgstr ""
+
+#, python-format
+msgid "Failed to import report: %(error)s"
+msgstr ""
+
+msgid "Skipped cycle import: requires both reviewees and questionnaires to be imported"
+msgstr ""
+
+msgid "Reviewees"
+msgstr ""
+
+msgid "Questionnaires"
+msgstr ""
+
+msgid "Users"
+msgstr ""
+
+msgid "Cycles"
+msgstr ""
+
+msgid "Reports"
+msgstr ""
+
+#, python-format
+msgid "%(count)s created"
+msgstr ""
+
+#, python-format
+msgid "%(count)s updated"
+msgstr ""
+
+#, python-format
+msgid "%(count)s skipped"
+msgstr ""
+
+msgid "No data imported"
+msgstr ""
+
+#, python-format
+msgid "Import failed with errors: %(errors)s"
 msgstr ""
 
 msgid "No organization found."
@@ -1473,9 +1673,6 @@ msgstr ""
 msgid "Question"
 msgstr ""
 
-msgid "Questionnaires"
-msgstr ""
-
 msgid "description"
 msgstr ""
 
@@ -1566,9 +1763,6 @@ msgid "No expiration set"
 msgstr ""
 
 msgid "Token Expiration"
-msgstr ""
-
-msgid "Reports"
 msgstr ""
 
 msgid "review cycle"
@@ -2252,12 +2446,6 @@ msgstr ""
 msgid "Team"
 msgstr ""
 
-msgid "Reviewees"
-msgstr ""
-
-msgid "Cycles"
-msgstr ""
-
 msgctxt "product reviews"
 msgid "Reviews"
 msgstr ""
@@ -2486,9 +2674,6 @@ msgid "<strong>Soft Delete (Anonymization):</strong> Removes personal identifiab
 msgstr ""
 
 msgid "<strong>Hard Delete (Complete Removal):</strong> Permanently removes all data including related records. Use only when legally required or explicitly requested."
-msgstr ""
-
-msgid "Users"
 msgstr ""
 
 #, python-format
