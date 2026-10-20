@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-20 09:28+0000\n"
+"POT-Creation-Date: 2026-10-20 09:31+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -149,6 +149,10 @@ msgstr ""
 
 #, python-format
 msgid "Invitation already sent to %(email)s"
+msgstr ""
+
+#, python-format
+msgid "Invitation to join %(organization)s on Blik"
 msgstr ""
 
 #, python-format
@@ -1856,6 +1860,9 @@ msgid "Expires on %(date)s (%(days)s days remaining)"
 msgstr ""
 
 msgid "Subscriptions"
+msgstr ""
+
+msgid "You already have a Blik360 account"
 msgstr ""
 
 msgid "EU SaaS"
@@ -4934,6 +4941,14 @@ msgstr ""
 msgid "Your Feedback Team"
 msgstr ""
 
+#, python-format
+msgid "You started a new subscription with %(email)s, but this address already has a Blik360 account. We cancelled the new subscription and nothing was charged."
+msgstr ""
+
+#, python-format
+msgid "To choose a plan for your existing organization, sign in at %(site_url)s and open Settings."
+msgstr ""
+
 msgid "Reset Your Password"
 msgstr ""
 
@@ -5145,6 +5160,30 @@ msgid "This is a friendly reminder that you have a pending %(category)s feedback
 msgstr ""
 
 msgid "Click the link below to continue your review:"
+msgstr ""
+
+msgid "You're Invited!"
+msgstr ""
+
+#, python-format
+msgid "You've been invited to join <strong>%(organization)s</strong> on Blik 360 Feedback Platform."
+msgstr ""
+
+msgid "Accept Invitation"
+msgstr ""
+
+msgid "This invitation will expire in 7 days."
+msgstr ""
+
+#, python-format
+msgid "%(organization)s Team"
+msgstr ""
+
+#, python-format
+msgid "You've been invited to join %(organization)s on Blik 360 Feedback Platform."
+msgstr ""
+
+msgid "Click the link below to accept this invitation and create your account:"
 msgstr ""
 
 #, python-format
