@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-20 11:18+0000\n"
+"POT-Creation-Date: 2026-10-20 12:00+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -2902,6 +2902,12 @@ msgstr "Ausstehend"
 msgid "Reminder sent %(date)s"
 msgstr "Erinnerung gesendet am %(date)s"
 
+#, python-format
+msgid "%(counter)s pending invitation"
+msgid_plural "%(counter)s pending invitations"
+msgstr[0] "%(counter)s ausstehende Einladung"
+msgstr[1] "%(counter)s ausstehende Einladungen"
+
 msgid "Send email invitations to reviewers who haven't received one yet"
 msgstr "E-Mail-Einladungen an Beurteilende senden, die noch keine erhalten haben"
 
@@ -3964,12 +3970,6 @@ msgstr "Entfernen"
 
 msgid "Send Reminder"
 msgstr "Erinnerung senden"
-
-#, python-format
-msgid "%(counter)s pending invitation"
-msgid_plural "%(counter)s pending invitations"
-msgstr[0] "%(counter)s ausstehende Einladung"
-msgstr[1] "%(counter)s ausstehende Einladungen"
 
 msgid "Send invitation emails to all reviewers who have been assigned but not sent invites yet"
 msgstr "Einladungs-E-Mails an alle zugewiesenen Beurteilenden senden, die noch keine Einladung erhalten haben"

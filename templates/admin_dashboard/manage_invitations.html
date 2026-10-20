@@ -214,7 +214,7 @@
         <form method="post" action="{% url 'send_invitations' cycle.uuid %}" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
             {% csrf_token %}
             <div>
-                <div style="font-weight: 600; margin-bottom: 0.25rem;">{{ unsent_tokens }} pending invitation{{ unsent_tokens|pluralize }}</div>
+                <div style="font-weight: 600; margin-bottom: 0.25rem;">{% blocktrans trimmed count counter=unsent_tokens %}{{ counter }} pending invitation{% plural %}{{ counter }} pending invitations{% endblocktrans %}</div>
                 <div style="font-size: 0.875rem; color: var(--text-secondary);">{% trans "Send email invitations to reviewers who haven't received one yet" %}</div>
             </div>
             <button type="submit" class="btn btn-primary">{% trans 'Send Pending Invitations' %}</button>
