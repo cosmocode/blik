@@ -61,14 +61,13 @@
             {% blocktrans trimmed with name=cycle.reviewee.name %}The 360-degree feedback report for <strong>{{ name }}</strong> has been generated and is ready to view.{% endblocktrans %}
         </p>
         {% if report.access_token_expires %}
-        <div style="padding: 0.75rem; background: {% if report.access_token_expires|timeuntil != '0 minutes' %}#FEF3C7{% else %}#FEE2E2{% endif %}; border-left: 4px solid {% if report.access_token_expires|timeuntil != '0 minutes' %}#F59E0B{% else %}#EF4444{% endif %}; border-radius: 6px; margin-bottom: 1rem;">
+        <div style="padding: 0.75rem; background: {% if report.access_token_expired %}#FEE2E2{% else %}#FEF3C7{% endif %}; border-left: 4px solid {% if report.access_token_expired %}#EF4444{% else %}#F59E0B{% endif %}; border-radius: 6px; margin-bottom: 1rem;">
             <div style="display: flex; align-items: start; gap: 0.5rem;">
-                <svg style="width: 20px; height: 20px; margin-top: 2px; color: {% if report.access_token_expires|timeuntil != '0 minutes' %}#F59E0B{% else %}#EF4444{% endif %};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <svg style="width: 20px; height: 20px; margin-top: 2px; color: {% if report.access_token_expired %}#EF4444{% else %}#F59E0B{% endif %};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 <div>
-                    <strong style="color: {% if report.access_token_expires|timeuntil != '0 minutes' %}#92400E{% else %}#991B1B{% endif %};">{% trans 'Report Access Token' %}</strong>
-                    <div style="font-size: 0.875rem; color: {% if report.access_token_expires|timeuntil != '0 minutes' %}#92400E{% else %}#991B1B{% endif %}; margin-top: 0.25rem;">
-                        {% now "Y-m-d H:i:s" as now_time %}
-                        {% if report.access_token_expires|date:"Y-m-d H:i:s" < now_time %}
+                    <strong style="color: {% if report.access_token_expired %}#991B1B{% else %}#92400E{% endif %};">{% trans 'Report Access Token' %}</strong>
+                    <div style="font-size: 0.875rem; color: {% if report.access_token_expired %}#991B1B{% else %}#92400E{% endif %}; margin-top: 0.25rem;">
+                        {% if report.access_token_expired %}
                             {% blocktrans trimmed with date=report.access_token_expires|date:"M d, Y" time=report.access_token_expires|time:"H:i" %}Expired on {{ date }} at {{ time }}{% endblocktrans %}
                         {% else %}
                             {% blocktrans trimmed with until=report.access_token_expires|timeuntil date=report.access_token_expires|date:"M d, Y" time=report.access_token_expires|time:"H:i" %}Expires in {{ until }} ({{ date }} at {{ time }}){% endblocktrans %}

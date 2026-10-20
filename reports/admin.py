@@ -18,11 +18,10 @@ class ReportAdmin(admin.ModelAdmin):
         if not obj.access_token_expires:
             return format_html('<span style="color: gray;">{}</span>', _('No expiry'))
 
-        now = timezone.now()
-        if obj.access_token_expires < now:
+        if obj.access_token_expired:
             return format_html('<span style="color: red; font-weight: bold;">{}</span>', _('Expired'))
 
-        time_left = obj.access_token_expires - now
+        time_left = obj.access_token_expires - timezone.now()
         if time_left.days < 7:
             return format_html('<span style="color: orange;">{}</span>', _('Expires in %(days)s days') % {'days': time_left.days})
 
@@ -35,12 +34,11 @@ class ReportAdmin(admin.ModelAdmin):
         if not obj.access_token_expires:
             return _('No expiration set')
 
-        now = timezone.now()
-        if obj.access_token_expires < now:
+        if obj.access_token_expired:
             return format_html('<span style="color: red; font-weight: bold;">{}</span>',
                              _('EXPIRED on %(date)s') % {'date': obj.access_token_expires.strftime('%Y-%m-%d %H:%M')})
 
-        time_left = obj.access_token_expires - now
+        time_left = obj.access_token_expires - timezone.now()
         return format_html('<span style="color: green;">{}</span>',
                          _('Expires on %(date)s (%(days)s days, %(hours)s hours remaining)') % {
                              'date': obj.access_token_expires.strftime('%Y-%m-%d %H:%M'),
