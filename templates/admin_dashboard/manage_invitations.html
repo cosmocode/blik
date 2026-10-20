@@ -160,7 +160,7 @@
                     </thead>
                     <tbody>
                         {% for token in tokens %}
-                        <tr style="border-bottom: 1px solid var(--border);" data-email="{{ token.reviewer_email|default:'' }}">
+                        <tr style="border-bottom: 1px solid var(--border);" data-email="{{ token.reviewer_email|default:'' }}" data-sent="{% if token.invitation_sent_at %}yes{% else %}no{% endif %}">
                             <td style="padding: 0.75rem;" class="reviewer-col">
                                 {% if token.reviewer_email %}
                                 <span style="color: var(--success); font-weight: 500;">✓ {% trans 'Invited by email' %}</span>
@@ -172,7 +172,7 @@
                             </td>
                             <td style="padding: 0.75rem;">
                                 {% if token.invitation_sent_at %}
-                                <span style="color: var(--success);">Sent {{ token.invitation_sent_at|date:"M d, Y" }}</span>
+                                <span style="color: var(--success);">{% blocktrans trimmed with date=token.invitation_sent_at|date:"M d, Y" %}Sent {{ date }}{% endblocktrans %}</span>
                                 {% elif token.reviewer_email %}
                                 <span style="color: var(--text-secondary);">{% trans 'Ready to send' %}</span>
                                 {% else %}
@@ -250,9 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (email && reviewerCol) {
             const span = reviewerCol.querySelector('span');
-            // Check if invitation was sent by looking at the invitation status column
-            const invitationStatus = row.children[1].textContent.trim();
-            const hasSent = invitationStatus.includes('Sent');
+            const hasSent = row.getAttribute('data-sent') === 'yes';
 
             if (!hasSent) {
                 // Show masked email for pending invitations

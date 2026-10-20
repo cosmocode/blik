@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 16:50+0000\n"
+"POT-Creation-Date: 2026-10-20 08:33+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -2666,6 +2666,10 @@ msgstr ""
 msgid "Awaiting claim"
 msgstr ""
 
+#, python-format
+msgid "Sent %(date)s"
+msgstr ""
+
 msgid "Ready to send"
 msgstr ""
 
@@ -3737,10 +3741,6 @@ msgid_plural "%(counter)s reviewers"
 msgstr[0] ""
 msgstr[1] ""
 
-#, python-format
-msgid "Sent %(date)s"
-msgstr ""
-
 msgid "Send Invite"
 msgstr ""
 
@@ -4388,6 +4388,10 @@ msgid "Back"
 msgstr ""
 
 msgid "Confirm Import"
+msgstr ""
+
+#, python-format
+msgid "%(sections)s sections, %(questions)s questions"
 msgstr ""
 
 msgid "Please select a file to import"
