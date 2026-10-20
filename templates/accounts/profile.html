@@ -1,6 +1,7 @@
 {% extends 'admin_dashboard/base.html' %}
 {% load i18n %}
 {% load static %}
+{% load feedback_tags %}
 
 {% block title %}{% trans 'My Profile' %}{% endblock %}
 
@@ -239,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                                     <div class="small mb-2">
                                                         <strong>{% trans 'Responses:' %}</strong>
                                                         {% for category, count in cycle_data.summary.by_category.items %}
-                                                            <span class="badge bg-secondary me-1">{{ category|title }}: {{ count }}</span>
+                                                            <span class="badge bg-secondary me-1">{{ category|category_label }}: {{ count }}</span>
                                                         {% endfor %}
                                                         <span class="badge bg-info">{% blocktrans trimmed with total=cycle_data.summary.total_responses %}Total: {{ total }}{% endblocktrans %}</span>
                                                     </div>

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-20 08:58+0000\n"
+"POT-Creation-Date: 2026-10-20 09:28+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1787,6 +1787,18 @@ msgstr ""
 
 #, python-format
 msgid "Review Check-In: %(questionnaire)s"
+msgstr ""
+
+msgid "Self"
+msgstr ""
+
+msgid "Peer"
+msgstr ""
+
+msgid "Manager"
+msgstr ""
+
+msgid "Direct Report"
 msgstr ""
 
 msgid "Invalid or expired invitation link."
@@ -5419,9 +5431,6 @@ msgstr ""
 msgid "Scale: %(min)s to %(max)s"
 msgstr ""
 
-msgid "Direct Report"
-msgstr ""
-
 #, python-format
 msgid "%(counter)s response"
 msgid_plural "%(counter)s responses"
@@ -5481,6 +5490,14 @@ msgstr ""
 msgid "Calibration Opportunity"
 msgstr ""
 
+msgctxt "severity"
+msgid "high"
+msgstr ""
+
+msgctxt "severity"
+msgid "moderate"
+msgstr ""
+
 msgid "Self-assessment"
 msgstr ""
 
@@ -5517,8 +5534,10 @@ msgstr ""
 msgid "Development Opportunities"
 msgstr ""
 
-#, python-format
-msgid "%(priority)s priority"
+msgid "high priority"
+msgstr ""
+
+msgid "medium priority"
 msgstr ""
 
 msgid "Visual comparison of performance across all competency areas"

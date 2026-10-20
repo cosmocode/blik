@@ -8,7 +8,7 @@
     {# Show preview of how the question was presented #}
     <div style="margin: 1rem 0; padding: 1rem; background: var(--bg-light); border-radius: 6px; border-left: 3px solid var(--primary);">
         <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 0.5rem;">
-            {% trans 'Question Format:' %} {{ question_data.question_type|title }}
+            {% trans 'Question Format:' %} {{ question_data.question_type|question_type_label }}
         </div>
         {% if question_data.question_type == 'rating' %}
             <div style="font-size: 0.875rem; color: var(--text-secondary);">
@@ -80,7 +80,7 @@
             {% with cat_data=question_data.by_category|get_item:category %}
             <div class="category-result">
                 <div class="category-header">
-                    <span class="badge badge-{{ category }}">{% if category == "direct_report" %}{% trans 'Direct Report' %}{% else %}{{ category|title }}{% endif %}</span>
+                    <span class="badge badge-{{ category }}">{{ category|category_label }}</span>
                     <span class="response-count">{% blocktrans trimmed count counter=cat_data.count %}{{ counter }} response{% plural %}{{ counter }} responses{% endblocktrans %}</span>
                 </div>
 

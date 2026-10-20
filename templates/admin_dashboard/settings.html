@@ -207,7 +207,7 @@
                                 {% elif subscription.status == 'canceled' %}
                                     <span class="badge" style="background: #dc2626; color: white;">{% trans 'Canceled' %}</span>
                                 {% else %}
-                                    <span class="badge" style="background: #6b7280; color: white;">{{ subscription.status|title }}</span>
+                                    <span class="badge" style="background: #6b7280; color: white;">{{ subscription.get_status_display }}</span>
                                 {% endif %}
                             </div>
                         </div>
