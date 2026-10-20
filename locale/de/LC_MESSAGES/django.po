@@ -3183,6 +3183,10 @@ msgstr "Bewertungen gesamt"
 msgid "Average Rating"
 msgstr "Durchschnittliche Bewertung"
 
+msgctxt "product review"
+msgid "Reviewer"
+msgstr "Verfasser:in"
+
 msgid "Approve"
 msgstr "Freigeben"
 
