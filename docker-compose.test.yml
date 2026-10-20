@@ -39,6 +39,7 @@ services:
       DATABASE_PORT: 5432
 
       # Django
+      ENVIRONMENT: test
       DEBUG: "True"
       SECRET_KEY: test-secret-key-for-testing-only
       ALLOWED_HOSTS: "*"
