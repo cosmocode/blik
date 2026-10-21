@@ -13,97 +13,104 @@ References:
 from statistics import mean
 from typing import Dict, List, Optional, Tuple
 
+from django.utils.translation import gettext, gettext_lazy as _
+
 
 # Dreyfus stage definitions
 DREYFUS_STAGES = {
     1: {
-        'name': 'Novice',
-        'short_description': 'Rigid rule follower',
-        'description': 'Follows rules rigidly, needs detailed instructions and close guidance',
+        'key': 'novice',
+        'name': _('Novice'),
+        'short_description': _('Rigid rule follower'),
+        'description': _('Follows rules rigidly, needs detailed instructions and close guidance'),
         'traits': [
-            'Requires step-by-step instructions',
-            'Follows rules without understanding context',
-            'Needs close supervision',
-            'Limited ability to recognize patterns',
-            'Task-focused rather than goal-focused'
+            _('Requires step-by-step instructions'),
+            _('Follows rules without understanding context'),
+            _('Needs close supervision'),
+            _('Limited ability to recognize patterns'),
+            _('Task-focused rather than goal-focused')
         ],
         'behaviors': [
-            'Asks for detailed procedures',
-            'Struggles with unexpected situations',
-            'Focuses on individual steps',
-            'Needs explicit direction for each task'
+            _('Asks for detailed procedures'),
+            _('Struggles with unexpected situations'),
+            _('Focuses on individual steps'),
+            _('Needs explicit direction for each task')
         ]
     },
     2: {
-        'name': 'Advanced Beginner',
-        'short_description': 'Recognizes patterns, needs guidelines',
-        'description': 'Can handle simple tasks independently, recognizes recurring patterns',
+        'key': 'advanced_beginner',
+        'name': _('Advanced Beginner'),
+        'short_description': _('Recognizes patterns, needs guidelines'),
+        'description': _('Can handle simple tasks independently, recognizes recurring patterns'),
         'traits': [
-            'Recognizes situational patterns',
-            'Handles routine tasks independently',
-            'Needs guidelines for non-standard situations',
-            'Starts to see similarities across problems',
-            'Still struggles with complex decisions'
+            _('Recognizes situational patterns'),
+            _('Handles routine tasks independently'),
+            _('Needs guidelines for non-standard situations'),
+            _('Starts to see similarities across problems'),
+            _('Still struggles with complex decisions')
         ],
         'behaviors': [
-            'Can work independently on familiar tasks',
-            'Asks for guidance on edge cases',
-            'Identifies when something looks wrong',
-            'Follows established patterns'
+            _('Can work independently on familiar tasks'),
+            _('Asks for guidance on edge cases'),
+            _('Identifies when something looks wrong'),
+            _('Follows established patterns')
         ]
     },
     3: {
-        'name': 'Competent',
-        'short_description': 'Develops mental models, takes responsibility',
-        'description': 'Plans deliberately, solves standard problems, takes ownership',
+        'key': 'competent',
+        'name': _('Competent'),
+        'short_description': _('Develops mental models, takes responsibility'),
+        'description': _('Plans deliberately, solves standard problems, takes ownership'),
         'traits': [
-            'Creates mental models of the domain',
-            'Plans work deliberately',
-            'Takes responsibility for outcomes',
-            'Solves standard problems independently',
-            'Makes conscious, reasoned decisions'
+            _('Creates mental models of the domain'),
+            _('Plans work deliberately'),
+            _('Takes responsibility for outcomes'),
+            _('Solves standard problems independently'),
+            _('Makes conscious, reasoned decisions')
         ],
         'behaviors': [
-            'Troubleshoots problems systematically',
-            'Prioritizes and plans work',
-            'Takes ownership of results',
-            'Follows through on commitments'
+            _('Troubleshoots problems systematically'),
+            _('Prioritizes and plans work'),
+            _('Takes ownership of results'),
+            _('Follows through on commitments')
         ]
     },
     4: {
-        'name': 'Proficient',
-        'short_description': 'Sees the big picture, learns from others',
-        'description': 'Sees the big picture, recognizes patterns quickly, handles complexity',
+        'key': 'proficient',
+        'name': _('Proficient'),
+        'short_description': _('Sees the big picture, learns from others'),
+        'description': _('Sees the big picture, recognizes patterns quickly, handles complexity'),
         'traits': [
-            'Sees the big picture and context',
-            'Recognizes patterns and deviations quickly',
-            'Learns from others experiences',
-            'Handles complex situations effectively',
-            'Knows when to break the rules'
+            _('Sees the big picture and context'),
+            _('Recognizes patterns and deviations quickly'),
+            _('Learns from others experiences'),
+            _('Handles complex situations effectively'),
+            _('Knows when to break the rules')
         ],
         'behaviors': [
-            'Quickly identifies root causes',
-            'Anticipates problems before they occur',
-            'Adapts approaches to context',
-            'Mentors less experienced team members'
+            _('Quickly identifies root causes'),
+            _('Anticipates problems before they occur'),
+            _('Adapts approaches to context'),
+            _('Mentors less experienced team members')
         ]
     },
     5: {
-        'name': 'Expert',
-        'short_description': 'Intuitive, creates new approaches',
-        'description': 'Works from intuition, creates novel solutions, recognized authority',
+        'key': 'expert',
+        'name': _('Expert'),
+        'short_description': _('Intuitive, creates new approaches'),
+        'description': _('Works from intuition, creates novel solutions, recognized authority'),
         'traits': [
-            'Works from intuition and deep understanding',
-            'Creates new approaches and solutions',
-            'Recognized as domain authority',
-            'Sees possibilities others miss',
-            'Operates at a transcendent level'
+            _('Works from intuition and deep understanding'),
+            _('Creates new approaches and solutions'),
+            _('Recognized as domain authority'),
+            _('Sees possibilities others miss'),
+            _('Operates at a transcendent level')
         ],
         'behaviors': [
-            'Solves problems others cannot',
-            'Innovates and creates best practices',
-            'Trusted for most difficult challenges',
-            'Shapes the direction of the field'
+            _('Solves problems others cannot'),
+            _('Innovates and creates best practices'),
+            _('Trusted for most difficult challenges'),
+            _('Shapes the direction of the field')
         ]
     }
 }
@@ -111,81 +118,144 @@ DREYFUS_STAGES = {
 # Agency/Initiative stage definitions
 AGENCY_STAGES = {
     1: {
-        'name': 'Directed',
-        'description': 'Waits for explicit instructions and direction'
+        'name': _('Directed'),
+        'description': _('Waits for explicit instructions and direction')
     },
     2: {
-        'name': 'Assisted',
-        'description': 'Takes initiative when prompted or guided'
+        'name': _('Assisted'),
+        'description': _('Takes initiative when prompted or guided')
     },
     3: {
-        'name': 'Independent',
-        'description': 'Proactively identifies and addresses problems'
+        'name': _('Independent'),
+        'description': _('Proactively identifies and addresses problems')
     },
     4: {
-        'name': 'Proactive',
-        'description': 'Regularly proposes improvements and drives change'
+        'name': _('Proactive'),
+        'description': _('Regularly proposes improvements and drives change')
     },
     5: {
-        'name': 'Self-Driven',
-        'description': 'Self-directed achiever who consistently improves systems'
+        'name': _('Self-Driven'),
+        'description': _('Self-directed achiever who consistently improves systems')
     }
 }
 
 # Quadrant definitions (Skill × Agency)
 QUADRANTS = {
     'developing_contributor': {
-        'name': 'Developing Contributor',
+        'name': _('Developing Contributor'),
         'skill_range': (1, 2.5),
         'agency_range': (1, 2.5),
-        'description': 'Building foundational skills and learning to work independently',
+        'description': _('Building foundational skills and learning to work independently'),
         'characteristics': [
-            'Early in career or role',
-            'Requires guidance and support',
-            'Building fundamental capabilities',
-            'Needs structured development'
+            _('Early in career or role'),
+            _('Requires guidance and support'),
+            _('Building fundamental capabilities'),
+            _('Needs structured development')
         ],
-        'development_path': 'Focus on building core skills through deliberate practice and seeking guidance. Work on taking more initiative on familiar tasks.'
+        'development_path': _(
+            'Focus on building core skills through deliberate practice and seeking guidance. '
+            'Work on taking more initiative on familiar tasks.'
+        ),
     },
     'hungry_learner': {
-        'name': 'Hungry Learner',
+        'name': _('Hungry Learner'),
         'skill_range': (1, 2.5),
         'agency_range': (2.5, 5),
-        'description': 'High initiative but developing expertise - eager to learn and contribute',
+        'description': _('High initiative but developing expertise - eager to learn and contribute'),
         'characteristics': [
-            'Strong drive and motivation',
-            'Seeks opportunities to grow',
-            'May overcommit without experience',
-            'Benefits from mentorship'
+            _('Strong drive and motivation'),
+            _('Seeks opportunities to grow'),
+            _('May overcommit without experience'),
+            _('Benefits from mentorship')
         ],
-        'development_path': 'Channel your energy into deliberate skill development. Seek mentorship from experts. Balance enthusiasm with building depth.'
+        'development_path': _(
+            'Channel your energy into deliberate skill development. Seek mentorship from experts. '
+            'Balance enthusiasm with building depth.'
+        ),
     },
     'specialist': {
-        'name': 'Specialist',
+        'name': _('Specialist'),
         'skill_range': (2.5, 5),
         'agency_range': (1, 2.5),
-        'description': 'Deep expertise but waits for direction - valuable contributor when engaged',
+        'description': _('Deep expertise but waits for direction - valuable contributor when engaged'),
         'characteristics': [
-            'Strong technical capabilities',
-            'Reliable when given clear objectives',
-            'Prefers depth over breadth',
-            'May need encouragement to lead'
+            _('Strong technical capabilities'),
+            _('Reliable when given clear objectives'),
+            _('Prefers depth over breadth'),
+            _('May need encouragement to lead')
         ],
-        'development_path': 'Build confidence in taking initiative. Start with small ownership opportunities. Share your expertise proactively.'
+        'development_path': _(
+            'Build confidence in taking initiative. Start with small ownership opportunities. '
+            'Share your expertise proactively.'
+        ),
     },
     'force_multiplier': {
-        'name': 'Force Multiplier',
+        'name': _('Force Multiplier'),
         'skill_range': (2.5, 5),
         'agency_range': (2.5, 5),
-        'description': 'High skill and high initiative - drives team success and innovation',
+        'description': _('High skill and high initiative - drives team success and innovation'),
         'characteristics': [
-            'Combines expertise with initiative',
-            'Mentors and elevates others',
-            'Drives meaningful improvements',
-            'Trusted for complex challenges'
+            _('Combines expertise with initiative'),
+            _('Mentors and elevates others'),
+            _('Drives meaningful improvements'),
+            _('Trusted for complex challenges')
         ],
-        'development_path': 'Continue expanding your impact. Focus on strategic initiatives and developing others. Consider broader leadership roles.'
+        'development_path': _(
+            'Continue expanding your impact. Focus on strategic initiatives and developing others. '
+            'Consider broader leadership roles.'
+        ),
     }
+}
+
+
+# Development recommendations by skill stage
+PRIMARY_FOCUS = {
+    1: _('Build foundational skills through deliberate practice and close guidance from experienced mentors.'),
+    2: _('Develop deeper pattern recognition and start building mental models of your domain.'),
+    3: _('Expand your perspective to see the bigger picture and learn from diverse experiences.'),
+    4: _('Deepen intuition through extensive practice and begin creating novel approaches.'),
+    5: _('Continue innovating and sharing your expertise to advance the field.'),
+}
+
+EARLY_QUICK_WINS = [
+    _('Seek feedback on your work early and often'),
+    _('Study examples of good work in your domain'),
+    _('Practice deliberate problem-solving with guidance'),
+]
+
+COMPETENT_QUICK_WINS = [
+    _('Take ownership of a complete project or feature'),
+    _('Learn from colleagues at different skill levels'),
+    _('Document your decision-making process'),
+]
+
+ADVANCED_QUICK_WINS = [
+    _('Mentor someone less experienced'),
+    _('Share your knowledge through documentation or talks'),
+    _('Tackle a novel problem in your domain'),
+]
+
+EARLY_RESOURCES = [
+    _('Structured learning programs or courses'),
+    _('Regular mentorship sessions'),
+    _('Code reviews and pair programming'),
+]
+
+COMPETENT_RESOURCES = [
+    _('Cross-functional projects'),
+    _('Technical leadership opportunities'),
+    _('Industry conferences and communities'),
+]
+
+ADVANCED_RESOURCES = [
+    _('Research and innovation projects'),
+    _('Teaching and mentoring opportunities'),
+    _('Speaking at conferences or writing articles'),
+]
+
+AGENCY_HINTS = {
+    'take_initiative': _('Take more initiative on projects - your skills are ready for more ownership'),
+    'deepen_expertise': _('Focus on deepening your technical expertise to match your initiative'),
 }
 
 
@@ -203,10 +273,9 @@ def calculate_dreyfus_level(report_data: Dict, questionnaire_id: Optional[int] =
     Returns:
         Dictionary with:
         - skill_level: Float 1-5 representing overall skill level
-        - skill_stage: String name of Dreyfus stage
+        - stage: Number of the Dreyfus stage (1-5), see skill_profile_with_texts() for its texts
         - confidence: Float 0-1 indicating calculation confidence
         - contributing_questions: List of question IDs that contributed
-        - stage_info: Full stage information (traits, behaviors, etc.)
         or None if insufficient data
     """
     weighted_scores = []
@@ -259,11 +328,11 @@ def calculate_dreyfus_level(report_data: Dict, questionnaire_id: Optional[int] =
     # If we found metadata-based scores, use them
     if weighted_scores:
         # Calculate weighted average
-        total_weight = sum(w for _, w in weighted_scores)
+        total_weight = sum(weight for score, weight in weighted_scores)
         if total_weight > 0:
             skill_level = sum(score * weight for score, weight in weighted_scores) / total_weight
         else:
-            skill_level = mean(score for score, _ in weighted_scores)
+            skill_level = mean(score for score, weight in weighted_scores)
 
         # Confidence based on number of contributing questions and total weight
         confidence = min(1.0, (len(contributing_questions) / 5.0) * (total_weight / 3.0))
@@ -274,25 +343,11 @@ def calculate_dreyfus_level(report_data: Dict, questionnaire_id: Optional[int] =
         if skill_level is None:
             return None
 
-    # Map to stage
-    stage_num = _level_to_stage(skill_level)
-    stage_info = DREYFUS_STAGES[stage_num].copy()
-
-    # Add development focus (what's needed for next level)
-    next_stage_num = min(5, stage_num + 1)
-    if next_stage_num > stage_num:
-        stage_info['next_stage'] = DREYFUS_STAGES[next_stage_num]['name']
-        stage_info['development_focus'] = _get_development_focus(stage_num, next_stage_num)
-    else:
-        stage_info['next_stage'] = None
-        stage_info['development_focus'] = ['Continue deepening expertise and innovating']
-
     return {
         'skill_level': round(skill_level, 2),
-        'skill_stage': stage_info['name'],
+        'stage': _level_to_stage(skill_level),
         'confidence': round(confidence, 2),
         'contributing_questions': contributing_questions,
-        'stage_info': stage_info
     }
 
 
@@ -307,7 +362,7 @@ def calculate_agency_level(report_data: Dict, questionnaire_id: Optional[int] = 
     Returns:
         Dictionary with:
         - agency_level: Float 1-5 representing initiative/autonomy level
-        - agency_stage: String name of agency stage
+        - stage: Number of the agency stage (1-5), see agency_profile_with_texts() for its texts
         - confidence: Float 0-1 indicating calculation confidence
         - contributing_questions: List of question IDs that contributed
         or None if insufficient data
@@ -362,25 +417,20 @@ def calculate_agency_level(report_data: Dict, questionnaire_id: Optional[int] = 
         return None
 
     # Calculate weighted average
-    total_weight = sum(w for _, w in weighted_scores)
+    total_weight = sum(weight for score, weight in weighted_scores)
     if total_weight > 0:
         agency_level = sum(score * weight for score, weight in weighted_scores) / total_weight
     else:
-        agency_level = mean(score for score, _ in weighted_scores)
+        agency_level = mean(score for score, weight in weighted_scores)
 
     # Confidence based on number of questions and weight
     confidence = min(1.0, (len(contributing_questions) / 3.0) * (total_weight / 2.0))
 
-    # Map to stage
-    stage_num = _level_to_stage(agency_level)
-    stage_info = AGENCY_STAGES[stage_num].copy()
-
     return {
         'agency_level': round(agency_level, 2),
-        'agency_stage': stage_info['name'],
+        'stage': _level_to_stage(agency_level),
         'confidence': round(confidence, 2),
         'contributing_questions': contributing_questions,
-        'description': stage_info['description']
     }
 
 
@@ -393,7 +443,7 @@ def calculate_dreyfus_quadrant(skill_level: float, agency_level: float) -> Dict:
         agency_level: Agency level (1-5)
 
     Returns:
-        Dictionary with quadrant information
+        Dictionary with the quadrant's key and both levels, see quadrant_with_texts() for its texts
     """
     # Determine quadrant based on threshold (2.5)
     if skill_level < 2.5 and agency_level < 2.5:
@@ -405,12 +455,11 @@ def calculate_dreyfus_quadrant(skill_level: float, agency_level: float) -> Dict:
     else:
         quadrant_key = 'force_multiplier'
 
-    quadrant_info = QUADRANTS[quadrant_key].copy()
-    quadrant_info['quadrant_key'] = quadrant_key
-    quadrant_info['skill_level'] = round(skill_level, 2)
-    quadrant_info['agency_level'] = round(agency_level, 2)
-
-    return quadrant_info
+    return {
+        'quadrant_key': quadrant_key,
+        'skill_level': round(skill_level, 2),
+        'agency_level': round(agency_level, 2),
+    }
 
 
 def get_dreyfus_traits(stage_num: int, detailed: bool = True) -> Dict:
@@ -447,9 +496,6 @@ def generate_development_recommendations(
     """
     Generate personalized development recommendations based on:
     - Current skill/agency levels
-    - Gap to next level
-    - Specific feedback from reviewers
-    - Weakest sub-dimensions
     - Question-specific action items (hybrid approach)
 
     Args:
@@ -458,103 +504,21 @@ def generate_development_recommendations(
         report_data: Full report data for context
 
     Returns:
-        Dictionary with personalized recommendations
+        Dictionary with:
+        - agency_hint: 'take_initiative' or 'deepen_expertise' when skill and agency lie more than half a level apart
+        - action_items: Action items of low-scoring questions as {'question_id', 'key', 'text'}
+        The stage-based recommendations follow from the skill stage, see development_plan_with_texts().
     """
     recommendations = {
-        'primary_focus': '',
-        'quick_wins': [],
-        'long_term_goals': [],
-        'resources': [],
-        'next_level_requirements': []
+        'agency_hint': None,
+        'action_items': [],
     }
 
     if not skill_profile:
         return recommendations
 
-    current_stage = _level_to_stage(skill_profile['skill_level'])
-    next_stage = min(5, current_stage + 1)
-
-    # Primary focus based on current stage
-    if current_stage == 1:
-        recommendations['primary_focus'] = 'Build foundational skills through deliberate practice and close guidance from experienced mentors.'
-    elif current_stage == 2:
-        recommendations['primary_focus'] = 'Develop deeper pattern recognition and start building mental models of your domain.'
-    elif current_stage == 3:
-        recommendations['primary_focus'] = 'Expand your perspective to see the bigger picture and learn from diverse experiences.'
-    elif current_stage == 4:
-        recommendations['primary_focus'] = 'Deepen intuition through extensive practice and begin creating novel approaches.'
-    else:
-        recommendations['primary_focus'] = 'Continue innovating and sharing your expertise to advance the field.'
-
-    # Get specific feedback from development_areas in insights
-    development_areas = _extract_development_areas(report_data)
-
-    # Quick wins - actionable items based on feedback
-    if current_stage < 3:
-        recommendations['quick_wins'] = [
-            'Seek feedback on your work early and often',
-            'Study examples of good work in your domain',
-            'Practice deliberate problem-solving with guidance'
-        ]
-    elif current_stage == 3:
-        recommendations['quick_wins'] = [
-            'Take ownership of a complete project or feature',
-            'Learn from colleagues at different skill levels',
-            'Document your decision-making process'
-        ]
-    else:
-        recommendations['quick_wins'] = [
-            'Mentor someone less experienced',
-            'Share your knowledge through documentation or talks',
-            'Tackle a novel problem in your domain'
-        ]
-
-    # Add specific recommendations from weak areas
-    if development_areas:
-        for area in development_areas[:3]:  # Top 3 areas
-            recommendations['quick_wins'].append(
-                f"Focus on improving: {area['area'].lower()}"
-            )
-
     # HYBRID APPROACH: Add personalized action items based on question scores
-    personalized_actions = _get_personalized_action_items(report_data, current_stage)
-    if personalized_actions:
-        # Insert personalized actions at the beginning (higher priority)
-        for action in reversed(personalized_actions):  # Reverse to maintain order when inserting at 0
-            recommendations['quick_wins'].insert(0, action)
-
-    # Long-term goals
-    if next_stage <= 5:
-        stage_info = DREYFUS_STAGES[next_stage]
-        recommendations['long_term_goals'] = [
-            f'Develop capabilities of a {stage_info["name"]}: {stage_info["short_description"]}',
-            'Build experience across diverse situations',
-            'Continuously reflect on your practice and learning'
-        ]
-
-    # Resources
-    if current_stage <= 2:
-        recommendations['resources'] = [
-            'Structured learning programs or courses',
-            'Regular mentorship sessions',
-            'Code reviews and pair programming'
-        ]
-    elif current_stage == 3:
-        recommendations['resources'] = [
-            'Cross-functional projects',
-            'Technical leadership opportunities',
-            'Industry conferences and communities'
-        ]
-    else:
-        recommendations['resources'] = [
-            'Research and innovation projects',
-            'Teaching and mentoring opportunities',
-            'Speaking at conferences or writing articles'
-        ]
-
-    # Requirements for next level
-    if next_stage <= 5:
-        recommendations['next_level_requirements'] = skill_profile['stage_info'].get('development_focus', [])
+    recommendations['action_items'] = _get_personalized_action_items(report_data, skill_profile['stage'])
 
     # Factor in agency if available
     if agency_profile:
@@ -563,18 +527,121 @@ def generate_development_recommendations(
 
         # If agency is lagging behind skill
         if agency_level < skill_level - 0.5:
-            recommendations['quick_wins'].insert(0, 'Take more initiative on projects - your skills are ready for more ownership')
+            recommendations['agency_hint'] = 'take_initiative'
 
         # If skill is lagging behind agency
         elif skill_level < agency_level - 0.5:
-            recommendations['quick_wins'].insert(0, 'Focus on deepening your technical expertise to match your initiative')
+            recommendations['agency_hint'] = 'deepen_expertise'
 
     return recommendations
 
 
+def stage_texts(stage: int) -> Dict:
+    """The texts of a Dreyfus stage and of what the next stage takes, in the active language."""
+
+    info = DREYFUS_STAGES[stage]
+    texts = {
+        'name': str(info['name']),
+        'short_description': str(info['short_description']),
+        'description': str(info['description']),
+        'traits': [str(trait) for trait in info['traits']],
+        'behaviors': [str(behavior) for behavior in info['behaviors']],
+    }
+    next_stage = min(5, stage + 1)
+
+    if next_stage > stage:
+        texts['next_stage'] = str(DREYFUS_STAGES[next_stage]['name'])
+        texts['development_focus'] = [str(focus) for focus in _get_development_focus(stage, next_stage)]
+    else:
+        texts['next_stage'] = None
+        texts['development_focus'] = [gettext('Continue deepening expertise and innovating')]
+
+    return texts
+
+
+def skill_profile_with_texts(profile: Dict) -> Dict:
+    """A skill profile from calculate_dreyfus_level() with the texts of its stage."""
+
+    stage_info = stage_texts(profile['stage'])
+
+    return {
+        **profile,
+        'skill_stage': stage_info['name'],
+        'stage_key': DREYFUS_STAGES[profile['stage']]['key'],
+        'stage_info': stage_info,
+    }
+
+
+def agency_profile_with_texts(profile: Dict) -> Dict:
+    """An agency profile from calculate_agency_level() with the texts of its stage."""
+
+    info = AGENCY_STAGES[profile['stage']]
+
+    return {
+        **profile,
+        'agency_stage': str(info['name']),
+        'description': str(info['description']),
+    }
+
+
+def quadrant_with_texts(quadrant: Dict) -> Dict:
+    """A quadrant from calculate_dreyfus_quadrant() with its texts."""
+
+    info = QUADRANTS[quadrant['quadrant_key']]
+
+    return {
+        **quadrant,
+        'name': str(info['name']),
+        'description': str(info['description']),
+        'characteristics': [str(characteristic) for characteristic in info['characteristics']],
+        'development_path': str(info['development_path']),
+        'skill_range': info['skill_range'],
+        'agency_range': info['agency_range'],
+    }
+
+
+def development_plan_with_texts(plan: Dict, skill_profile: Dict) -> Dict:
+    """A plan from generate_development_recommendations() with its recommendations in the active language."""
+
+    stage = skill_profile['stage']
+    next_stage = min(5, stage + 1)
+    next_stage_info = DREYFUS_STAGES[next_stage]
+
+    if stage < 3:
+        quick_wins, resources = EARLY_QUICK_WINS, EARLY_RESOURCES
+    elif stage == 3:
+        quick_wins, resources = COMPETENT_QUICK_WINS, COMPETENT_RESOURCES
+    else:
+        quick_wins, resources = ADVANCED_QUICK_WINS, ADVANCED_RESOURCES
+
+    actions = [action['text'] for action in plan['action_items']]
+    quick_wins = actions + [str(quick_win) for quick_win in quick_wins]
+
+    if hint := plan.get('agency_hint'):
+        quick_wins.insert(0, str(AGENCY_HINTS[hint]))
+
+    next_capabilities = gettext('Develop capabilities of a %(stage)s: %(description)s') % {
+        'stage': next_stage_info['name'],
+        'description': next_stage_info['short_description'],
+    }
+
+    return {
+        **plan,
+        'primary_focus': str(PRIMARY_FOCUS[stage]),
+        'quick_wins': quick_wins,
+        'long_term_goals': [
+            next_capabilities,
+            gettext('Build experience across diverse situations'),
+            gettext('Continuously reflect on your practice and learning'),
+        ],
+        'resources': [str(resource) for resource in resources],
+        'next_level_requirements': stage_texts(stage)['development_focus'],
+    }
+
+
 # Helper functions
 
-def _get_personalized_action_items(report_data: Dict, current_stage: int) -> List[str]:
+def _get_personalized_action_items(report_data: Dict, current_stage: int) -> List[Dict]:
     """
     Extract personalized action items based on question scores and current Dreyfus stage.
 
@@ -587,7 +654,7 @@ def _get_personalized_action_items(report_data: Dict, current_stage: int) -> Lis
         current_stage: Current Dreyfus stage (1-5)
 
     Returns:
-        List of personalized action item strings
+        List of personalized action items as {'question_id', 'key', 'text'}
     """
     from questionnaires.models import Question
     from statistics import mean
@@ -647,7 +714,7 @@ def _get_personalized_action_items(report_data: Dict, current_stage: int) -> Lis
                 continue
 
             # Add the action item
-            personalized_actions.append(text)
+            personalized_actions.append({'question_id': question.id, 'key': action_item.get('key'), 'text': text})
 
     # Limit to top 5 most relevant action items
     return personalized_actions[:5]
@@ -655,43 +722,34 @@ def _get_personalized_action_items(report_data: Dict, current_stage: int) -> Lis
 
 def _level_to_stage(level: float) -> int:
     """Convert continuous level (1.0-5.0) to discrete stage (1-5)."""
-    if level >= 4.5:
-        return 5
-    elif level >= 3.5:
-        return 4
-    elif level >= 2.5:
-        return 3
-    elif level >= 1.5:
-        return 2
-    else:
-        return 1
+    return max(1, min(5, int(level + 0.5)))
 
 
 def _get_development_focus(current_stage: int, next_stage: int) -> List[str]:
     """Get what's needed to progress from current to next stage."""
     focus_areas = {
         (1, 2): [
-            'Recognize recurring patterns in your work',
-            'Handle routine tasks independently',
-            'Build situational awareness beyond just following rules'
+            _('Recognize recurring patterns in your work'),
+            _('Handle routine tasks independently'),
+            _('Build situational awareness beyond just following rules')
         ],
         (2, 3): [
-            'Develop mental models of how things work',
-            'Take responsibility for outcomes, not just tasks',
-            'Plan and prioritize work deliberately'
+            _('Develop mental models of how things work'),
+            _('Take responsibility for outcomes, not just tasks'),
+            _('Plan and prioritize work deliberately')
         ],
         (3, 4): [
-            'See the big picture and system context',
-            'Learn from others\' experiences, not just your own',
-            'Recognize patterns and deviations quickly'
+            _('See the big picture and system context'),
+            _('Learn from others\' experiences, not just your own'),
+            _('Recognize patterns and deviations quickly')
         ],
         (4, 5): [
-            'Trust your intuition based on deep experience',
-            'Create novel approaches and solutions',
-            'Become a recognized authority in your domain'
+            _('Trust your intuition based on deep experience'),
+            _('Create novel approaches and solutions'),
+            _('Become a recognized authority in your domain')
         ]
     }
-    return focus_areas.get((current_stage, next_stage), ['Continue developing expertise'])
+    return focus_areas.get((current_stage, next_stage), [_('Continue developing expertise')])
 
 
 def _fallback_section_based_detection(report_data: Dict) -> Tuple[Optional[float], float]:
@@ -719,10 +777,3 @@ def _fallback_section_based_detection(report_data: Dict) -> Tuple[Optional[float
                 return skill_level, confidence
 
     return None, 0.0
-
-
-def _extract_development_areas(report_data: Dict) -> List[Dict]:
-    """Extract development areas from report data insights."""
-    # This would typically come from the insights section
-    # For now, return empty list - will be populated by main report generation
-    return []

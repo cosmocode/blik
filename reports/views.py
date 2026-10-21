@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 from accounts.permissions import can_view_all_reports
 from reviews.models import ReviewCycle
 from .models import Report
+from .report_texts import with_texts
 from .services import generate_report, get_report_summary, apply_display_anonymization
 import uuid
 
@@ -65,6 +66,7 @@ def view_report(request, cycle_uuid):
     context = {
         'cycle': cycle,
         'report': report,
+        'report_data': with_texts(report.report_data),
         'display_data': display_data,  # For detailed report sections
         'summary': summary,
         'questionnaire': cycle.questionnaire,
@@ -130,6 +132,7 @@ def reviewee_report(request, access_token):
     context = {
         'cycle': cycle,
         'report': report,
+        'report_data': with_texts(report.report_data),
         'display_data': display_data,  # For detailed report sections
         'summary': summary,
         'questionnaire': cycle.questionnaire,
