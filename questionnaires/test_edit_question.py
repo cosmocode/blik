@@ -49,8 +49,13 @@ class EditQuestionTests(TestCase):
         self.assertEqual(self.question.config['dreyfus_mapping'], {'skill': 1.5})
 
     def test_another_type_drops_the_rating_labels_but_keeps_the_dreyfus_weights(self):
-        self.edit(question_type='likert', question_text=self.question.question_text, likert_scale='Never\nOften')
+        self.edit(
+            question_type='likert',
+            question_text=self.question.question_text,
+            likert_option_id=['', ''],
+            likert_option_label=['Never', 'Often'],
+        )
 
-        self.assertEqual(self.question.config['scale'], ['Never', 'Often'])
+        self.assertEqual(list(self.question.options.values_list('label', flat=True)), ['Never', 'Often'])
         self.assertNotIn('labels', self.question.config)
         self.assertEqual(self.question.config['dreyfus_mapping'], {'skill': 1.5})

@@ -32,10 +32,10 @@
         {% elif question_data.question_type == 'likert' %}
             <div style="font-size: 0.875rem; color: var(--text-secondary);">
                 {% trans 'Likert scale options:' %}
-                {% if question_data.question_config.scale %}
+                {% if question_data|report_options %}
                 <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                    {% for option in question_data.question_config.scale %}
-                        <span style="padding: 0.25rem 0.75rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; font-size: 0.8125rem;">{{ option }}</span>
+                    {% for option in question_data|report_options %}
+                        <span style="padding: 0.25rem 0.75rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; font-size: 0.8125rem;">{{ option.label }}</span>
                     {% endfor %}
                 </div>
                 {% else %}
@@ -48,8 +48,8 @@
             <div style="font-size: 0.875rem; color: var(--text-secondary);">
                 {% trans 'Single choice (select one):' %}
                 <div style="margin-top: 0.5rem;">
-                    {% for choice in question_data.question_config.choices %}
-                        <div style="font-size: 0.8125rem; padding: 0.25rem 0;">○ {{ choice }}</div>
+                    {% for option in question_data|report_options %}
+                        <div style="font-size: 0.8125rem; padding: 0.25rem 0;">○ {{ option.label }}</div>
                     {% endfor %}
                 </div>
             </div>
@@ -57,8 +57,8 @@
             <div style="font-size: 0.875rem; color: var(--text-secondary);">
                 {% trans 'Multiple choice (select all that apply):' %}
                 <div style="margin-top: 0.5rem;">
-                    {% for choice in question_data.question_config.choices %}
-                        <div style="font-size: 0.8125rem; padding: 0.25rem 0;">☐ {{ choice }}</div>
+                    {% for option in question_data|report_options %}
+                        <div style="font-size: 0.8125rem; padding: 0.25rem 0;">☐ {{ option.label }}</div>
                     {% endfor %}
                 </div>
             </div>
@@ -89,6 +89,17 @@
                         {{ cat_data.message }}
                     </div>
                 {% else %}
+                    {% if cat_data.unmapped %}
+                    <div class="insufficient-data">
+                        {% blocktrans trimmed count counter=cat_data.unmapped %}
+                            {{ counter }} answer could not be matched to an option, because the question changed
+                            after it was given.
+                        {% plural %}
+                            {{ counter }} answers could not be matched to an option, because the question changed
+                            after they were given.
+                        {% endblocktrans %}
+                    </div>
+                    {% endif %}
                     {# RATING QUESTIONS - Show average and distribution #}
                     {% if question_data.question_type == 'rating' and cat_data.avg %}
                         <div class="rating-display">
@@ -142,11 +153,10 @@
                     {# LIKERT QUESTIONS - Show sentiment summary + distribution #}
                     {% elif question_data.question_type == 'likert' %}
                         {% if cat_data.distribution %}
-                            {# Calculate sentiment (positive = agree/strongly agree) #}
-                            {% with scale=question_data.question_config.scale %}
+                            {# Calculate sentiment (positive = the two highest options) #}
+                            {% with scale=question_data|report_options %}
                             {% with total_responses=cat_data.count %}
-                            {% with strongly_agree=cat_data.distribution|get_item:'Strongly Agree'|default:0 agree=cat_data.distribution|get_item:'Agree'|default:0 %}
-                            {% with positive_count=strongly_agree|add:agree %}
+                            {% with positive_count=cat_data.distribution|likert_positive_count:scale %}
                             {% with positive_pct=positive_count|percentage:total_responses %}
 
                             {% if positive_pct >= 70 %}
@@ -162,11 +172,11 @@
                             <div class="distribution-container" style="margin-top: 0.75rem;">
                                 {# Show all scale options in order, including zeros #}
                                 {% for option in scale %}
-                                    {% with count=cat_data.distribution|get_item:option|default:0 %}
+                                    {% with count=cat_data.distribution|option_count:option %}
                                     {% with pct=count|percentage:total_responses %}
                                     <div class="distribution-item">
                                         <div class="distribution-header">
-                                            <span class="distribution-label">{{ option }}</span>
+                                            <span class="distribution-label">{{ option.label }}</span>
                                             <span class="distribution-count">{% blocktrans trimmed count counter=count %}{{ counter }} respondent{% plural %}{{ counter }} respondents{% endblocktrans %} ({{ pct }}%)</span>
                                         </div>
                                         <div class="distribution-bar-container">
@@ -181,7 +191,6 @@
                             {% endwith %}
                             {% endwith %}
                             {% endwith %}
-                            {% endwith %}
                         {% endif %}
 
                     {# SINGLE CHOICE - Show sorted by frequency with percentages #}
@@ -190,7 +199,7 @@
                             <div class="rating-display">
                                 <span class="rating-score">{{ cat_data.avg|floatformat:1 }}</span>
                                 <div class="rating-bar-container">
-                                    {% with weights=question_data.question_config.weights %}
+                                    {% with weights=question_data|option_weights %}
                                         {% if weights %}
                                             {% widthratio cat_data.avg weights|last 100 as bar_width %}
                                             <div class="rating-bar-fill" style="width: {{ bar_width }}%"></div>
@@ -207,7 +216,7 @@
                                 {% with pct=count|percentage:cat_data.count %}
                                 <div class="distribution-item">
                                     <div class="distribution-header">
-                                        <span class="distribution-label">{{ option }}</span>
+                                        <span class="distribution-label">{{ option|option_label:question_data }}</span>
                                         <span class="distribution-count">{% blocktrans trimmed count counter=count %}{{ counter }} respondent{% plural %}{{ counter }} respondents{% endblocktrans %} ({{ pct }}%)</span>
                                     </div>
                                     <div class="distribution-bar-container">
@@ -234,7 +243,7 @@
                                 {% with pct=count|percentage:cat_data.count %}
                                 <div class="distribution-item">
                                     <div class="distribution-header">
-                                        <span class="distribution-label">{{ option }}</span>
+                                        <span class="distribution-label">{{ option|option_label:question_data }}</span>
                                         <span class="distribution-count">{% blocktrans trimmed with selected=count count counter=cat_data.count %}{{ selected }} of {{ counter }} respondent{% plural %}{{ selected }} of {{ counter }} respondents{% endblocktrans %} ({{ pct }}%)</span>
                                     </div>
                                     <div class="distribution-bar-container">

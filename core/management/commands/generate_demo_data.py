@@ -751,6 +751,11 @@ class Command(BaseCommand):
             if random.random() < 0.2:
                 rating = max(1, min(5, rating + random.choice([-1, 1])))
 
+            if question.question_type == 'likert':
+                # Likert answers store the id of the option at that scale position
+                options = list(question.options.all())
+                return {'value': options[min(rating, len(options)) - 1].id if options else ''}
+
             return {'value': rating}
 
         elif question.question_type == 'text':
@@ -823,8 +828,9 @@ class Command(BaseCommand):
         elif question.question_type == 'single_choice':
             # Handle single choice questions
             config = question.config or {}
-            choices = config.get('choices', [])
-            weights = config.get('weights', [])
+            options = list(question.options.all())
+            choices = [option.id for option in options]
+            weights = [option.weight for option in options if option.weight is not None]
 
             if not choices:
                 return {'value': ''}
@@ -847,8 +853,7 @@ class Command(BaseCommand):
 
         elif question.question_type == 'multiple_choice':
             # Handle multiple choice questions
-            config = question.config or {}
-            choices = config.get('choices', [])
+            choices = [option.id for option in question.options.all()]
 
             if not choices:
                 return {'value': []}

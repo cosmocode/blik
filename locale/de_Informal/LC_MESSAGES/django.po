@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-20 15:33+0000\n"
+"POT-Creation-Date: 2026-10-21 10:00+0000\n"
 "Language: de_Informal\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -891,9 +891,6 @@ msgstr ""
 msgid "Error updating section: %(error)s"
 msgstr ""
 
-msgid "Weights count did not match choices count. Scoring disabled for this question."
-msgstr ""
-
 msgid "Invalid weight values. Scoring disabled for this question."
 msgstr ""
 
@@ -1756,6 +1753,18 @@ msgstr ""
 msgid "questions"
 msgstr ""
 
+msgid "label"
+msgstr ""
+
+msgid "weight"
+msgstr ""
+
+msgid "answer option"
+msgstr ""
+
+msgid "answer options"
+msgstr ""
+
 msgid "No expiry"
 msgstr ""
 
@@ -1794,22 +1803,22 @@ msgstr ""
 msgid "available"
 msgstr ""
 
-msgid "Expiration date for access token"
-msgstr ""
-
 msgid "access token expires"
 msgstr ""
 
-msgid "Last time report was accessed"
+msgid "Expiration date for access token"
 msgstr ""
 
 msgid "last accessed"
 msgstr ""
 
-msgid "Number of times report has been accessed"
+msgid "Last time report was accessed"
 msgstr ""
 
 msgid "access count"
+msgstr ""
+
+msgid "Number of times report has been accessed"
 msgstr ""
 
 msgid "report"
@@ -2030,6 +2039,10 @@ msgid "Question \"%(question)s\" is required"
 msgstr ""
 
 #, python-format
+msgid "Invalid option for question \"%(question)s\""
+msgstr ""
+
+#, python-format
 msgid "Rating must be between %(min)s and %(max)s"
 msgstr ""
 
@@ -2085,10 +2098,10 @@ msgstr ""
 msgid "monthly price"
 msgstr ""
 
-msgid "Maximum total: reviewees + team members combined"
+msgid "maximum employees"
 msgstr ""
 
-msgid "maximum employees"
+msgid "Maximum total: reviewees + team members combined"
 msgstr ""
 
 msgid "Stripe price ID"
@@ -2955,6 +2968,9 @@ msgstr ""
 msgid "Ask an organization administrator to buy another round."
 msgstr ""
 
+msgid "Add option"
+msgstr ""
+
 #, python-format
 msgid "Type: %(type)s"
 msgstr ""
@@ -3379,7 +3395,7 @@ msgstr ""
 msgid "Multiple Choice (Checkboxes)"
 msgstr ""
 
-msgid "Likert Scale Items (one per line)"
+msgid "Likert Scale Items"
 msgstr ""
 
 msgid "Scale Configuration"
@@ -3407,13 +3423,10 @@ msgstr ""
 msgid "e.g., Extremely"
 msgstr ""
 
-msgid "Choices (one per line)"
+msgid "Choices"
 msgstr ""
 
 msgid "Enable numeric scoring for analytics"
-msgstr ""
-
-msgid "Assign weights to each option (for scoring)"
 msgstr ""
 
 msgid "Required question"
@@ -3443,16 +3456,10 @@ msgstr ""
 msgid "Creates a slider or numeric input for precise measurement (e.g., 1-100 scale)."
 msgstr ""
 
-msgid "Option 1&#10;Option 2&#10;Option 3"
-msgstr ""
-
 msgid "When enabled, this question will contribute to section scores and charts"
 msgstr ""
 
 msgid "Learn more about scoring"
-msgstr ""
-
-msgid "Assign numeric values (e.g., 1-5 scale) to measure this dimension"
 msgstr ""
 
 msgid "Dreyfus/Agency Configuration (Optional)"
@@ -3477,15 +3484,6 @@ msgid "Define action items for development plans when this question scores low"
 msgstr ""
 
 msgid "Add Question"
-msgstr ""
-
-msgid "Option"
-msgstr ""
-
-msgid "Weight"
-msgstr ""
-
-msgid "(empty)"
 msgstr ""
 
 #, python-format
@@ -3658,6 +3656,21 @@ msgid "Section Description (Optional)"
 msgstr ""
 
 msgid "Questions about leadership style, decision-making, and team management"
+msgstr ""
+
+msgid "Option"
+msgstr ""
+
+msgid "Weight"
+msgstr ""
+
+msgid "Move up"
+msgstr ""
+
+msgid "Move down"
+msgstr ""
+
+msgid "Remove option"
 msgstr ""
 
 msgid "Request failed."
@@ -5693,6 +5706,12 @@ msgstr ""
 #, python-format
 msgid "%(counter)s response"
 msgid_plural "%(counter)s responses"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%(counter)s answer could not be matched to an option, because the question changed after it was given."
+msgid_plural "%(counter)s answers could not be matched to an option, because the question changed after they were given."
 msgstr[0] ""
 msgstr[1] ""
 

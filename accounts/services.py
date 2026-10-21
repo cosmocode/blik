@@ -57,7 +57,9 @@ def export_organization_data(organization):
         })
 
     # Export questionnaires
-    for questionnaire in Questionnaire.objects.for_organization(organization).prefetch_related('sections__questions'):
+    questionnaires = Questionnaire.objects.for_organization(organization)
+
+    for questionnaire in questionnaires.prefetch_related('sections__questions__options'):
         q_data = {
             'name': questionnaire.name,
             'description': questionnaire.description,
@@ -76,6 +78,7 @@ def export_organization_data(organization):
                     'question_text': question.question_text,
                     'question_type': question.question_type,
                     'config': question.config,
+                    'options': question.options_data,
                     'required': question.required,
                     'order': question.order,
                 })

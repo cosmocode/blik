@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib import messages
 from django.utils.translation import gettext as _, gettext_lazy
+
+from questionnaires.models import Question
 from .models import ReviewCycle, ReviewerToken, Response
 
 
@@ -75,6 +77,6 @@ class ResponseAdmin(admin.ModelAdmin):
     list_select_related = ['cycle', 'cycle__reviewee', 'question', 'token']
     readonly_fields = ['created_at', 'updated_at']
 
-    def question_short(self, obj):
-        return obj.question.question_text[:50] + '...' if len(obj.question.question_text) > 50 else obj.question.question_text
-    question_short.short_description = gettext_lazy('Question')
+    @admin.display(description=gettext_lazy('Question'), ordering='question__question_text')
+    def question_short(self, obj: Response):
+        return obj.question.short_text

@@ -28,7 +28,18 @@ from reports.models import Report
 from reports.services import generate_report
 from reviews.factories import ReviewCycleFactory, ReviewerTokenFactory
 
-DEFAULT_LIKERT = 'Strongly Disagree\nDisagree\nNeutral\nAgree\nStrongly Agree'
+DEFAULT_LIKERT = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree']
+
+
+def option_rows(prefix, labels, weights=()):
+    """The answer option rows the editor posts for new options."""
+
+    rows = {f'{prefix}_option_id': [''] * len(labels), f'{prefix}_option_label': labels}
+
+    if weights:
+        rows[f'{prefix}_option_weight'] = weights
+
+    return rows
 
 
 class FormChoices(HTMLParser):
@@ -99,7 +110,8 @@ class QuestionnaireFlowTests(TestCase):
         self.client.force_login(self.admin)
 
         self.questionnaire = self.build_questionnaire()
-        self.questions = {q.question_text: q for q in Question.objects.filter(section__questionnaire=self.questionnaire)}
+        questions = Question.objects.filter(section__questionnaire=self.questionnaire)
+        self.questions = {question.question_text: question for question in questions}
         self.cycle = ReviewCycleFactory(
             reviewee=RevieweeFactory(organization=self.organization, name='Dana Doe'),
             questionnaire=self.questionnaire,
@@ -122,11 +134,11 @@ class QuestionnaireFlowTests(TestCase):
         add('rating', 'Shares knowledge', add_skill_weight='1.0',
             **{'add_action_items[0][text]': 'Pair with a colleague every week',
                'add_action_items[0][threshold]': '4.5'})
-        add('likert', 'Gives useful feedback', likert_scale=DEFAULT_LIKERT)
-        add('likert', 'Asks for help', likert_scale='Never\nSometimes\nOften\nAlways')
-        add('single_choice', 'Seniority', choices='Novice\nAdvanced\nExpert', enable_scoring='on',
-            **{'weights[]': ['1', '3', '5']})
-        add('multiple_choice', 'Strong areas', choices='Code\nDocs\nTalks')
+        add('likert', 'Gives useful feedback', **option_rows('likert', DEFAULT_LIKERT))
+        add('likert', 'Asks for help', **option_rows('likert', ['Never', 'Sometimes', 'Often', 'Always']))
+        add('single_choice', 'Seniority', enable_scoring='on',
+            **option_rows('choice', ['Novice', 'Advanced', 'Expert'], ['1', '3', '5']))
+        add('multiple_choice', 'Strong areas', **option_rows('choice', ['Code', 'Docs', 'Talks']))
         add('scale', 'Energy', scale_min='0', scale_max='10', scale_step='1',
             scale_min_label='Drained', scale_max_label='Energised')
         add('text', 'Anything else?')
@@ -201,7 +213,7 @@ class QuestionnaireFlowTests(TestCase):
         def labels(text):
             return set(choices[f'question_{self.questions[text].id}'])
 
-        self.assertEqual(labels('Gives useful feedback'), set(DEFAULT_LIKERT.split('\n')))
+        self.assertEqual(labels('Gives useful feedback'), set(DEFAULT_LIKERT))
         self.assertEqual(labels('Asks for help'), {'Never', 'Sometimes', 'Often', 'Always'})
         self.assertEqual(labels('Seniority'), {'Novice', 'Advanced', 'Expert'})
         self.assertEqual(labels('Strong areas'), {'Code', 'Docs', 'Talks'})

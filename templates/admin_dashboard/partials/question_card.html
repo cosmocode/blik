@@ -13,8 +13,8 @@
                 {% blocktrans trimmed with type=question.get_question_type_display %}Type: {{ type }}{% endblocktrans %}
                 {% if question.question_type == 'rating' and question.config.min %}
                 | {% blocktrans trimmed with min=question.config.min max=question.config.max %}Scale: {{ min }}-{{ max }}{% endblocktrans %}
-                {% elif question.question_type == 'likert' and question.config.scale %}
-                | {% blocktrans trimmed with count=question.config.scale|length %}{{ count }}-point scale{% endblocktrans %}
+                {% elif question.question_type == 'likert' and question.options.all %}
+                | {% blocktrans trimmed with count=question.options.all|length %}{{ count }}-point scale{% endblocktrans %}
                 {% endif %}
             </div>
         </div>
@@ -34,6 +34,7 @@
                 data-question-type="{{ question.question_type }}"
                 data-required="{{ question.required|yesno:'true,false' }}"
                 data-config="{{ question.config|to_json }}"
+                data-options="{{ question.options_data|to_json }}"
             >{% trans 'Edit' %}</button>
             <form method="post" style="margin: 0;" onsubmit="return confirm('{{ _('Delete this question?')|escapejs }}');">
                 {% csrf_token %}

@@ -88,6 +88,70 @@ def sort_by_frequency(distribution):
 
 
 @register.filter
+def report_options(question_data):
+    """Answer options of a report question as [{'id', 'label', 'weight'}, ...].
+
+    Reports generated before answer options existed count their answers by label and carry no 'options'. For those the
+    label doubles as the id, so their stored counts still line up.
+    """
+
+    if options := question_data.get('options'):
+        return options
+
+    config = question_data.get('question_config') or {}
+    labels = config.get('scale') or config.get('choices') or []
+    weights = config.get('weights') or []
+
+    return [
+        {'id': label, 'label': label, 'weight': weights[index] if index < len(weights) else None}
+        for index, label in enumerate(labels)
+    ]
+
+
+def distribution_key(option):
+    """The key a report distribution counts an option under: its id as text."""
+
+    option_id = option['id']
+
+    return f'{option_id}'
+
+
+@register.filter
+def option_count(distribution, option):
+    """How many answers in a report distribution chose the option."""
+
+    return (distribution or {}).get(distribution_key(option), 0)
+
+
+@register.filter
+def option_label(key, question_data):
+    """Label of the option a report distribution key stands for, falling back to the key itself."""
+
+    for option in report_options(question_data):
+        if distribution_key(option) == key:
+            return option['label']
+
+    return key
+
+
+@register.filter
+def option_weights(question_data):
+    """The weights of a report question's options, in their order."""
+
+    return [option['weight'] for option in report_options(question_data) if option['weight'] is not None]
+
+
+@register.filter
+def likert_positive_count(distribution, options):
+    """Answers in the two highest options of a likert scale.
+
+    Counted by position rather than by label, so custom scales and reworded or translated labels are summarised too.
+    """
+
+    return sum(option_count(distribution, option) for option in options[-2:])
+
+
+@register.filter
 def get_rating_label(question_config, rating_value):
     """Get label for a rating value from question config"""
     try:

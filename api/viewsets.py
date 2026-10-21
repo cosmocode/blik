@@ -16,6 +16,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiPara
 from accounts.models import Reviewee
 from accounts.permissions import visible_cycles
 from reviews.models import ReviewCycle, ReviewerToken
+from questionnaires.answer_options import OPTION_TYPES, resolve_answer
 from questionnaires.models import Questionnaire
 from reports.models import Report
 
@@ -497,11 +498,11 @@ class ReviewCycleViewSet(viewsets.ModelViewSet):
             )
 
         # Get all questions for validation
-        questions = Question.objects.filter(section__questionnaire=cycle.questionnaire)
+        questions = Question.objects.filter(section__questionnaire=cycle.questionnaire).prefetch_related('options')
         question_dict = {str(q.uuid): q for q in questions}
 
-        # Process responses
-        created_responses = []
+        # Validate every answer before creating any, so a rejected request leaves no partial set of responses behind
+        answers = []
         for resp_data in responses_data:
             question_uuid = resp_data.get('question_uuid')
             value = resp_data.get('value')
@@ -511,15 +512,35 @@ class ReviewCycleViewSet(viewsets.ModelViewSet):
 
             question = question_dict[question_uuid]
 
-            # Create response with answer_data
-            response = QuestionResponse.objects.create(
+            # Clients may send the option id or its label; both are stored as the id
+            if question.question_type in OPTION_TYPES:
+                options = list(question.options.all())
+                given = value if isinstance(value, list) else [value]
+                resolved = [resolve_answer(options, answer) for answer in given]
+
+                if None in resolved:
+                    return Response(
+                        {'error': f'Invalid option for question {question_uuid}'},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+                if isinstance(value, list):
+                    value = resolved
+                else:
+                    [value] = resolved
+
+            answers.append((question, value))
+
+        created_responses = [
+            QuestionResponse.objects.create(
                 cycle=cycle,
                 question=question,
                 token=reviewer_token,
                 category=reviewer_token.category,
                 answer_data={'value': value}
             )
-            created_responses.append(response)
+            for question, value in answers
+        ]
 
         # Mark token as completed
         reviewer_token.completed_at = timezone.now()
@@ -635,7 +656,7 @@ class QuestionnaireViewSet(viewsets.ReadOnlyModelViewSet):
             Questionnaire.objects.filter(
                 Q(organization=org) | Q(organization__isnull=True), is_active=True
             )
-            .prefetch_related("sections__questions")
+            .prefetch_related("sections__questions__options")
             .order_by("name")
         )
 

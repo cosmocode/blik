@@ -59,9 +59,9 @@
                     <div style="margin-top: 0.5rem;">
                         <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">{% trans 'Likert scale options:' %}</div>
                         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                            {% for item in question.config.scale %}
+                            {% for option in question.options.all %}
                             <div style="padding: 0.5rem 0.75rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; font-size: 0.875rem; color: var(--text-primary);">
-                                {{ item }}
+                                {{ option.label }}
                             </div>
                             {% endfor %}
                         </div>
@@ -70,8 +70,8 @@
                     <div style="margin-top: 0.5rem;">
                         <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">{% trans 'Options:' %}</div>
                         <ul style="margin-left: 1.5rem;">
-                            {% for choice in question.config.choices %}
-                            <li>{{ choice }}</li>
+                            {% for option in question.options.all %}
+                            <li>{{ option.label }}</li>
                             {% endfor %}
                         </ul>
                     </div>
