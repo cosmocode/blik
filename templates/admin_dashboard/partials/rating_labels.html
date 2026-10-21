@@ -1,0 +1,9 @@
+{# Labels of the rating values; prefilled with the defaults when adding a question, filled from the question when editing #}
+<div style="display: flex; flex-direction: column; gap: 0.5rem;">
+    {% for value, label in default_rating_labels.items %}
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <span style="width: 1.5rem; color: var(--text-secondary);">{{ value }}</span>
+        <input type="text" name="rating_label_{{ value }}" data-rating-value="{{ value }}" class="form-control" {% if prefill %}value="{{ label }}"{% endif %}>
+    </div>
+    {% endfor %}
+</div>

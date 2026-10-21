@@ -12,12 +12,12 @@
         </div>
         {% if question_data.question_type == 'rating' %}
             <div style="font-size: 0.875rem; color: var(--text-secondary);">
-                {% if question_data.question_config.labels %}
+                {% if question_data|report_labels %}
                     {% trans 'Rating scale (1-5):' %}
                     <div style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.25rem;">
                         {% for rating in "12345" %}
                             {% with rating_int=rating|add:"0" %}
-                            {% with label=question_data.question_config|get_rating_label:rating_int %}
+                            {% with label=question_data|get_rating_label:rating_int %}
                             {% if label %}
                                 <div style="font-size: 0.8125rem;">{{ rating_int }}. {{ label }}</div>
                             {% endif %}
@@ -121,7 +121,7 @@
                                 <div class="distribution-item">
                                     <div class="distribution-header">
                                         <span class="distribution-label">
-                                            {{ rating_int }} - {{ question_data.question_config|get_rating_label:rating_int }}
+                                            {{ rating_int }} - {{ question_data|get_rating_label:rating_int }}
                                         </span>
                                         <span class="distribution-count">{{ count }} ({{ pct }}%)</span>
                                     </div>

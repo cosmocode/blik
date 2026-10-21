@@ -45,11 +45,11 @@ class QuestionFactory(DjangoModelFactory):
     config = factory.LazyFunction(lambda: {
         'min': 1,
         'max': 5,
-        'labels': {
-            '1': 'Poor',
-            '3': 'Average',
-            '5': 'Excellent'
-        }
+    })
+    labels = factory.LazyFunction(lambda: {
+        '1': 'Poor',
+        '3': 'Average',
+        '5': 'Excellent'
     })
     required = True
     order = factory.Sequence(lambda n: n)
@@ -62,11 +62,11 @@ class RatingQuestionFactory(QuestionFactory):
     config = factory.LazyFunction(lambda: {
         'min': 1,
         'max': 5,
-        'labels': {
-            '1': 'Needs improvement',
-            '3': 'Meets expectations',
-            '5': 'Exceeds expectations'
-        }
+    })
+    labels = factory.LazyFunction(lambda: {
+        '1': 'Needs improvement',
+        '3': 'Meets expectations',
+        '5': 'Exceeds expectations'
     })
 
 

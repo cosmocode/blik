@@ -138,17 +138,21 @@ class Question(TimeStampedModel):
     question_type = models.CharField(_('question type'), max_length=20, choices=QUESTION_TYPES)
 
     # JSON field for question configuration
-    # For rating: {"min": 1, "max": 5, "labels": {"1": "Poor", "5": "Excellent"}}
+    # For rating: {"min": 1, "max": 5}
     # For likert, single_choice and multiple_choice the options are AnswerOption rows
     # For single_choice and multiple_choice with scoring: {"scoring_enabled": true}, the options carry the weights
     #   Note: For multiple_choice, score = sum of selected option weights (rewards selecting more positive attributes)
-    # For scale: {"min": 1, "max": 100, "step": 1, "min_label": "Not at all", "max_label": "Extremely"}
+    # For scale: {"min": 1, "max": 100, "step": 1}
     # Optional chart configuration:
     #   "chart_weight": 1.0 (default) - Weight in section average (0.5 = half weight, 2.0 = double weight)
     #   "exclude_from_charts": false (default) - Set true to exclude from chart aggregations
     # Optional Dreyfus model configuration:
     #   "dreyfus_mapping": {"skill": 1.5, "agency": 0.5} - Weights for skill/agency dimensions
     config = models.JSONField(_('configuration'), default=dict)
+
+    # For rating: labels by value, {"1": "Poor", "5": "Excellent"}
+    # For scale: labels of its ends, {"min": "Not at all", "max": "Extremely"}
+    labels = models.JSONField(_('labels'), default=dict, blank=True)
 
     # Personalized action items for development plans
     # Format: [

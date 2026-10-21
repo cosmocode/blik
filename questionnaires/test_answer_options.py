@@ -1,4 +1,4 @@
-"""Answer options: answers refer to options by id, the editor posts them as rows."""
+"""Answer options and labels: answers refer to options by id, the editor posts them as rows."""
 from io import StringIO
 
 from django.contrib.auth.models import User
@@ -10,8 +10,9 @@ from accounts.models import Reviewee, UserProfile
 from accounts.permissions import assign_organization_admin, ensure_permission_groups
 from api.models import APIToken
 from core.models import Organization
-from core.upgrade_steps import create_answer_options
-from questionnaires.answer_options import move_options_out_of_config, save_options
+from core.upgrade_steps import move_question_texts
+from questionnaires.answer_options import save_options
+from questionnaires.legacy_config import config_with_texts, move_texts_out_of_config
 from questionnaires.models import Question, QuestionSection, Questionnaire
 from questionnaires.signals import clone_questionnaire_for_organization
 from reports.services import generate_report
@@ -53,6 +54,17 @@ class AnswerOptionTestCase(TestCase):
         save_options(question, [(None, label, weight) for label, weight in options])
 
         return question
+
+    def create_old_question(self, question_type, config):
+        """A question as saved before answer options and Question.labels existed."""
+
+        return Question.objects.create(
+            section=self.section,
+            question_text=question_type,
+            question_type=question_type,
+            config=config,
+            order=self.section.questions.count(),
+        )
 
     def create_token(self):
         return ReviewerToken.objects.create(cycle=self.cycle, category='peer')
@@ -169,23 +181,59 @@ class EditorTest(AnswerOptionTestCase):
 
         self.assertFalse(self.multi.options.exists())
 
-
-class ConfigOptionsTest(AnswerOptionTestCase):
-
-    def test_options_kept_in_the_config_become_rows(self):
-        question = Question.objects.create(
-            section=self.section,
-            question_text='Old',
-            question_type='single_choice',
-            config={'choices': ['Low', 'High'], 'weights': [1, 5], 'scoring_enabled': True},
-            order=9,
+    def test_rating_and_scale_labels_are_stored_without_the_empty_ones(self):
+        self.edit(
+            action='add_question',
+            section_id=self.section.id,
+            question_type='rating',
+            question_text='Rating',
+            rating_label_1='Rarely',
+            rating_label_5='Always',
+        )
+        self.edit(
+            action='add_question',
+            section_id=self.section.id,
+            question_type='scale',
+            question_text='Scale',
+            scale_min_label='Drained',
         )
 
-        move_options_out_of_config(question)
-        move_options_out_of_config(question)
+        self.assertEqual(Question.objects.get(question_text='Rating').labels, {'1': 'Rarely', '5': 'Always'})
+        self.assertEqual(Question.objects.get(question_text='Scale').labels, {'min': 'Drained'})
+
+
+class ConfigTextsTest(AnswerOptionTestCase):
+
+    def test_options_kept_in_the_config_become_rows(self):
+        config = {'choices': ['Low', 'High'], 'weights': [1, 5], 'scoring_enabled': True}
+        question = self.create_old_question('single_choice', config)
+
+        move_texts_out_of_config(question)
+        move_texts_out_of_config(question)
 
         self.assertEqual(list(question.options.values_list('label', 'weight')), [('Low', 1), ('High', 5)])
         self.assertEqual(question.config, {'scoring_enabled': True})
+
+    def test_labels_kept_in_the_config_move_to_their_field(self):
+        rating = self.create_old_question('rating', {'min': 1, 'max': 5, 'labels': {'1': 'Poor', '5': 'Great'}})
+        scale = self.create_old_question('scale', {'min': 0, 'max': 10, 'min_label': 'Low', 'max_label': 'High'})
+
+        move_texts_out_of_config(rating)
+        move_texts_out_of_config(scale)
+
+        self.assertEqual((rating.config, rating.labels), ({'min': 1, 'max': 5}, {'1': 'Poor', '5': 'Great'}))
+        self.assertEqual((scale.config, scale.labels), ({'min': 0, 'max': 10}, {'min': 'Low', 'max': 'High'}))
+
+    def test_the_api_reads_the_texts_from_the_config_as_before(self):
+        rating = self.create_old_question('rating', {'min': 1, 'max': 5, 'labels': {'1': 'Poor', '5': 'Great'}})
+        scale = self.create_old_question('scale', {'min': 0, 'max': 10, 'max_label': 'High'})
+        before = [rating.config, scale.config, config_with_texts(self.choice)]
+
+        move_texts_out_of_config(rating)
+        move_texts_out_of_config(scale)
+
+        self.assertEqual([config_with_texts(rating), config_with_texts(scale)], before[:2])
+        self.assertEqual(before[2], {'scoring_enabled': True, 'choices': ['Low', 'High'], 'weights': [1, 5]})
 
     def test_cloning_into_a_new_organization_copies_the_options(self):
         other = Organization.objects.create(name='Other', email='other@example.com')
@@ -198,17 +246,6 @@ class ConfigOptionsTest(AnswerOptionTestCase):
 
 class UpgradeStepTest(AnswerOptionTestCase):
 
-    def create_old_question(self, question_type, config):
-        """A question as saved before answer options existed."""
-
-        return Question.objects.create(
-            section=self.section,
-            question_text=question_type,
-            question_type=question_type,
-            config=config,
-            order=self.section.questions.count(),
-        )
-
     def test_labels_become_option_ids_and_unknown_answers_are_kept(self):
         likert = self.create_old_question('likert', {'scale': SCALE})
         multi = self.create_old_question('multiple_choice', {'choices': ['Calm', 'Kind', 'Fast']})
@@ -219,7 +256,7 @@ class UpgradeStepTest(AnswerOptionTestCase):
         written = self.respond(text, 'Agree')
 
         out = StringIO()
-        create_answer_options(out)
+        move_question_texts(out)
 
         for response in [agree, reworded, chosen, written]:
             response.refresh_from_db()
@@ -231,12 +268,20 @@ class UpgradeStepTest(AnswerOptionTestCase):
         self.assertEqual(written.answer_data, {'value': 'Agree'})
         self.assertIn('Mapped 1 response(s), 2 with unmapped answers.', out.getvalue())
 
+    def test_rating_labels_move_out_of_the_config(self):
+        rating = self.create_old_question('rating', {'min': 1, 'max': 5, 'labels': {'1': 'Poor'}})
+
+        move_question_texts(StringIO())
+
+        rating.refresh_from_db()
+        self.assertEqual((rating.config, rating.labels), ({'min': 1, 'max': 5}, {'1': 'Poor'}))
+
     def test_numeric_likert_answers_map_to_their_position(self):
         likert = self.create_old_question('likert', {'scale': SCALE})
         fourth = self.respond(likert, 4)
         too_high = self.respond(likert, 9)
 
-        create_answer_options(StringIO())
+        move_question_texts(StringIO())
 
         fourth.refresh_from_db()
         too_high.refresh_from_db()

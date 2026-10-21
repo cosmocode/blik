@@ -2,11 +2,7 @@
 Answer options of likert and choice questions.
 
 A response stores the id of the option a reviewer chose, never its label, so a label can be reworded or translated
-without orphaning the answers already given.
-
-Questions saved before answer options existed, the shipped fixtures and older exports keep the options in
-`Question.config` instead, as `scale` (likert) or `choices` and `weights`. `move_options_out_of_config()` turns them into
-AnswerOption rows.
+without orphaning the answers already given. Older configs keep the options themselves, see legacy_config.py.
 """
 
 from django.core.validators import EMPTY_VALUES
@@ -14,77 +10,11 @@ from django.db import models
 
 from reviews.models import Response
 
-from .models import AnswerOption, Question
+from .models import AnswerOption
 
 OPTION_TYPES = ['likert', 'single_choice', 'multiple_choice']
 
 DEFAULT_LIKERT_SCALE = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree']
-
-# Where older configs keep the options
-CONFIG_OPTION_KEYS = ['scale', 'choices', 'weights']
-
-
-def options_from_config(question):
-    """Return [(label, weight), ...] as the config describes them."""
-
-    config = question.config or {}
-
-    if question.question_type == 'likert':
-        return [(label, None) for label in config.get('scale', [])]
-
-    choices = config.get('choices', [])
-    weights = config.get('weights') or []
-
-    return [(label, weights[index] if index < len(weights) else None) for index, label in enumerate(choices)]
-
-
-def options_as_config(question):
-    """The options in the config keys that clients written before answer options existed read them from."""
-
-    options = list(question.options.all())
-    labels = [option.label for option in options]
-    weights = [option.weight for option in options]
-
-    if question.question_type == 'likert':
-        return {'scale': labels}
-
-    if question.question_type not in OPTION_TYPES:
-        return {}
-
-    if any(weight is not None for weight in weights):
-        return {'choices': labels, 'weights': weights}
-
-    return {'choices': labels}
-
-
-def move_options_out_of_config(question):
-    """Turn the options a question keeps in its config into AnswerOption rows."""
-
-    config = question.config or {}
-
-    if not any(key in config for key in CONFIG_OPTION_KEYS):
-        return
-
-    if question.question_type in OPTION_TYPES:
-        options = options_from_config(question)
-        AnswerOption.objects.bulk_create([
-            AnswerOption(question=question, order=order, label=label, weight=weight)
-            for order, [label, weight] in enumerate(options)
-        ])
-
-    question.config = {key: value for key, value in config.items() if key not in CONFIG_OPTION_KEYS}
-    question.save(update_fields=['config'])
-
-
-def move_all_options_out_of_config():
-    """move_options_out_of_config() for every question that still keeps its options in the config."""
-
-    questions = list(Question.objects.filter(config__has_any_keys=CONFIG_OPTION_KEYS))
-
-    for question in questions:
-        move_options_out_of_config(question)
-
-    return len(questions)
 
 
 def save_options(question, rows):

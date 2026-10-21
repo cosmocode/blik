@@ -79,6 +79,7 @@ def export_organization_data(organization):
                     'question_type': question.question_type,
                     'config': question.config,
                     'options': question.options_data,
+                    'labels': question.labels,
                     'required': question.required,
                     'order': question.order,
                 })

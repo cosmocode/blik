@@ -518,6 +518,7 @@ def generate_report(cycle):
             'question_text': '',
             'question_type': '',
             'question_config': {},
+            'labels': {},
             'options': [],
             'by_category': defaultdict(lambda: {
                 'responses': [],
@@ -540,6 +541,7 @@ def generate_report(cycle):
         question_data['question_text'] = question.question_text
         question_data['question_type'] = question.question_type
         question_data['question_config'] = question.config  # Store config for weight calculations
+        question_data['labels'] = question.labels
         question_data['options'] = [
             {'id': option.id, 'label': option.label, 'weight': option.weight}
             for option in question.options.all()
@@ -588,6 +590,7 @@ def generate_report(cycle):
                 'question_text': question_data['question_text'],
                 'question_type': question_data['question_type'],
                 'question_config': question_data['question_config'],  # Include config for labels, scales, etc.
+                'labels': question_data['labels'],
                 'options': question_data['options'],
                 'category_order': present_categories,  # Explicit ordering
                 'by_category': {}
