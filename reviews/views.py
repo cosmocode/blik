@@ -8,6 +8,7 @@ from django.utils.translation import gettext as _
 from django_ratelimit.decorators import ratelimit
 from core.languages import is_language, request_language
 from .models import ReviewerToken, Response, ReviewCycle
+from questionnaires.answer_options import OPTION_TYPES, resolve_answer
 from questionnaires.models import Question
 import secrets
 import logging
@@ -134,7 +135,7 @@ def feedback_form(request, token):
     questionnaire = cycle.questionnaire
 
     # Get all sections with questions
-    sections = questionnaire.sections.prefetch_related('questions').all()
+    sections = questionnaire.sections.prefetch_related('questions__options')
 
     # Get existing responses for this token
     existing_responses = {}
@@ -178,7 +179,7 @@ def submit_feedback(request, token):
     questionnaire = cycle.questionnaire
 
     # Get all questions for validation
-    questions = Question.objects.filter(section__questionnaire=questionnaire)
+    questions = Question.objects.filter(section__questionnaire=questionnaire).prefetch_related('options')
 
     errors = []
     responses_to_save = []
@@ -195,21 +196,28 @@ def submit_feedback(request, token):
 
             # Check required fields
             if question.required and not answer_values:
-                errors.append(_('Question "%(question)s" is required') % {'question': question.question_text[:50]})
+                errors.append(_('Question "%(question)s" is required') % {'question': question.short_text})
                 continue
 
             # Skip empty optional fields
             if not answer_values:
                 continue
 
-            answer_data = {'value': answer_values}
+            options = list(question.options.all())
+            resolved = [resolve_answer(options, answer) for answer in answer_values]
+
+            if None in resolved:
+                errors.append(_('Invalid option for question "%(question)s"') % {'question': question.short_text})
+                continue
+
+            answer_data = {'value': resolved}
         else:
             # For all other question types (single value)
             answer_value = request.POST.get(field_name, '').strip()
 
             # Check required fields
             if question.required and not answer_value:
-                errors.append(_('Question "%(question)s" is required') % {'question': question.question_text[:50]})
+                errors.append(_('Question "%(question)s" is required') % {'question': question.short_text})
                 continue
 
             # Skip empty optional fields
@@ -241,8 +249,15 @@ def submit_feedback(request, token):
                 except ValueError:
                     errors.append(_('Invalid scale value'))
                     continue
+            elif question.question_type in OPTION_TYPES:
+                option_id = resolve_answer(list(question.options.all()), answer_value)
+
+                if option_id is None:
+                    errors.append(_('Invalid option for question "%(question)s"') % {'question': question.short_text})
+                    continue
+
+                answer_data = {'value': option_id}
             else:
-                # text, single_choice, likert
                 answer_data = {'value': answer_value}
 
         responses_to_save.append({

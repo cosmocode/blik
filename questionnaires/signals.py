@@ -4,7 +4,8 @@ from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.core.management import call_command
 from core.models import Organization
-from .models import Questionnaire, QuestionSection, Question
+from .answer_options import move_all_options_out_of_config
+from .models import AnswerOption, Questionnaire, QuestionSection, Question
 import logging
 import uuid
 
@@ -48,11 +49,16 @@ def clone_questionnaire_for_organization(questionnaire, organization):
     for original_section_pk, cloned_section in section_mapping.items():
         questions = Question.objects.filter(section_id=original_section_pk).order_by('order')
         for question in questions:
+            options = list(question.options.all())
             question.pk = None
             question.id = None
             question.uuid = uuid.uuid4()  # Generate a new UUID
             question.section = cloned_section
             question.save()
+            AnswerOption.objects.bulk_create([
+                AnswerOption(question=question, order=option.order, label=option.label, weight=option.weight)
+                for option in options
+            ])
 
     return cloned_questionnaire
 
@@ -90,6 +96,7 @@ def load_default_questionnaire_fixtures(sender, **kwargs):
         except Exception as e:
             logger.warning(f"⚠ Could not load {fixture}: {e}")
 
+    move_all_options_out_of_config()
     logger.info("Default questionnaire fixtures loaded successfully")
 
 

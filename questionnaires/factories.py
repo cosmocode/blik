@@ -3,6 +3,7 @@ Factory definitions for questionnaire models
 """
 import factory
 from factory.django import DjangoModelFactory
+from .answer_options import DEFAULT_LIKERT_SCALE, save_options
 from .models import Questionnaire, QuestionSection, Question
 from core.factories import OrganizationFactory
 
@@ -80,12 +81,12 @@ class LikertQuestionFactory(QuestionFactory):
     """Factory for Likert scale questions"""
 
     question_type = 'likert'
-    config = factory.LazyFunction(lambda: {
-        'scale': [
-            'Strongly Disagree',
-            'Disagree',
-            'Neutral',
-            'Agree',
-            'Strongly Agree'
-        ]
-    })
+    config = {}
+
+    @factory.post_generation
+    def answer_options(self, create, extracted, **kwargs):
+        """The default five-point scale, or the labels passed as answer_options=[...]."""
+
+        if create:
+            labels = extracted or DEFAULT_LIKERT_SCALE
+            save_options(self, [(None, label, None) for label in labels])

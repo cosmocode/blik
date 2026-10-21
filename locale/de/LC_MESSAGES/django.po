@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-20 15:33+0000\n"
+"POT-Creation-Date: 2026-10-21 10:00+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -891,9 +891,6 @@ msgstr "Abschnitt nicht gefunden."
 msgid "Error updating section: %(error)s"
 msgstr "Fehler beim Aktualisieren des Abschnitts: %(error)s"
 
-msgid "Weights count did not match choices count. Scoring disabled for this question."
-msgstr "Die Anzahl der Gewichtungen passt nicht zur Anzahl der Antwortoptionen. Die Bewertung ist für diese Frage deaktiviert."
-
 msgid "Invalid weight values. Scoring disabled for this question."
 msgstr "Ungültige Gewichtungen. Die Bewertung ist für diese Frage deaktiviert."
 
@@ -1756,6 +1753,18 @@ msgstr "Frage"
 msgid "questions"
 msgstr "Fragen"
 
+msgid "label"
+msgstr "Beschriftung"
+
+msgid "weight"
+msgstr "Gewichtung"
+
+msgid "answer option"
+msgstr "Antwortoption"
+
+msgid "answer options"
+msgstr "Antwortoptionen"
+
 msgid "No expiry"
 msgstr "Kein Ablauf"
 
@@ -1794,23 +1803,23 @@ msgstr "erstellt am"
 msgid "available"
 msgstr "verfügbar"
 
-msgid "Expiration date for access token"
-msgstr "Ablaufdatum des Zugangstokens"
-
 msgid "access token expires"
 msgstr "Zugangstoken läuft ab"
 
-msgid "Last time report was accessed"
-msgstr "Letzter Zugriff auf den Bericht"
+msgid "Expiration date for access token"
+msgstr "Ablaufdatum des Zugangstokens"
 
 msgid "last accessed"
 msgstr "letzter Zugriff"
 
-msgid "Number of times report has been accessed"
-msgstr "Anzahl der Zugriffe auf den Bericht"
+msgid "Last time report was accessed"
+msgstr "Letzter Zugriff auf den Bericht"
 
 msgid "access count"
 msgstr "Anzahl Zugriffe"
+
+msgid "Number of times report has been accessed"
+msgstr "Anzahl der Zugriffe auf den Bericht"
 
 msgid "report"
 msgstr "Bericht"
@@ -2030,6 +2039,10 @@ msgid "Question \"%(question)s\" is required"
 msgstr "Die Frage „%(question)s“ ist eine Pflichtfrage"
 
 #, python-format
+msgid "Invalid option for question \"%(question)s\""
+msgstr "Ungültige Option bei der Frage „%(question)s“"
+
+#, python-format
 msgid "Rating must be between %(min)s and %(max)s"
 msgstr "Die Bewertung muss zwischen %(min)s und %(max)s liegen"
 
@@ -2085,11 +2098,11 @@ msgstr "Tariftyp"
 msgid "monthly price"
 msgstr "Monatspreis"
 
-msgid "Maximum total: reviewees + team members combined"
-msgstr "Maximum insgesamt: Beurteilte und Teammitglieder zusammen"
-
 msgid "maximum employees"
 msgstr "maximale Anzahl an Beschäftigten"
+
+msgid "Maximum total: reviewees + team members combined"
+msgstr "Maximum insgesamt: Beurteilte und Teammitglieder zusammen"
 
 msgid "Stripe price ID"
 msgstr "Stripe-Preis-ID"
@@ -2955,6 +2968,9 @@ msgstr "Abonnement „Enterprise“ starten"
 msgid "Ask an organization administrator to buy another round."
 msgstr "Weitere Pakete können nur Organisations-Admins kaufen."
 
+msgid "Add option"
+msgstr "Option hinzufügen"
+
 #, python-format
 msgid "Type: %(type)s"
 msgstr "Typ: %(type)s"
@@ -3379,8 +3395,8 @@ msgstr "Einfachauswahl (Dropdown)"
 msgid "Multiple Choice (Checkboxes)"
 msgstr "Mehrfachauswahl (Checkboxen)"
 
-msgid "Likert Scale Items (one per line)"
-msgstr "Stufen der Likert-Skala (eine pro Zeile)"
+msgid "Likert Scale Items"
+msgstr "Stufen der Likert-Skala"
 
 msgid "Scale Configuration"
 msgstr "Skalenkonfiguration"
@@ -3407,14 +3423,11 @@ msgstr "Beschriftung Maximum (optional)"
 msgid "e.g., Extremely"
 msgstr "z. B. Extrem"
 
-msgid "Choices (one per line)"
-msgstr "Optionen (eine pro Zeile)"
+msgid "Choices"
+msgstr "Optionen"
 
 msgid "Enable numeric scoring for analytics"
 msgstr "Numerische Wertung für Auswertungen aktivieren"
-
-msgid "Assign weights to each option (for scoring)"
-msgstr "Jeder Option eine Gewichtung zuweisen (für die Wertung)"
 
 msgid "Required question"
 msgstr "Pflichtfrage"
@@ -3443,17 +3456,11 @@ msgstr "Standardmäßig ist eine 5-stufige Skala vorgegeben, anpassbar z. B. auf
 msgid "Creates a slider or numeric input for precise measurement (e.g., 1-100 scale)."
 msgstr "Erzeugt einen Schieberegler oder ein Zahlenfeld für genaue Messungen (z. B. Skala 1-100)."
 
-msgid "Option 1&#10;Option 2&#10;Option 3"
-msgstr "Option 1&#10;Option 2&#10;Option 3"
-
 msgid "When enabled, this question will contribute to section scores and charts"
 msgstr "Wenn aktiviert, fließt diese Frage in die Abschnittswerte und Diagramme ein"
 
 msgid "Learn more about scoring"
 msgstr "Mehr zur Wertung"
-
-msgid "Assign numeric values (e.g., 1-5 scale) to measure this dimension"
-msgstr "Zahlenwerte zuweisen (z. B. Skala 1-5), um diese Dimension zu messen"
 
 msgid "Dreyfus/Agency Configuration (Optional)"
 msgstr "Konfiguration Dreyfus/Eigeninitiative (optional)"
@@ -3478,15 +3485,6 @@ msgstr "Maßnahmen für Entwicklungspläne festlegen, wenn diese Frage niedrig b
 
 msgid "Add Question"
 msgstr "Frage hinzufügen"
-
-msgid "Option"
-msgstr "Option"
-
-msgid "Weight"
-msgstr "Gewichtung"
-
-msgid "(empty)"
-msgstr "(leer)"
 
 #, python-format
 msgid "Action Item #%(number)s"
@@ -3659,6 +3657,21 @@ msgstr "Abschnittsbeschreibung (optional)"
 
 msgid "Questions about leadership style, decision-making, and team management"
 msgstr "Fragen zu Führungsstil, Entscheidungsfindung und Teamführung"
+
+msgid "Option"
+msgstr "Option"
+
+msgid "Weight"
+msgstr "Gewichtung"
+
+msgid "Move up"
+msgstr "Nach oben"
+
+msgid "Move down"
+msgstr "Nach unten"
+
+msgid "Remove option"
+msgstr "Option entfernen"
 
 msgid "Request failed."
 msgstr "Anfrage fehlgeschlagen."
@@ -5695,6 +5708,12 @@ msgid "%(counter)s response"
 msgid_plural "%(counter)s responses"
 msgstr[0] "%(counter)s Antwort"
 msgstr[1] "%(counter)s Antworten"
+
+#, python-format
+msgid "%(counter)s answer could not be matched to an option, because the question changed after it was given."
+msgid_plural "%(counter)s answers could not be matched to an option, because the question changed after they were given."
+msgstr[0] "%(counter)s Antwort ließ sich keiner Option zuordnen, weil die Frage nach ihrer Abgabe geändert wurde."
+msgstr[1] "%(counter)s Antworten ließen sich keiner Option zuordnen, weil die Frage nach ihrer Abgabe geändert wurde."
 
 #, python-format
 msgid "Strong consensus: %(pct)s%% positive (%(positive)s of %(total)s respondents)"

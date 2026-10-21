@@ -13,6 +13,7 @@ from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from questionnaires.answer_options import move_options_out_of_config, save_options
 from subscriptions.utils import NoCycleCredits
 
 
@@ -367,7 +368,7 @@ def import_questionnaires(organization, questionnaires_data, conflict_resolution
 
                 # Import questions
                 for question_data in section_data.get('questions', []):
-                    Question.objects.create(
+                    question = Question.objects.create(
                         section=section,
                         question_text=question_data['question_text'],
                         question_type=question_data.get('question_type', 'text'),
@@ -375,6 +376,12 @@ def import_questionnaires(organization, questionnaires_data, conflict_resolution
                         required=question_data.get('required', False),
                         order=question_data.get('order', 0),
                     )
+
+                    # Exports written before answer options existed keep the options in the config
+                    if options := question_data.get('options'):
+                        save_options(question, [(None, option['label'], option.get('weight')) for option in options])
+                    else:
+                        move_options_out_of_config(question)
 
         except Exception as e:
             result['errors'].append(_('Failed to import questionnaire %(questionnaire)s: %(error)s') % {

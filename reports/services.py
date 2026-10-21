@@ -1,5 +1,5 @@
 from django.db.models import Avg, Count
-from collections import defaultdict
+from collections import Counter, defaultdict
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.urls import reverse
@@ -445,8 +445,8 @@ def _calculate_chart_data(report_data, cycle):
                     elif question_type in ['single_choice', 'multiple_choice']:
                         # Choice questions with weights - normalize based on weight range
                         try:
-                            config = question_data.get('question_config', {})
-                            weights = config.get('weights', [])
+                            options = question_data.get('options', [])
+                            weights = [option['weight'] for option in options if option['weight'] is not None]
 
                             if weights:
                                 min_weight = min(weights)
@@ -491,6 +491,12 @@ def _calculate_chart_data(report_data, cycle):
     return chart_data
 
 
+def count_answers(option_ids):
+    """How often each option was chosen, keyed by its id as text: JSON object keys are always text."""
+
+    return {f'{option_id}': count for option_id, count in Counter(option_ids).items()}
+
+
 def generate_report(cycle):
     """Generate aggregated report for a review cycle"""
 
@@ -503,7 +509,7 @@ def generate_report(cycle):
     # Get all responses for this cycle
     responses = Response.objects.filter(cycle=cycle).select_related(
         'question', 'question__section'
-    )
+    ).prefetch_related('question__options')
 
     # Group responses by section and question
     data_by_section = defaultdict(lambda: {
@@ -512,9 +518,11 @@ def generate_report(cycle):
             'question_text': '',
             'question_type': '',
             'question_config': {},
+            'options': [],
             'by_category': defaultdict(lambda: {
                 'responses': [],
                 'count': 0,
+                'unmapped': 0,
                 'avg': None
             })
         })
@@ -532,11 +540,18 @@ def generate_report(cycle):
         question_data['question_text'] = question.question_text
         question_data['question_type'] = question.question_type
         question_data['question_config'] = question.config  # Store config for weight calculations
+        question_data['options'] = [
+            {'id': option.id, 'label': option.label, 'weight': option.weight}
+            for option in question.options.all()
+        ]
 
         # Add response to category
         category_data = question_data['by_category'][response.category]
         category_data['responses'].append(response.answer_data.get('value'))
         category_data['count'] += 1
+
+        if response.answer_data.get('unmapped'):
+            category_data['unmapped'] += 1
 
     # Calculate averages and apply anonymity threshold
     report_data = {
@@ -573,9 +588,11 @@ def generate_report(cycle):
                 'question_text': question_data['question_text'],
                 'question_type': question_data['question_type'],
                 'question_config': question_data['question_config'],  # Include config for labels, scales, etc.
+                'options': question_data['options'],
                 'category_order': present_categories,  # Explicit ordering
                 'by_category': {}
             }
+            weight_by_id = {option['id']: option['weight'] for option in question_data['options']}
 
             for category, category_data in ordered_categories.items():
                 count = category_data['count']
@@ -586,6 +603,9 @@ def generate_report(cycle):
                     'count': count,
                     'responses': category_data['responses']
                 }
+
+                if unmapped := category_data['unmapped']:
+                    result['unmapped'] = unmapped
 
                 # Calculate average for rating, scale, and likert questions
                 if question_data['question_type'] == 'rating':
@@ -602,34 +622,24 @@ def generate_report(cycle):
                 elif question_data['question_type'] == 'likert':
                     # Convert likert text responses to numeric scores (1-indexed position in scale)
                     # Store both the text distribution and numeric average
-                    from collections import Counter
                     text_responses = [r for r in category_data['responses'] if r]
                     if text_responses:
-                        result['distribution'] = dict(Counter(text_responses))
+                        result['distribution'] = count_answers(text_responses)
                         # For numeric calculations, use position in scale (1-indexed)
                         # This allows averaging likert responses
                 elif question_data['question_type'] == 'single_choice':
                     # Store distribution of single choice responses (dropdown selection)
-                    from collections import Counter
                     text_responses = [r for r in category_data['responses'] if r]
                     if text_responses:
-                        result['distribution'] = dict(Counter(text_responses))
+                        result['distribution'] = count_answers(text_responses)
 
                         # Calculate weighted score if weights are configured
                         config = question_data.get('question_config', {})
-                        if config.get('scoring_enabled') and config.get('weights'):
-                            choices = config.get('choices', [])
-                            weights = config.get('weights', [])
-                            scores = []
-
-                            for response_text in text_responses:
-                                try:
-                                    # Find the index of the selected choice
-                                    choice_index = choices.index(response_text)
-                                    if 0 <= choice_index < len(weights):
-                                        scores.append(weights[choice_index])
-                                except (ValueError, IndexError):
-                                    pass  # Skip if choice not found or index out of range
+                        if config.get('scoring_enabled'):
+                            scores = [
+                                weight_by_id[option_id] for option_id in text_responses
+                                if weight_by_id.get(option_id) is not None
+                            ]
 
                             if scores:
                                 result['avg'] = round(sum(scores) / len(scores), 2)
@@ -637,32 +647,25 @@ def generate_report(cycle):
                 elif question_data['question_type'] == 'multiple_choice':
                     # Store distribution of multiple choice responses (checkboxes)
                     # Each response is a list of selected options, so we need to flatten
-                    from collections import Counter
                     all_selected_options = []
                     for response in category_data['responses']:
                         if response and isinstance(response, list):
                             all_selected_options.extend(response)
                     if all_selected_options:
-                        result['distribution'] = dict(Counter(all_selected_options))
+                        result['distribution'] = count_answers(all_selected_options)
 
                         # Calculate weighted score if weights are configured
                         config = question_data.get('question_config', {})
-                        if config.get('scoring_enabled') and config.get('weights'):
-                            choices = config.get('choices', [])
-                            weights = config.get('weights', [])
+                        if config.get('scoring_enabled'):
                             response_scores = []
 
                             # For each response (which is a list of selected choices)
                             for response in category_data['responses']:
                                 if response and isinstance(response, list):
-                                    selected_weights = []
-                                    for selected_choice in response:
-                                        try:
-                                            choice_index = choices.index(selected_choice)
-                                            if 0 <= choice_index < len(weights):
-                                                selected_weights.append(weights[choice_index])
-                                        except (ValueError, IndexError):
-                                            pass
+                                    selected_weights = [
+                                        weight_by_id[option_id] for option_id in response
+                                        if weight_by_id.get(option_id) is not None
+                                    ]
 
                                     # Sum the weights for this response (not average)
                                     # This rewards selecting more positive attributes

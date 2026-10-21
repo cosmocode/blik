@@ -41,6 +41,7 @@ from core.languages import default_language, is_language, language_name
 from core.gdpr import GDPRDeletionService
 from core.models import Organization
 from productreviews.models import ProductReview
+from questionnaires.answer_options import DEFAULT_LIKERT_SCALE, save_options
 from questionnaires.models import Question, QuestionSection, Questionnaire
 from reports.dreyfus_service import (
     AGENCY_STAGES,
@@ -656,7 +657,7 @@ def questionnaire_list(request):
 def questionnaire_preview(request, questionnaire_id):
     """Preview a questionnaire"""
     questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
-    sections = questionnaire.sections.prefetch_related('questions').all()
+    sections = questionnaire.sections.prefetch_related('questions__options')
 
     context = {
         'questionnaire': questionnaire,
@@ -815,6 +816,26 @@ def questionnaire_create(request):
     return render(request, 'admin_dashboard/questionnaire_form.html', context)
 
 
+def posted_option_rows(post, prefix, with_weights=False):
+    """The answer options the question editor posted, as [(id or None, label, weight), ...].
+
+    Each row posts the id of its option (empty for a new one), its label and, for choice questions, its weight. Rows
+    without a label are dropped. Raises ValueError for a weight that is not a number.
+    """
+
+    ids = post.getlist(f'{prefix}_option_id')
+    labels = post.getlist(f'{prefix}_option_label')
+    weights = post.getlist(f'{prefix}_option_weight') if with_weights else [''] * len(labels)
+    rows = []
+
+    for posted_id, label, weight in zip(ids, labels, weights):
+        if label := label.strip():
+            option_id = int(posted_id) if posted_id.isdigit() else None
+            rows.append((option_id, label, float(weight) if with_weights else None))
+
+    return rows
+
+
 @login_required
 @can_manage_questionnaires_required
 def questionnaire_edit(request, questionnaire_id):
@@ -893,6 +914,7 @@ def questionnaire_edit(request, questionnaire_id):
 
                     # Build config based on question type
                     config = {}
+                    option_rows = []
                     if question_type == 'rating':
                         config = {
                             'min': 1,
@@ -906,32 +928,21 @@ def questionnaire_edit(request, questionnaire_id):
                             }
                         }
                     elif question_type == 'likert':
-                        scale_raw = request.POST.get('likert_scale', '')
-                        if scale_raw:
-                            scale = [s.strip() for s in scale_raw.split('\n') if s.strip()]
-                        else:
-                            scale = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree']
-                        config = {'scale': scale}
-                    elif question_type == 'single_choice' or question_type == 'multiple_choice':
-                        choices_raw = request.POST.get('choices', '')
-                        choices = [c.strip() for c in choices_raw.split('\n') if c.strip()]
-                        config = {'choices': choices}
+                        option_rows = posted_option_rows(request.POST, 'likert')
 
-                        # Check if scoring is enabled and weights are provided
+                        if not option_rows:
+                            option_rows = [(None, label, None) for label in DEFAULT_LIKERT_SCALE]
+                    elif question_type == 'single_choice' or question_type == 'multiple_choice':
+                        # Weights only count with scoring enabled
                         enable_scoring = request.POST.get('enable_scoring') == 'on'
-                        if enable_scoring:
-                            weights_raw = request.POST.getlist('weights[]')
-                            try:
-                                # Parse weights as floats
-                                weights = [float(w) for w in weights_raw if w.strip()]
-                                # Validate: weights must match choices length
-                                if len(weights) == len(choices):
-                                    config['weights'] = weights
-                                    config['scoring_enabled'] = True
-                                else:
-                                    messages.warning(request, _('Weights count did not match choices count. Scoring disabled for this question.'))
-                            except (ValueError, TypeError):
-                                messages.warning(request, _('Invalid weight values. Scoring disabled for this question.'))
+
+                        try:
+                            option_rows = posted_option_rows(request.POST, 'choice', with_weights=enable_scoring)
+                        except ValueError:
+                            option_rows = posted_option_rows(request.POST, 'choice')
+                            messages.warning(request, _('Invalid weight values. Scoring disabled for this question.'))
+                        else:
+                            config = {'scoring_enabled': True} if enable_scoring else {}
                     elif question_type == 'scale':
                         try:
                             min_val = int(request.POST.get('scale_min', 1))
@@ -998,6 +1009,7 @@ def questionnaire_edit(request, questionnaire_id):
                         order=next_order,
                         action_items=action_items
                     )
+                    save_options(question, option_rows)
 
                     if is_ajax:
                         question_html = render_to_string(
@@ -1062,6 +1074,7 @@ def questionnaire_edit(request, questionnaire_id):
 
                     # Build config based on question type
                     config = {}
+                    option_rows = []
                     if question_type == 'rating':
                         config = {
                             'min': 1,
@@ -1075,32 +1088,21 @@ def questionnaire_edit(request, questionnaire_id):
                             }
                         }
                     elif question_type == 'likert':
-                        scale_raw = request.POST.get('likert_scale', '')
-                        if scale_raw:
-                            scale = [s.strip() for s in scale_raw.split('\n') if s.strip()]
-                        else:
-                            scale = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree']
-                        config = {'scale': scale}
-                    elif question_type == 'single_choice' or question_type == 'multiple_choice':
-                        choices_raw = request.POST.get('choices', '')
-                        choices = [c.strip() for c in choices_raw.split('\n') if c.strip()]
-                        config = {'choices': choices}
+                        option_rows = posted_option_rows(request.POST, 'likert')
 
-                        # Check if scoring is enabled and weights are provided
+                        if not option_rows:
+                            option_rows = [(None, label, None) for label in DEFAULT_LIKERT_SCALE]
+                    elif question_type == 'single_choice' or question_type == 'multiple_choice':
+                        # Weights only count with scoring enabled
                         enable_scoring = request.POST.get('enable_scoring') == 'on'
-                        if enable_scoring:
-                            weights_raw = request.POST.getlist('weights[]')
-                            try:
-                                # Parse weights as floats
-                                weights = [float(w) for w in weights_raw if w.strip()]
-                                # Validate: weights must match choices length
-                                if len(weights) == len(choices):
-                                    config['weights'] = weights
-                                    config['scoring_enabled'] = True
-                                else:
-                                    messages.warning(request, _('Weights count did not match choices count. Scoring disabled for this question.'))
-                            except (ValueError, TypeError):
-                                messages.warning(request, _('Invalid weight values. Scoring disabled for this question.'))
+
+                        try:
+                            option_rows = posted_option_rows(request.POST, 'choice', with_weights=enable_scoring)
+                        except ValueError:
+                            option_rows = posted_option_rows(request.POST, 'choice')
+                            messages.warning(request, _('Invalid weight values. Scoring disabled for this question.'))
+                        else:
+                            config = {'scoring_enabled': True} if enable_scoring else {}
                     elif question_type == 'scale':
                         try:
                             min_val = int(request.POST.get('scale_min', 1))
@@ -1131,6 +1133,7 @@ def questionnaire_edit(request, questionnaire_id):
 
                     question.config = config
                     question.save()
+                    save_options(question, option_rows)
 
                     if is_ajax:
                         return JsonResponse({
@@ -1143,6 +1146,7 @@ def questionnaire_edit(request, questionnaire_id):
                                 'question_type_display': question.get_question_type_display(),
                                 'required': question.required,
                                 'config': question.config,
+                                'options': question.options_data,
                             },
                         })
 
@@ -1212,12 +1216,13 @@ def questionnaire_edit(request, questionnaire_id):
 
         return redirect('questionnaire_edit', questionnaire_id=questionnaire.id)
 
-    sections = questionnaire.sections.prefetch_related('questions').all()
+    sections = questionnaire.sections.prefetch_related('questions__options')
 
     context = {
         'action': 'Edit',
         'questionnaire': questionnaire,
         'sections': sections,
+        'default_likert_scale': DEFAULT_LIKERT_SCALE,
     }
 
     return render(request, 'admin_dashboard/questionnaire_form.html', context)

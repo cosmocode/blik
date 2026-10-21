@@ -8,6 +8,9 @@ recorded as success=True in the UpgradeStep table will execute.
 Old steps should stay in this list forever. If the underlying code is
 removed later, replace the callable body with a no-op.
 """
+from django.db import transaction
+
+from questionnaires.answer_options import migrate_responses, move_all_options_out_of_config
 from questionnaires.management.commands.apply_dreyfus_mappings import Command as DreyfusCommand
 
 
@@ -76,9 +79,23 @@ def _move_setup_admins_into_the_admin_group(stdout):
                  f'removed stale admin grants from {demoted} member(s).')
 
 
+def create_answer_options(stdout):
+    """Move the options of likert and choice questions out of their config and point the answers at them.
+
+    Runs in one transaction: a converted answer holds an option id, which a second run would take for a likert scale
+    position, so a step that fails halfway must leave everything as it was.
+    """
+
+    with transaction.atomic():
+        count = move_all_options_out_of_config()
+        stdout.write(f'Created the options of {count} question(s).')
+        migrate_responses(stdout)
+
+
 STEPS = [
     ('0001_apply_dreyfus_mappings', _apply_dreyfus_mappings),
     ('0002_reapply_dreyfus_mappings', _reapply_dreyfus_mappings),
     ('0003_move_setup_admins_into_the_admin_group',
      _move_setup_admins_into_the_admin_group),
+    ('0004_create_answer_options', create_answer_options),
 ]

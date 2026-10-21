@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _, gettext
 from core.models import TimeStampedModel, Organization
 from core.managers import QuestionnaireManager
@@ -138,13 +139,8 @@ class Question(TimeStampedModel):
 
     # JSON field for question configuration
     # For rating: {"min": 1, "max": 5, "labels": {"1": "Poor", "5": "Excellent"}}
-    # For likert: {"scale": ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]}
-    # For single_choice:
-    #   Basic: {"choices": ["Option 1", "Option 2"]}
-    #   With scoring: {"choices": ["Option 1", "Option 2"], "weights": [5, 3], "scoring_enabled": true}
-    # For multiple_choice:
-    #   Basic: {"choices": ["Option 1", "Option 2"]}
-    #   With scoring: {"choices": ["Option 1", "Option 2"], "weights": [5, 3], "scoring_enabled": true}
+    # For likert, single_choice and multiple_choice the options are AnswerOption rows
+    # For single_choice and multiple_choice with scoring: {"scoring_enabled": true}, the options carry the weights
     #   Note: For multiple_choice, score = sum of selected option weights (rewards selecting more positive attributes)
     # For scale: {"min": 1, "max": 100, "step": 1, "min_label": "Not at all", "max_label": "Extremely"}
     # Optional chart configuration:
@@ -175,4 +171,41 @@ class Question(TimeStampedModel):
         unique_together = ['section', 'order']
 
     def __str__(self):
-        return f"{self.section.title} - {self.question_text[:50]}"
+        return f'{self.section.title} - {self.short_text}'
+
+    @property
+    def short_text(self):
+        """The question text cut to 50 characters, for messages that quote it."""
+
+        return Truncator(self.question_text).chars(50)
+
+    @property
+    def options_data(self):
+        """The answer options as plain data, for the editor and the export."""
+
+        return [{'id': option.id, 'label': option.label, 'weight': option.weight} for option in self.options.all()]
+
+
+class AnswerOption(TimeStampedModel):
+    """One selectable answer of a likert or choice question.
+
+    Responses store the option's id, never its label, so a label can be reworded or translated without orphaning the
+    answers already given.
+    """
+
+    question = models.ForeignKey(Question, models.CASCADE, 'options', verbose_name=_('question'))
+    order = models.PositiveIntegerField(_('sort order'))
+    label = models.CharField(_('label'), max_length=255)
+    weight = models.FloatField(_('weight'), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _('answer option')
+        verbose_name_plural = _('answer options')
+        db_table = 'answer_options'
+        ordering = ['question', 'order']
+        constraints = [
+            models.UniqueConstraint(fields=['question', 'order'], name='answer_option_unique_order'),
+        ]
+
+    def __str__(self):
+        return f'{self.question_id}: {self.label}'

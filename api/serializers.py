@@ -8,7 +8,8 @@ from rest_framework import serializers
 from django.db.models import Count, Q
 from accounts.models import Reviewee
 from reviews.models import CATEGORY_ORDER, ReviewCycle, ReviewerToken, Response
-from questionnaires.models import Questionnaire, QuestionSection, Question
+from questionnaires.answer_options import options_as_config
+from questionnaires.models import AnswerOption, Questionnaire, QuestionSection, Question
 from reports.models import Report
 from .models import APIToken, WebhookEndpoint, WebhookDelivery
 
@@ -80,8 +81,18 @@ class RevieweeListSerializer(serializers.ModelSerializer):
 # =============================================================================
 
 
+class AnswerOptionSerializer(serializers.ModelSerializer):
+    """Serializer for the options of likert and choice questions."""
+
+    class Meta:
+        model = AnswerOption
+        fields = ["id", "label"]
+
+
 class QuestionSerializer(serializers.ModelSerializer):
     """Serializer for individual questions."""
+
+    options = AnswerOptionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Question
@@ -90,6 +101,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             "question_text",
             "question_type",
             "config",
+            "options",
             "required",
             "order",
             "section",
@@ -98,6 +110,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
+        data["config"] = {**data["config"], **options_as_config(instance)}
         reviewee_name = self.context.get("reviewee_name")
         if reviewee_name:
             first_name = reviewee_name.split()[0]

@@ -268,13 +268,8 @@
                 </div>
 
                 <div id="edit_likert_container" class="form-group" style="display: none;">
-                    <label for="edit_likert_scale" class="form-label">{% trans 'Likert Scale Items (one per line)' %}</label>
-                    <textarea
-                        id="edit_likert_scale"
-                        name="likert_scale"
-                        class="form-control"
-                        rows="5"
-                    ></textarea>
+                    <label class="form-label">{% trans 'Likert Scale Items' %}</label>
+                    {% include 'admin_dashboard/partials/option_rows.html' with id='edit_likert_options' prefix='likert' %}
                 </div>
 
                 <div id="edit_scale_container" class="form-group" style="display: none;">
@@ -304,14 +299,8 @@
                 </div>
 
                 <div id="edit_choices_container" class="form-group" style="display: none;">
-                    <label for="edit_choices" class="form-label">{% trans 'Choices (one per line)' %}</label>
-                    <textarea
-                        id="edit_choices"
-                        name="choices"
-                        class="form-control"
-                        rows="3"
-                        oninput="updateEditWeightInputs()"
-                    ></textarea>
+                    <label class="form-label">{% trans 'Choices' %}</label>
+                    {% include 'admin_dashboard/partials/option_rows.html' with id='edit_choice_options' prefix='choice' weights=True %}
 
                     <div style="margin-top: 1rem;">
                         <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
@@ -319,15 +308,10 @@
                                 type="checkbox"
                                 id="edit_enable_scoring"
                                 name="enable_scoring"
-                                onchange="toggleEditWeightInputs()"
+                                onchange="toggleOptionWeights(this)"
                             >
                             <span>{% trans 'Enable numeric scoring for analytics' %}</span>
                         </label>
-                    </div>
-
-                    <div id="edit_weights_container" style="display: none; margin-top: 1rem;">
-                        <label class="form-label">{% trans 'Assign weights to each option (for scoring)' %}</label>
-                        <div id="edit_weight_inputs"></div>
                     </div>
                 </div>
 
@@ -426,18 +410,8 @@
                             </div>
 
                             <div id="likert_container_{{ section.id }}" class="form-group" style="display: none;">
-                                <label for="likert_scale_{{ section.id }}" class="form-label">{% trans 'Likert Scale Items (one per line)' %}</label>
-                                <textarea
-                                    id="likert_scale_{{ section.id }}"
-                                    name="likert_scale"
-                                    class="form-control"
-                                    rows="5"
-                                    placeholder="Strongly Disagree&#10;Disagree&#10;Neutral&#10;Agree&#10;Strongly Agree"
-                                >Strongly Disagree
-Disagree
-Neutral
-Agree
-Strongly Agree</textarea>
+                                <label class="form-label">{% trans 'Likert Scale Items' %}</label>
+                                {% include 'admin_dashboard/partials/option_rows.html' with prefix='likert' defaults=default_likert_scale %}
                                 <small style="color: var(--text-secondary); font-size: 0.875rem;">{% trans 'Default 5-point scale provided. Customize or use 3-point, 7-point, etc.' %}</small>
                             </div>
 
@@ -471,15 +445,8 @@ Strongly Agree</textarea>
                             </div>
 
                             <div id="choices_container_{{ section.id }}" class="form-group" style="display: none;">
-                                <label for="choices_{{ section.id }}" class="form-label">{% trans 'Choices (one per line)' %}</label>
-                                <textarea
-                                    id="choices_{{ section.id }}"
-                                    name="choices"
-                                    class="form-control"
-                                    rows="3"
-                                    placeholder="{% trans 'Option 1&#10;Option 2&#10;Option 3' %}"
-                                    oninput="updateWeightInputs{{ section.id }}()"
-                                ></textarea>
+                                <label class="form-label">{% trans 'Choices' %}</label>
+                                {% include 'admin_dashboard/partials/option_rows.html' with prefix='choice' weights=True %}
 
                                 <div style="margin-top: 1rem;">
                                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
@@ -487,7 +454,7 @@ Strongly Agree</textarea>
                                             type="checkbox"
                                             id="enable_scoring_{{ section.id }}"
                                             name="enable_scoring"
-                                            onchange="toggleWeightInputs{{ section.id }}()"
+                                            onchange="toggleOptionWeights(this)"
                                         >
                                         <span>{% trans 'Enable numeric scoring for analytics' %}</span>
                                     </label>
@@ -501,14 +468,6 @@ Strongly Agree</textarea>
                                             {% trans 'Learn more about scoring' %}
                                         </button>
                                     </small>
-                                </div>
-
-                                <div id="weights_container_{{ section.id }}" style="display: none; margin-top: 1rem;">
-                                    <label class="form-label">{% trans 'Assign weights to each option (for scoring)' %}</label>
-                                    <small style="color: var(--text-secondary); font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">
-                                        {% trans 'Assign numeric values (e.g., 1-5 scale) to measure this dimension' %}
-                                    </small>
-                                    <div id="weight_inputs_{{ section.id }}"></div>
                                 </div>
                             </div>
 
@@ -592,76 +551,7 @@ Strongly Agree</textarea>
                                         scaleContainer.style.display = 'block';
                                     } else if (select.value === 'single_choice' || select.value === 'multiple_choice') {
                                         choicesContainer.style.display = 'block';
-                                        updateWeightInputs{{ section.id }}();
                                     }
-                                }
-
-                                function toggleWeightInputs{{ section.id }}() {
-                                    const enableScoring = document.getElementById('enable_scoring_{{ section.id }}');
-                                    const weightsContainer = document.getElementById('weights_container_{{ section.id }}');
-
-                                    if (enableScoring.checked) {
-                                        weightsContainer.style.display = 'block';
-                                        updateWeightInputs{{ section.id }}();
-                                    } else {
-                                        weightsContainer.style.display = 'none';
-                                    }
-                                }
-
-                                function updateWeightInputs{{ section.id }}() {
-                                    const enableScoring = document.getElementById('enable_scoring_{{ section.id }}');
-                                    if (!enableScoring.checked) return;
-
-                                    const choicesTextarea = document.getElementById('choices_{{ section.id }}');
-                                    const weightInputsContainer = document.getElementById('weight_inputs_{{ section.id }}');
-
-                                    const choices = choicesTextarea.value.split('\n').filter(c => c.trim());
-
-                                    // Clear existing inputs
-                                    weightInputsContainer.innerHTML = '';
-
-                                    if (choices.length === 0) return;
-
-                                    // Create a table for better layout
-                                    const table = document.createElement('table');
-                                    table.style.width = '100%';
-                                    table.style.borderCollapse = 'collapse';
-
-                                    // Header
-                                    const thead = document.createElement('thead');
-                                    const headerRow = document.createElement('tr');
-                                    headerRow.innerHTML = `
-                                        <th style="text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--border); color: var(--text-secondary); font-weight: 600;">{{ _('Option')|escapejs }}</th>
-                                        <th style="text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--border); color: var(--text-secondary); font-weight: 600; width: 100px;">{{ _('Weight')|escapejs }}</th>
-                                    `;
-                                    thead.appendChild(headerRow);
-                                    table.appendChild(thead);
-
-                                    // Body
-                                    const tbody = document.createElement('tbody');
-                                    choices.forEach((choice, index) => {
-                                        const row = document.createElement('tr');
-                                        row.innerHTML = `
-                                            <td style="padding: 0.5rem; border-bottom: 1px solid var(--border); color: var(--text-primary);">${choice || '{{ _('(empty)')|escapejs }}'}</td>
-                                            <td style="padding: 0.5rem; border-bottom: 1px solid var(--border);">
-                                                <input
-                                                    type="number"
-                                                    name="weights[]"
-                                                    value="${index + 1}"
-                                                    min="1"
-                                                    max="10"
-                                                    step="0.1"
-                                                    class="form-control"
-                                                    style="width: 80px;"
-                                                    required
-                                                >
-                                            </td>
-                                        `;
-                                        tbody.appendChild(row);
-                                    });
-                                    table.appendChild(tbody);
-
-                                    weightInputsContainer.appendChild(table);
                                 }
 
                                 function showScoringHelpModal{{ section.id }}() {
@@ -912,6 +802,17 @@ Strongly Agree</textarea>
     {% endif %}
 </div>
 
+<template id="option_row_template">
+    <div class="option-row" style="display: flex; gap: 0.5rem; align-items: center;">
+        <input type="hidden" data-field="id">
+        <input type="text" data-field="label" class="form-control" style="flex: 1;" placeholder="{% trans 'Option' %}">
+        <input type="number" data-field="weight" class="form-control" style="width: 80px;" step="0.1" title="{% trans 'Weight' %}">
+        <button type="button" class="btn btn-sm btn-secondary" onclick="moveOptionRow(this, -1)" title="{% trans 'Move up' %}">↑</button>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="moveOptionRow(this, 1)" title="{% trans 'Move down' %}">↓</button>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="this.closest('.option-row').remove()" title="{% trans 'Remove option' %}">×</button>
+    </div>
+</template>
+
 <script>
 // Attach event listeners to edit buttons
 document.addEventListener('DOMContentLoaded', function() {
@@ -924,11 +825,68 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', submitAddQuestionForm);
     });
 
+    document.querySelectorAll('.option-rows').forEach(resetOptionRows);
+
     bindEditQuestionButtons(document);
 });
 
+/* Answer option rows (admin_dashboard/partials/option_rows.html) */
+function addOptionRow(container, option = {}) {
+    const list = container.querySelector('.option-rows-list');
+    const row = document.getElementById('option_row_template').content.firstElementChild.cloneNode(true);
+    const values = {id: option.id ?? '', label: option.label ?? '', weight: option.weight ?? list.children.length + 1};
+
+    row.querySelectorAll('[data-field]').forEach(function(input) {
+        input.name = `${container.dataset.prefix}_option_${input.dataset.field}`;
+        input.value = values[input.dataset.field];
+    });
+
+    const weightInput = row.querySelector('[data-field="weight"]');
+
+    if (container.dataset.weights === 'true') {
+        weightInput.style.display = container.classList.contains('scoring') ? '' : 'none';
+    } else {
+        weightInput.remove();
+    }
+
+    list.appendChild(row);
+}
+
+function setOptionRows(container, options) {
+    container.querySelector('.option-rows-list').innerHTML = '';
+    options.forEach(function(option) {
+        addOptionRow(container, option);
+    });
+}
+
+function resetOptionRows(container) {
+    const labels = JSON.parse(container.dataset.defaults || '[]');
+    showOptionWeights(container, false);
+    setOptionRows(container, labels.map(label => ({label})));
+}
+
+function moveOptionRow(button, step) {
+    const row = button.closest('.option-row');
+    const neighbour = step < 0 ? row.previousElementSibling : row.nextElementSibling;
+
+    if (neighbour) {
+        row.parentNode.insertBefore(row, step < 0 ? neighbour : neighbour.nextElementSibling);
+    }
+}
+
+function showOptionWeights(container, show) {
+    container.classList.toggle('scoring', show);
+    container.querySelectorAll('[data-field="weight"]').forEach(function(input) {
+        input.style.display = show ? '' : 'none';
+    });
+}
+
+function toggleOptionWeights(checkbox) {
+    showOptionWeights(checkbox.closest('form').querySelector('.option-rows[data-weights="true"]'), checkbox.checked);
+}
+
 // Edit Question Modal Functions
-function openEditQuestionModal(questionId, questionText, questionType, required, config) {
+function openEditQuestionModal(questionId, questionText, questionType, required, config, options) {
     // Set basic fields
     document.getElementById('edit_question_id').value = questionId;
     document.getElementById('edit_question_text').value = questionText;
@@ -939,22 +897,22 @@ function openEditQuestionModal(questionId, questionText, questionType, required,
     const likertContainer = document.getElementById('edit_likert_container');
     const scaleContainer = document.getElementById('edit_scale_container');
     const choicesContainer = document.getElementById('edit_choices_container');
-    const likertScale = document.getElementById('edit_likert_scale');
-    const choices = document.getElementById('edit_choices');
+    const likertOptions = document.getElementById('edit_likert_options');
+    const choiceOptions = document.getElementById('edit_choice_options');
     const enableScoring = document.getElementById('edit_enable_scoring');
 
     // Reset containers
     likertContainer.style.display = 'none';
     scaleContainer.style.display = 'none';
     choicesContainer.style.display = 'none';
-    likertScale.value = '';
-    choices.value = '';
+    resetOptionRows(likertOptions);
+    resetOptionRows(choiceOptions);
     enableScoring.checked = false;
 
     // Populate based on question type
-    if (questionType === 'likert' && config.scale) {
+    if (questionType === 'likert') {
         likertContainer.style.display = 'block';
-        likertScale.value = config.scale.join('\n');
+        setOptionRows(likertOptions, options);
     } else if (questionType === 'scale') {
         scaleContainer.style.display = 'block';
         document.getElementById('edit_scale_min').value = config.min || 1;
@@ -962,25 +920,11 @@ function openEditQuestionModal(questionId, questionText, questionType, required,
         document.getElementById('edit_scale_step').value = config.step || 1;
         document.getElementById('edit_scale_min_label').value = config.min_label || '';
         document.getElementById('edit_scale_max_label').value = config.max_label || '';
-    } else if ((questionType === 'single_choice' || questionType === 'multiple_choice') && config.choices) {
+    } else if (questionType === 'single_choice' || questionType === 'multiple_choice') {
         choicesContainer.style.display = 'block';
-        choices.value = config.choices.join('\n');
-
-        // Check if scoring is enabled
-        if (config.scoring_enabled && config.weights) {
-            enableScoring.checked = true;
-            toggleEditWeightInputs();
-
-            // Populate weights
-            setTimeout(() => {
-                const weightInputs = document.querySelectorAll('#edit_weight_inputs input[name="weights[]"]');
-                config.weights.forEach((weight, index) => {
-                    if (weightInputs[index]) {
-                        weightInputs[index].value = weight;
-                    }
-                });
-            }, 100);
-        }
+        enableScoring.checked = Boolean(config.scoring_enabled);
+        showOptionWeights(choiceOptions, enableScoring.checked);
+        setOptionRows(choiceOptions, options);
     }
 
     // Show modal
@@ -1015,8 +959,8 @@ function buildQuestionMeta(question) {
 
     if (question.question_type === 'rating' && question.config?.min !== undefined && question.config?.max !== undefined) {
         meta += ' | ' + '{{ scale_label|escapejs }}'.replace('%(min)s', question.config.min).replace('%(max)s', question.config.max);
-    } else if (question.question_type === 'likert' && Array.isArray(question.config?.scale)) {
-        meta += ' | ' + '{{ point_scale_label|escapejs }}'.replace('%(count)s', question.config.scale.length);
+    } else if (question.question_type === 'likert' && Array.isArray(question.options)) {
+        meta += ' | ' + '{{ point_scale_label|escapejs }}'.replace('%(count)s', question.options.length);
     }
 
     return meta;
@@ -1054,6 +998,7 @@ function updateQuestionCard(question) {
         editButton.dataset.questionType = question.question_type;
         editButton.dataset.required = question.required ? 'true' : 'false';
         editButton.dataset.config = JSON.stringify(question.config || {});
+        editButton.dataset.options = JSON.stringify(question.options || []);
     }
 }
 
@@ -1123,8 +1068,9 @@ function bindEditQuestionButtons(rootElement) {
             const questionType = this.dataset.questionType;
             const required = this.dataset.required === 'true';
             const config = JSON.parse(this.dataset.config || '{}');
+            const options = JSON.parse(this.dataset.options || '[]');
 
-            openEditQuestionModal(questionId, questionText, questionType, required, config);
+            openEditQuestionModal(questionId, questionText, questionType, required, config, options);
         });
     });
 }
@@ -1211,6 +1157,7 @@ async function submitAddQuestionForm(event) {
         }
 
         form.reset();
+        form.querySelectorAll('.option-rows').forEach(resetOptionRows);
         const sectionId = form.dataset.sectionId;
         const typeSelect = form.querySelector(`#question_type_${sectionId}`);
         if (typeSelect) {
@@ -1249,76 +1196,7 @@ function toggleEditChoices() {
         scaleContainer.style.display = 'block';
     } else if (questionType === 'single_choice' || questionType === 'multiple_choice') {
         choicesContainer.style.display = 'block';
-        updateEditWeightInputs();
     }
-}
-
-function toggleEditWeightInputs() {
-    const enableScoring = document.getElementById('edit_enable_scoring');
-    const weightsContainer = document.getElementById('edit_weights_container');
-
-    if (enableScoring.checked) {
-        weightsContainer.style.display = 'block';
-        updateEditWeightInputs();
-    } else {
-        weightsContainer.style.display = 'none';
-    }
-}
-
-function updateEditWeightInputs() {
-    const enableScoring = document.getElementById('edit_enable_scoring');
-    if (!enableScoring.checked) return;
-
-    const choicesTextarea = document.getElementById('edit_choices');
-    const weightInputsContainer = document.getElementById('edit_weight_inputs');
-
-    const choices = choicesTextarea.value.split('\n').filter(c => c.trim());
-
-    // Clear existing inputs
-    weightInputsContainer.innerHTML = '';
-
-    if (choices.length === 0) return;
-
-    // Create a table for better layout
-    const table = document.createElement('table');
-    table.style.width = '100%';
-    table.style.borderCollapse = 'collapse';
-
-    // Header
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    headerRow.innerHTML = `
-        <th style="text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--border); color: var(--text-secondary); font-weight: 600;">{{ _('Option')|escapejs }}</th>
-        <th style="text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--border); color: var(--text-secondary); font-weight: 600; width: 100px;">{{ _('Weight')|escapejs }}</th>
-    `;
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-
-    // Body
-    const tbody = document.createElement('tbody');
-    choices.forEach((choice, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td style="padding: 0.5rem; border-bottom: 1px solid var(--border); color: var(--text-primary);">${choice || '{{ _('(empty)')|escapejs }}'}</td>
-            <td style="padding: 0.5rem; border-bottom: 1px solid var(--border);">
-                <input
-                    type="number"
-                    name="weights[]"
-                    value="${index + 1}"
-                    min="1"
-                    max="10"
-                    step="0.1"
-                    class="form-control"
-                    style="width: 80px;"
-                    required
-                >
-            </td>
-        `;
-        tbody.appendChild(row);
-    });
-    table.appendChild(tbody);
-
-    weightInputsContainer.appendChild(table);
 }
 
 // Dreyfus/Agency Configuration Modal Functions
