@@ -84,8 +84,8 @@
                             >
                             <label for="q{{ question.id }}_{{ value }}" class="rating-label">
                                 <span class="rating-value">{{ value }}</span>
-                                {% if question.config.labels|get_item:value %}
-                                <span class="rating-description">{{ question.config.labels|get_item:value }}</span>
+                                {% if question.labels|get_item:value %}
+                                <span class="rating-description">{{ question.labels|get_item:value }}</span>
                                 {% endif %}
                             </label>
                         </div>
@@ -158,14 +158,14 @@
                     {% elif question.question_type == 'scale' %}
                     <div class="scale-group">
                         <div class="scale-labels">
-                            {% if question.config.min_label %}
-                            <span class="scale-label-min">{{ question.config.min_label }}</span>
+                            {% if question.labels.min %}
+                            <span class="scale-label-min">{{ question.labels.min }}</span>
                             {% endif %}
                             <span class="scale-value-display" id="scale_value_{{ question.id }}">
                                 {% if existing_responses|get_item:question.id %}{{ existing_responses|get_item:question.id }}{% else %}{{ question.config.min }}{% endif %}
                             </span>
-                            {% if question.config.max_label %}
-                            <span class="scale-label-max">{{ question.config.max_label }}</span>
+                            {% if question.labels.max %}
+                            <span class="scale-label-max">{{ question.labels.max }}</span>
                             {% endif %}
                         </div>
                         <input

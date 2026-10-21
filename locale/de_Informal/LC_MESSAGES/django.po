@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-21 10:00+0000\n"
+"POT-Creation-Date: 2026-10-21 10:49+0000\n"
 "Language: de_Informal\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1741,6 +1741,9 @@ msgstr ""
 msgid "configuration"
 msgstr ""
 
+msgid "labels"
+msgstr ""
+
 msgid "action items"
 msgstr ""
 
@@ -3393,6 +3396,9 @@ msgid "Single Choice (Dropdown)"
 msgstr ""
 
 msgid "Multiple Choice (Checkboxes)"
+msgstr ""
+
+msgid "Rating labels"
 msgstr ""
 
 msgid "Likert Scale Items"

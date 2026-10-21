@@ -267,6 +267,11 @@
                     </select>
                 </div>
 
+                <div id="edit_rating_container" class="form-group" style="display: none;">
+                    <label class="form-label">{% trans 'Rating labels' %}</label>
+                    {% include 'admin_dashboard/partials/rating_labels.html' %}
+                </div>
+
                 <div id="edit_likert_container" class="form-group" style="display: none;">
                     <label class="form-label">{% trans 'Likert Scale Items' %}</label>
                     {% include 'admin_dashboard/partials/option_rows.html' with id='edit_likert_options' prefix='likert' %}
@@ -409,6 +414,11 @@
                                 </select>
                             </div>
 
+                            <div id="rating_container_{{ section.id }}" class="form-group">
+                                <label class="form-label">{% trans 'Rating labels' %}</label>
+                                {% include 'admin_dashboard/partials/rating_labels.html' with prefill=True %}
+                            </div>
+
                             <div id="likert_container_{{ section.id }}" class="form-group" style="display: none;">
                                 <label class="form-label">{% trans 'Likert Scale Items' %}</label>
                                 {% include 'admin_dashboard/partials/option_rows.html' with prefix='likert' defaults=default_likert_scale %}
@@ -537,15 +547,19 @@
 
                             <script>
                                 function toggleChoices{{ section.id }}(select) {
+                                    const ratingContainer = document.getElementById('rating_container_{{ section.id }}');
                                     const likertContainer = document.getElementById('likert_container_{{ section.id }}');
                                     const scaleContainer = document.getElementById('scale_container_{{ section.id }}');
                                     const choicesContainer = document.getElementById('choices_container_{{ section.id }}');
 
+                                    ratingContainer.style.display = 'none';
                                     likertContainer.style.display = 'none';
                                     scaleContainer.style.display = 'none';
                                     choicesContainer.style.display = 'none';
 
-                                    if (select.value === 'likert') {
+                                    if (select.value === 'rating') {
+                                        ratingContainer.style.display = 'block';
+                                    } else if (select.value === 'likert') {
                                         likertContainer.style.display = 'block';
                                     } else if (select.value === 'scale') {
                                         scaleContainer.style.display = 'block';
@@ -886,7 +900,7 @@ function toggleOptionWeights(checkbox) {
 }
 
 // Edit Question Modal Functions
-function openEditQuestionModal(questionId, questionText, questionType, required, config, options) {
+function openEditQuestionModal(questionId, questionText, questionType, required, config, options, labels) {
     // Set basic fields
     document.getElementById('edit_question_id').value = questionId;
     document.getElementById('edit_question_text').value = questionText;
@@ -894,6 +908,7 @@ function openEditQuestionModal(questionId, questionText, questionType, required,
     document.getElementById('edit_required').checked = required;
 
     // Handle question type specific fields
+    const ratingContainer = document.getElementById('edit_rating_container');
     const likertContainer = document.getElementById('edit_likert_container');
     const scaleContainer = document.getElementById('edit_scale_container');
     const choicesContainer = document.getElementById('edit_choices_container');
@@ -902,6 +917,7 @@ function openEditQuestionModal(questionId, questionText, questionType, required,
     const enableScoring = document.getElementById('edit_enable_scoring');
 
     // Reset containers
+    ratingContainer.style.display = 'none';
     likertContainer.style.display = 'none';
     scaleContainer.style.display = 'none';
     choicesContainer.style.display = 'none';
@@ -909,8 +925,14 @@ function openEditQuestionModal(questionId, questionText, questionType, required,
     resetOptionRows(choiceOptions);
     enableScoring.checked = false;
 
+    ratingContainer.querySelectorAll('[data-rating-value]').forEach(function(input) {
+        input.value = labels[input.dataset.ratingValue] || '';
+    });
+
     // Populate based on question type
-    if (questionType === 'likert') {
+    if (questionType === 'rating') {
+        ratingContainer.style.display = 'block';
+    } else if (questionType === 'likert') {
         likertContainer.style.display = 'block';
         setOptionRows(likertOptions, options);
     } else if (questionType === 'scale') {
@@ -918,8 +940,8 @@ function openEditQuestionModal(questionId, questionText, questionType, required,
         document.getElementById('edit_scale_min').value = config.min || 1;
         document.getElementById('edit_scale_max').value = config.max || 100;
         document.getElementById('edit_scale_step').value = config.step || 1;
-        document.getElementById('edit_scale_min_label').value = config.min_label || '';
-        document.getElementById('edit_scale_max_label').value = config.max_label || '';
+        document.getElementById('edit_scale_min_label').value = labels.min || '';
+        document.getElementById('edit_scale_max_label').value = labels.max || '';
     } else if (questionType === 'single_choice' || questionType === 'multiple_choice') {
         choicesContainer.style.display = 'block';
         enableScoring.checked = Boolean(config.scoring_enabled);
@@ -999,6 +1021,7 @@ function updateQuestionCard(question) {
         editButton.dataset.required = question.required ? 'true' : 'false';
         editButton.dataset.config = JSON.stringify(question.config || {});
         editButton.dataset.options = JSON.stringify(question.options || []);
+        editButton.dataset.labels = JSON.stringify(question.labels || {});
     }
 }
 
@@ -1069,8 +1092,9 @@ function bindEditQuestionButtons(rootElement) {
             const required = this.dataset.required === 'true';
             const config = JSON.parse(this.dataset.config || '{}');
             const options = JSON.parse(this.dataset.options || '[]');
+            const labels = JSON.parse(this.dataset.labels || '{}');
 
-            openEditQuestionModal(questionId, questionText, questionType, required, config, options);
+            openEditQuestionModal(questionId, questionText, questionType, required, config, options, labels);
         });
     });
 }
@@ -1182,15 +1206,19 @@ async function submitAddQuestionForm(event) {
 
 function toggleEditChoices() {
     const questionType = document.getElementById('edit_question_type').value;
+    const ratingContainer = document.getElementById('edit_rating_container');
     const likertContainer = document.getElementById('edit_likert_container');
     const scaleContainer = document.getElementById('edit_scale_container');
     const choicesContainer = document.getElementById('edit_choices_container');
 
+    ratingContainer.style.display = 'none';
     likertContainer.style.display = 'none';
     scaleContainer.style.display = 'none';
     choicesContainer.style.display = 'none';
 
-    if (questionType === 'likert') {
+    if (questionType === 'rating') {
+        ratingContainer.style.display = 'block';
+    } else if (questionType === 'likert') {
         likertContainer.style.display = 'block';
     } else if (questionType === 'scale') {
         scaleContainer.style.display = 'block';

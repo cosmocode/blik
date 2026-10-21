@@ -152,12 +152,23 @@ def likert_positive_count(distribution, options):
 
 
 @register.filter
-def get_rating_label(question_config, rating_value):
-    """Get label for a rating value from question config"""
+def report_labels(question_data):
+    """Rating labels of a report question; reports generated before Question.labels existed keep them in the config."""
+
+    config = question_data.get('question_config') or {}
+
+    return question_data.get('labels') or config.get('labels') or {}
+
+
+@register.filter
+def get_rating_label(question_data, rating_value):
+    """Get label for a rating value of a report question"""
+
+    labels = report_labels(question_data)
+
     try:
-        labels = question_config.get('labels', {})
         return labels.get(str(int(rating_value)), '')
-    except (ValueError, TypeError, AttributeError):
+    except (ValueError, TypeError):
         return ''
 
 

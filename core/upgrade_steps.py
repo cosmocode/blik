@@ -14,7 +14,8 @@ from pathlib import Path
 from django.apps import apps
 from django.db import transaction
 
-from questionnaires.answer_options import migrate_responses, move_all_options_out_of_config
+from questionnaires.answer_options import migrate_responses
+from questionnaires.legacy_config import move_all_texts_out_of_config
 from questionnaires.management.commands.apply_dreyfus_mappings import Command as DreyfusCommand
 
 
@@ -132,16 +133,16 @@ def _fill_the_collaboration_section(stdout):
                  f'empty {title} section(s).')
 
 
-def create_answer_options(stdout):
-    """Move the options of likert and choice questions out of their config and point the answers at them.
+def move_question_texts(stdout):
+    """Move the options and labels of questions out of their config and point the answers at the options.
 
     Runs in one transaction: a converted answer holds an option id, which a second run would take for a likert scale
     position, so a step that fails halfway must leave everything as it was.
     """
 
     with transaction.atomic():
-        count = move_all_options_out_of_config()
-        stdout.write(f'Created the options of {count} question(s).')
+        count = move_all_texts_out_of_config()
+        stdout.write(f'Moved the texts of {count} question(s) out of their config.')
         migrate_responses(stdout)
 
 
@@ -151,5 +152,5 @@ STEPS = [
     ('0003_move_setup_admins_into_the_admin_group',
      _move_setup_admins_into_the_admin_group),
     ('0004_fill_the_collaboration_section', _fill_the_collaboration_section),
-    ('0005_create_answer_options', create_answer_options),
+    ('0005_move_question_texts', move_question_texts),
 ]

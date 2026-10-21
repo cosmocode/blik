@@ -148,7 +148,6 @@ class Command(BaseCommand):
             config = {
                 "min": 1,
                 "max": 5,
-                "labels": q_data["labels"],
                 "dreyfus_mapping": {
                     "skill": q_data["weight"]
                 }
@@ -161,6 +160,7 @@ class Command(BaseCommand):
                 question_text=q_data["text"],
                 question_type="rating",
                 config=config,
+                labels=q_data["labels"],
                 required=True,
                 order=i
             )
@@ -239,7 +239,6 @@ class Command(BaseCommand):
             config = {
                 "min": 1,
                 "max": 5,
-                "labels": q_data["labels"],
                 "dreyfus_mapping": {
                     "agency": q_data["weight"]
                 }
@@ -252,6 +251,7 @@ class Command(BaseCommand):
                 question_text=q_data["text"],
                 question_type="rating",
                 config=config,
+                labels=q_data["labels"],
                 required=True,
                 order=i
             )

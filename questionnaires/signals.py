@@ -4,7 +4,7 @@ from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.core.management import call_command
 from core.models import Organization
-from .answer_options import move_all_options_out_of_config
+from .legacy_config import move_all_texts_out_of_config
 from .models import AnswerOption, Questionnaire, QuestionSection, Question
 import logging
 import uuid
@@ -96,7 +96,7 @@ def load_default_questionnaire_fixtures(sender, **kwargs):
         except Exception as e:
             logger.warning(f"⚠ Could not load {fixture}: {e}")
 
-    move_all_options_out_of_config()
+    move_all_texts_out_of_config()
     logger.info("Default questionnaire fixtures loaded successfully")
 
 

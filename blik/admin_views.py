@@ -70,6 +70,9 @@ from subscriptions.utils import (
 
 logger = logging.getLogger(__name__)
 
+# A new rating question reads its five values like the default likert scale
+DEFAULT_RATING_LABELS = {f'{value}': label for value, label in enumerate(DEFAULT_LIKERT_SCALE, 1)}
+
 
 def get_cycle_or_404(request, cycle_uuid):
     """
@@ -816,6 +819,21 @@ def questionnaire_create(request):
     return render(request, 'admin_dashboard/questionnaire_form.html', context)
 
 
+def posted_labels(post, question_type):
+    """The rating or scale labels the question editor posted, without the empty ones."""
+
+    if question_type == 'rating':
+        fields = {key: f'rating_label_{key}' for key in DEFAULT_RATING_LABELS}
+    elif question_type == 'scale':
+        fields = {'min': 'scale_min_label', 'max': 'scale_max_label'}
+    else:
+        return {}
+
+    labels = {key: post.get(field, '').strip() for key, field in fields.items()}
+
+    return {key: label for key, label in labels.items() if label}
+
+
 def posted_option_rows(post, prefix, with_weights=False):
     """The answer options the question editor posted, as [(id or None, label, weight), ...].
 
@@ -915,18 +933,10 @@ def questionnaire_edit(request, questionnaire_id):
                     # Build config based on question type
                     config = {}
                     option_rows = []
+                    labels = posted_labels(request.POST, question_type)
                     if question_type == 'rating':
-                        config = {
-                            'min': 1,
-                            'max': 5,
-                            'labels': {
-                                '1': 'Strongly Disagree',
-                                '2': 'Disagree',
-                                '3': 'Neutral',
-                                '4': 'Agree',
-                                '5': 'Strongly Agree'
-                            }
-                        }
+                        config = {'min': 1, 'max': 5}
+                        labels = labels or DEFAULT_RATING_LABELS
                     elif question_type == 'likert':
                         option_rows = posted_option_rows(request.POST, 'likert')
 
@@ -948,18 +958,12 @@ def questionnaire_edit(request, questionnaire_id):
                             min_val = int(request.POST.get('scale_min', 1))
                             max_val = int(request.POST.get('scale_max', 100))
                             step_val = int(request.POST.get('scale_step', 1))
-                            min_label = request.POST.get('scale_min_label', '').strip()
-                            max_label = request.POST.get('scale_max_label', '').strip()
 
                             config = {
                                 'min': min_val,
                                 'max': max_val,
                                 'step': step_val
                             }
-                            if min_label:
-                                config['min_label'] = min_label
-                            if max_label:
-                                config['max_label'] = max_label
                         except (ValueError, TypeError):
                             # Use defaults if parsing fails
                             config = {'min': 1, 'max': 100, 'step': 1}
@@ -1005,6 +1009,7 @@ def questionnaire_edit(request, questionnaire_id):
                         question_text=question_text,
                         question_type=question_type,
                         config=config,
+                        labels=labels,
                         required=required,
                         order=next_order,
                         action_items=action_items
@@ -1064,7 +1069,6 @@ def questionnaire_edit(request, questionnaire_id):
             if question_id and question_text:
                 try:
                     question = Question.objects.get(id=question_id, section__questionnaire=questionnaire)
-                    previous_type = question.question_type
                     previous_config = question.config
 
                     # Update basic fields
@@ -1075,18 +1079,10 @@ def questionnaire_edit(request, questionnaire_id):
                     # Build config based on question type
                     config = {}
                     option_rows = []
+                    labels = posted_labels(request.POST, question_type)
                     if question_type == 'rating':
-                        config = {
-                            'min': 1,
-                            'max': 5,
-                            'labels': {
-                                '1': 'Strongly Disagree',
-                                '2': 'Disagree',
-                                '3': 'Neutral',
-                                '4': 'Agree',
-                                '5': 'Strongly Agree'
-                            }
-                        }
+                        config = {'min': 1, 'max': 5}
+                        labels = labels or DEFAULT_RATING_LABELS
                     elif question_type == 'likert':
                         option_rows = posted_option_rows(request.POST, 'likert')
 
@@ -1108,30 +1104,23 @@ def questionnaire_edit(request, questionnaire_id):
                             min_val = int(request.POST.get('scale_min', 1))
                             max_val = int(request.POST.get('scale_max', 100))
                             step_val = int(request.POST.get('scale_step', 1))
-                            min_label = request.POST.get('scale_min_label', '').strip()
-                            max_label = request.POST.get('scale_max_label', '').strip()
 
                             config = {
                                 'min': min_val,
                                 'max': max_val,
                                 'step': step_val
                             }
-                            if min_label:
-                                config['min_label'] = min_label
-                            if max_label:
-                                config['max_label'] = max_label
                         except (ValueError, TypeError):
                             # Use defaults if parsing fails
                             config = {'min': 1, 'max': 100, 'step': 1}
                             messages.warning(request, _('Invalid scale values. Using defaults (1-100, step 1).'))
 
-                    # The dialog shows neither the Dreyfus weights nor the labels of a rating scale, so keep them
+                    # The dialog doesn't show the Dreyfus weights, so keep them
                     if 'dreyfus_mapping' in previous_config:
                         config['dreyfus_mapping'] = previous_config['dreyfus_mapping']
-                    if question_type == previous_type == 'rating' and 'labels' in previous_config:
-                        config['labels'] = previous_config['labels']
 
                     question.config = config
+                    question.labels = labels
                     question.save()
                     save_options(question, option_rows)
 
@@ -1147,6 +1136,7 @@ def questionnaire_edit(request, questionnaire_id):
                                 'required': question.required,
                                 'config': question.config,
                                 'options': question.options_data,
+                                'labels': question.labels,
                             },
                         })
 
@@ -1223,6 +1213,7 @@ def questionnaire_edit(request, questionnaire_id):
         'questionnaire': questionnaire,
         'sections': sections,
         'default_likert_scale': DEFAULT_LIKERT_SCALE,
+        'default_rating_labels': DEFAULT_RATING_LABELS,
     }
 
     return render(request, 'admin_dashboard/questionnaire_form.html', context)
