@@ -1353,7 +1353,7 @@ async function loadDreyfusConfig(questionId) {
 
         if (data.action_items && data.action_items.length > 0) {
             data.action_items.forEach(item => {
-                addActionItem(item.text, item.threshold, item.stages);
+                addActionItem(item.text, item.threshold, item.stages, item.key);
             });
         } else {
             // Show empty state
@@ -1369,7 +1369,7 @@ async function loadDreyfusConfig(questionId) {
 
 {% blocktrans trimmed asvar action_item_label with number='%(number)s' %}Action Item #{{ number }}{% endblocktrans %}
 {% blocktrans trimmed asvar stage_label with stage='%(stage)s' %}Stage {{ stage }}{% endblocktrans %}
-function addActionItem(text = '', threshold = 3.0, stages = []) {
+function addActionItem(text = '', threshold = 3.0, stages = [], key = '') {
     const container = document.getElementById('action_items_container');
 
     // Remove empty state message if present
@@ -1398,6 +1398,8 @@ function addActionItem(text = '', threshold = 3.0, stages = []) {
                 style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.25rem; padding: 0; width: 24px; height: 24px;"
             >&times;</button>
         </div>
+
+        <input type="hidden" name="action_items[${itemId}][key]" value="${key}">
 
         <div style="margin-bottom: 1rem;">
             <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-primary); font-size: 0.875rem;">{{ _('Action Item Text')|escapejs }} *</label>
