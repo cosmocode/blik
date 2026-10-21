@@ -105,7 +105,7 @@
                         <div class="rating-display">
                             <span class="rating-score">{{ cat_data.avg }}</span>
                             <div class="rating-bar-container">
-                                <div class="rating-bar-fill" style="width: {{ cat_data.avg|floatformat:0|add:"0"|mul:"20" }}%"></div>
+                                <div class="rating-bar-fill" style="width: {% widthratio cat_data.avg 5 100 %}%"></div>
                             </div>
                             <span class="response-count">/ 5.0</span>
                         </div>

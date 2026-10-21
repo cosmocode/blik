@@ -2,6 +2,8 @@ from django import template
 from django.utils.translation import gettext_lazy as _
 
 from questionnaires.models import Question
+from reports.report_texts import RATING_RANGES
+from reports.services import get_rating_key
 from reviews.models import CATEGORY_ORDER
 
 register = template.Library()
@@ -22,15 +24,6 @@ def get_item(dictionary, key):
     if not isinstance(dictionary, dict):
         return None
     return dictionary.get(str(key))
-
-
-@register.filter
-def mul(value, arg):
-    """Multiply the value by the argument"""
-    try:
-        return float(value) * float(arg)
-    except (ValueError, TypeError):
-        return 0
 
 
 @register.filter
@@ -149,6 +142,20 @@ def likert_positive_count(distribution, options):
     """
 
     return sum(option_count(distribution, option) for option in options[-2:])
+
+
+@register.filter
+def rating_key(score):
+    """The overall rating of an average score; reports colour a score by it."""
+
+    return get_rating_key(score)
+
+
+@register.filter
+def rating_with_range(score):
+    """The overall rating of an average score, with the scores it covers."""
+
+    return RATING_RANGES[get_rating_key(score)]
 
 
 @register.filter

@@ -11,6 +11,7 @@ from reviews.models import CATEGORY_ORDER, ReviewCycle, ReviewerToken, Response
 from questionnaires.legacy_config import config_with_texts
 from questionnaires.models import AnswerOption, Questionnaire, QuestionSection, Question
 from reports.models import Report
+from reports.report_texts import with_texts
 from .models import APIToken, WebhookEndpoint, WebhookDelivery
 
 
@@ -490,6 +491,10 @@ class ReportSerializer(serializers.ModelSerializer):
             if self.context["view"].action == "list":
                 data.pop("access_token", None)
                 data.pop("report_data", None)  # Too large for lists
+
+        # Clients read the texts of the report, not the codes it stores
+        if "report_data" in data:
+            data["report_data"] = with_texts(instance.report_data)
 
         return data
 

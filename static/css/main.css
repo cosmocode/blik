@@ -2339,51 +2339,51 @@ body.setup-page {
 .dreyfus-model g[id*="cp_5"] { opacity: 0.3; transition: opacity 0.3s, filter 0.3s; }
 
 /* Novice - cp_1 */
-.dreyfus-model[data-current-stage="Novice"] g[id*="cp_1"] {
+.dreyfus-model[data-current-stage="novice"] g[id*="cp_1"] {
     opacity: 1;
     filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.6));
 }
-.dreyfus-model[data-current-stage="Novice"] #g-root-tx_novice_hwjayzz18d8s-fill text {
+.dreyfus-model[data-current-stage="novice"] #g-root-tx_novice_hwjayzz18d8s-fill text {
     font-weight: bold;
     fill: var(--primary-color, #3b82f6);
 }
 
 /* Advanced Beginner - cp_2 */
-.dreyfus-model[data-current-stage="Advanced Beginner"] g[id*="cp_2"] {
+.dreyfus-model[data-current-stage="advanced_beginner"] g[id*="cp_2"] {
     opacity: 1;
     filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.6));
 }
-.dreyfus-model[data-current-stage="Advanced Beginner"] #g-root-tx_advanced_59ah7z18fly-fill text {
+.dreyfus-model[data-current-stage="advanced_beginner"] #g-root-tx_advanced_59ah7z18fly-fill text {
     font-weight: bold;
     fill: var(--primary-color, #3b82f6);
 }
 
 /* Competent - cp_3 */
-.dreyfus-model[data-current-stage="Competent"] g[id*="cp_3"] {
+.dreyfus-model[data-current-stage="competent"] g[id*="cp_3"] {
     opacity: 1;
     filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.6));
 }
-.dreyfus-model[data-current-stage="Competent"] #g-root-tx_competen_1hfpt1nz18em8-fill text {
+.dreyfus-model[data-current-stage="competent"] #g-root-tx_competen_1hfpt1nz18em8-fill text {
     font-weight: bold;
     fill: var(--primary-color, #3b82f6);
 }
 
 /* Proficient - cp_4 */
-.dreyfus-model[data-current-stage="Proficient"] g[id*="cp_4"] {
+.dreyfus-model[data-current-stage="proficient"] g[id*="cp_4"] {
     opacity: 1;
     filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.6));
 }
-.dreyfus-model[data-current-stage="Proficient"] #g-root-tx_proficie_144vrrfz18d1e-fill text {
+.dreyfus-model[data-current-stage="proficient"] #g-root-tx_proficie_144vrrfz18d1e-fill text {
     font-weight: bold;
     fill: var(--primary-color, #3b82f6);
 }
 
 /* Expert - cp_5 */
-.dreyfus-model[data-current-stage="Expert"] g[id*="cp_5"] {
+.dreyfus-model[data-current-stage="expert"] g[id*="cp_5"] {
     opacity: 1;
     filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.6));
 }
-.dreyfus-model[data-current-stage="Expert"] #g-root-tx_expert_hxs957z18ff0-fill text {
+.dreyfus-model[data-current-stage="expert"] #g-root-tx_expert_hxs957z18ff0-fill text {
     font-weight: bold;
     fill: var(--primary-color, #3b82f6);
 }

@@ -45,10 +45,10 @@ from questionnaires.action_items import add_action_item_keys
 from questionnaires.answer_options import DEFAULT_LIKERT_SCALE, save_options
 from questionnaires.models import Question, QuestionSection, Questionnaire
 from reports.dreyfus_service import (
-    AGENCY_STAGES,
-    DREYFUS_STAGES,
+    agency_profile_with_texts,
     calculate_dreyfus_quadrant,
-    _get_development_focus,
+    quadrant_with_texts,
+    skill_profile_with_texts,
     _level_to_stage,
 )
 from reports.models import Report
@@ -727,39 +727,26 @@ def questionnaire_sample_report(request, questionnaire_id):
 
     if has_skill:
         skill_level = round(rng.uniform(3.2, 4.1), 2)
-        stage_num = _level_to_stage(skill_level)
-        stage_info = DREYFUS_STAGES[stage_num].copy()
-        next_stage_num = min(5, stage_num + 1)
-        if next_stage_num > stage_num:
-            stage_info['next_stage'] = DREYFUS_STAGES[next_stage_num]['name']
-            stage_info['development_focus'] = _get_development_focus(stage_num, next_stage_num)
-        else:
-            stage_info['next_stage'] = None
-            stage_info['development_focus'] = [_('Continue deepening expertise and innovating')]
-
-        insights['skill_profile'] = {
+        insights['skill_profile'] = skill_profile_with_texts({
             'skill_level': skill_level,
-            'skill_stage': stage_info['name'],
+            'stage': _level_to_stage(skill_level),
             'confidence': 0.85,
-            'stage_info': stage_info,
-        }
+        })
 
     if has_agency:
         agency_level = round(rng.uniform(3.4, 4.3), 2)
-        agency_stage_num = max(1, min(5, round(agency_level)))
-        agency_stage_info = AGENCY_STAGES[agency_stage_num]
-        insights['agency_profile'] = {
+        insights['agency_profile'] = agency_profile_with_texts({
             'agency_level': agency_level,
-            'agency_stage': agency_stage_info['name'],
+            'stage': _level_to_stage(agency_level),
             'confidence': 0.85,
-            'description': agency_stage_info['description'],
-        }
+        })
 
     if has_skill and has_agency:
-        insights['dreyfus_quadrant'] = calculate_dreyfus_quadrant(
+        quadrant = calculate_dreyfus_quadrant(
             insights['skill_profile']['skill_level'],
             insights['agency_profile']['agency_level'],
         )
+        insights['dreyfus_quadrant'] = quadrant_with_texts(quadrant)
 
     # Minimal development plan so the "next level" cards render.
     if has_skill:

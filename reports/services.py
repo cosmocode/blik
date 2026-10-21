@@ -16,6 +16,116 @@ import copy
 # Import Dreyfus service functions
 from . import dreyfus_service
 
+# Version of report_data's layout: 2 stores codes and numbers where version 1 stored English text
+REPORT_SCHEMA = 2
+
+# Overall ratings, see report_texts.py for their texts
+RATING_OUTSTANDING = 'outstanding'
+RATING_EXCELLENT = 'excellent'
+RATING_STRONG = 'strong'
+RATING_DEVELOPING = 'developing'
+RATING_NEEDS_SUPPORT = 'needs_support'
+
+
+def get_rating_key(score):
+    """The overall rating of an average score."""
+
+    if score >= 4.5:
+        return RATING_OUTSTANDING
+
+    if score >= 4.0:
+        return RATING_EXCELLENT
+
+    if score >= 3.5:
+        return RATING_STRONG
+
+    if score >= 3.0:
+        return RATING_DEVELOPING
+
+    return RATING_NEEDS_SUPPORT
+
+
+# Directions of a trend, see report_texts.py for their symbols and labels
+TREND_UP = 'up'
+TREND_SLIGHT_UP = 'slight_up'
+TREND_STABLE = 'stable'
+TREND_SLIGHT_DOWN = 'slight_down'
+TREND_DOWN = 'down'
+
+
+def get_trend_direction(change):
+    """The direction of a trend by how much a score changed."""
+
+    if change >= 0.3:
+        return TREND_UP
+
+    if change >= 0.1:
+        return TREND_SLIGHT_UP
+
+    if change <= -0.3:
+        return TREND_DOWN
+
+    if change <= -0.1:
+        return TREND_SLIGHT_DOWN
+
+    return TREND_STABLE
+
+
+# Kinds of perception gap, see report_texts.py for their texts
+GAP_IMPOSTER_SYNDROME = 'imposter_syndrome'
+GAP_OVERCONFIDENCE = 'overconfidence'
+
+
+def get_gap_type(gap):
+    """The kind of perception gap between self-assessment and the others' average, None for a small one."""
+
+    if gap < -0.5:
+        return GAP_IMPOSTER_SYNDROME
+
+    if gap > 0.5:
+        return GAP_OVERCONFIDENCE
+
+    return None
+
+
+SEVERITY_HIGH = 'high'
+SEVERITY_MODERATE = 'moderate'
+
+
+def get_gap_severity(gap):
+    """How severe a perception gap is: high from a whole point apart."""
+
+    if abs(gap) > 1.0:
+        return SEVERITY_HIGH
+
+    return SEVERITY_MODERATE
+
+
+STRENGTH_EXCEPTIONAL = 'exceptional'
+STRENGTH_STRONG = 'strong'
+
+
+def get_strength_level(score):
+    """How strong a strength is, for an average score of at least 4."""
+
+    if score >= 4.5:
+        return STRENGTH_EXCEPTIONAL
+
+    return STRENGTH_STRONG
+
+
+PRIORITY_HIGH = 'high'
+PRIORITY_MEDIUM = 'medium'
+
+
+def get_development_priority(score):
+    """How urgent a development area is, for an average score below 3."""
+
+    if score < 2.5:
+        return PRIORITY_HIGH
+
+    return PRIORITY_MEDIUM
+
 
 def _get_previous_cycle_report(cycle):
     """
@@ -40,24 +150,15 @@ def _get_previous_cycle_report(cycle):
 def _calculate_trend_indicator(current_score, previous_score):
     """
     Calculate trend indicator based on score change.
-    Returns: {'direction': str, 'change': float, 'symbol': str}
+    Returns: {'direction': str, 'change': float}, see report_texts.py for its symbol and label
     """
+
     if previous_score is None or current_score is None:
         return None
 
     change = current_score - previous_score
 
-    # Define thresholds
-    if change >= 0.3:
-        return {'direction': 'up', 'change': change, 'symbol': '↑', 'label': 'Improved'}
-    elif change >= 0.1:
-        return {'direction': 'slight_up', 'change': change, 'symbol': '↗', 'label': 'Slightly improved'}
-    elif change <= -0.3:
-        return {'direction': 'down', 'change': change, 'symbol': '↓', 'label': 'Declined'}
-    elif change <= -0.1:
-        return {'direction': 'slight_down', 'change': change, 'symbol': '↘', 'label': 'Slightly declined'}
-    else:
-        return {'direction': 'stable', 'change': change, 'symbol': '→', 'label': 'Stable'}
+    return {'direction': get_trend_direction(change), 'change': change}
 
 
 def _calculate_peer_benchmarks(cycle, section_summary):
@@ -264,25 +365,13 @@ def _calculate_insights(report_data):
         if others_avg is not None:
             gap = self_avg - others_avg
 
-            if gap < -0.5:
+            if gap_type := get_gap_type(gap):
                 insights['perception_gaps'].append({
-                    'type': 'imposter_syndrome',
-                    'severity': 'high' if gap < -1.0 else 'moderate',
+                    'type': gap_type,
+                    'severity': get_gap_severity(gap),
                     'self_score': round(self_avg, 2),
                     'others_score': round(others_avg, 2),
                     'gap': round(gap, 2),
-                    'message': f'Self-assessment ({self_avg:.1f}) significantly lower than others\' perception ({others_avg:.1f})',
-                    'interpretation': 'Strong performance but may undervalue own contributions'
-                })
-            elif gap > 0.5:
-                insights['perception_gaps'].append({
-                    'type': 'overconfidence',
-                    'severity': 'high' if gap > 1.0 else 'moderate',
-                    'self_score': round(self_avg, 2),
-                    'others_score': round(others_avg, 2),
-                    'gap': round(gap, 2),
-                    'message': f'Self-assessment ({self_avg:.1f}) higher than others\' perception ({others_avg:.1f})',
-                    'interpretation': 'Opportunity to align self-perception with team feedback'
                 })
 
     # Identify strengths (avg >= 4.0) and development areas (avg < 3.0)
@@ -297,7 +386,7 @@ def _calculate_insights(report_data):
                 strength = {
                     'area': section_title,
                     'others_avg': round(avg_score, 2),
-                    'level': 'exceptional' if avg_score >= 4.5 else 'strong'
+                    'level': get_strength_level(avg_score)
                 }
                 # Add self score and gap if available
                 if self_score is not None:
@@ -309,7 +398,7 @@ def _calculate_insights(report_data):
                 dev_area = {
                     'area': section_title,
                     'others_avg': round(avg_score, 2),
-                    'priority': 'high' if avg_score < 2.5 else 'medium'
+                    'priority': get_development_priority(avg_score)
                 }
                 # Add self score and gap if available
                 if self_score is not None:
@@ -351,11 +440,7 @@ def _calculate_insights(report_data):
         overall_avg = mean(others_ratings)
         insights['overall_sentiment'] = {
             'score': round(overall_avg, 2),
-            'rating': 'Outstanding' if overall_avg >= 4.5 else
-                     'Excellent' if overall_avg >= 4.0 else
-                     'Strong' if overall_avg >= 3.5 else
-                     'Developing' if overall_avg >= 3.0 else
-                     'Needs Support',
+            'rating': get_rating_key(overall_avg),
             'based_on': 'others',  # Clarify this excludes self
             'self_avg': round(mean(all_self_ratings), 2) if all_self_ratings else None
         }
@@ -557,6 +642,7 @@ def generate_report(cycle):
 
     # Calculate averages and apply anonymity threshold
     report_data = {
+        'schema': REPORT_SCHEMA,
         'by_section': {},
         'questionnaire_id': questionnaire.id
     }

@@ -38,7 +38,7 @@
         <div class="tab-content active" data-tab-content="skill">
             <!-- Dreyfus Diamond Visualization -->
             <div class="dreyfus-svg-container">
-                {% include "components/dreyfus_model_svg.html" with current_stage=insights.skill_profile.skill_stage %}
+                {% include "components/dreyfus_model_svg.html" with current_stage=insights.skill_profile.stage_key %}
             </div>
 
             <!-- Current Stage Summary -->
