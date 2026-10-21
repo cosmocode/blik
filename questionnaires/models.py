@@ -157,6 +157,7 @@ class Question(TimeStampedModel):
     # Personalized action items for development plans
     # Format: [
     #   {
+    #     "key": "k3x9a2bq",  // Stable key a translation of the item refers to
     #     "text": "Practice pair programming with senior developers",
     #     "threshold": 3.0,  // Include if question score < threshold
     #     "stages": [1, 2, 3]  // Optional: Relevant Dreyfus stages (1-5)

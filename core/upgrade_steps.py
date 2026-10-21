@@ -14,9 +14,11 @@ from pathlib import Path
 from django.apps import apps
 from django.db import transaction
 
+from questionnaires.action_items import add_action_item_keys
 from questionnaires.answer_options import migrate_responses
 from questionnaires.legacy_config import move_all_texts_out_of_config
 from questionnaires.management.commands.apply_dreyfus_mappings import Command as DreyfusCommand
+from questionnaires.models import Question
 
 
 def _apply_dreyfus_mappings(stdout):
@@ -146,6 +148,19 @@ def move_question_texts(stdout):
         migrate_responses(stdout)
 
 
+def key_action_items(stdout):
+    """Give every action item a key, which a translation of the item refers to."""
+
+    questions = Question.objects.exclude(action_items=[])
+
+    for question in questions:
+        question.action_items = add_action_item_keys(question.action_items)
+        question.save(update_fields=['action_items'])
+
+    count = len(questions)
+    stdout.write(f'Keyed the action items of {count} question(s).')
+
+
 STEPS = [
     ('0001_apply_dreyfus_mappings', _apply_dreyfus_mappings),
     ('0002_reapply_dreyfus_mappings', _reapply_dreyfus_mappings),
@@ -153,4 +168,5 @@ STEPS = [
      _move_setup_admins_into_the_admin_group),
     ('0004_fill_the_collaboration_section', _fill_the_collaboration_section),
     ('0005_move_question_texts', move_question_texts),
+    ('0006_key_action_items', key_action_items),
 ]

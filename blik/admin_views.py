@@ -41,6 +41,7 @@ from core.languages import default_language, is_language, language_name
 from core.gdpr import GDPRDeletionService
 from core.models import Organization
 from productreviews.models import ProductReview
+from questionnaires.action_items import add_action_item_keys
 from questionnaires.answer_options import DEFAULT_LIKERT_SCALE, save_options
 from questionnaires.models import Question, QuestionSection, Questionnaire
 from reports.dreyfus_service import (
@@ -1012,7 +1013,7 @@ def questionnaire_edit(request, questionnaire_id):
                         labels=labels,
                         required=required,
                         order=next_order,
-                        action_items=action_items
+                        action_items=add_action_item_keys(action_items)
                     )
                     save_options(question, option_rows)
 
@@ -1182,6 +1183,7 @@ def questionnaire_edit(request, questionnaire_id):
                         text = request.POST.get(f'action_items[{idx}][text]', '').strip()
                         threshold = request.POST.get(f'action_items[{idx}][threshold]', 3.0)
                         stages_raw = request.POST.getlist(f'action_items[{idx}][stages][]')
+                        key = request.POST.get(f'action_items[{idx}][key]', '').strip()
 
                         if text:  # Only add if text is not empty
                             item = {
@@ -1189,13 +1191,16 @@ def questionnaire_edit(request, questionnaire_id):
                                 'threshold': float(threshold)
                             }
 
+                            if key:
+                                item['key'] = key
+
                             # Add stages if any are selected
                             if stages_raw:
                                 item['stages'] = [int(s) for s in stages_raw]
 
                             action_items.append(item)
 
-                    question.action_items = action_items
+                    question.action_items = add_action_item_keys(action_items)
                     question.save()
 
                     messages.success(request, _('Dreyfus/Agency configuration updated successfully.'))
