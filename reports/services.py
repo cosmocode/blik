@@ -924,9 +924,11 @@ def send_report_ready_notification(report, request=None):
 
     try:
         with translation.override(recipient_language(reviewee.language, organization=reviewee.organization)):
+            questionnaire = cycle.questionnaire.translated()
             context = {
                 'reviewee': reviewee,
                 'cycle': cycle,
+                'questionnaire_name': questionnaire.name,
                 'report_url': report_url,
                 'response_count': response_count,
             }

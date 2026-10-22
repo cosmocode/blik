@@ -12,7 +12,13 @@ from accounts.models import Reviewee, UserProfile
 from accounts.permissions import assign_organization_admin, ensure_permission_groups
 from api.models import APIToken
 from core.models import Organization
-from questionnaires.models import Question, QuestionSection, Questionnaire
+from questionnaires.models import (
+    Question,
+    QuestionSection,
+    QuestionSectionTranslation,
+    QuestionTranslation,
+    Questionnaire,
+)
 from reports.report_texts import with_texts
 from reports.services import generate_report
 from reviews.models import Response, ReviewCycle, ReviewerToken
@@ -44,9 +50,12 @@ CODES = {
 
 class ReportTextsTest(TestCase):
 
+    def setUp(self):
+        self.questionnaire = Questionnaire.objects.create(name='Skills')
+
     def test_the_codes_become_the_english_texts_reports_stored_before(self):
         with translation.override('en'):
-            data = with_texts(CODES)
+            data = with_texts(CODES, self.questionnaire)
 
         trend = data['comparison']['overall_trend']
         section_trend = data['comparison']['section_trends']['Collaboration']
@@ -81,7 +90,7 @@ class ReportTextsTest(TestCase):
         self.assertEqual(plan['next_level_requirements'], skill['stage_info']['development_focus'])
 
     def test_the_stored_codes_stay_untouched(self):
-        with_texts(CODES)
+        with_texts(CODES, self.questionnaire)
 
         self.assertNotIn('label', CODES['comparison']['overall_trend'])
         self.assertEqual(CODES['insights']['overall_sentiment']['rating'], 'excellent')
@@ -93,7 +102,7 @@ class ReportTextsTest(TestCase):
         }}
 
         with translation.override('de'):
-            data = with_texts(report_data)
+            data = with_texts(report_data, self.questionnaire)
 
         self.assertEqual(data['insights']['overall_sentiment']['rating'], 'Excellent')
         self.assertEqual(data['insights']['skill_profile']['skill_stage'], 'Advanced Beginner')
@@ -103,6 +112,7 @@ class ReportTextsTest(TestCase):
 class TrendChangeTest(TestCase):
 
     def render(self):
+        questionnaire = Questionnaire.objects.create(name='Skills')
         report_data = with_texts({
             'schema': 2,
             'insights': {'overall_sentiment': {'score': 4.1, 'rating': 'excellent'}},
@@ -112,7 +122,7 @@ class TrendChangeTest(TestCase):
                 'overall_trend': {'direction': 'up', 'change': 0.43},
                 'section_trends': {'Collaboration': {'direction': 'slight_down', 'change': -0.18}},
             },
-        })
+        }, questionnaire)
         cycle = SimpleNamespace(organization=SimpleNamespace(min_responses_for_anonymity=3))
 
         return render_to_string('reports/_report_content.html', {
@@ -155,12 +165,12 @@ class GeneratedReportTest(TestCase):
         UserProfile.objects.create(user=self.admin, organization=self.organization)
         assign_organization_admin(self.admin)
 
-        questionnaire = Questionnaire.objects.create(name='Skills', organization=self.organization)
-        section = QuestionSection.objects.create(questionnaire=questionnaire, title='Growth')
-        skill = self.create_question(section, 'Solves problems', {'skill': 1.0})
-        agency = self.create_question(section, 'Takes initiative', {'agency': 1.0})
+        self.questionnaire = Questionnaire.objects.create(name='Skills', organization=self.organization)
+        self.section = QuestionSection.objects.create(questionnaire=self.questionnaire, title='Growth')
+        self.skill = skill = self.create_question(self.section, 'Solves problems', {'skill': 1.0})
+        agency = self.create_question(self.section, 'Takes initiative', {'agency': 1.0})
         reviewee = Reviewee.objects.create(name='Dana', email='dana@acme.example', organization=self.organization)
-        self.cycle = ReviewCycle.objects.create(reviewee=reviewee, questionnaire=questionnaire)
+        self.cycle = ReviewCycle.objects.create(reviewee=reviewee, questionnaire=self.questionnaire)
 
         for category, rating in [('self', 2), ('peer', 4), ('peer', 4)]:
             token = ReviewerToken.objects.create(cycle=self.cycle, category=category)
@@ -183,7 +193,19 @@ class GeneratedReportTest(TestCase):
             question_text=text,
             question_type='rating',
             config={'min': 1, 'max': 5, 'dreyfus_mapping': dreyfus_mapping},
+            labels={'1': 'Poor', '5': 'Excellent'},
+            action_items=[{'key': 'practice', 'text': f'Practice: {text}', 'threshold': 5}],
             order=section.questions.count(),
+        )
+
+    def translate(self):
+        QuestionSectionTranslation.objects.create(section=self.section, language='de', title='Wachstum')
+        QuestionTranslation.objects.create(
+            question=self.skill,
+            language='de',
+            question_text='Löst Probleme',
+            labels={'5': 'Hervorragend'},
+            action_items={'practice': 'Täglich üben'},
         )
 
     def test_a_report_stores_codes_instead_of_texts(self):
@@ -217,3 +239,66 @@ class GeneratedReportTest(TestCase):
         insights = response.json()['report_data']['insights']
         self.assertEqual(insights['skill_profile']['skill_stage'], 'Proficient')
         self.assertEqual(insights['overall_sentiment']['rating'], 'Excellent')
+
+    def test_the_questionnaire_texts_follow_the_reader(self):
+        self.translate()
+
+        with translation.override('de'):
+            data = with_texts(self.report.report_data, self.questionnaire)
+
+        section = data['by_section'][f'{self.section.id}']
+        skill = section['questions'][f'{self.skill.id}']
+        [agency] = [question for question in section['questions'].values() if question is not skill]
+        self.assertEqual(section['title'], 'Wachstum')
+        self.assertEqual(skill['question_text'], 'Löst Probleme')
+        self.assertEqual(skill['labels'], {'1': 'Poor', '5': 'Hervorragend'})
+        self.assertEqual(agency['question_text'], 'Takes initiative')
+        self.assertEqual(list(data['section_summary']), ['Wachstum'])
+        self.assertEqual(list(data['charts']['section_scores']), ['Wachstum'])
+        self.assertEqual([strength['area'] for strength in data['insights']['strengths']], ['Wachstum'])
+        self.assertIn('Täglich üben', data['insights']['development_plan']['quick_wins'])
+
+    def test_the_source_language_shows_the_stored_texts(self):
+        self.translate()
+        self.skill.question_text = 'Solves problems well'
+        self.skill.save()
+
+        with translation.override('en'):
+            data = with_texts(self.report.report_data, self.questionnaire)
+
+        skill = data['by_section'][f'{self.section.id}']['questions'][f'{self.skill.id}']
+        self.assertEqual(skill['question_text'], 'Solves problems')
+
+    def test_a_deleted_question_keeps_its_stored_text(self):
+        self.translate()
+        self.skill.delete()
+
+        with translation.override('de'):
+            data = with_texts(self.report.report_data, self.questionnaire)
+
+        questions = data['by_section'][f'{self.section.id}']['questions']
+        self.assertIn('Solves problems', [question['question_text'] for question in questions.values()])
+
+    def test_the_report_page_is_in_the_readers_language(self):
+        self.translate()
+        self.admin.profile.language = 'de'
+        self.admin.profile.save()
+        self.client.force_login(self.admin)
+
+        page = self.client.get(reverse('reports:view_report', args=[self.cycle.uuid]))
+
+        self.assertContains(page, 'Löst Probleme')
+        self.assertContains(page, 'Wachstum')
+        self.assertContains(page, 'class="report-language-switcher"')
+        self.assertNotContains(page, 'Solves problems')
+
+    def test_the_api_returns_the_questionnaire_texts_in_the_language_asked_for(self):
+        self.translate()
+        token = APIToken.objects.create(organization=self.organization, created_by=self.admin, name='T')
+        api = APIClient()
+        api.credentials(HTTP_AUTHORIZATION=f'Bearer {token.token}')
+
+        response = api.get(f'/api/v1/reports/{self.report.uuid}/?lang=de')
+
+        section = response.json()['report_data']['by_section'][f'{self.section.id}']
+        self.assertEqual(section['title'], 'Wachstum')

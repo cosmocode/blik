@@ -11,6 +11,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
+            model_name='Questionnaire',
+            name='source_language',
+            field=models.CharField(default='en', max_length=20, verbose_name='source language'),
+        ),
+        migrations.AddField(
             model_name='Question',
             name='labels',
             field=models.JSONField(blank=True, default=dict, verbose_name='labels'),
@@ -32,6 +37,82 @@ class Migration(migrations.Migration):
                 'db_table': 'answer_options',
                 'ordering': ['question', 'order'],
                 'constraints': [models.UniqueConstraint(fields=('question', 'order'), name='answer_option_unique_order')],
+            },
+        ),
+        migrations.CreateModel(
+            name='QuestionnaireTranslation',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
+                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='updated at')),
+                ('language', models.CharField(max_length=20, verbose_name='language')),
+                ('source_checksums', models.JSONField(blank=True, default=dict, verbose_name='source checksums')),
+                ('name', models.CharField(blank=True, max_length=255, verbose_name='name')),
+                ('description', models.TextField(blank=True, verbose_name='description')),
+                ('questionnaire', models.ForeignKey(on_delete=models.CASCADE, related_name='translations', to='questionnaires.Questionnaire', verbose_name='questionnaire')),
+            ],
+            options={
+                'verbose_name': 'questionnaire translation',
+                'verbose_name_plural': 'questionnaire translations',
+                'db_table': 'questionnaire_translations',
+                'constraints': [models.UniqueConstraint(fields=('questionnaire', 'language'), name='questionnaire_translation_unique')],
+            },
+        ),
+        migrations.CreateModel(
+            name='QuestionSectionTranslation',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
+                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='updated at')),
+                ('language', models.CharField(max_length=20, verbose_name='language')),
+                ('source_checksums', models.JSONField(blank=True, default=dict, verbose_name='source checksums')),
+                ('title', models.CharField(blank=True, max_length=255, verbose_name='title')),
+                ('description', models.TextField(blank=True, verbose_name='description')),
+                ('section', models.ForeignKey(on_delete=models.CASCADE, related_name='translations', to='questionnaires.QuestionSection', verbose_name='section')),
+            ],
+            options={
+                'verbose_name': 'section translation',
+                'verbose_name_plural': 'section translations',
+                'db_table': 'question_section_translations',
+                'constraints': [models.UniqueConstraint(fields=('section', 'language'), name='question_section_translation_unique')],
+            },
+        ),
+        migrations.CreateModel(
+            name='QuestionTranslation',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
+                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='updated at')),
+                ('language', models.CharField(max_length=20, verbose_name='language')),
+                ('source_checksums', models.JSONField(blank=True, default=dict, verbose_name='source checksums')),
+                ('question_text', models.TextField(blank=True, verbose_name='question text')),
+                ('labels', models.JSONField(blank=True, default=dict, verbose_name='labels')),
+                ('action_items', models.JSONField(blank=True, default=dict, verbose_name='action items')),
+                ('question', models.ForeignKey(on_delete=models.CASCADE, related_name='translations', to='questionnaires.Question', verbose_name='question')),
+            ],
+            options={
+                'verbose_name': 'question translation',
+                'verbose_name_plural': 'question translations',
+                'db_table': 'question_translations',
+                'constraints': [models.UniqueConstraint(fields=('question', 'language'), name='question_translation_unique')],
+            },
+        ),
+        migrations.CreateModel(
+            name='AnswerOptionTranslation',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
+                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='updated at')),
+                ('language', models.CharField(max_length=20, verbose_name='language')),
+                ('source_checksums', models.JSONField(blank=True, default=dict, verbose_name='source checksums')),
+                ('label', models.CharField(blank=True, max_length=255, verbose_name='label')),
+                ('option', models.ForeignKey(on_delete=models.CASCADE, related_name='translations', to='questionnaires.AnswerOption', verbose_name='answer option')),
+            ],
+            options={
+                'verbose_name': 'answer option translation',
+                'verbose_name_plural': 'answer option translations',
+                'db_table': 'answer_option_translations',
+                'constraints': [models.UniqueConstraint(fields=('option', 'language'), name='answer_option_translation_unique')],
             },
         ),
     ]

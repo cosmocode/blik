@@ -47,6 +47,10 @@
         </svg>
         <span>{% trans 'Toggle Theme' %}</span>
     </button>
+    <div class="report-language-switcher">
+        {% url 'set_language' as language_url %}
+        {% include 'components/language_switcher.html' with action=language_url %}
+    </div>
 
     <div class="report-container">
         {{ report_data.charts|json_script:"chart-data" }}
@@ -59,7 +63,7 @@
                 {% if is_admin_view %}
                 <div class="meta-item">
                     <span class="meta-label">{% trans 'Questionnaire' %}</span>
-                    <span class="meta-value">{{ cycle.questionnaire.name }}</span>
+                    <span class="meta-value">{{ questionnaire.name }}</span>
                 </div>
                 {% endif %}
                 <div class="meta-item">

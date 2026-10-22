@@ -132,10 +132,7 @@ def feedback_form(request, token):
         reviewer_token.claimed_at = timezone.now()
         reviewer_token.save(update_fields=['claimed_at'])
 
-    questionnaire = cycle.questionnaire
-
-    # Get all sections with questions
-    sections = questionnaire.sections.prefetch_related('questions__options')
+    questionnaire = cycle.questionnaire.translated()
 
     # Get existing responses for this token
     existing_responses = {}
@@ -150,7 +147,7 @@ def feedback_form(request, token):
         'token': reviewer_token,
         'cycle': cycle,
         'questionnaire': questionnaire,
-        'sections': sections,
+        'sections': questionnaire.sections.all(),
         'reviewee': cycle.reviewee,
         'existing_responses': existing_responses,
         'invitation_token': invitation_token,
@@ -178,8 +175,11 @@ def submit_feedback(request, token):
 
     questionnaire = cycle.questionnaire
 
-    # Get all questions for validation
-    questions = Question.objects.filter(section__questionnaire=questionnaire).prefetch_related('options')
+    # Get all questions for validation, translated because the error messages quote them
+    queryset = Question.objects.filter(section__questionnaire=questionnaire).prefetch_related(
+        *Question.translation_lookups()
+    )
+    questions = [question.translated() for question in queryset]
 
     errors = []
     responses_to_save = []

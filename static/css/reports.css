@@ -39,9 +39,21 @@ body.report-page {
     height: 20px;
 }
 
+.report-language-switcher {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1000;
+}
+
+.report-language-switcher .language-switcher {
+    padding: 0;
+}
+
 /* Print styles - always use light theme */
 @media print {
-    .report-theme-toggle {
+    .report-theme-toggle,
+    .report-language-switcher {
         display: none !important;
     }
 

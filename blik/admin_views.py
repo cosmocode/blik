@@ -659,13 +659,19 @@ def questionnaire_list(request):
 
 @login_required
 def questionnaire_preview(request, questionnaire_id):
-    """Preview a questionnaire"""
+    """Preview a questionnaire in its source language, or in the language that ?lang= picks."""
     questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
-    sections = questionnaire.sections.prefetch_related('questions__options')
+    language = request.GET.get('lang')
+
+    if not is_language(language):
+        language = questionnaire.source_language
+
+    questionnaire = questionnaire.translated(language)
 
     context = {
         'questionnaire': questionnaire,
-        'sections': sections,
+        'sections': questionnaire.sections.all(),
+        'preview_language': language,
     }
 
     return render(request, 'admin_dashboard/questionnaire_preview.html', context)
@@ -679,10 +685,7 @@ def questionnaire_sample_report(request, questionnaire_id):
     can reuse the real Dreyfus diamond + agency SVGs and Chart.js radar/gap
     graphs. Seeded by questionnaire id so reloads look identical.
     """
-    questionnaire = get_object_or_404(
-        Questionnaire.objects.prefetch_related('sections__questions'),
-        id=questionnaire_id,
-    )
+    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id).translated()
 
     rng = random.Random(questionnaire.id)
 
