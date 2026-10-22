@@ -256,6 +256,7 @@ AXES_RESET_ON_SUCCESS = True
 AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesStandaloneBackend',  # AxesStandaloneBackend should be first
     'django.contrib.auth.backends.ModelBackend',
+    'accounts.backends.EmailBackend',
 ]
 
 # Organization settings

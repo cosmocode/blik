@@ -1,51 +1,25 @@
 import logging
 
-logger = logging.getLogger(__name__)
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
-from core.models import Organization
 from accounts.models import UserProfile, OrganizationInvitation, PasswordResetToken
 from accounts.services import create_user_with_email_as_username
 from accounts.forms import ForgotPasswordForm, ResetPasswordForm
 
+logger = logging.getLogger(__name__)
 
-@require_http_methods(["GET", "POST"])
-@ratelimit(key='ip', rate='5/m', method='POST', block=True)
-def login_view(request):
-    """User login view."""
-    if request.user.is_authenticated:
-        return redirect('admin_dashboard')
 
-    if request.method == 'POST':
-        # The template uses 'login' as the field name (your modification)
-        username = request.POST.get('login')
-        password = request.POST.get('password')
-
-        # Try authenticating with username first, then email
-        user = authenticate(request, username=username, password=password)
-
-        if user is None:
-            # Try email-based login
-            from django.contrib.auth.models import User
-            try:
-                user_obj = User.objects.get(email=username)
-                user = authenticate(request, username=user_obj.username, password=password)
-            except User.DoesNotExist:
-                pass
-
-        if user is not None:
-            login(request, user)
-            return redirect('admin_dashboard')
-        else:
-            messages.error(request, 'Invalid username or password.')
-
-    return render(request, 'accounts/login.html')
+@method_decorator(ratelimit(key='ip', rate='5/m', block=True), name='post')
+class RateLimitedLoginView(LoginView):
+    template_name = 'accounts/login.html'
+    redirect_authenticated_user = True
 
 
 @require_http_methods(["GET"])

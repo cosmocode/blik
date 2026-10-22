@@ -1,0 +1,68 @@
+"""Login through Django's LoginView, with the username or the email address."""
+from django.contrib.auth.models import User
+from django.core.cache import cache
+from django.test import TestCase
+from django.urls import reverse
+
+from accounts.models import UserProfile
+from core.models import Organization
+
+
+class LoginTests(TestCase):
+    def setUp(self):
+        # The login is rate limited per IP; the limit counts in the cache
+        cache.clear()
+        organization = Organization.objects.create(name='Acme', email='org@acme.example')
+        self.user = User.objects.create_user(username='dana', email='Dana@acme.example', password='secret-pw')
+        UserProfile.objects.create(user=self.user, organization=organization)
+
+    def login(self, username, password='secret-pw', next_url=''):
+        return self.client.post(reverse('login'), {'username': username, 'password': password, 'next': next_url})
+
+    def test_the_username_logs_in_and_lands_on_the_dashboard(self):
+        response = self.login('dana')
+
+        self.assertRedirects(response, '/dashboard/', fetch_redirect_response=False)
+
+    def test_the_email_address_logs_in_regardless_of_case(self):
+        response = self.login('dana@ACME.example')
+
+        self.assertRedirects(response, '/dashboard/', fetch_redirect_response=False)
+
+    def test_the_login_returns_to_the_page_that_asked_for_it(self):
+        response = self.login('dana', next_url='/dashboard/team/')
+
+        self.assertRedirects(response, '/dashboard/team/', fetch_redirect_response=False)
+
+    def test_a_next_url_on_another_host_is_ignored(self):
+        response = self.login('dana', next_url='https://evil.example/')
+
+        self.assertRedirects(response, '/dashboard/', fetch_redirect_response=False)
+
+    def test_a_wrong_password_shows_an_error(self):
+        response = self.login('dana', password='wrong')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'alert-error')
+
+    def test_two_users_with_the_same_email_address_can_both_log_in(self):
+        User.objects.create_user(username='dana2', email='dana@acme.example', password='other-pw')
+
+        response = self.login('dana@acme.example', password='other-pw')
+
+        self.assertRedirects(response, '/dashboard/', fetch_redirect_response=False)
+
+    def test_the_sixth_attempt_within_a_minute_is_blocked(self):
+        # Different usernames, so axes (per username and IP) does not lock first
+        for attempt in range(5):
+            self.assertEqual(self.login(f'nobody{attempt}', password='wrong').status_code, 200)
+
+        self.assertEqual(self.login('dana').status_code, 403)
+        self.assertEqual(self.client.get(reverse('login')).status_code, 200)
+
+    def test_a_signed_in_user_is_sent_on(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse('login') + '?next=/dashboard/team/')
+
+        self.assertRedirects(response, '/dashboard/team/', fetch_redirect_response=False)
