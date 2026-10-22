@@ -51,6 +51,16 @@
                     >{% if questionnaire %}{{ questionnaire.description }}{% endif %}</textarea>
                 </div>
 
+                <div class="form-group">
+                    <label for="source_language" class="form-label">{% trans 'Language' %}</label>
+                    <select id="source_language" name="source_language" class="form-control">
+                        {% for code, name in LANGUAGES %}
+                        <option value="{{ code }}"{% if code == source_language %} selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-text">{% trans 'The language the questionnaire is written in. Translations into other languages are made from its texts.' %}</small>
+                </div>
+
                 <div class="form-group" style="margin-bottom: 0;">
                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                         <input
@@ -78,6 +88,29 @@
     </div>
 
     {% if questionnaire %}
+    <!-- Translations -->
+    <div class="card mb-2">
+        <div class="card-header">
+            <h2 class="card-title">{% trans 'Translations' %}</h2>
+        </div>
+        <div class="card-body">
+            {% for state in translation_states %}
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.5rem 0;{% if not forloop.first %} border-top: 1px solid var(--border);{% endif %}">
+                <div>
+                    <div style="font-weight: 500; color: var(--text-primary);">{{ state.name }}</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                        {% include 'admin_dashboard/partials/translation_state.html' %}
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <a href="{% url 'questionnaire_preview' questionnaire.id %}?lang={{ state.code }}" class="btn btn-sm btn-secondary">{% trans 'Preview' %}</a>
+                    <a href="{% url 'questionnaire_translate' questionnaire.id state.code %}" class="btn btn-sm btn-primary">{% trans 'Translate' %}</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
     <!-- Edit Section Modal -->
     <div id="edit_section_modal" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeEditSectionModal()">
         <div class="modal-content" style="max-width: 600px;">

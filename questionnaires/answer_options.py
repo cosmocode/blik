@@ -7,6 +7,7 @@ without orphaning the answers already given. Older configs keep the options them
 
 from django.core.validators import EMPTY_VALUES
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from reviews.models import Response
 
@@ -14,7 +15,8 @@ from .models import AnswerOption
 
 OPTION_TYPES = ['likert', 'single_choice', 'multiple_choice']
 
-DEFAULT_LIKERT_SCALE = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree']
+# Offered in the source language of the questionnaire a new question belongs to
+DEFAULT_LIKERT_SCALE = [_('Strongly Disagree'), _('Disagree'), _('Neutral'), _('Agree'), _('Strongly Agree')]
 
 
 def save_options(question, rows):
