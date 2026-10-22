@@ -58,7 +58,7 @@ def view_report(request, cycle_uuid):
 
     # Apply display-level anonymization based on organization settings
     min_threshold = cycle.organization.min_responses_for_anonymity
-    report_data = with_texts(report.report_data, cycle.questionnaire)
+    report_data = with_texts(report.report_data, cycle.questionnaire, cycle.reviewee.name)
     display_data = apply_display_anonymization(
         report_data,
         min_threshold=min_threshold
@@ -125,7 +125,7 @@ def reviewee_report(request, access_token):
 
     # Apply display-level anonymization based on organization settings
     min_threshold = cycle.organization.min_responses_for_anonymity
-    report_data = with_texts(report.report_data, cycle.questionnaire)
+    report_data = with_texts(report.report_data, cycle.questionnaire, cycle.reviewee.name)
     display_data = apply_display_anonymization(
         report_data,
         min_threshold=min_threshold

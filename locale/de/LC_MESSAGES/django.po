@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-22 12:06+0000\n"
+"POT-Creation-Date: 2026-10-22 16:14+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -3529,6 +3529,10 @@ msgstr "Abonnement „Enterprise“ starten"
 msgid "Ask an organization administrator to buy another round."
 msgstr "Weitere Pakete können nur Organisations-Admins kaufen."
 
+#, python-brace-format
+msgid "{name} stands for the first name of the person reviewed."
+msgstr "{name} steht für den Vornamen der beurteilten Person."
+
 msgid "Add option"
 msgstr "Option hinzufügen"
 
@@ -4035,8 +4039,9 @@ msgstr "Noch keine Fragen in diesem Abschnitt."
 msgid "Add Question to This Section"
 msgstr "Frage zu diesem Abschnitt hinzufügen"
 
-msgid "How effectively does this person communicate complex ideas?"
-msgstr "Wie wirksam vermittelt diese Person komplexe Ideen?"
+#, python-brace-format
+msgid "How effectively does {name} communicate complex ideas?"
+msgstr "Wie wirkungsvoll vermittelt {name} komplexe Ideen?"
 
 msgid "Default 5-point scale provided. Customize or use 3-point, 7-point, etc."
 msgstr "Standardmäßig ist eine 5-stufige Skala vorgegeben, anpassbar z. B. auf 3 oder 7 Stufen."

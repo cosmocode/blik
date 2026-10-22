@@ -13,6 +13,8 @@ from django.utils import translation
 from django.utils.formats import number_format
 from django.utils.translation import gettext_lazy as _
 
+from questionnaires.placeholders import personalize
+
 from .dreyfus_service import (
     DREYFUS_STAGES,
     agency_profile_with_texts,
@@ -146,8 +148,24 @@ def translate_questionnaire_texts(data, questionnaire):
         item['text'] = action_items.get(item['key'], item['text'])
 
 
-def with_texts(report_data, questionnaire):
-    """A copy of report_data with the texts its codes stand for, and its questionnaire texts in the active language."""
+def personalize_texts(data, name):
+    """Put the reviewee's first name into the question texts and action items stored in data."""
+
+    for section_data in data.get('by_section', {}).values():
+        for question_data in section_data['questions'].values():
+            question_data['question_text'] = personalize(question_data['question_text'], name)
+
+    insights = data.get('insights') or {}
+
+    for item in (insights.get('development_plan') or {}).get('action_items', []):
+        item['text'] = personalize(item['text'], name)
+
+
+def with_texts(report_data, questionnaire, reviewee_name=None):
+    """
+    A copy of report_data with the texts its codes stand for, its questionnaire texts in the active language and the
+    reviewee's first name in them.
+    """
 
     data = copy.deepcopy(report_data)
     insights = data.get('insights') or {}
@@ -160,6 +178,7 @@ def with_texts(report_data, questionnaire):
         return data
 
     translate_questionnaire_texts(data, questionnaire)
+    personalize_texts(data, reviewee_name)
     comparison = data.get('comparison') or {}
     trends = [comparison.get('overall_trend'), *(comparison.get('section_trends') or {}).values()]
 

@@ -41,6 +41,9 @@
                 {% else %}
                 <input type="text" id="{{ text.field_name }}" name="{{ text.field_name }}" class="form-control" lang="{{ state.code }}" value="{{ text.text }}" placeholder="{{ text.fallback }}"{% if text.max_length %} maxlength="{{ text.max_length }}"{% endif %}>
                 {% endif %}
+                {% if '{name}' in text.source %}
+                <small class="form-text">{% include 'admin_dashboard/partials/name_placeholder_hint.html' %}</small>
+                {% endif %}
                 {% if text.missing or text.outdated %}
                 <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.25rem; font-size: 0.875rem;">
                     {% if text.missing %}<span class="badge badge-warning">{% trans 'Missing' %}</span>{% endif %}
