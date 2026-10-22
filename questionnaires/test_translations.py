@@ -166,6 +166,13 @@ class TranslatedFormTest(TranslatedQuestionnaireTestCase):
 
         self.assertNotContains(page, 'Shares knowledge')
 
+    def test_the_form_puts_the_first_name_into_the_translated_question(self):
+        self.rating.translations.update(question_text='Teilt {name} Wissen?')
+
+        page = self.client.get(reverse('reviews:feedback_form', args=[self.token.token]))
+
+        self.assertContains(page, 'Teilt Dana Wissen?')
+
     def test_errors_quote_the_question_in_the_reviewers_language(self):
         response = self.client.post(reverse('reviews:submit_feedback', args=[self.token.token]))
 
@@ -256,6 +263,13 @@ class TranslatedAPITest(TranslatedQuestionnaireTestCase):
 
         self.assertIn('Fähigkeiten', [questionnaire['name'] for questionnaire in questionnaires])
         self.assertEqual(texts, ['Teilt Wissen', 'Listens well'])
+
+    def test_the_questionnaire_of_a_cycle_has_the_first_name(self):
+        self.rating.translations.update(question_text='Teilt {name} Wissen?')
+
+        texts = self.get_question_texts(f'/api/v1/cycles/{self.cycle.uuid}/questionnaire/?lang=de')
+
+        self.assertEqual(texts, ['Teilt Dana Wissen?', 'Listens well'])
 
     def test_cycles_keep_the_source_name(self):
         cycle = self.api.get(f'/api/v1/cycles/{self.cycle.uuid}/?lang=de').json()
@@ -388,6 +402,14 @@ class TranslationEditorTest(TranslatedQuestionnaireTestCase):
         self.assertContains(page, '>Teilt Wissen</textarea>')
         self.assertContains(page, 'value="Ihr Wachstum"')
         self.assertContains(page, 'Missing')
+
+    def test_the_translation_page_explains_the_name_placeholder(self):
+        self.likert.question_text = 'Does {name} listen?'
+        self.likert.save()
+
+        page = self.client.get(self.translate_url())
+
+        self.assertContains(page, 'stands for the first name of the person reviewed', count=1)
 
     def test_the_translation_page_saves(self):
         field_name = f'question-{self.likert.id}-question_text'

@@ -2,6 +2,7 @@ from django import template
 from django.utils.translation import gettext_lazy as _
 
 from questionnaires.models import Question
+from questionnaires.placeholders import personalize as personalize_text
 from reports.report_texts import RATING_RANGES
 from reports.services import get_rating_key
 from reviews.models import CATEGORY_ORDER
@@ -190,13 +191,8 @@ def count_value(lst, value):
 
 @register.filter
 def personalize(text, name):
-    """Replace 'This person' / 'this person' with the reviewee's first name."""
-    if not name:
-        return text
-    first_name = name.split()[0] if name else "This person"
-    text = text.replace("This person", first_name)
-    text = text.replace("this person", first_name)
-    return text
+    """The text with the reviewee's first name, see questionnaires/placeholders.py."""
+    return personalize_text(text, name)
 
 
 @register.filter

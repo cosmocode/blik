@@ -10,6 +10,7 @@ from accounts.models import Reviewee
 from reviews.models import CATEGORY_ORDER, ReviewCycle, ReviewerToken, Response
 from questionnaires.legacy_config import config_with_texts
 from questionnaires.models import AnswerOption, Questionnaire, QuestionSection, Question
+from questionnaires.placeholders import personalize
 from reports.models import Report
 from reports.report_texts import with_texts
 from .models import APIToken, WebhookEndpoint, WebhookDelivery
@@ -123,14 +124,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data["config"] = config_with_texts(instance)
-        reviewee_name = self.context.get("reviewee_name")
-        if reviewee_name:
-            first_name = reviewee_name.split()[0]
-            data["question_text"] = (
-                data["question_text"]
-                .replace("This person", first_name)
-                .replace("this person", first_name)
-            )
+        data["question_text"] = personalize(data["question_text"], self.context.get("reviewee_name"))
         return data
 
 
@@ -505,7 +499,9 @@ class ReportSerializer(serializers.ModelSerializer):
 
         # Clients read the texts of the report, not the codes it stores
         if "report_data" in data:
-            data["report_data"] = with_texts(instance.report_data, instance.cycle.questionnaire)
+            data["report_data"] = with_texts(
+                instance.report_data, instance.cycle.questionnaire, instance.cycle.reviewee.name
+            )
 
         return data
 

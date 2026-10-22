@@ -1,4 +1,5 @@
 """Reports store codes and numbers; their texts are added in the reader's language when the report is shown."""
+import copy
 from types import SimpleNamespace
 
 from django.contrib.auth.models import User
@@ -257,6 +258,21 @@ class GeneratedReportTest(TestCase):
         self.assertEqual(list(data['charts']['section_scores']), ['Wachstum'])
         self.assertEqual([strength['area'] for strength in data['insights']['strengths']], ['Wachstum'])
         self.assertIn('Täglich üben', data['insights']['development_plan']['quick_wins'])
+
+    def test_the_first_name_replaces_the_placeholder(self):
+        data = copy.deepcopy(self.report.report_data)
+        skill = data['by_section'][f'{self.section.id}']['questions'][f'{self.skill.id}']
+        skill['question_text'] = 'Does {name} solve problems?'
+
+        for item in data['insights']['development_plan']['action_items']:
+            item['text'] = 'Pair {name} with a colleague'
+
+        with translation.override('en'):
+            data = with_texts(data, self.questionnaire, 'Dana Doe')
+
+        skill = data['by_section'][f'{self.section.id}']['questions'][f'{self.skill.id}']
+        self.assertEqual(skill['question_text'], 'Does Dana solve problems?')
+        self.assertIn('Pair Dana with a colleague', data['insights']['development_plan']['quick_wins'])
 
     def test_the_source_language_shows_the_stored_texts(self):
         self.translate()

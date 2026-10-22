@@ -280,7 +280,9 @@
                         class="form-control"
                         rows="2"
                         required
+                        aria-describedby="edit_question_text_hint"
                     ></textarea>
+                    <small id="edit_question_text_hint" class="form-text">{% include 'admin_dashboard/partials/name_placeholder_hint.html' %}</small>
                 </div>
 
                 <div class="form-group">
@@ -426,8 +428,10 @@
                                     class="form-control"
                                     rows="2"
                                     required
-                                    placeholder="{% trans 'How effectively does this person communicate complex ideas?' %}"
+                                    placeholder="{% trans 'How effectively does {name} communicate complex ideas?' %}"
+                                    aria-describedby="question_text_hint_{{ section.id }}"
                                 ></textarea>
+                                <small id="question_text_hint_{{ section.id }}" class="form-text">{% include 'admin_dashboard/partials/name_placeholder_hint.html' %}</small>
                             </div>
 
                             <div class="form-group">
