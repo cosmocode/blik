@@ -14,11 +14,11 @@ from django.core.validators import validate_email
 from django.db import transaction
 from django.db.models import ProtectedError
 from django.db.models import Avg, Count, Max, OuterRef, Q, Subquery
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import timezone, translation
 from django.utils.functional import partition
 from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.http import require_POST
@@ -44,6 +44,13 @@ from productreviews.models import ProductReview
 from questionnaires.action_items import add_action_item_keys
 from questionnaires.answer_options import DEFAULT_LIKERT_SCALE, save_options
 from questionnaires.models import Question, QuestionSection, Questionnaire
+from questionnaires.translations import (
+    LanguageState,
+    get_language_states,
+    get_text_translations,
+    has_translation,
+    save_text_translations,
+)
 from reports.dreyfus_service import (
     agency_profile_with_texts,
     calculate_dreyfus_quadrant,
@@ -73,6 +80,16 @@ logger = logging.getLogger(__name__)
 
 # A new rating question reads its five values like the default likert scale
 DEFAULT_RATING_LABELS = {f'{value}': label for value, label in enumerate(DEFAULT_LIKERT_SCALE, 1)}
+
+
+def get_default_labels(questionnaire):
+    """The default likert scale and rating labels of a new question, in the questionnaire's source language."""
+
+    with translation.override(questionnaire.source_language):
+        likert_scale = [f'{label}' for label in DEFAULT_LIKERT_SCALE]
+        rating_labels = {key: f'{label}' for key, label in DEFAULT_RATING_LABELS.items()}
+
+    return likert_scale, rating_labels
 
 
 def get_cycle_or_404(request, cycle_uuid):
@@ -641,8 +658,12 @@ def questionnaire_list(request):
         question_count=Subquery(question_count_subquery),
         cycle_count=Count('review_cycles')
     ).prefetch_related(
-        'sections__questions'
+        *Questionnaire.translation_lookups()
     ).order_by('-is_default', 'name')
+
+    # The languages it is translated into, at least in part
+    for questionnaire in questionnaires:
+        questionnaire.translation_states = [state for state in get_language_states(questionnaire) if state.translated]
 
     # Archived ones are kept out of the way but stay reachable: their cycles
     # and reports still reference them, so they cannot simply disappear.
@@ -783,10 +804,17 @@ def questionnaire_create(request):
         name = request.POST.get('name')
         description = request.POST.get('description', '')
         is_default = request.POST.get('is_default') == 'on'
+        source_language = request.POST.get('source_language')
+
+        if not is_language(source_language):
+            source_language = translation.get_language()
 
         if not name:
             messages.error(request, _('Questionnaire name is required.'))
-            return render(request, 'admin_dashboard/questionnaire_form.html', {'action': 'Create'})
+            return render(request, 'admin_dashboard/questionnaire_form.html', {
+                'action': 'Create',
+                'source_language': source_language,
+            })
 
         try:
             # Get organization from request context
@@ -796,7 +824,8 @@ def questionnaire_create(request):
                 name=name,
                 description=description,
                 is_default=is_default,
-                organization=org
+                organization=org,
+                source_language=source_language,
             )
             messages.success(request, _('Questionnaire "%(name)s" created successfully.') % {'name': questionnaire.name})
             return redirect('questionnaire_edit', questionnaire_id=questionnaire.id)
@@ -805,6 +834,8 @@ def questionnaire_create(request):
 
     context = {
         'action': 'Create',
+        # New questionnaires are most likely written in the language their author works in
+        'source_language': translation.get_language(),
     }
 
     return render(request, 'admin_dashboard/questionnaire_form.html', context)
@@ -859,13 +890,30 @@ def questionnaire_edit(request, questionnaire_id):
         organization=org
     )
 
+    default_likert_scale, default_rating_labels = get_default_labels(questionnaire)
+
     if request.method == 'POST':
         action = request.POST.get('action')
 
         if action == 'update_info':
+            source_language = request.POST.get('source_language')
+
+            if not is_language(source_language):
+                source_language = questionnaire.source_language
+
+            # The source language cannot also have a translation
+            if source_language != questionnaire.source_language and has_translation(questionnaire, source_language):
+                messages.error(
+                    request,
+                    _('This questionnaire is already translated into %(language)s. Empty that translation first to '
+                      'make %(language)s its source language.') % {'language': language_name(source_language)},
+                )
+                return redirect('questionnaire_edit', questionnaire_id=questionnaire.id)
+
             questionnaire.name = request.POST.get('name', questionnaire.name)
             questionnaire.description = request.POST.get('description', '')
             questionnaire.is_default = request.POST.get('is_default') == 'on'
+            questionnaire.source_language = source_language
 
             try:
                 questionnaire.save()
@@ -927,12 +975,12 @@ def questionnaire_edit(request, questionnaire_id):
                     labels = posted_labels(request.POST, question_type)
                     if question_type == 'rating':
                         config = {'min': 1, 'max': 5}
-                        labels = labels or DEFAULT_RATING_LABELS
+                        labels = labels or default_rating_labels
                     elif question_type == 'likert':
                         option_rows = posted_option_rows(request.POST, 'likert')
 
                         if not option_rows:
-                            option_rows = [(None, label, None) for label in DEFAULT_LIKERT_SCALE]
+                            option_rows = [(None, label, None) for label in default_likert_scale]
                     elif question_type == 'single_choice' or question_type == 'multiple_choice':
                         # Weights only count with scoring enabled
                         enable_scoring = request.POST.get('enable_scoring') == 'on'
@@ -1073,12 +1121,12 @@ def questionnaire_edit(request, questionnaire_id):
                     labels = posted_labels(request.POST, question_type)
                     if question_type == 'rating':
                         config = {'min': 1, 'max': 5}
-                        labels = labels or DEFAULT_RATING_LABELS
+                        labels = labels or default_rating_labels
                     elif question_type == 'likert':
                         option_rows = posted_option_rows(request.POST, 'likert')
 
                         if not option_rows:
-                            option_rows = [(None, label, None) for label in DEFAULT_LIKERT_SCALE]
+                            option_rows = [(None, label, None) for label in default_likert_scale]
                     elif question_type == 'single_choice' or question_type == 'multiple_choice':
                         # Weights only count with scoring enabled
                         enable_scoring = request.POST.get('enable_scoring') == 'on'
@@ -1201,17 +1249,52 @@ def questionnaire_edit(request, questionnaire_id):
 
         return redirect('questionnaire_edit', questionnaire_id=questionnaire.id)
 
-    sections = questionnaire.sections.prefetch_related('questions__options')
-
     context = {
         'action': 'Edit',
         'questionnaire': questionnaire,
-        'sections': sections,
-        'default_likert_scale': DEFAULT_LIKERT_SCALE,
-        'default_rating_labels': DEFAULT_RATING_LABELS,
+        'source_language': questionnaire.source_language,
+        'translation_states': get_language_states(questionnaire),
+        # The translation states prefetched the sections, questions and options
+        'sections': questionnaire.sections.all(),
+        'default_likert_scale': default_likert_scale,
+        'default_rating_labels': default_rating_labels,
     }
 
     return render(request, 'admin_dashboard/questionnaire_form.html', context)
+
+
+@login_required
+@can_manage_questionnaires_required
+def questionnaire_translate(request, questionnaire_id, language):
+    """Translate the texts of a questionnaire into another language, next to its source texts."""
+
+    questionnaire = get_object_or_404(
+        Questionnaire,
+        id=questionnaire_id,
+        organization=getattr(request, 'organization', None),
+    )
+
+    if not is_language(language) or language == questionnaire.source_language:
+        raise Http404
+
+    if request.method == 'POST':
+        if errors := save_text_translations(questionnaire, language, request.POST):
+            for error in errors:
+                messages.error(request, error)
+        else:
+            messages.success(request, _('Translation saved.'))
+
+        return redirect('questionnaire_translate', questionnaire_id=questionnaire.id, language=language)
+
+    texts = get_text_translations(questionnaire, language)
+    context = {
+        'questionnaire': questionnaire,
+        'texts': texts,
+        'state': LanguageState.from_texts(language, texts),
+        'source_language_name': language_name(questionnaire.source_language),
+    }
+
+    return render(request, 'admin_dashboard/questionnaire_translate.html', context)
 
 
 @login_required

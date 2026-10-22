@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-22 08:59+0000\n"
+"POT-Creation-Date: 2026-10-22 12:06+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -862,6 +862,10 @@ msgid "Error creating questionnaire: %(error)s"
 msgstr "Fehler beim Anlegen des Fragebogens: %(error)s"
 
 #, python-format
+msgid "This questionnaire is already translated into %(language)s. Empty that translation first to make %(language)s its source language."
+msgstr "Für %(language)s gibt es bereits eine Übersetzung dieses Fragebogens. Leeren Sie diese zuerst, um %(language)s zur Ausgangssprache zu machen."
+
+#, python-format
 msgid "Questionnaire \"%(name)s\" updated successfully."
 msgstr "Fragebogen „%(name)s“ aktualisiert."
 
@@ -930,6 +934,9 @@ msgstr "Frage nicht gefunden."
 #, python-format
 msgid "Error updating Dreyfus configuration: %(error)s"
 msgstr "Fehler beim Aktualisieren der Dreyfus-Konfiguration: %(error)s"
+
+msgid "Translation saved."
+msgstr "Übersetzung gespeichert."
 
 #, python-format
 msgid "Questionnaire \"%(name)s\" archived. It is used by %(count)s review cycle(s) and cannot be deleted."
@@ -1678,6 +1685,21 @@ msgstr "Produktbewertung"
 msgid "Question"
 msgstr "Frage"
 
+msgid "Strongly Disagree"
+msgstr "Stimme überhaupt nicht zu"
+
+msgid "Disagree"
+msgstr "Stimme nicht zu"
+
+msgid "Neutral"
+msgstr "Neutral"
+
+msgid "Agree"
+msgstr "Stimme zu"
+
+msgid "Strongly Agree"
+msgstr "Stimme voll zu"
+
 msgid "description"
 msgstr "Beschreibung"
 
@@ -1794,6 +1816,38 @@ msgstr "Übersetzung einer Antwortoption"
 
 msgid "answer option translations"
 msgstr "Übersetzungen von Antwortoptionen"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Description"
+msgstr "Beschreibung"
+
+msgid "Section title"
+msgstr "Titel des Abschnitts"
+
+msgid "Section description"
+msgstr "Beschreibung des Abschnitts"
+
+msgid "Action item"
+msgstr "Maßnahme"
+
+msgid "Answer option"
+msgstr "Antwortoption"
+
+msgid "Label of the lowest value"
+msgstr "Beschriftung des niedrigsten Werts"
+
+msgid "Label of the highest value"
+msgstr "Beschriftung des höchsten Werts"
+
+#, python-format
+msgid "Label of rating %(value)s"
+msgstr "Beschriftung der Bewertung %(value)s"
+
+#, python-format
+msgid "The translation of \"%(text)s\" is longer than %(max_length)s characters."
+msgstr "Die Übersetzung von „%(text)s“ ist länger als %(max_length)s Zeichen."
 
 msgid "No expiry"
 msgstr "Kein Ablauf"
@@ -3219,9 +3273,6 @@ msgstr "<strong>Endgültig löschen (vollständige Entfernung):</strong> Entfern
 msgid "Reviewees (%(count)s)"
 msgstr "Beurteilte (%(count)s)"
 
-msgid "Name"
-msgstr "Name"
-
 msgid "Department"
 msgstr "Abteilung"
 
@@ -3507,6 +3558,21 @@ msgstr "Diese Frage löschen?"
 
 msgid "Delete"
 msgstr "Löschen"
+
+#, python-format
+msgid "%(counter)s text missing"
+msgid_plural "%(counter)s texts missing"
+msgstr[0] "%(counter)s Text fehlt"
+msgstr[1] "%(counter)s Texte fehlen"
+
+#, python-format
+msgid "%(counter)s outdated"
+msgid_plural "%(counter)s outdated"
+msgstr[0] "%(counter)s veraltet"
+msgstr[1] "%(counter)s veraltet"
+
+msgid "Fully translated"
+msgstr "Vollständig übersetzt"
 
 msgid "Delete Product Review"
 msgstr "Produktbewertung löschen"
@@ -3820,6 +3886,9 @@ msgstr "Beschreibung (optional)"
 msgid "Comprehensive feedback covering leadership, communication, and technical skills"
 msgstr "Umfassendes Feedback zu Führung, Kommunikation und fachlichen Fähigkeiten"
 
+msgid "The language the questionnaire is written in. Translations into other languages are made from its texts."
+msgstr "Die Sprache, in der der Fragebogen geschrieben ist. Übersetzungen in andere Sprachen entstehen aus seinen Texten."
+
 msgid "Set as default questionnaire"
 msgstr "Als Standardfragebogen festlegen"
 
@@ -3828,6 +3897,12 @@ msgstr "Angaben aktualisieren"
 
 msgid "Preview"
 msgstr "Vorschau"
+
+msgid "Translations"
+msgstr "Übersetzungen"
+
+msgid "Translate"
+msgstr "Übersetzen"
 
 msgid "Edit Section"
 msgstr "Abschnitt bearbeiten"
@@ -4351,6 +4426,29 @@ msgstr "Leistung aufgeschlüsselt nach Kompetenzbereichen"
 
 msgid "Overall score (excluding self-assessment)"
 msgstr "Gesamtwert (ohne Selbsteinschätzung)"
+
+#, python-format
+msgid "Translate %(name)s into %(language)s"
+msgstr "%(name)s übersetzen: %(language)s"
+
+#, python-format
+msgid "Translate into %(language)s"
+msgstr "Übersetzung: %(language)s"
+
+msgid "Back to Editor"
+msgstr "Zurück zum Editor"
+
+msgid "Missing"
+msgstr "Fehlt"
+
+msgid "Outdated"
+msgstr "Veraltet"
+
+msgid "Still correct"
+msgstr "Passt noch"
+
+msgid "Save Translation"
+msgstr "Übersetzung speichern"
 
 msgid "Submit Your Review"
 msgstr "Bewertung abgeben"

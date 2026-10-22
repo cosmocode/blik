@@ -1,0 +1,9 @@
+{% load i18n %}{# How far a questionnaire is translated into one language, from a LanguageState #}
+{% if state.missing %}
+{% blocktrans trimmed count counter=state.missing %}{{ counter }} text missing{% plural %}{{ counter }} texts missing{% endblocktrans %}
+{% endif %}
+{% if state.missing and state.outdated %}·{% endif %}
+{% if state.outdated %}
+{% blocktrans trimmed count counter=state.outdated %}{{ counter }} outdated{% plural %}{{ counter }} outdated{% endblocktrans %}
+{% endif %}
+{% if not state.missing and not state.outdated %}{% trans 'Fully translated' %}{% endif %}

@@ -206,6 +206,16 @@ class Question(Translatable, TimeStampedModel):
 
         return [{'id': option.id, 'label': option.label, 'weight': option.weight} for option in self.options.all()]
 
+    def get_source_value(self, field):
+        """Action items are translated by their key."""
+
+        if field == 'action_items':
+            return {
+                item['key']: item.get('text') for item in self.action_items if isinstance(item, dict) and 'key' in item
+            }
+
+        return super().get_source_value(field)
+
     def set_texts(self, texts):
         """Labels and action items are translated by key; keys the source no longer has are left out."""
 

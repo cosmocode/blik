@@ -10,7 +10,7 @@ from accounts.models import Reviewee, UserProfile
 from accounts.permissions import assign_organization_admin, ensure_permission_groups
 from api.models import APIToken
 from core.models import Organization
-from questionnaires.answer_options import save_options
+from questionnaires.answer_options import DEFAULT_LIKERT_SCALE, save_options
 from questionnaires.models import (
     AnswerOptionTranslation,
     Question,
@@ -21,6 +21,7 @@ from questionnaires.models import (
     QuestionnaireTranslation,
 )
 from questionnaires.signals import clone_questionnaire_for_organization
+from questionnaires.translations import get_checksum, get_text_translations, save_text_translations
 from reviews.models import ReviewCycle, ReviewerToken
 from reviews.services import send_reviewer_invitations
 
@@ -256,3 +257,193 @@ class TranslatedAPITest(TranslatedQuestionnaireTestCase):
         cycle = self.api.get(f'/api/v1/cycles/{self.cycle.uuid}/?lang=de').json()
 
         self.assertEqual(cycle['questionnaire_detail']['name'], 'Skills')
+
+
+class TranslationStateTest(TranslatedQuestionnaireTestCase):
+
+    def get_questionnaire(self):
+        """The questionnaire as a request loads it, without the parts an earlier call prefetched."""
+
+        return Questionnaire.objects.get(pk=self.questionnaire.pk)
+
+    def get_texts(self, language='de'):
+        return {(text.part, text.key): text for text in get_text_translations(self.get_questionnaire(), language)}
+
+    def get_text(self, part, key, language='de'):
+        return self.get_texts(language)[part, key]
+
+    def save(self, language='de', confirm=False, **changes):
+        """Save the current translations into language, all confirmed as up to date if asked, with changes applied."""
+
+        texts = get_text_translations(self.get_questionnaire(), language)
+        data = {text.field_name: text.text for text in texts}
+
+        if confirm:
+            data.update({f'current-{text.field_name}': 'on' for text in texts})
+
+        data.update(changes)
+
+        return save_text_translations(self.get_questionnaire(), language, data)
+
+    def test_texts_without_translation_are_missing(self):
+        self.assertTrue(self.get_text(self.likert, 'question_text').missing)
+        self.assertFalse(self.get_text(self.rating, 'question_text').missing)
+
+    def test_saving_stores_the_texts_with_the_checksums_of_their_source(self):
+        field_name = self.get_text(self.likert, 'question_text').field_name
+
+        self.save(**{field_name: 'Hört gut zu'})
+
+        translation = self.likert.translations.get(language='de')
+        self.assertEqual(translation.question_text, 'Hört gut zu')
+        self.assertEqual(translation.source_checksums, {'question_text': get_checksum('Listens well')})
+        self.assertFalse(self.get_text(self.likert, 'question_text').outdated)
+
+    def test_a_changed_source_text_shows_its_translation_as_outdated(self):
+        self.save(confirm=True)
+        self.rating.question_text = 'Shares what they know'
+        self.rating.save()
+
+        self.assertTrue(self.get_text(self.rating, 'question_text').outdated)
+        self.assertFalse(self.get_text(self.rating, 'labels.1').outdated)
+
+    def test_an_outdated_text_stays_outdated_until_confirmed(self):
+        self.save(confirm=True)
+        self.rating.question_text = 'Shares what they know'
+        self.rating.save()
+        field_name = self.get_text(self.rating, 'question_text').field_name
+
+        self.save()
+        self.assertTrue(self.get_text(self.rating, 'question_text').outdated)
+
+        self.save(**{f'current-{field_name}': 'on'})
+        self.assertFalse(self.get_text(self.rating, 'question_text').outdated)
+
+    def test_an_empty_text_removes_its_translation(self):
+        self.save(**{self.get_text(self.rating, 'question_text').field_name: ''})
+
+        translation = self.rating.translations.get(language='de')
+        self.assertEqual(translation.question_text, '')
+        self.assertEqual(translation.labels, {'1': 'Schwach'})
+
+    def test_a_translation_without_texts_is_deleted(self):
+        texts = get_text_translations(self.get_questionnaire(), 'de')
+
+        self.save(**{text.field_name: '' for text in texts if text.part == self.rating})
+
+        self.assertFalse(self.rating.translations.filter(language='de').exists())
+
+    def test_saving_drops_texts_the_source_no_longer_has(self):
+        self.save()
+
+        self.assertNotIn('9', self.rating.translations.get(language='de').labels)
+
+    def test_a_too_long_text_saves_nothing(self):
+        errors = self.save(**{
+            self.get_text(self.questionnaire, 'name').field_name: 'x' * 300,
+            self.get_text(self.likert, 'question_text').field_name: 'Hört gut zu',
+        })
+
+        self.assertEqual(len(errors), 1)
+        self.assertFalse(self.likert.translations.exists())
+
+    def test_a_variant_shows_the_texts_of_its_base_language(self):
+        question_text = self.get_text(self.rating, 'question_text', 'de-informal')
+        title = self.get_text(self.section, 'title', 'de-informal')
+
+        self.assertEqual((question_text.text, question_text.fallback), ('', 'Teilt Wissen'))
+        self.assertFalse(question_text.missing)
+        self.assertEqual((title.text, title.fallback), ('Dein Wachstum', 'Ihr Wachstum'))
+
+    def test_a_variant_of_the_source_language_misses_nothing(self):
+        self.questionnaire.source_language = 'de'
+        self.questionnaire.save()
+
+        self.assertFalse(any(text.missing for text in self.get_texts('de-informal').values()))
+        self.assertTrue(self.get_text(self.likert, 'question_text', 'en').missing)
+
+
+class TranslationEditorTest(TranslatedQuestionnaireTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.client.force_login(self.admin)
+
+    def translate_url(self, language='de', questionnaire=None):
+        questionnaire = questionnaire or self.questionnaire
+
+        return reverse('questionnaire_translate', args=[questionnaire.id, language])
+
+    def edit(self, **data):
+        return self.client.post(reverse('questionnaire_edit', args=[self.questionnaire.id]), data)
+
+    def test_the_translation_page_shows_source_and_translation_side_by_side(self):
+        page = self.client.get(self.translate_url())
+
+        self.assertContains(page, 'Shares knowledge')
+        self.assertContains(page, '>Teilt Wissen</textarea>')
+        self.assertContains(page, 'value="Ihr Wachstum"')
+        self.assertContains(page, 'Missing')
+
+    def test_the_translation_page_saves(self):
+        field_name = f'question-{self.likert.id}-question_text'
+
+        response = self.client.post(self.translate_url(), {field_name: 'Hört gut zu'})
+
+        self.assertRedirects(response, self.translate_url())
+        self.assertEqual(self.likert.translations.get(language='de').question_text, 'Hört gut zu')
+
+    def test_only_other_languages_of_the_own_organization_can_be_translated(self):
+        other = Questionnaire.objects.create(name='Other', organization=Organization.objects.create(
+            name='Other', email='org@other.example'))
+
+        self.assertEqual(self.client.get(self.translate_url('en')).status_code, 404)
+        self.assertEqual(self.client.get(self.translate_url('xx')).status_code, 404)
+        self.assertEqual(self.client.get(self.translate_url(questionnaire=other)).status_code, 404)
+
+    def test_members_cannot_translate(self):
+        member = User.objects.create_user('member', 'member@acme.example', 'pw')
+        UserProfile.objects.create(user=member, organization=self.organization)
+        self.client.force_login(member)
+
+        self.client.post(self.translate_url(), {f'question-{self.likert.id}-question_text': 'Hört gut zu'})
+
+        self.assertFalse(self.likert.translations.exists())
+
+    def test_the_editor_and_the_list_show_how_far_the_translations_are(self):
+        editor = self.client.get(reverse('questionnaire_edit', args=[self.questionnaire.id]))
+        listing = self.client.get(reverse('questionnaire_list'))
+
+        self.assertContains(editor, self.translate_url())
+        self.assertContains(editor, 'texts missing')
+        self.assertContains(listing, 'Deutsch (Sie):')
+
+    def test_the_source_language_can_change_to_a_language_without_translation(self):
+        self.edit(action='update_info', name='Skills', source_language='de-informal')
+        self.questionnaire.refresh_from_db()
+        self.assertEqual(self.questionnaire.source_language, 'en')
+
+        QuestionSectionTranslation.objects.filter(language='de-informal').delete()
+        self.edit(action='update_info', name='Skills', source_language='de-informal')
+        self.questionnaire.refresh_from_db()
+        self.assertEqual(self.questionnaire.source_language, 'de-informal')
+
+    def test_a_new_questionnaire_takes_the_language_picked(self):
+        self.client.post(reverse('questionnaire_create'), {'name': 'Fragen', 'source_language': 'de'})
+
+        self.assertEqual(Questionnaire.objects.get(name='Fragen').source_language, 'de')
+
+    def test_new_questions_get_the_default_labels_in_the_source_language(self):
+        self.questionnaire.source_language = 'de'
+        self.questionnaire.save()
+
+        self.edit(action='add_question', section_id=self.section.id, question_type='likert', question_text='Hilft')
+        self.edit(action='add_question', section_id=self.section.id, question_type='rating', question_text='Plant')
+
+        with translation.override('de'):
+            scale = [f'{label}' for label in DEFAULT_LIKERT_SCALE]
+
+        likert = Question.objects.get(question_text='Hilft')
+        rating = Question.objects.get(question_text='Plant')
+        self.assertEqual([option.label for option in likert.options.all()], scale)
+        self.assertEqual(rating.labels, {f'{value}': label for value, label in enumerate(scale, 1)})
