@@ -159,7 +159,7 @@
 
     <div class="card">
         <div class="card-body stat-card-content">
-            <div class="stat-number warning">{{ total_tokens|add:"-"|add:completed_tokens }}</div>
+            <div class="stat-number warning">{{ pending_tokens }}</div>
             <div class="stat-label">Pending</div>
         </div>
     </div>
@@ -515,9 +515,9 @@ document.addEventListener('DOMContentLoaded', function() {
             </form>
             {% endif %}
 
-            {% if total_tokens|add:"-"|add:completed_tokens > 0 %}
+            {% if pending_tokens > 0 %}
             <a href="{% url 'send_reminder_form' cycle.uuid %}" class="btn btn-warning" style="color: white;">
-                Send Reminders ({{ total_tokens|add:"-"|add:completed_tokens }})
+                Send Reminders ({{ pending_tokens }})
             </a>
             {% endif %}
 
