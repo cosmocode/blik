@@ -1,4 +1,6 @@
 """Questionnaires are translated text by text; whatever is not translated shows in the source language."""
+import json
+
 from django.contrib.auth.models import User
 from django.core import mail
 from django.test import TestCase
@@ -6,8 +8,10 @@ from django.urls import reverse
 from django.utils import translation
 from rest_framework.test import APIClient
 
+from accounts.import_service import import_questionnaires
 from accounts.models import Reviewee, UserProfile
 from accounts.permissions import assign_organization_admin, ensure_permission_groups
+from accounts.services import export_organization_data
 from api.models import APIToken
 from core.models import Organization
 from questionnaires.answer_options import DEFAULT_LIKERT_SCALE, save_options
@@ -447,3 +451,82 @@ class TranslationEditorTest(TranslatedQuestionnaireTestCase):
         rating = Question.objects.get(question_text='Plant')
         self.assertEqual([option.label for option in likert.options.all()], scale)
         self.assertEqual(rating.labels, {f'{value}': label for value, label in enumerate(scale, 1)})
+
+
+class TranslationExportTest(TranslatedQuestionnaireTestCase):
+
+    def export(self):
+        """The questionnaire as the export file holds it."""
+
+        data = json.loads(json.dumps(export_organization_data(self.organization)))
+        [questionnaire] = [
+            questionnaire for questionnaire in data['questionnaires'] if questionnaire['name'] == 'Skills'
+        ]
+
+        return questionnaire
+
+    def import_into_other_organization(self, questionnaire_data):
+        organization = Organization.objects.create(name='Other', email='org@other.example')
+        result = import_questionnaires(organization, [questionnaire_data])
+
+        return result['questionnaire_map']['Skills']
+
+    def test_the_export_holds_the_source_language_translations_and_action_items(self):
+        questionnaire = self.export()
+        [section] = questionnaire['sections']
+        rating, likert = section['questions']
+        [action_item] = rating['action_items']
+        agree, disagree = likert['options']
+
+        self.assertEqual(questionnaire['source_language'], 'en')
+        self.assertEqual(questionnaire['translations']['de']['name'], 'Fähigkeiten')
+        self.assertEqual(section['translations']['de-informal']['title'], 'Dein Wachstum')
+        self.assertEqual(action_item['key'], 'pairing')
+        self.assertEqual(rating['translations']['de']['action_items'], {'pairing': 'Wöchentlich zu zweit arbeiten'})
+        self.assertEqual(agree['translations']['de']['label'], 'Stimme zu')
+
+    def test_an_import_restores_the_translations(self):
+        questionnaire = self.import_into_other_organization(self.export()).translated('de')
+        [section] = questionnaire.sections.all()
+        rating, likert = section.questions.all()
+        [action_item] = rating.action_items
+
+        self.assertEqual((questionnaire.name, section.title, rating.question_text), (
+            'Fähigkeiten', 'Ihr Wachstum', 'Teilt Wissen'))
+        self.assertEqual(action_item['text'], 'Wöchentlich zu zweit arbeiten')
+        self.assertEqual([option.label for option in likert.options.all()], ['Stimme zu', 'Disagree'])
+
+    def test_an_import_leaves_out_unknown_languages_the_source_language_and_wrong_types(self):
+        questionnaire_data = self.export()
+        questionnaire_data['translations'] = {
+            'xx': {'name': 'Unbekannt'},
+            'en': {'name': 'Source'},
+            'de': {'name': 5, 'description': 'Beschreibung', 'source_checksums': ['wrong']},
+        }
+
+        questionnaire = self.import_into_other_organization(questionnaire_data)
+
+        [translation] = questionnaire.translations.all()
+        self.assertEqual((translation.language, translation.name, translation.description), ('de', '', 'Beschreibung'))
+        self.assertEqual(translation.source_checksums, {})
+
+    def test_an_export_from_before_translations_imports_in_the_default_language(self):
+        questionnaire_data = self.export()
+
+        for key in ['source_language', 'translations']:
+            questionnaire_data.pop(key)
+
+        for section in questionnaire_data['sections']:
+            section.pop('translations')
+
+            for question in section['questions']:
+                question.pop('translations')
+                question.pop('action_items')
+
+        questionnaire = self.import_into_other_organization(questionnaire_data)
+
+        self.assertEqual(questionnaire.source_language, 'en')
+        self.assertFalse(questionnaire.translations.exists())
+        [section] = questionnaire.sections.all()
+        self.assertEqual([question.action_items for question in section.questions.all()], [[], []])
+

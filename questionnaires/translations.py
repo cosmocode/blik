@@ -18,7 +18,7 @@ from django.db import transaction
 from django.db.models import prefetch_related_objects
 from django.utils.translation import get_language, gettext, gettext_lazy as _
 
-from core.languages import get_base_language, language_name, translation_languages
+from core.languages import get_base_language, is_language, language_name, translation_languages
 
 # A checksum only has to tell one version of a source text from the next
 CHECKSUM_LENGTH = 16
@@ -393,3 +393,50 @@ def save_text_translations(questionnaire, language, data):
             save_part_translation(part, language, list(part_texts), data)
 
     return []
+
+
+def get_translations_data(part):
+    """The translations of a questionnaire part as plain data for the export, by language."""
+
+    return {
+        translation.language: {
+            **{field: getattr(translation, field) for field in part.translated_fields},
+            'source_checksums': translation.source_checksums,
+        }
+        for translation in part.translations.all()
+    }
+
+
+def import_translations(part, data, source_language):
+    """
+    Create the translations of a questionnaire part from exported data. Languages this install does not offer, the
+    source language and values of the wrong type are left out.
+    """
+
+    if not isinstance(data, dict):
+        return
+
+    relation = part.translations
+    translations = []
+
+    for language, values in data.items():
+        if not is_language(language) or language == source_language or not isinstance(values, dict):
+            continue
+
+        translation = relation.model(**{relation.field.name: part, 'language': language})
+
+        for field in [*part.translated_fields, 'source_checksums']:
+            value = values.get(field)
+
+            if isinstance(getattr(translation, field), dict):
+                texts = value if isinstance(value, dict) else {}
+                value = {f'{key}': text for key, text in texts.items() if isinstance(text, str)}
+            elif not isinstance(value, str):
+                value = ''
+
+            setattr(translation, field, value)
+
+        translations.append(translation)
+
+    relation.model.objects.bulk_create(translations)
+
