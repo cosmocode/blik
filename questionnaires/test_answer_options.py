@@ -355,7 +355,9 @@ class ReportTest(AnswerOptionTestCase):
         self.respond(self.likert, self.option_id(self.likert, 'Agree'))
         report = generate_report(self.cycle)
 
-        # Reports from before answer options keep the scale in the config and count answers by label
+        # Reports from before answer options have no schema, keep the scale in the config and count answers by label
+        report.report_data.pop('schema')
+
         for section in report.report_data['by_section'].values():
             for question in section['questions'].values():
                 question.pop('options')

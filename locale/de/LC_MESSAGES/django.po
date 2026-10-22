@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-21 12:43+0000\n"
+"POT-Creation-Date: 2026-10-22 08:59+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1684,6 +1684,9 @@ msgstr "Beschreibung"
 msgid "default"
 msgstr "Standard"
 
+msgid "source language"
+msgstr "Ausgangssprache"
+
 msgid "questionnaire"
 msgstr "Fragebogen"
 
@@ -1764,6 +1767,33 @@ msgstr "Antwortoption"
 
 msgid "answer options"
 msgstr "Antwortoptionen"
+
+msgid "source checksums"
+msgstr "Prüfsummen der Ausgangstexte"
+
+msgid "questionnaire translation"
+msgstr "Übersetzung eines Fragebogens"
+
+msgid "questionnaire translations"
+msgstr "Übersetzungen von Fragebögen"
+
+msgid "section translation"
+msgstr "Übersetzung eines Abschnitts"
+
+msgid "section translations"
+msgstr "Übersetzungen von Abschnitten"
+
+msgid "question translation"
+msgstr "Übersetzung einer Frage"
+
+msgid "question translations"
+msgstr "Übersetzungen von Fragen"
+
+msgid "answer option translation"
+msgstr "Übersetzung einer Antwortoption"
+
+msgid "answer option translations"
+msgstr "Übersetzungen von Antwortoptionen"
 
 msgid "No expiry"
 msgstr "Kein Ablauf"
@@ -4244,6 +4274,9 @@ msgstr "Es wurde noch kein Fragebogen eingerichtet"
 #, python-format
 msgid "Preview: %(name)s"
 msgstr "Vorschau: %(name)s"
+
+msgid "Preview language"
+msgstr "Sprache der Vorschau"
 
 msgid "Rating scale:"
 msgstr "Bewertungsskala:"

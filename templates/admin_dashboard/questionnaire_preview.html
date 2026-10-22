@@ -17,7 +17,18 @@
             <p style="color: var(--text-secondary);">{{ questionnaire.description }}</p>
             {% endif %}
         </div>
-        <a href="{% url 'questionnaire_list' %}" class="btn btn-secondary">{% trans 'Back to List' %}</a>
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <nav aria-label="{% trans 'Preview language' %}" style="display: flex; gap: 0.5rem;">
+                {% for code, name in LANGUAGES %}
+                {% if code == preview_language %}
+                <a href="?lang={{ code }}" class="btn btn-sm btn-primary" aria-current="page">{{ name }}</a>
+                {% else %}
+                <a href="?lang={{ code }}" class="btn btn-sm btn-secondary">{{ name }}</a>
+                {% endif %}
+                {% endfor %}
+            </nav>
+            <a href="{% url 'questionnaire_list' %}" class="btn btn-secondary">{% trans 'Back to List' %}</a>
+        </div>
     </div>
 </div>
 

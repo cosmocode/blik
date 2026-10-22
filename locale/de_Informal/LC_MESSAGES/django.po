@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-21 12:43+0000\n"
+"POT-Creation-Date: 2026-10-22 08:59+0000\n"
 "Language: de_Informal\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1684,6 +1684,9 @@ msgstr ""
 msgid "default"
 msgstr ""
 
+msgid "source language"
+msgstr ""
+
 msgid "questionnaire"
 msgstr ""
 
@@ -1763,6 +1766,33 @@ msgid "answer option"
 msgstr ""
 
 msgid "answer options"
+msgstr ""
+
+msgid "source checksums"
+msgstr ""
+
+msgid "questionnaire translation"
+msgstr ""
+
+msgid "questionnaire translations"
+msgstr ""
+
+msgid "section translation"
+msgstr ""
+
+msgid "section translations"
+msgstr ""
+
+msgid "question translation"
+msgstr ""
+
+msgid "question translations"
+msgstr ""
+
+msgid "answer option translation"
+msgstr ""
+
+msgid "answer option translations"
 msgstr ""
 
 msgid "No expiry"
@@ -4243,6 +4273,9 @@ msgstr ""
 
 #, python-format
 msgid "Preview: %(name)s"
+msgstr ""
+
+msgid "Preview language"
 msgstr ""
 
 msgid "Rating scale:"

@@ -28,7 +28,7 @@
 - {% trans 'Reviewers remain anonymous' %}
 - {% trans 'They can save their progress and return later' %}
 
-{% trans 'Questionnaire:' %} {{ cycle.questionnaire.name }}
+{% trans 'Questionnaire:' %} {{ questionnaire_name }}
 
 {% trans 'Best regards,' %}
 {% trans 'Your Feedback Team' %}

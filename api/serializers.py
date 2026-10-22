@@ -15,6 +15,16 @@ from reports.report_texts import with_texts
 from .models import APIToken, WebhookEndpoint, WebhookDelivery
 
 
+class TranslatedSerializerMixin:
+    """Serializes the object translated into the language in the context, where the view puts one there."""
+
+    def to_representation(self, instance):
+        if language := self.context.get("language"):
+            instance = instance.translated(language)
+
+        return super().to_representation(instance)
+
+
 # =============================================================================
 # REVIEWEE SERIALIZERS
 # =============================================================================
@@ -135,7 +145,7 @@ class QuestionSectionSerializer(serializers.ModelSerializer):
         read_only_fields = []
 
 
-class QuestionnaireSerializer(serializers.ModelSerializer):
+class QuestionnaireSerializer(TranslatedSerializerMixin, serializers.ModelSerializer):
     """
     Full questionnaire serializer with sections and questions.
     """
@@ -149,6 +159,7 @@ class QuestionnaireSerializer(serializers.ModelSerializer):
             "uuid",
             "name",
             "description",
+            "source_language",
             "is_default",
             "is_active",
             "created_at",
@@ -163,12 +174,12 @@ class QuestionnaireSerializer(serializers.ModelSerializer):
         return sum(section.questions.count() for section in obj.sections.all())
 
 
-class QuestionnaireListSerializer(serializers.ModelSerializer):
+class QuestionnaireListSerializer(TranslatedSerializerMixin, serializers.ModelSerializer):
     """Minimal serializer for questionnaire lists."""
 
     class Meta:
         model = Questionnaire
-        fields = ["uuid", "name", "description", "is_default", "is_active"]
+        fields = ["uuid", "name", "description", "source_language", "is_default", "is_active"]
 
 
 # =============================================================================
@@ -494,7 +505,7 @@ class ReportSerializer(serializers.ModelSerializer):
 
         # Clients read the texts of the report, not the codes it stores
         if "report_data" in data:
-            data["report_data"] = with_texts(instance.report_data)
+            data["report_data"] = with_texts(instance.report_data, instance.cycle.questionnaire)
 
         return data
 
