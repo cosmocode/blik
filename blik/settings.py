@@ -404,3 +404,7 @@ SPECTACULAR_SETTINGS = {
         {'name': 'webhooks', 'description': 'Manage webhook endpoints'},
     ],
 }
+
+if env('ENVIRONMENT', default='') == 'test':
+    # Speed up logins in tests with a weak password hasher
+    PASSWORD_HASHERS = ['django.contrib.auth.hashers.MD5PasswordHasher']
