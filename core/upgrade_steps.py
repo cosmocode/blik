@@ -8,6 +8,11 @@ recorded as success=True in the UpgradeStep table will execute.
 Old steps should stay in this list forever. If the underlying code is
 removed later, replace the callable body with a no-op.
 """
+import json
+from pathlib import Path
+
+from django.apps import apps
+
 from questionnaires.management.commands.apply_dreyfus_mappings import Command as DreyfusCommand
 
 
@@ -76,9 +81,59 @@ def _move_setup_admins_into_the_admin_group(stdout):
                  f'removed stale admin grants from {demoted} member(s).')
 
 
+def _fill_the_collaboration_section(stdout):
+    """Add the questions of "Collaboration & Personality" to the Software
+    Engineering template.
+
+    The fixture gave that section the primary key of the next one, so
+    migration 0010 created it without its three questions. Only the
+    template gets them: copies in organizations are in use, and new
+    questions would change cycles that are already running.
+    """
+    from questionnaires.models import Question, Questionnaire, QuestionSection
+
+    title = 'Collaboration & Personality'
+    fixture_path = (Path(apps.get_app_config('questionnaires').path)
+                    / 'fixtures' / 'software_engineering_questionnaire.json')
+    fixture = json.loads(fixture_path.read_text())
+
+    [section_pk] = [
+        item['pk'] for item in fixture
+        if item['model'] == 'questionnaires.questionsection'
+        and item['fields']['title'] == title
+    ]
+    questions = [
+        item['fields'] for item in fixture
+        if item['model'] == 'questionnaires.question'
+        and item['fields']['section'] == section_pk
+    ]
+
+    sections = list(QuestionSection.objects.filter(
+        questionnaire__in=Questionnaire.objects.templates(),
+        questionnaire__name='Software Engineering 360 Review',
+        title=title,
+        questions__isnull=True,
+    ))
+
+    for section in sections:
+        for fields in questions:
+            Question.objects.create(
+                section=section,
+                question_text=fields['question_text'],
+                question_type=fields['question_type'],
+                config=fields['config'],
+                required=fields['required'],
+                order=fields['order'],
+            )
+
+    stdout.write(f'Added {len(questions)} question(s) to {len(sections)} '
+                 f'empty {title} section(s).')
+
+
 STEPS = [
     ('0001_apply_dreyfus_mappings', _apply_dreyfus_mappings),
     ('0002_reapply_dreyfus_mappings', _reapply_dreyfus_mappings),
     ('0003_move_setup_admins_into_the_admin_group',
      _move_setup_admins_into_the_admin_group),
+    ('0004_fill_the_collaboration_section', _fill_the_collaboration_section),
 ]
