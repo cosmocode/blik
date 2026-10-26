@@ -52,7 +52,7 @@
   },
   {
     "model": "questionnaires.question",
-    "pk": 3,
+    "pk": 2,
     "fields": {
       "section": 1,
       "question_text": "Rate their ability to translate ideas into clear, readable code",
@@ -93,7 +93,7 @@
   },
   {
     "model": "questionnaires.questionsection",
-    "pk": 3,
+    "pk": 2,
     "fields": {
       "questionnaire": 3,
       "title": "Collaboration & Personality",
