@@ -1,7 +1,9 @@
 """The questionnaires made from a shipped template get {name} and the shipped translations, but edited texts do not."""
 import json
+from io import StringIO
 from unittest.mock import patch
 
+from django.core.management import call_command
 from django.test import TestCase
 
 from accounts.import_service import import_questionnaires
@@ -11,7 +13,7 @@ from questionnaires.legacy_config import move_all_texts_out_of_config
 from questionnaires.models import Questionnaire, QuestionnaireTranslation
 from questionnaires.shipped import add_shipped_translations, get_template_texts
 from questionnaires.signals import clone_questionnaire_for_organization
-from questionnaires.translations import get_text_translations
+from questionnaires.translations import get_language_states, get_text_translations
 
 GERMAN = {
     ('simple', '360 Degree Feedback'): '360°-Feedback',
@@ -177,3 +179,14 @@ class TemplateCatalogueTest(TestCase):
         ])
         self.assertIn('Exceptional', texts)
         self.assertEqual(texts.count('Strongly Agree'), 1)
+
+
+class ShippedCatalogTest(TestCase):
+    """The compiled catalogues in locale/, as the upgrade reads them."""
+
+    def test_the_upgrade_translates_every_text_of_every_template(self):
+        call_command('upgrade', stdout=StringIO())
+
+        for template in Questionnaire.objects.templates():
+            for state in get_language_states(template):
+                self.assertEqual((state.missing, state.outdated), (0, 0), f'{template.name}, {state.code}')

@@ -438,7 +438,7 @@ msgstr ""
 #, python-brace-format
 msgctxt "professional_skills"
 msgid "How would you describe {name}'s professionalism and work ethic?"
-msgstr ""
+msgstr "Wie würdest du die Professionalität und Arbeitsethik von {name} beschreiben?"
 
 msgctxt "professional_skills"
 msgid "Needs improvement"
@@ -759,7 +759,7 @@ msgstr ""
 
 msgctxt "software_engineering"
 msgid "How would you describe their enthusiasm for the work?"
-msgstr ""
+msgstr "Wie würdest du die Begeisterung von {name} für die Arbeit beschreiben?"
 
 msgctxt "software_engineering"
 msgid "Shows little interest, appears to program only for money"
