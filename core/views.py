@@ -8,6 +8,7 @@ from .models import Organization
 from .forms import SetupAdminForm, SetupOrganizationForm, SetupEmailForm
 from accounts.services import create_user_with_email_as_username
 from questionnaires.legacy_config import move_all_texts_out_of_config
+from questionnaires.shipped import add_shipped_translations
 
 User = get_user_model()
 
@@ -215,6 +216,7 @@ def setup_complete(request):
             call_command('loaddata', 'professional_skills_questionnaire')
             call_command('loaddata', 'software_engineering_questionnaire')
             move_all_texts_out_of_config()
+            add_shipped_translations()
             messages.success(request, _('Default questionnaires loaded successfully!'))
         except Exception as e:
             messages.warning(request, _('Could not load default questionnaires: %(error)s') % {'error': e})

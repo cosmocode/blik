@@ -16,6 +16,11 @@ class Migration(migrations.Migration):
             field=models.CharField(default='en', max_length=20, verbose_name='source language'),
         ),
         migrations.AddField(
+            model_name='Questionnaire',
+            name='template_key',
+            field=models.CharField(blank=True, max_length=50, verbose_name='template key'),
+        ),
+        migrations.AddField(
             model_name='Question',
             name='labels',
             field=models.JSONField(blank=True, default=dict, verbose_name='labels'),

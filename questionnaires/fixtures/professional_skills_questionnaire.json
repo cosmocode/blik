@@ -28,7 +28,7 @@
     "pk": 1001,
     "fields": {
       "section": 101,
-      "question_text": "How effectively does this person analyze and solve problems?",
+      "question_text": "How effectively does {name} analyze and solve problems?",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -55,7 +55,7 @@
     "pk": 1002,
     "fields": {
       "section": 101,
-      "question_text": "How well does this person make decisions under pressure or with incomplete information?",
+      "question_text": "How well does {name} make decisions under pressure or with incomplete information?",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -108,7 +108,7 @@
     "pk": 1004,
     "fields": {
       "section": 102,
-      "question_text": "How clearly and effectively does this person communicate?",
+      "question_text": "How clearly and effectively does {name} communicate?",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -135,7 +135,7 @@
     "pk": 1005,
     "fields": {
       "section": 102,
-      "question_text": "How well does this person collaborate and work with others?",
+      "question_text": "How well does {name} collaborate and work with others?",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -162,7 +162,7 @@
     "pk": 1006,
     "fields": {
       "section": 102,
-      "question_text": "This person actively listens to and considers others' perspectives",
+      "question_text": "{name} actively listens to and considers others' perspectives",
       "question_type": "likert",
       "config": {
         "scale": [
@@ -210,7 +210,7 @@
     "pk": 1008,
     "fields": {
       "section": 103,
-      "question_text": "How proactively does this person identify and address opportunities or challenges?",
+      "question_text": "How proactively does {name} identify and address opportunities or challenges?",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -237,7 +237,7 @@
     "pk": 1009,
     "fields": {
       "section": 103,
-      "question_text": "This person consistently takes ownership and follows through on commitments",
+      "question_text": "{name} consistently takes ownership and follows through on commitments",
       "question_type": "likert",
       "config": {
         "scale": [
@@ -288,7 +288,7 @@
     "pk": 1011,
     "fields": {
       "section": 104,
-      "question_text": "How quickly does this person learn new skills and concepts?",
+      "question_text": "How quickly does {name} learn new skills and concepts?",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -315,7 +315,7 @@
     "pk": 1012,
     "fields": {
       "section": 104,
-      "question_text": "How well does this person adapt to change and handle ambiguity?",
+      "question_text": "How well does {name} adapt to change and handle ambiguity?",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -369,7 +369,7 @@
     "pk": 1014,
     "fields": {
       "section": 105,
-      "question_text": "What is the quality of work this person delivers?",
+      "question_text": "What is the quality of work {name} delivers?",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -396,7 +396,7 @@
     "pk": 1015,
     "fields": {
       "section": 105,
-      "question_text": "How well does this person balance quality with practical deadlines and constraints?",
+      "question_text": "How well does {name} balance quality with practical deadlines and constraints?",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -449,7 +449,7 @@
     "pk": 1017,
     "fields": {
       "section": 106,
-      "question_text": "How effectively does this person influence and guide others?",
+      "question_text": "How effectively does {name} influence and guide others?",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -476,7 +476,7 @@
     "pk": 1018,
     "fields": {
       "section": 106,
-      "question_text": "How well does this person develop and support the growth of others?",
+      "question_text": "How well does {name} develop and support the growth of others?",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -504,7 +504,7 @@
     "pk": 1019,
     "fields": {
       "section": 106,
-      "question_text": "How well does this person understand and contribute to broader organizational goals?",
+      "question_text": "How well does {name} understand and contribute to broader organizational goals?",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -557,7 +557,7 @@
     "pk": 1021,
     "fields": {
       "section": 107,
-      "question_text": "How would you describe this person's professionalism and work ethic?",
+      "question_text": "How would you describe {name}'s professionalism and work ethic?",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -581,7 +581,7 @@
     "pk": 1022,
     "fields": {
       "section": 107,
-      "question_text": "How well does this person handle feedback and demonstrate self-awareness?",
+      "question_text": "How well does {name} handle feedback and demonstrate self-awareness?",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -608,7 +608,7 @@
     "pk": 1023,
     "fields": {
       "section": 107,
-      "question_text": "How positive and constructive is this person's attitude?",
+      "question_text": "How positive and constructive is {name}'s attitude?",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -658,7 +658,7 @@
     "pk": 1025,
     "fields": {
       "section": 108,
-      "question_text": "What are this person's greatest strengths?",
+      "question_text": "What are {name}'s greatest strengths?",
       "question_type": "text",
       "config": {},
       "required": false,

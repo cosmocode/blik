@@ -10,8 +10,8 @@ from core.upgrade_steps import _fill_the_collaboration_section
 from questionnaires.models import QuestionSection
 
 TEXTS = [
-    'How well does this person work with the team to solve complex problems?',
-    'This person is friendly, approachable, and creates a positive team environment',
+    'How well does {name} work with the team to solve complex problems?',
+    '{name} is friendly, approachable, and creates a positive team environment',
     'Additional comments on their collaboration and team dynamics',
 ]
 

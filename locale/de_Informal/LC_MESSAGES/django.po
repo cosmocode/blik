@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-22 16:14+0000\n"
+"POT-Creation-Date: 2026-10-26 14:26+0000\n"
 "Language: de_Informal\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1707,6 +1707,9 @@ msgid "default"
 msgstr ""
 
 msgid "source language"
+msgstr ""
+
+msgid "template key"
 msgstr ""
 
 msgid "questionnaire"

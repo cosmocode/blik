@@ -19,6 +19,7 @@ from questionnaires.answer_options import migrate_responses
 from questionnaires.legacy_config import move_all_texts_out_of_config
 from questionnaires.management.commands.apply_dreyfus_mappings import Command as DreyfusCommand
 from questionnaires.models import Question
+from questionnaires.shipped import add_shipped_translations
 
 
 def _apply_dreyfus_mappings(stdout):
@@ -161,6 +162,13 @@ def key_action_items(stdout):
     stdout.write(f'Keyed the action items of {count} question(s).')
 
 
+def translate_shipped_questionnaires(stdout):
+    """Put {name} into the questions of the questionnaires made from a shipped template and add their translations."""
+
+    count = add_shipped_translations()
+    stdout.write(f'Translated {count} questionnaire(s) made from a shipped template.')
+
+
 STEPS = [
     ('0001_apply_dreyfus_mappings', _apply_dreyfus_mappings),
     ('0002_reapply_dreyfus_mappings', _reapply_dreyfus_mappings),
@@ -169,4 +177,5 @@ STEPS = [
     ('0004_fill_the_collaboration_section', _fill_the_collaboration_section),
     ('0005_move_question_texts', move_question_texts),
     ('0006_key_action_items', key_action_items),
+    ('0007_translate_shipped_questionnaires', translate_shipped_questionnaires),
 ]

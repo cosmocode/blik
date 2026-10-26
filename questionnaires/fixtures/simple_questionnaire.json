@@ -142,7 +142,7 @@
     "pk": 5,
     "fields": {
       "section": 2,
-      "question_text": "This person communicates clearly and effectively",
+      "question_text": "{name} communicates clearly and effectively",
       "question_type": "likert",
       "config": {
         "scale": [
@@ -230,7 +230,7 @@
     "pk": 8,
     "fields": {
       "section": 3,
-      "question_text": "This person is flexible and adapts well to change",
+      "question_text": "{name} is flexible and adapts well to change",
       "question_type": "likert",
       "config": {
         "scale": [

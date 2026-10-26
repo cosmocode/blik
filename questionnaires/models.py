@@ -39,6 +39,8 @@ class Questionnaire(Translatable, TimeStampedModel):
     # The language of the texts above and of everything in the questionnaire; validated against settings.LANGUAGES
     # where it is set, so the language list is never frozen into a migration
     source_language = models.CharField(_('source language'), max_length=20, default=settings.LANGUAGE_CODE)
+    # The shipped template the questionnaire was made from, see questionnaires/shipped.py
+    template_key = models.CharField(_('template key'), max_length=50, blank=True)
 
     objects = QuestionnaireManager()
 

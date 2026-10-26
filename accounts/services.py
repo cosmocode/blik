@@ -66,6 +66,7 @@ def export_organization_data(organization):
             'description': questionnaire.description,
             'is_active': questionnaire.is_active,
             'source_language': questionnaire.source_language,
+            'template_key': questionnaire.template_key,
             'translations': get_translations_data(questionnaire),
             'sections': []
         }

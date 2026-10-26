@@ -18,6 +18,7 @@ from core.languages import is_language
 from questionnaires.action_items import add_action_item_keys
 from questionnaires.answer_options import save_options
 from questionnaires.legacy_config import move_texts_out_of_config
+from questionnaires.shipped import TEMPLATE_NAMES
 from questionnaires.translations import import_translations
 from subscriptions.utils import NoCycleCredits
 
@@ -319,6 +320,11 @@ def import_questionnaires(organization, questionnaires_data, conflict_resolution
             if not is_language(source_language):
                 source_language = settings.LANGUAGE_CODE
 
+            template_key = q_data.get('template_key')
+
+            if not isinstance(template_key, str) or template_key not in TEMPLATE_NAMES:
+                template_key = ''
+
             # Check if questionnaire exists
             existing = Questionnaire.objects.filter(
                 organization=organization,
@@ -355,6 +361,7 @@ def import_questionnaires(organization, questionnaires_data, conflict_resolution
                 questionnaire.description = q_data.get('description', '')
                 questionnaire.is_active = q_data.get('is_active', True)
                 questionnaire.source_language = source_language
+                questionnaire.template_key = template_key
                 questionnaire.save()
                 result['updated'] += 1
             else:
@@ -364,6 +371,7 @@ def import_questionnaires(organization, questionnaires_data, conflict_resolution
                     description=q_data.get('description', ''),
                     is_active=q_data.get('is_active', True),
                     source_language=source_language,
+                    template_key=template_key,
                 )
                 result['created'] += 1
 

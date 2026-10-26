@@ -6,6 +6,7 @@ from django.core.management import call_command
 from core.models import Organization
 from .legacy_config import move_all_texts_out_of_config
 from .models import AnswerOption, Questionnaire, QuestionSection, Question
+from .shipped import add_shipped_translations
 from .translations import copy_translations
 import logging
 import uuid
@@ -33,6 +34,7 @@ def clone_questionnaire_for_organization(questionnaire, organization):
         is_default=False,  # Only templates should be marked as default
         is_active=questionnaire.is_active,
         source_language=questionnaire.source_language,
+        template_key=questionnaire.template_key,
     )
     copy_translations(questionnaire.translations.all(), cloned_questionnaire)
 
@@ -107,6 +109,7 @@ def load_default_questionnaire_fixtures(sender, **kwargs):
             logger.warning(f"⚠ Could not load {fixture}: {e}")
 
     move_all_texts_out_of_config()
+    add_shipped_translations()
     logger.info("Default questionnaire fixtures loaded successfully")
 
 
