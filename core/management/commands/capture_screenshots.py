@@ -5,10 +5,118 @@ for the landing page.
 """
 from django.core.management.base import BaseCommand
 from django.conf import settings
+from django.template.loader import render_to_string
+from django.utils.html import escape
+from types import SimpleNamespace
 import json
 import os
 import asyncio
 from pathlib import Path
+
+
+# Sample context for email previews. Names match generate_screenshot_data.
+SAMPLE_URL = 'https://app.blik360.com'
+SAMPLE_REVIEWEE = SimpleNamespace(name='Emma Davis', email='emma.davis@acme.example.com')
+SAMPLE_CYCLE = SimpleNamespace(
+    questionnaire=SimpleNamespace(name='Software Engineering 360 Review'),
+)
+SAMPLE_INVITE = f'{SAMPLE_URL}/feedback/invite/3f9c2a7e-5b1d-4e8a-9c6f-2d7b8e1a4c90/'
+SAMPLE_FEEDBACK = f'{SAMPLE_URL}/feedback/8a1d4f6b-2c3e-4b7a-9d5f-6e0c1b2a3d4e/'
+
+# (name, template, subject, recipient, context). Subjects match the senders in
+# reviews/services.py, reports/services.py and core/email.py.
+EMAIL_PREVIEWS = [
+    ('email_welcome', 'emails/welcome',
+     f'Welcome to {settings.SITE_NAME} - Your Account is Ready', 'admin@acme.example.com',
+     {'user': SimpleNamespace(email='admin@acme.example.com', username='admin@acme.example.com'),
+      'password': 'kT7#mQ2v', 'login_url': f'{SAMPLE_URL}/accounts/login/',
+      'site_name': settings.SITE_NAME}),
+    ('email_reviewee_self_assessment', 'emails/reviewee_self_assessment',
+     'Complete Your Self-Assessment: Software Engineering 360 Review', SAMPLE_REVIEWEE.email,
+     {'reviewee': SAMPLE_REVIEWEE, 'cycle': SAMPLE_CYCLE, 'self_assessment_url': SAMPLE_INVITE}),
+    ('email_reviewee_invitation_links', 'emails/reviewee_invitation_links',
+     'Share Your 360 Feedback Links: Software Engineering 360 Review', SAMPLE_REVIEWEE.email,
+     {'reviewee': SAMPLE_REVIEWEE, 'cycle': SAMPLE_CYCLE,
+      'peer_url': f'{SAMPLE_URL}/feedback/invite/b72e9d14-6a3c-4f58-8e21-c9d0a5f3b7e6/',
+      'manager_url': f'{SAMPLE_URL}/feedback/invite/5d0f3a8c-91e7-4b2d-a6c4-e83f17b92d05/',
+      'direct_report_url': f'{SAMPLE_URL}/feedback/invite/e4a19c7b-2f60-4d8e-b3a5-07c6d9f12e84/'}),
+    ('email_reviewer_invitation', 'emails/reviewer_invitation',
+     '360 Feedback Request: Emma Davis', 'michael.chen@acme.example.com',
+     {'reviewee_name': SAMPLE_REVIEWEE.name, 'category': 'Peer', 'feedback_url': SAMPLE_FEEDBACK,
+      'questionnaire_name': SAMPLE_CYCLE.questionnaire.name}),
+    ('email_reviewer_reminder', 'emails/reviewer_reminder',
+     'Reminder: 360 Feedback Request for Emma Davis', 'michael.chen@acme.example.com',
+     {'reviewee_name': SAMPLE_REVIEWEE.name, 'category': 'Peer', 'feedback_url': SAMPLE_FEEDBACK,
+      'questionnaire_name': SAMPLE_CYCLE.questionnaire.name}),
+    ('email_report_ready', 'emails/report_ready',
+     'Your 360 Feedback Report is Ready!', SAMPLE_REVIEWEE.email,
+     {'reviewee': SAMPLE_REVIEWEE, 'cycle': SAMPLE_CYCLE, 'response_count': 9,
+      'report_url': f'{SAMPLE_URL}/my-report/c4e8b2a1-7d3f-4a6e-9b5c-1f2d3e4a5b6c/'}),
+]
+
+# Fill the cycle form so the shot shows a ready-to-submit round
+CYCLE_FORM_JS = '''() => {
+    const pick = (id, label) => {
+        const sel = document.getElementById(id);
+        const opt = Array.from(sel.options).find(o => o.text.includes(label)) || sel.options[1];
+        sel.value = opt.value;
+        sel.dispatchEvent(new Event('change'));
+    };
+    pick('reviewee', 'Emma Davis');
+    pick('questionnaire', 'Software Engineering');
+    toggleInviteForm();
+    document.querySelector('[name="manager_emails"]').value = 'sarah.johnson@acme.example.com';
+    document.querySelector('[name="peer_emails"]').value =
+        ['michael.chen', 'emily.rodriguez', 'david.kim'].map(n => n + '@acme.example.com').join(', ');
+}'''
+
+# Width the email templates are laid out for (600px table plus 20px padding).
+EMAIL_WIDTH = 640
+
+
+def render_email_preview(template, subject, recipient, context, theme):
+    """Render an email template inside a simple inbox frame (sender, subject, body)."""
+    body = render_to_string(f'{template}.html', context)
+    dark = theme == 'dark'
+    bg, fg, muted, line = ('#111827', '#f9fafb', '#9ca3af', '#374151') if dark else \
+        ('#ffffff', '#111827', '#6b7280', '#e5e7eb')
+    return f'''<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html, body {{ margin: 0; height: 100%; background: {bg}; color: {fg};
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }}
+  body {{ display: flex; flex-direction: column; }}
+  .head {{ max-width: 960px; width: 100%; margin: 0 auto; box-sizing: border-box; padding: 20px 16px 12px; }}
+  .subject {{ font-size: 22px; font-weight: 600; margin: 0 0 16px; }}
+  .from {{ display: flex; gap: 12px; align-items: center; }}
+  .avatar {{ width: 40px; height: 40px; border-radius: 50%; flex: none; color: #fff; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }}
+  .meta {{ font-size: 14px; color: {muted}; line-height: 1.5; min-width: 0; }}
+  .meta strong {{ color: {fg}; }}
+  .wrap {{ flex: 1; border-top: 1px solid {line}; overflow: hidden; }}
+  iframe {{ display: block; border: 0; width: 100%; height: 100%; margin: 0 auto; transform-origin: 0 0; }}
+</style></head><body>
+<div class="head">
+  <h1 class="subject">{escape(subject)}</h1>
+  <div class="from">
+    <div class="avatar">B</div>
+    <div class="meta"><strong>{escape(settings.SITE_NAME)}</strong> &lt;noreply@blik360.com&gt;<br>
+      to {escape(recipient)} &middot; 09:14</div>
+  </div>
+</div>
+<div class="wrap"><iframe id="mail" srcdoc="{escape(body)}"></iframe></div>
+<script>
+  // Shrink to fit on narrow screens, like mobile mail apps do with fixed-width emails
+  const f = document.getElementById('mail'), w = innerWidth;
+  if (w < {EMAIL_WIDTH}) {{
+    const s = w / {EMAIL_WIDTH};
+    f.style.width = '{EMAIL_WIDTH}px';
+    f.style.height = (f.parentElement.clientHeight / s) + 'px';
+    f.style.transform = 'scale(' + s + ')';
+  }}
+</script>
+</body></html>'''
 
 
 class Command(BaseCommand):
@@ -33,11 +141,18 @@ class Command(BaseCommand):
             default='http://localhost:8000',
             help='Base URL of the running application'
         )
+        parser.add_argument(
+            '--only',
+            type=str,
+            default='',
+            help='Comma-separated name prefixes to capture (e.g. email_,cycle_create); default all'
+        )
 
     def handle(self, *args, **options):
         config_path = options['config']
         output_dir = options['output_dir']
         base_url = options['base_url']
+        self.only = [p for p in options['only'].split(',') if p]
 
         # Check if config exists
         if not os.path.exists(config_path):
@@ -82,7 +197,7 @@ class Command(BaseCommand):
             self.stdout.write('Logging in as admin...')
             page = await browser.new_page()
             await page.goto(f'{base_url}/accounts/login/')
-            await page.fill('input[name="login"]', config['admin_username'])
+            await page.fill('input[name="username"]', config['admin_username'])
             await page.fill('input[name="password"]', config['admin_password'])
             await page.click('button[type="submit"]')
             await page.wait_for_load_state('networkidle')
@@ -360,6 +475,44 @@ class Command(BaseCommand):
                 },
             ])
 
+            # "How Blik works" flow: sign up, configure, add reviewees, start a cycle
+            flow_pages = [
+                ('signup_desktop', '/landing/signup/', '.plans-grid', {}),
+                ('questionnaires_desktop', '/dashboard/questionnaires/', 'table', {}),
+                ('questionnaire_edit_desktop',
+                 f'/dashboard/questionnaires/{config.get("questionnaire_id")}/edit/', 'form', {}),
+                ('reviewees_desktop', '/dashboard/reviewees/', 'table', {}),
+                # Slot for the self-vs-others gap column (built separately). Skipped
+                # until the reviewee overview renders an element matching skip_unless.
+                ('reviewees_gap_desktop', '/dashboard/reviewees/', 'table',
+                 {'skip_unless': '[data-gap-column]'}),
+                ('cycle_create_desktop', '/dashboard/cycles/create/', '#cycleForm',
+                 {'prepare_js': CYCLE_FORM_JS, 'viewport': {'width': 1920, 'height': 1600}}),
+            ]
+            for name, path, wait_for, extra in flow_pages:
+                for theme in ('light', 'dark'):
+                    screenshot_configs.append({
+                        'name': f'{name}_{theme}',
+                        'url': f'{base_url}{path}',
+                        'viewport': {'width': 1920, 'height': 1080},
+                        'theme': theme,
+                        'wait_for': wait_for,
+                        **extra,
+                    })
+
+            # Reviewee report on a phone (what the reviewee opens from the email)
+            if config.get('report_tokens'):
+                for theme in ('light', 'dark'):
+                    screenshot_configs.append({
+                        'name': f'report_mobile_{theme}',
+                        'url': f'{base_url}/my-report/{first_token}/',
+                        'viewport': {'width': 375, 'height': 812},
+                        'theme': theme,
+                        'wait_for': '#overall-performance',
+                    })
+
+            screenshot_configs = self._filter(screenshot_configs)
+
             # Capture screenshots
             for i, screenshot_config in enumerate(screenshot_configs, 1):
                 self.stdout.write(f'\n[{i}/{len(screenshot_configs)}] Capturing: {screenshot_config["name"]}')
@@ -408,6 +561,20 @@ class Command(BaseCommand):
                         )
                     except:
                         pass  # Continue even if charts don't load
+
+                # Optional slot: skip when the page lacks the element (feature not merged yet)
+                if 'skip_unless' in screenshot_config:
+                    if not await page.query_selector(screenshot_config['skip_unless']):
+                        self.stdout.write(self.style.WARNING(
+                            f'  Skipped: {screenshot_config["skip_unless"]} not on page'
+                        ))
+                        await page.close()
+                        continue
+
+                # Run page setup (fill a form, open a section) before the shot
+                if 'prepare_js' in screenshot_config:
+                    await page.evaluate(screenshot_config['prepare_js'])
+                    await page.wait_for_timeout(500)
 
                 # Click element if needed (e.g., for tab switching)
                 if 'click_element' in screenshot_config:
@@ -523,6 +690,26 @@ class Command(BaseCommand):
                     },
                 ]
 
+                # Reviewee self-assessment and the reviewer thank-you page
+                public_pages = [
+                    ('self_assessment', config.get('self_feedback_token'), 'form'),
+                    ('feedback_complete', config.get('completed_feedback_token'), 'body'),
+                ]
+                for name, token, wait_for in public_pages:
+                    if not token:
+                        continue
+                    for device, viewport in (('desktop', {'width': 1920, 'height': 1080}),
+                                             ('mobile', {'width': 375, 'height': 812})):
+                        for theme in ('light', 'dark'):
+                            feedback_configs.append({
+                                'name': f'{name}_{device}_{theme}',
+                                'url': f'{base_url}/feedback/{token}/',
+                                'viewport': viewport,
+                                'theme': theme,
+                                'wait_for': wait_for,
+                            })
+                feedback_configs = self._filter(feedback_configs)
+
                 feedback_start = len(screenshot_configs) + 1
                 total_screenshots = len(screenshot_configs) + len(feedback_configs)
 
@@ -562,4 +749,37 @@ class Command(BaseCommand):
 
                     await page.close()
 
+            await self._capture_emails(browser, output_path)
+
             await browser.close()
+
+    def _filter(self, configs):
+        if not self.only:
+            return configs
+        return [c for c in configs if c['name'].startswith(tuple(self.only))]
+
+    async def _capture_emails(self, browser, output_path):
+        """Render email templates locally in an inbox frame; nothing is sent."""
+        # Admin email: desktop only. Reviewee/reviewer emails: desktop and mobile.
+        configs = []
+        for name, template, subject, recipient, context in EMAIL_PREVIEWS:
+            devices = [('desktop', {'width': 1920, 'height': 1080})]
+            if name != 'email_welcome':
+                devices.append(('mobile', {'width': 375, 'height': 812}))
+            for device, viewport in devices:
+                for theme in ('light', 'dark'):
+                    configs.append({
+                        'name': f'{name}_{device}_{theme}',
+                        'html': render_email_preview(template, subject, recipient, context, theme),
+                        'viewport': viewport,
+                    })
+
+        for screenshot_config in self._filter(configs):
+            self.stdout.write(f'\nCapturing: {screenshot_config["name"]}')
+            page = await browser.new_page(viewport=screenshot_config['viewport'], device_scale_factor=1)
+            await page.set_content(screenshot_config['html'], wait_until='load')
+            await page.wait_for_timeout(500)
+            output_file = output_path / f'{screenshot_config["name"]}.png'
+            await page.screenshot(path=str(output_file), full_page=False, type='png')
+            self.stdout.write(self.style.SUCCESS(f'  ✓ Saved: {output_file}'))
+            await page.close()
