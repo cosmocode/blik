@@ -7895,3 +7895,105 @@
 @media (prefers-reduced-motion: reduce) {
     .landing-page .hiw-teaser-shot { transition: none; }
 }
+
+/* ==========================================================================
+   Card grids: Design 1, "Divided list"
+   --------------------------------------------------------------------------
+   Plain feature cards that sit directly in a .features-grid or
+   .audience-card-grid lose their box. Each item sits under a hairline with
+   a short primary-colour accent mark. Two columns, or three when the item
+   count divides by three. Mobile: one column.
+
+   Scope:
+   - Only direct children: grid > .feature-card. Standalone .feature-card
+     panels elsewhere keep their card look.
+   - Coloured and special variants keep their card look: any class that
+     contains feature-card-, comparison-, dreyfus-, portfolio-, archetype-,
+     audience-, about-, framework- or product-. Spacing utilities (mb-*,
+     mt-*) are not variants.
+   - A grid that contains any such variant keeps the old card layout for
+     all its items, so mixed grids (performance matrix, Dreyfus levels,
+     danger/success pairs) stay consistent.
+   - Everything depends on :has(). Browsers without it keep the old cards.
+   ========================================================================== */
+.landing-page :is(.features-grid, .audience-card-grid):has(> .feature-card):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))) {
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: var(--space-10);
+    row-gap: 0;
+}
+
+.landing-page :is(.features-grid, .audience-card-grid):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))) > .feature-card {
+    position: relative;
+    background: none;
+    border: 0;
+    border-top: 1px solid var(--border);
+    border-radius: 0;
+    padding: var(--space-6) 0 var(--space-8);
+    transition: none;
+}
+
+.landing-page :is(.features-grid, .audience-card-grid):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))) > .feature-card::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: var(--space-6);
+    height: 2px;
+    background: var(--primary);
+}
+
+.landing-page :is(.features-grid, .audience-card-grid):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))) > .feature-card h3 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    line-height: 1.35;
+    margin: 0 0 var(--space-2);
+}
+
+.landing-page :is(.features-grid, .audience-card-grid):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))) > .feature-card > :is(p, ul, ol) {
+    max-width: 62ch;
+}
+
+.landing-page :is(.features-grid, .audience-card-grid):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))) > .feature-card > :last-child {
+    margin-bottom: 0;
+}
+
+/* Without card padding, outside bullets would hang past the column edge.
+   Unstyled lists (list-style: none) keep their own zero padding. */
+.landing-page :is(.features-grid, .audience-card-grid):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))) > .feature-card :is(ul:not(.audience-list, .audience-resource-list, .comparison-list), ol) {
+    padding-left: 1.25em;
+}
+
+/* Numbered steps: a large primary-colour number replaces the accent mark. */
+.landing-page :is(.features-grid, .audience-card-grid):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))) > .feature-card:has(> .audience-step-number) {
+    padding-top: var(--space-4);
+}
+
+.landing-page :is(.features-grid, .audience-card-grid):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))) > .feature-card:has(> .audience-step-number)::before {
+    content: none;
+}
+
+.landing-page :is(.features-grid, .audience-card-grid) > .feature-card > .audience-step-number {
+    font-size: var(--text-3xl);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: var(--space-3);
+}
+
+@media (min-width: 640px) {
+    .landing-page :is(.features-grid, .audience-card-grid):has(> .feature-card):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0 var(--space-10);
+    }
+}
+
+@media (min-width: 1024px) {
+    /* Three columns only when the count divides by three: 3, 6, 9. */
+    .landing-page :is(.features-grid, .audience-card-grid):has(> .feature-card:last-child:nth-child(3n)):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    /* Four numbered steps read as one sequence: one row of four. */
+    .landing-page :is(.features-grid, .audience-card-grid):has(> .feature-card:last-child:nth-child(4)):has(> .feature-card > .audience-step-number):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))) {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
