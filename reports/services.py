@@ -789,6 +789,34 @@ def get_report_summary(report):
     return summary
 
 
+OTHERS_CATEGORIES = ('peer', 'manager')  # same "others" as insights['overall_sentiment']
+
+
+def self_vs_others_gap(report_data, min_threshold):
+    """
+    Self-assessment minus the others' average, from the stored report insights.
+
+    Positive: rates self higher than others do. Negative: rates self lower.
+    None when there is no self-assessment, no others' score, or fewer other
+    reviewers (peer + manager) than the organization's anonymity threshold.
+    """
+    sentiment = (report_data.get('insights') or {}).get('overall_sentiment') or {}
+    self_avg, others_avg = sentiment.get('self_avg'), sentiment.get('score')
+    if self_avg is None or others_avg is None:
+        return None
+
+    # Reviewer count per category = its highest count on any question.
+    reviewers = defaultdict(int)
+    for section in report_data.get('by_section', {}).values():
+        for question in section.get('questions', {}).values():
+            for category, cat_data in question.get('by_category', {}).items():
+                reviewers[category] = max(reviewers[category], cat_data.get('count', 0))
+    if sum(reviewers[c] for c in OTHERS_CATEGORIES) < min_threshold:
+        return None
+
+    return round(self_avg - others_avg, 2)
+
+
 def send_report_ready_notification(report, request=None):
     """
     Send email to reviewee when their report is ready

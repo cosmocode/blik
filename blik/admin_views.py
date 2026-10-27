@@ -49,7 +49,7 @@ from reports.dreyfus_service import (
     _level_to_stage,
 )
 from reports.models import Report
-from reports.services import generate_report, send_report_ready_notification
+from reports.services import generate_report, self_vs_others_gap, send_report_ready_notification
 from reviews.models import ReviewCycle, ReviewerToken
 from reviews.services import (
     assign_tokens_to_emails,
@@ -314,10 +314,15 @@ def update_user_permissions(request):
 def reviewee_list(request):
     """List and manage reviewees"""
     org = request.organization
+    latest_report_id = Report.objects.filter(
+        cycle__reviewee=OuterRef('pk'), cycle__status='completed', available=True,
+    ).order_by('-cycle__created_at').values('id')[:1]
     # Filter out anonymized reviewees (those with @deleted.invalid emails)
     reviewees_qs = Reviewee.objects.for_organization(org).filter(is_active=True).annotate(
-        cycle_count=Count('review_cycles')
+        cycle_count=Count('review_cycles'),
+        latest_report_id=Subquery(latest_report_id),
     ).order_by('name')
+    sort = 'gap' if request.GET.get('sort') == 'gap' else None
 
     # Get per_page from request, default to 25
     per_page = request.GET.get('per_page', '25')
@@ -328,6 +333,25 @@ def reviewee_list(request):
     except (ValueError, TypeError):
         per_page = 25
 
+    # Latest completed report and its self-vs-others gap, one query per call.
+    min_threshold = org.min_responses_for_anonymity if org else 3
+
+    def load_reports(rows):
+        ids = [r.latest_report_id for r in rows if r.latest_report_id]
+        return {
+            report.id: (report, self_vs_others_gap(report.report_data, min_threshold))
+            for report in Report.objects.filter(id__in=ids).select_related('cycle')
+        }
+
+    if sort == 'gap':
+        # ponytail: sorting across pages loads report_data for every reviewee in
+        # the org; fine at org scale, store the gap on Report if that grows.
+        reviewees_qs = list(reviewees_qs)
+        reports_by_id = load_reports(reviewees_qs)
+        gap_of = lambda r: reports_by_id.get(r.latest_report_id, (None, None))[1]
+        # Largest distance first (either direction); no gap last.
+        reviewees_qs.sort(key=lambda r: (gap_of(r) is None, -abs(gap_of(r) or 0)))
+
     # Paginate reviewees
     paginator = Paginator(reviewees_qs, per_page)
     page = request.GET.get('page')
@@ -337,6 +361,9 @@ def reviewee_list(request):
         reviewees = paginator.page(1)
     except EmptyPage:
         reviewees = paginator.page(paginator.num_pages)
+
+    if sort != 'gap':
+        reports_by_id = load_reports(reviewees)
 
     # Get subscription status
     subscription_status = get_subscription_status(org) if org else None
@@ -358,23 +385,14 @@ def reviewee_list(request):
         # Get active cycle
         active_cycle = reviewee.review_cycles.filter(status='active').order_by('-created_at').first()
 
-        # Get latest completed cycle with a report
-        latest_completed_report = None
-        completed_cycles = reviewee.review_cycles.filter(status='completed').order_by('-created_at')
-        for cycle in completed_cycles:
-            try:
-                report = cycle.report
-                if report.available:
-                    latest_completed_report = report
-                    break
-            except:
-                continue
+        latest_completed_report, gap = reports_by_id.get(reviewee.latest_report_id, (None, None))
 
         reviewees_with_latest.append({
             'reviewee': reviewee,
             'latest_questionnaire': latest_cycle.questionnaire if latest_cycle else None,
             'active_cycle': active_cycle,
             'latest_completed_report': latest_completed_report,
+            'gap': gap,
         })
 
     context = {
@@ -383,6 +401,7 @@ def reviewee_list(request):
         'questionnaires': questionnaires,
         'subscription_status': subscription_status,
         'per_page': per_page,
+        'sort': sort,
     }
 
     return render(request, 'admin_dashboard/reviewee_list.html', context)
