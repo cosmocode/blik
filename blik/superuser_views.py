@@ -3,7 +3,7 @@ Superuser-only views for administrative tasks
 """
 from datetime import timedelta
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -15,13 +15,7 @@ from accounts.permissions import assign_organization_admin
 from accounts.services import create_user_with_email_as_username
 
 
-def superuser_required(user):
-    """Check if user is a superuser"""
-    return user.is_superuser
-
-
 @login_required
-@user_passes_test(superuser_required)
 def create_organization(request):
     """
     Superuser-only page to create organizations without payment plans.
@@ -29,6 +23,10 @@ def create_organization(request):
     Creates the organization and sends an invitation to the specified admin email.
     The invited admin goes through the normal invitation acceptance flow.
     """
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to create organizations.')
+        return redirect('admin_dashboard')
+
     if request.method == 'POST':
         org_name = request.POST.get('org_name', '').strip()
         admin_email = request.POST.get('admin_email', '').strip().lower()
