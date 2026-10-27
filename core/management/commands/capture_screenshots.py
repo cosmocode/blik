@@ -480,12 +480,14 @@ class Command(BaseCommand):
                 ('signup_desktop', '/landing/signup/', '.plans-grid', {}),
                 ('questionnaires_desktop', '/dashboard/questionnaires/', 'table', {}),
                 ('questionnaire_edit_desktop',
-                 f'/dashboard/questionnaires/{config.get("questionnaire_id")}/edit/', 'form', {}),
+                 f'/dashboard/questionnaires/{config.get("questionnaire_id")}/edit/', '.container form', {}),
+                ('questionnaire_translate_desktop',
+                 f'/dashboard/questionnaires/{config.get("questionnaire_uuid")}/translate/de/', '.container form', {}),
                 ('reviewees_desktop', '/dashboard/reviewees/', 'table', {}),
-                # Slot for the self-vs-others gap column (built separately). Skipped
-                # until the reviewee overview renders an element matching skip_unless.
+                # Sorting by gap switches on the self-vs-others column; skipped if
+                # the column is not shown.
                 ('reviewees_gap_desktop', '/dashboard/reviewees/?sort=gap', 'table',
-                 {'skip_unless': '[data-gap-column]'}),
+                 {'skip_unless': '[data-reviewee-column="gap"]:not([hidden])'}),
                 ('cycle_create_desktop', '/dashboard/cycles/create/', '#cycleForm',
                  {'prepare_js': CYCLE_FORM_JS, 'viewport': {'width': 1920, 'height': 1600}}),
             ]
@@ -690,12 +692,14 @@ class Command(BaseCommand):
                     },
                 ]
 
-                # Reviewee self-assessment and the reviewer thank-you page
+                # Reviewee self-assessment, the reviewer thank-you page, and the form
+                # opened by a German browser (the questionnaire is translated)
                 public_pages = [
-                    ('self_assessment', config.get('self_feedback_token'), 'form'),
-                    ('feedback_complete', config.get('completed_feedback_token'), 'body'),
+                    ('self_assessment', config.get('self_feedback_token'), 'form', None),
+                    ('feedback_complete', config.get('completed_feedback_token'), 'body', None),
+                    ('feedback_translated', config.get('translated_feedback_token'), 'form', 'de-DE'),
                 ]
-                for name, token, wait_for in public_pages:
+                for name, token, wait_for, locale in public_pages:
                     if not token:
                         continue
                     for device, viewport in (('desktop', {'width': 1920, 'height': 1080}),
@@ -707,6 +711,7 @@ class Command(BaseCommand):
                                 'viewport': viewport,
                                 'theme': theme,
                                 'wait_for': wait_for,
+                                'locale': locale,
                             })
                 feedback_configs = self._filter(feedback_configs)
 
@@ -718,7 +723,8 @@ class Command(BaseCommand):
 
                     page = await browser.new_page(
                         viewport=screenshot_config['viewport'],
-                        device_scale_factor=1
+                        device_scale_factor=1,
+                        locale=screenshot_config.get('locale'),
                     )
 
                     await page.add_init_script(f'''

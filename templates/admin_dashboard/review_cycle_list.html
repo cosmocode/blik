@@ -14,15 +14,15 @@
 
 {% if total_count or is_filtered %}
 <div class="card">
-    <form id="cycle-filters" method="get" class="cycle-filters">
-        <nav class="cycle-stages" aria-label="{% trans 'Filter by stage' %}">
-            <a href="?{% querystring stage=None page=None %}" class="btn btn-sm {% if not stage %}btn-primary{% else %}btn-secondary{% endif %}"{% if not stage %} aria-current="true"{% endif %}>{% trans 'All' %} <span class="cycle-stage-count">{{ total_count }}</span></a>
+    <form id="cycle-filters" method="get" class="list-filters">
+        <nav id="cycle-stages" class="stage-tabs" aria-label="{% trans 'Filter by stage' %}">
+            <a href="?{% querystring stage=None page=None %}" class="stage-tab"{% if not stage %} aria-current="true"{% endif %}>{% trans 'All' %} <span>{{ total_count }}</span></a>
             {% for key, label, count in stages %}
-            <a href="?{% querystring stage=key page=None %}" class="btn btn-sm {% if stage == key %}btn-primary{% else %}btn-secondary{% endif %}"{% if stage == key %} aria-current="true"{% endif %}>{{ label }} <span class="cycle-stage-count">{{ count }}</span></a>
+            <a href="?{% querystring stage=key page=None %}" class="stage-tab"{% if stage == key %} aria-current="true"{% endif %}>{{ label }} <span>{{ count }}</span></a>
             {% endfor %}
         </nav>
         {% if stage %}<input type="hidden" name="stage" value="{{ stage }}">{% endif %}
-        <div class="cycle-filter-fields">
+        <div class="list-filter-fields">
             <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="{% trans 'Search reviewee name or email' %}" aria-label="{% trans 'Search reviewee' %}" title="{% trans 'Press / to search' %}">
             <select name="questionnaire" class="form-control" aria-label="{% trans 'Questionnaire' %}" onchange="this.form.requestSubmit()">
                 <option value="">{% trans 'All questionnaires' %}</option>
@@ -35,9 +35,10 @@
                 <option value="{{ key }}" {% if sort == key %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
             </select>
-            {% if is_filtered %}<a href="?{% querystring stage=None q=None questionnaire=None page=None %}" class="btn btn-sm btn-secondary">{% trans 'Clear filters' %}</a>{% endif %}
+            <span id="cycle-clear">{% if is_filtered %}<a href="?{% querystring stage=None q=None questionnaire=None page=None %}" class="btn btn-sm btn-secondary">{% trans 'Clear filters' %}</a>{% endif %}</span>
         </div>
     </form>
+    <div id="cycle-results">
     <div class="card-body">
         {% if not cycles.object_list %}
         <div class="empty-state">
@@ -214,6 +215,7 @@
         </div>
     </div>
     {% endif %}
+    </div>
 </div>
 {% else %}
 <div class="card">
@@ -228,35 +230,6 @@
 {% endif %}
 
 <style>
-.cycle-filters {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 1rem 1.5rem 0;
-}
-@media (max-width: 767px) {
-    .cycle-filters { padding: 1rem 1rem 0; }
-}
-.cycle-stages,
-.cycle-filter-fields {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    align-items: center;
-}
-.cycle-filter-fields .form-control {
-    width: auto;
-    min-width: 0;
-    flex: 0 1 14rem;
-}
-.cycle-filter-fields input[type="search"] {
-    flex: 1 1 16rem;
-}
-.cycle-stage-count {
-    opacity: 0.75;
-    font-variant-numeric: tabular-nums;
-    margin-left: 0.25rem;
-}
 .dropdown-item:hover {
     background-color: var(--bg-light);
 }
@@ -277,59 +250,54 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Handle dropdown toggle with proper positioning
-document.addEventListener('DOMContentLoaded', function() {
-    const dropdownToggles = document.querySelectorAll('[data-toggle^="cycle-"]');
-
-    dropdownToggles.forEach(toggle => {
-        toggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            const dropdownId = this.getAttribute('data-toggle');
-            const menu = document.getElementById(dropdownId);
-
-            // Close all other dropdowns
-            document.querySelectorAll('.dropdown-menu').forEach(m => {
-                if (m.id !== dropdownId) {
-                    m.style.display = 'none';
-                }
-            });
-
-            // Toggle this dropdown
-            const isVisible = menu.style.display === 'block';
-
-            if (!isVisible) {
-                // Position the dropdown relative to the button
-                const rect = this.getBoundingClientRect();
-                menu.style.top = (rect.bottom + window.scrollY + 4) + 'px';
-                menu.style.left = (rect.left + window.scrollX) + 'px';
-                menu.style.display = 'block';
-            } else {
-                menu.style.display = 'none';
+// Search as you type: fetch the filtered page and swap the parts that
+// change. The search field itself stays put, so focus and typing survive.
+(function() {
+    const search = document.querySelector('#cycle-filters input[name="q"]');
+    if (!search) return;
+    let timer, controller;
+    search.addEventListener('input', () => {
+        clearTimeout(timer);
+        timer = setTimeout(async () => {
+            const params = [...new FormData(search.form)].filter(([, value]) => value);
+            const url = location.pathname + '?' + new URLSearchParams(params);
+            if (controller) controller.abort();
+            controller = new AbortController();
+            try {
+                const response = await fetch(url, {signal: controller.signal});
+                const page = new DOMParser().parseFromString(await response.text(), 'text/html');
+                ['cycle-stages', 'cycle-clear', 'cycle-results'].forEach(id => {
+                    document.getElementById(id).replaceWith(page.getElementById(id));
+                });
+                history.replaceState(null, '', url);
+            } catch (e) {
+                if (e.name !== 'AbortError') search.form.requestSubmit();
             }
-        });
+        }, 30);
     });
+})();
 
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.btn-group')) {
-            document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                menu.style.display = 'none';
-            });
-        }
-    });
-
-    // Prevent dropdown from closing when clicking inside it
+// Row dropdowns. Delegated, so rows swapped in by the search keep working.
+document.addEventListener('click', function(e) {
+    // Close every menu outside the clicked button group.
+    const group = e.target.closest('.btn-group');
     document.querySelectorAll('.dropdown-menu').forEach(menu => {
-        menu.addEventListener('click', function(e) {
-            // Let form submissions go through (they'll navigate away anyway)
-            if (e.target.closest('form')) {
-                return;
-            }
-            e.stopPropagation();
-        });
+        if (!group || !group.contains(menu)) menu.style.display = 'none';
     });
+
+    const toggle = e.target.closest('[data-toggle^="cycle-"]');
+    if (!toggle) return;
+    e.preventDefault();
+    const menu = document.getElementById(toggle.getAttribute('data-toggle'));
+    if (menu.style.display === 'block') {
+        menu.style.display = 'none';
+    } else {
+        // Position the dropdown relative to the button
+        const rect = toggle.getBoundingClientRect();
+        menu.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+        menu.style.left = (rect.left + window.scrollX) + 'px';
+        menu.style.display = 'block';
+    }
 });
 
 // UUID Modal functions
@@ -342,6 +310,7 @@ function showUuidModal(cycleUuid, revieweeUuid, revieweeName) {
     document.getElementById('modal-reviewee-name').textContent = revieweeName;
     document.getElementById('modal-cycle-uuid').textContent = cycleUuid;
     document.getElementById('modal-reviewee-uuid').textContent = revieweeUuid;
+    renderApiExamples(cycleUuid, revieweeUuid);
 
     document.getElementById('uuid-modal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -359,8 +328,10 @@ function createUuidModal() {
     modal.className = 'modal-overlay';
     modal.style.display = 'none';
     {% blocktrans trimmed asvar api_intro with name_id='modal-reviewee-name' %}Use these UUIDs when accessing the REST API for <strong id="{{ name_id }}"></strong>{% endblocktrans %}
+    {% url 'api:swagger-ui' as api_docs_url %}
+    {% if perms.accounts.can_manage_organization %}{% url 'settings' as settings_url %}{% blocktrans trimmed asvar api_token_hint with url=settings_url|add:'#api' %}Replace <code>$BLIK_API_TOKEN</code> with a token from <a href="{{ url }}">Settings → API</a>.{% endblocktrans %}{% else %}{% blocktrans trimmed asvar api_token_hint %}Replace <code>$BLIK_API_TOKEN</code> with an API token from an organization admin.{% endblocktrans %}{% endif %}
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-content" style="max-width: 760px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
                 <h3 style="margin: 0;">{{ _('API Identifiers')|escapejs }}</h3>
                 <button onclick="closeUuidModal()" aria-label="{{ _('Close')|escapejs }}"
@@ -386,6 +357,9 @@ function createUuidModal() {
                         <button onclick="copyUuid('modal-reviewee-uuid')" class="btn btn-sm btn-secondary">{{ _('Copy')|escapejs }}</button>
                     </div>
                 </div>
+                <h4 class="api-examples-title">{{ _('Example calls')|escapejs }}</h4>
+                <p class="help-text">{{ api_token_hint|escapejs }} <a href="{{ api_docs_url|escapejs }}" target="_blank" rel="noopener">{{ _('Full API documentation')|escapejs }}</a></p>
+                <div id="modal-api-examples"></div>
             </div>
         </div>
     `;
@@ -399,12 +373,48 @@ function createUuidModal() {
     });
 }
 
-function copyUuid(elementId) {
-    const element = document.getElementById(elementId);
-    const text = element.textContent;
+// Example calls for the modal: method, path, Swagger operation (tag/operationId), label.
+const API_BASE = '{{ SITE_URL|escapejs }}/api/v1';
+const API_EXAMPLES = [
+    ['GET', ids => `/cycles/${ids.cycle}/`, 'cycles/cycles_retrieve', '{{ _("Cycle details")|escapejs }}'],
+    ['GET', ids => `/cycles/${ids.cycle}/progress/`, 'cycles/cycles_progress_retrieve', '{{ _("Response progress per group")|escapejs }}'],
+    ['POST', ids => `/cycles/${ids.cycle}/send_reminders/`, 'cycles/cycles_send_reminders_create', '{{ _("Remind all pending reviewers")|escapejs }}'],
+    ['POST', ids => `/cycles/${ids.cycle}/complete/`, 'cycles/cycles_complete_create', '{{ _("Close the cycle and generate the report")|escapejs }}'],
+    ['GET', ids => `/reviewees/${ids.reviewee}/`, 'reviewees/reviewees_retrieve', '{{ _("Reviewee details")|escapejs }}'],
+    ['GET', ids => `/reviewees/${ids.reviewee}/cycles/`, 'reviewees/reviewees_cycles_retrieve', '{{ _("All cycles of this reviewee")|escapejs }}'],
+];
 
+function renderApiExamples(cycleUuid, revieweeUuid) {
+    const ids = {cycle: cycleUuid, reviewee: revieweeUuid};
+    const container = document.getElementById('modal-api-examples');
+    container.replaceChildren(...API_EXAMPLES.map(([method, path, operation, label]) => {
+        const example = document.createElement('div');
+        example.className = 'api-example';
+        const command = `curl${method === 'GET' ? '' : ' -X ' + method} -H "Authorization: Bearer $BLIK_API_TOKEN" ${API_BASE}${path(ids)}`;
+        example.innerHTML = `
+            <div class="api-example-head">
+                <span class="api-method api-method--${method.toLowerCase()}">${method}</span>
+                <span class="api-example-label"></span>
+                <a href="{{ api_docs_url|escapejs }}#/${operation}" target="_blank" rel="noopener">{{ _('Docs')|escapejs }}</a>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <code class="uuid-display api-example-code"></code>
+                <button type="button" class="btn btn-sm btn-secondary">{{ _('Copy')|escapejs }}</button>
+            </div>`;
+        example.querySelector('.api-example-label').textContent = label;
+        example.querySelector('code').textContent = command;
+        example.querySelector('button').addEventListener('click', () => copyText(command, '{{ _("Command copied to clipboard")|escapejs }}'));
+        return example;
+    }));
+}
+
+function copyUuid(elementId) {
+    copyText(document.getElementById(elementId).textContent, '{{ _('UUID copied to clipboard')|escapejs }}');
+}
+
+function copyText(text, message) {
     navigator.clipboard.writeText(text).then(() => {
-        showCopyFeedback('{{ _('UUID copied to clipboard')|escapejs }}');
+        showCopyFeedback(message);
     }).catch(() => {
         // Fallback
         const textarea = document.createElement('textarea');
@@ -413,7 +423,7 @@ function copyUuid(elementId) {
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-        showCopyFeedback('{{ _('UUID copied to clipboard')|escapejs }}');
+        showCopyFeedback(message);
     });
 }
 
@@ -436,6 +446,39 @@ function showCopyFeedback(message) {
 </script>
 
 <style>
+.api-examples-title {
+    margin: 1.5rem 0 0.25rem;
+}
+#uuid-modal .help-text a {
+    color: var(--primary);
+}
+.api-example {
+    margin-top: 1rem;
+}
+.api-example-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.375rem;
+    font-size: 0.875rem;
+}
+.api-example-head a {
+    margin-left: auto;
+    color: var(--primary);
+}
+.api-method {
+    font-family: monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    color: white;
+}
+.api-method--get { background: var(--success); }
+.api-method--post { background: var(--primary); }
+.api-example-code {
+    white-space: pre-wrap;
+}
 .uuid-display {
     flex: 1;
     padding: 0.5rem;

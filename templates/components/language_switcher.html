@@ -1,10 +1,14 @@
 {% load i18n %}{% get_current_language as current_language %}
-<form method="post" action="{{ action }}" class="language-switcher{% if corner %} language-switcher--corner{% endif %}">
+<form method="post" action="{{ action }}" class="language-switcher{% if corner %} language-switcher--corner{% endif %}{% if compact %} language-switcher--compact{% endif %}">
     {% csrf_token %}
     <input type="hidden" name="next" value="{{ request.get_full_path }}">
-    <select name="language" aria-label="{% trans 'Language' %}" onchange="this.form.submit()">
-        {% for code, name in LANGUAGES %}
-        <option value="{{ code }}"{% if code == current_language %} selected{% endif %}>{{ name }}</option>
-        {% endfor %}
-    </select>
+    <div class="language-switcher-control">
+        {% if compact %}<span class="language-switcher-label" aria-hidden="true">{{ current_language|slice:":2"|upper }}{% if current_language == 'de-informal' %} (Du){% endif %}</span>{% endif %}
+        <select name="language" aria-label="{% trans 'Language' %}" onchange="this.form.submit()">
+            {% for code, name in LANGUAGES %}
+            <option value="{{ code }}"{% if code == current_language %} selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+        </select>
+        <svg class="language-switcher-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+    </div>
 </form>

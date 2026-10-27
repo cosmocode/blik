@@ -8,7 +8,7 @@
     <title>{% block title %}{% trans 'Admin Dashboard' %}{% endblock %} - Blik</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%234f46e5'/><circle cx='50' cy='50' r='25' fill='none' stroke='white' stroke-width='3'/></svg>">
+    {% include 'components/favicon.html' %}
 
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     {% block extra_css %}{% endblock %}
@@ -51,31 +51,54 @@
                 </button>
             </div>
             <ul class="navbar-nav" id="navbar-nav">
-                <li><a href="{% url 'admin_dashboard' %}" {% if request.resolver_match.url_name == 'admin_dashboard' %}class="active"{% endif %}>{% trans 'Dashboard' %}</a></li>
-                <li><a href="{% url 'team_list' %}" {% if 'team' in request.resolver_match.url_name %}class="active"{% endif %}>{% trans 'Team' %}</a></li>
-                <li><a href="{% url 'reviewee_list' %}" {% if 'reviewee' in request.resolver_match.url_name %}class="active"{% endif %}>{% trans 'Reviewees' %}</a></li>
-                <li><a href="{% url 'questionnaire_list' %}" {% if 'questionnaire' in request.resolver_match.url_name %}class="active"{% endif %}>{% trans 'Questionnaires' %}</a></li>
-                <li><a href="{% url 'review_cycle_list' %}" {% if 'cycle' in request.resolver_match.url_name %}class="active"{% endif %}>{% trans 'Cycles' %}</a></li>
-                {% if user.is_superuser and HAS_STRIPE_CONFIGURED %}
-                <li><a href="{% url 'product_review_list' %}" {% if 'product_review' in request.resolver_match.url_name %}class="active"{% endif %}>{% trans 'Reviews' context 'product reviews' %}</a></li>
-                {% endif %}
-                {% if perms.accounts.can_manage_organization %}
-                <li><a href="{% url 'settings' %}" {% if request.resolver_match.url_name == 'settings' %}class="active"{% endif %}>{% trans 'Settings' %}</a></li>
-                {% endif %}
-                {% if user.is_superuser %}
-                <li><a href="{% url 'superuser_create_organization' %}" {% if request.resolver_match.url_name == 'superuser_create_organization' %}class="active"{% endif %}>{% trans 'Create Org' %}</a></li>
-                <li><a href="/admin/">{% trans 'Admin' %}</a></li>
-                {% endif %}
-                <li><a href="{% url 'profile' %}" {% if request.resolver_match.url_name == 'profile' %}class="active"{% endif %} title="{{ user.username }}">{% trans 'Profile' %}</a></li>
+                {% with url_name=request.resolver_match.url_name|default:'' %}
+                <li><a href="{% url 'admin_dashboard' %}" {% if url_name == 'admin_dashboard' %}class="active"{% endif %}>{% trans 'Dashboard' %}</a></li>
+                <li><a href="{% url 'reviewee_list' %}" {% if 'reviewee' in url_name %}class="active"{% endif %}>{% trans 'Reviewees' %}</a></li>
+                <li><a href="{% url 'review_cycle_list' %}" {% if 'cycle' in url_name %}class="active"{% endif %}>{% trans 'Cycles' %}</a></li>
                 <li>
-                    <form method="post" action="{% url 'logout' %}" style="display: inline; margin: 0;">
-                        {% csrf_token %}
-                        <button type="submit" class="nav-logout-btn">{% trans 'Logout' %}</button>
-                    </form>
+                    <details class="nav-menu">
+                        <summary {% if 'questionnaire' in url_name or 'team' in url_name or url_name == 'settings' %}class="active"{% endif %}>{% trans 'Organization' %}</summary>
+                        <ul>
+                            <li><a href="{% url 'questionnaire_list' %}" {% if 'questionnaire' in url_name %}class="active"{% endif %}>{% trans 'Questionnaires' %}</a></li>
+                            <li><a href="{% url 'team_list' %}" {% if 'team' in url_name %}class="active"{% endif %}>{% trans 'Team' %}</a></li>
+                            {% if perms.accounts.can_manage_organization %}
+                            <li><a href="{% url 'settings' %}" {% if url_name == 'settings' %}class="active"{% endif %}>{% trans 'Settings' %}</a></li>
+                            {% endif %}
+                        </ul>
+                    </details>
                 </li>
+                {% if user.is_superuser %}
+                <li>
+                    <details class="nav-menu">
+                        <summary {% if 'product_review' in url_name or url_name == 'superuser_create_organization' %}class="active"{% endif %}>{% trans 'Platform' %}</summary>
+                        <ul>
+                            {% if HAS_STRIPE_CONFIGURED %}
+                            <li><a href="{% url 'product_review_list' %}" {% if 'product_review' in url_name %}class="active"{% endif %}>{% trans 'Reviews' context 'product reviews' %}</a></li>
+                            {% endif %}
+                            <li><a href="{% url 'superuser_create_organization' %}" {% if url_name == 'superuser_create_organization' %}class="active"{% endif %}>{% trans 'Create Org' %}</a></li>
+                            <li><a href="/admin/">{% trans 'Admin' %}</a></li>
+                        </ul>
+                    </details>
+                </li>
+                {% endif %}
+                <li>
+                    <details class="nav-menu">
+                        <summary {% if url_name == 'profile' %}class="active"{% endif %}>{{ user.get_short_name|default:user.username }}</summary>
+                        <ul>
+                            <li><a href="{% url 'profile' %}" {% if url_name == 'profile' %}class="active"{% endif %}>{% trans 'Profile' %}</a></li>
+                            <li>
+                                <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="nav-logout-btn">{% trans 'Logout' %}</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </details>
+                </li>
+                {% endwith %}
                 <li>
                     {% url 'set_language' as language_url %}
-                    {% include 'components/language_switcher.html' with action=language_url %}
+                    {% include 'components/language_switcher.html' with action=language_url compact=True %}
                 </li>
                 <li><button id="theme-toggle" class="theme-toggle-btn" aria-label="{% trans 'Toggle theme' %}">
                     <svg id="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -121,6 +144,21 @@
         navbarNav.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
                 navbarNav.classList.remove('active');
+            });
+        });
+
+        // Nav menus: one open at a time; outside click or Escape closes them.
+        const navMenus = navbarNav.querySelectorAll('.nav-menu');
+        navMenus.forEach(menu => menu.addEventListener('toggle', () => {
+            if (menu.open) navMenus.forEach(other => { if (other !== menu) other.open = false; });
+        }));
+        document.addEventListener('click', e => {
+            navMenus.forEach(menu => { if (!menu.contains(e.target)) menu.open = false; });
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key !== 'Escape') return;
+            navMenus.forEach(menu => {
+                if (menu.open) { menu.open = false; menu.querySelector('summary').focus(); }
             });
         });
 

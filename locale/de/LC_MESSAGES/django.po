@@ -6749,6 +6749,126 @@ msgstr "Inaktiv"
 msgid "Did not observe"
 msgstr "Nicht beobachtet"
 
+# Questionnaire overview and quick preview
+msgid "Choose a questionnaire, preview the questions, and see an example feedback report."
+msgstr "Wählen Sie einen Fragebogen, sehen Sie sich die Fragen an und prüfen Sie einen Beispielbericht."
+
+msgid "Report includes"
+msgstr "Inhalte des Berichts"
+
+msgid "Report details"
+msgstr "Berichtsdetails"
+
+msgid "Usage"
+msgstr "Verwendung"
+
+msgid "Not used yet"
+msgstr "Noch nicht verwendet"
+
+msgid "The default choice when no other questionnaire is selected."
+msgstr "Die Standardauswahl, wenn kein anderer Fragebogen ausgewählt wird."
+
+msgid "%(counter)s review cycle"
+msgid_plural "%(counter)s review cycles"
+msgstr[0] "%(counter)s Feedbackrunde"
+msgstr[1] "%(counter)s Feedbackrunden"
+
+msgid "%(counter)s question"
+msgid_plural "%(counter)s questions"
+msgstr[0] "%(counter)s Frage"
+msgstr[1] "%(counter)s Fragen"
+
+msgid "Example Report"
+msgstr "Beispielbericht"
+
+msgid "About this questionnaire"
+msgstr "Über diesen Fragebogen"
+
+msgid "Loading questions…"
+msgstr "Fragen werden geladen…"
+
+msgid "The questions could not be loaded. Please try again."
+msgstr "Die Fragen konnten nicht geladen werden. Bitte versuchen Sie es erneut."
+
+msgid "Try again"
+msgstr "Erneut versuchen"
+
+msgid "Open full preview"
+msgstr "Vollständige Vorschau öffnen"
+
+msgid "This is a preview. Alex is used as an example name; no answers are collected."
+msgstr "Dies ist eine Vorschau. Alex wird als Beispielname verwendet; es werden keine Antworten erfasst."
+
+msgid "Required"
+msgstr "Erforderlich"
+
+msgid "Select all that apply"
+msgstr "Wählen Sie alle zutreffenden Antworten aus"
+
+msgid "Select one answer"
+msgstr "Wählen Sie eine Antwort aus"
+
+msgid "Skills overview"
+msgstr "Kompetenzübersicht"
+
+msgid "Compare strengths across topics in a radar chart."
+msgstr "Vergleichen Sie Stärken in verschiedenen Themen anhand eines Netzdiagramms."
+
+msgid "Skill level"
+msgstr "Kompetenzniveau"
+
+msgid "See the stage of skill development (Dreyfus model)."
+msgstr "Erkennen Sie den Entwicklungsstand der Kompetenzen (Dreyfus-Modell)."
+
+msgid "Initiative"
+msgstr "Eigeninitiative"
+
+msgid "Understand initiative and independence (agency model)."
+msgstr "Verstehen Sie Eigeninitiative und Selbstständigkeit (Agency-Modell)."
+
+msgid "Written feedback"
+msgstr "Schriftliches Feedback"
+
+msgid "Read comments and examples from reviewers."
+msgstr "Lesen Sie Kommentare und Beispiele der Feedbackgebenden."
+
+msgid "Answer breakdown"
+msgstr "Antwortverteilung"
+
+msgid "See how responses are distributed for each question."
+msgstr "Sehen Sie, wie sich die Antworten auf jede Frage verteilen."
+
+msgid "Question results"
+msgstr "Ergebnisse pro Frage"
+
+# Profile page refresh
+msgid "Manage your personal details and find your feedback reports."
+msgstr "Verwalten Sie Ihre persönlichen Angaben und finden Sie Ihre Feedbackberichte."
+
+msgid "Your account"
+msgstr "Ihr Konto"
+
+msgid "Review cycle access"
+msgstr "Berechtigung für Feedbackrunden"
+
+msgid "You can create review cycles for yourself and others."
+msgstr "Sie können Feedbackrunden für sich selbst und andere erstellen."
+
+msgid "You can create review cycles for yourself."
+msgstr "Sie können Feedbackrunden für sich selbst erstellen."
+
+msgid "My feedback"
+msgstr "Mein Feedback"
+
+msgid "Review cycles where you receive feedback."
+msgstr "Feedbackrunden, in denen Sie Feedback erhalten."
+
+msgid "No reportable responses yet"
+msgstr "Noch keine auswertbaren Antworten"
+
+msgid "Available when the cycle is completed"
+msgstr "Nach Abschluss der Feedbackrunde verfügbar"
+
 msgid "No responses yet"
 msgstr "Noch keine Antworten"
 
@@ -6793,3 +6913,166 @@ msgstr "Filter zurücksetzen"
 
 msgid "No review cycles match these filters."
 msgstr "Keine Feedbackrunden entsprechen diesen Filtern."
+
+msgid "Platform"
+msgstr "Plattform"
+
+# Reviewee overview filters and actions
+msgid "Find people, follow their feedback, and plan the next review."
+msgstr "Finden Sie Personen, verfolgen Sie ihr Feedback und planen Sie die nächste Feedbackrunde."
+
+msgid "Filter by review status"
+msgstr "Nach Feedbackstatus filtern"
+
+msgid "All people"
+msgstr "Alle Personen"
+
+msgid "Find a person"
+msgstr "Person suchen"
+
+msgid "Name, email or department"
+msgstr "Name, E-Mail oder Abteilung"
+
+msgid "All departments"
+msgstr "Alle Abteilungen"
+
+msgid "Latest questionnaire"
+msgstr "Letzter Fragebogen"
+
+msgid "Columns"
+msgstr "Spalten"
+
+msgid "Choose the details you want to see."
+msgstr "Wählen Sie die Angaben aus, die Sie sehen möchten."
+
+msgid "Compares self-assessment with the average of other reviewers in the latest completed report."
+msgstr "Vergleicht die Selbsteinschätzung mit dem Durchschnitt der anderen Feedbackgebenden im letzten abgeschlossenen Bericht."
+
+msgid "Positive: rates themselves higher. Negative: rates themselves lower. Zero: the ratings agree."
+msgstr "Positiv: höhere Selbsteinschätzung. Negativ: niedrigere Selbsteinschätzung. Null: Die Einschätzungen stimmen überein."
+
+msgid "A difference is shown only when there is enough feedback to protect anonymity. Use it as a conversation starter, not a performance score."
+msgstr "Eine Differenz wird nur bei ausreichend anonymem Feedback angezeigt. Nutzen Sie sie als Gesprächsanlass, nicht als Leistungsbewertung."
+
+msgid "Person"
+msgstr "Person"
+
+msgid "Review status"
+msgstr "Feedbackstatus"
+
+msgid "About self vs others"
+msgstr "Zur Selbst- und Fremdeinschätzung"
+
+msgid "Not selected yet"
+msgstr "Noch nicht ausgewählt"
+
+msgid "Not available yet"
+msgstr "Noch nicht verfügbar"
+
+msgid "Start review"
+msgstr "Feedbackrunde starten"
+
+msgid "No report available"
+msgstr "Kein Bericht verfügbar"
+
+msgid "View latest report"
+msgstr "Letzten Bericht ansehen"
+
+msgid "Start a new review"
+msgstr "Neue Feedbackrunde starten"
+
+msgid "Edit details"
+msgstr "Angaben bearbeiten"
+
+msgid "No people match these filters."
+msgstr "Keine Personen entsprechen diesen Filtern."
+
+msgid "Try another name or clear the filters to see everyone."
+msgstr "Versuchen Sie einen anderen Namen oder entfernen Sie die Filter, um alle Personen anzuzeigen."
+
+msgid "Reviewee pages"
+msgstr "Seiten der Beurteilten"
+
+msgid "Start a review"
+msgstr "Feedbackrunde starten"
+
+msgid "This person already has an active cycle. This will start another review."
+msgstr "Für diese Person läuft bereits eine Feedbackrunde. Es wird eine weitere Runde gestartet."
+
+msgid "The previous questionnaire is archived. An active questionnaire has been selected."
+msgstr "Der vorherige Fragebogen ist archiviert. Ein aktiver Fragebogen wurde ausgewählt."
+
+msgid "Reviewers and feedback categories are copied from the latest cycle. Invitations are sent to reviewers who have an email address."
+msgstr "Feedbackgebende und Kategorien werden aus der letzten Runde übernommen. Feedbackgebende mit E-Mail-Adresse erhalten eine Einladung."
+
+msgid "The cycle starts with space for a self-assessment, three peers and one manager. You can assign reviewers in the next step."
+msgstr "Die Runde beginnt mit Plätzen für eine Selbsteinschätzung, drei Kollegen und eine Führungskraft. Im nächsten Schritt können Sie Feedbackgebende zuweisen."
+
+msgid "Not started"
+msgstr "Noch nicht begonnen"
+
+msgid "Name A–Z"
+msgstr "Name A–Z"
+
+msgid "Name Z–A"
+msgstr "Name Z–A"
+
+msgid "Largest self/others difference"
+msgstr "Größte Differenz zwischen Selbst- und Fremdeinschätzung"
+
+msgid "Showing %(first)s–%(last)s of %(total)s people"
+msgstr "Personen %(first)s–%(last)s von %(total)s"
+
+msgid "%(counter)s person matches your filters"
+msgid_plural "%(counter)s people match your filters"
+msgstr[0] "%(counter)s Person entspricht Ihren Filtern"
+msgstr[1] "%(counter)s Personen entsprechen Ihren Filtern"
+
+msgid "Next step"
+msgstr "Nächster Schritt"
+
+msgid "Fill in self-assessment"
+msgstr "Selbsteinschätzung ausfüllen"
+
+msgid "View progress"
+msgstr "Fortschritt ansehen"
+
+msgid "Report available when the cycle is completed"
+msgstr "Bericht verfügbar, sobald die Feedbackrunde abgeschlossen ist"
+
+msgid "Example calls"
+msgstr "Beispielaufrufe"
+
+msgid "Full API documentation"
+msgstr "Vollständige API-Dokumentation"
+
+#, python-format
+msgid "Replace <code>$BLIK_API_TOKEN</code> with a token from <a href=\"%(url)s\">Settings → API</a>."
+msgstr "<code>$BLIK_API_TOKEN</code> durch einen Token aus <a href=\"%(url)s\">Einstellungen → API</a> ersetzen."
+
+msgid "Replace <code>$BLIK_API_TOKEN</code> with an API token from an organization admin."
+msgstr "<code>$BLIK_API_TOKEN</code> durch einen API-Token von einer Organisationsadministration ersetzen."
+
+msgid "Cycle details"
+msgstr "Details der Feedbackrunde"
+
+msgid "Response progress per group"
+msgstr "Antwortfortschritt pro Gruppe"
+
+msgid "Remind all pending reviewers"
+msgstr "Alle ausstehenden Beurteilenden erinnern"
+
+msgid "Close the cycle and generate the report"
+msgstr "Feedbackrunde abschließen und Bericht erstellen"
+
+msgid "Reviewee details"
+msgstr "Details der beurteilten Person"
+
+msgid "All cycles of this reviewee"
+msgstr "Alle Feedbackrunden dieser Person"
+
+msgid "Docs"
+msgstr "Doku"
+
+msgid "Command copied to clipboard"
+msgstr "Befehl in die Zwischenablage kopiert"

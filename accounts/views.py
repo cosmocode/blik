@@ -236,8 +236,9 @@ def reset_password_view(request, token):
 @require_http_methods(["GET", "POST"])
 def profile_view(request):
     """User profile view with editing capabilities and cycle reports."""
+    from django.db.models import Count, Exists, OuterRef, Q
     from accounts.forms import ProfileEditForm
-    from reviews.models import ReviewCycle
+    from reviews.models import ReviewCycle, ReviewerToken
     from reports.models import Report
     from reports.services import get_report_summary
 
@@ -261,10 +262,18 @@ def profile_view(request):
     organization = profile.organization
 
     # Get cycles for the current user as reviewee
+    # Response counts for progress, and whether the self-assessment is done so
+    # the page only offers the self-assessment link while it is still open
+    # (each visit to that link hands out a new token).
     user_cycles = ReviewCycle.objects.filter(
         reviewee__email=request.user.email,
         reviewee__organization=organization
-    ).select_related('reviewee', 'questionnaire', 'created_by').order_by('-created_at')
+    ).select_related('reviewee', 'questionnaire', 'created_by').annotate(
+        token_count=Count('tokens'),
+        completed_count=Count('tokens', filter=Q(tokens__completed_at__isnull=False)),
+        self_done=Exists(ReviewerToken.objects.filter(
+            cycle=OuterRef('pk'), category='self', completed_at__isnull=False)),
+    ).order_by('-created_at')
 
     # Attach report data to each cycle
     cycles_with_reports = []

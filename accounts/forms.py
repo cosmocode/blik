@@ -11,6 +11,7 @@ class ProfileEditForm(forms.ModelForm):
     """Form for editing user profile information"""
 
     first_name = forms.CharField(
+        label=_('First Name'),
         max_length=150,
         required=False,
         widget=forms.TextInput(attrs={
@@ -20,6 +21,7 @@ class ProfileEditForm(forms.ModelForm):
     )
 
     last_name = forms.CharField(
+        label=_('Last Name'),
         max_length=150,
         required=False,
         widget=forms.TextInput(attrs={
@@ -29,6 +31,7 @@ class ProfileEditForm(forms.ModelForm):
     )
 
     email = forms.EmailField(
+        label=_('Email'),
         required=True,
         widget=forms.EmailInput(attrs={
             'class': 'form-control',
@@ -38,7 +41,9 @@ class ProfileEditForm(forms.ModelForm):
 
     # Stored on the profile, not on the user
     language = forms.ChoiceField(
+        label=_('Language'),
         required=False,
+        help_text=_('Used for the dashboard and for emails to you.'),
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 

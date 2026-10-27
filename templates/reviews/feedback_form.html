@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% trans 'Feedback' %} - {{ reviewee.name }}</title>
+    {% include 'components/favicon.html' %}
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <script>
         // Theme detection and initialization
@@ -34,7 +35,7 @@
 </head>
 <body style="background: var(--bg-body);">
     {% url 'reviews:feedback_language' token.token as language_url %}
-    {% include 'components/language_switcher.html' with action=language_url corner=True %}
+    {% include 'components/language_switcher.html' with action=language_url corner=True compact=True %}
     <div class="feedback-container">
         <div class="feedback-header">
             <h1>{% trans '360 Feedback' %}</h1>
