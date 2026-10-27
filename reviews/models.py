@@ -233,4 +233,4 @@ class Response(TimeStampedModel):
         unique_together = ['token', 'question']
 
     def __str__(self):
-        return f"{self.cycle} - {self.question.question_text[:30]}"
+        return f'{self.cycle} - {self.question.short_text}'

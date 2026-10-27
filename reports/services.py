@@ -1,5 +1,5 @@
 from django.db.models import Avg, Count
-from collections import defaultdict
+from collections import Counter, defaultdict
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.urls import reverse
@@ -15,6 +15,116 @@ import copy
 
 # Import Dreyfus service functions
 from . import dreyfus_service
+
+# Version of report_data's layout: 2 stores codes and numbers where version 1 stored English text
+REPORT_SCHEMA = 2
+
+# Overall ratings, see report_texts.py for their texts
+RATING_OUTSTANDING = 'outstanding'
+RATING_EXCELLENT = 'excellent'
+RATING_STRONG = 'strong'
+RATING_DEVELOPING = 'developing'
+RATING_NEEDS_SUPPORT = 'needs_support'
+
+
+def get_rating_key(score):
+    """The overall rating of an average score."""
+
+    if score >= 4.5:
+        return RATING_OUTSTANDING
+
+    if score >= 4.0:
+        return RATING_EXCELLENT
+
+    if score >= 3.5:
+        return RATING_STRONG
+
+    if score >= 3.0:
+        return RATING_DEVELOPING
+
+    return RATING_NEEDS_SUPPORT
+
+
+# Directions of a trend, see report_texts.py for their symbols and labels
+TREND_UP = 'up'
+TREND_SLIGHT_UP = 'slight_up'
+TREND_STABLE = 'stable'
+TREND_SLIGHT_DOWN = 'slight_down'
+TREND_DOWN = 'down'
+
+
+def get_trend_direction(change):
+    """The direction of a trend by how much a score changed."""
+
+    if change >= 0.3:
+        return TREND_UP
+
+    if change >= 0.1:
+        return TREND_SLIGHT_UP
+
+    if change <= -0.3:
+        return TREND_DOWN
+
+    if change <= -0.1:
+        return TREND_SLIGHT_DOWN
+
+    return TREND_STABLE
+
+
+# Kinds of perception gap, see report_texts.py for their texts
+GAP_IMPOSTER_SYNDROME = 'imposter_syndrome'
+GAP_OVERCONFIDENCE = 'overconfidence'
+
+
+def get_gap_type(gap):
+    """The kind of perception gap between self-assessment and the others' average, None for a small one."""
+
+    if gap < -0.5:
+        return GAP_IMPOSTER_SYNDROME
+
+    if gap > 0.5:
+        return GAP_OVERCONFIDENCE
+
+    return None
+
+
+SEVERITY_HIGH = 'high'
+SEVERITY_MODERATE = 'moderate'
+
+
+def get_gap_severity(gap):
+    """How severe a perception gap is: high from a whole point apart."""
+
+    if abs(gap) > 1.0:
+        return SEVERITY_HIGH
+
+    return SEVERITY_MODERATE
+
+
+STRENGTH_EXCEPTIONAL = 'exceptional'
+STRENGTH_STRONG = 'strong'
+
+
+def get_strength_level(score):
+    """How strong a strength is, for an average score of at least 4."""
+
+    if score >= 4.5:
+        return STRENGTH_EXCEPTIONAL
+
+    return STRENGTH_STRONG
+
+
+PRIORITY_HIGH = 'high'
+PRIORITY_MEDIUM = 'medium'
+
+
+def get_development_priority(score):
+    """How urgent a development area is, for an average score below 3."""
+
+    if score < 2.5:
+        return PRIORITY_HIGH
+
+    return PRIORITY_MEDIUM
 
 
 def _get_previous_cycle_report(cycle):
@@ -40,24 +150,15 @@ def _get_previous_cycle_report(cycle):
 def _calculate_trend_indicator(current_score, previous_score):
     """
     Calculate trend indicator based on score change.
-    Returns: {'direction': str, 'change': float, 'symbol': str}
+    Returns: {'direction': str, 'change': float}, see report_texts.py for its symbol and label
     """
+
     if previous_score is None or current_score is None:
         return None
 
     change = current_score - previous_score
 
-    # Define thresholds
-    if change >= 0.3:
-        return {'direction': 'up', 'change': change, 'symbol': '↑', 'label': 'Improved'}
-    elif change >= 0.1:
-        return {'direction': 'slight_up', 'change': change, 'symbol': '↗', 'label': 'Slightly improved'}
-    elif change <= -0.3:
-        return {'direction': 'down', 'change': change, 'symbol': '↓', 'label': 'Declined'}
-    elif change <= -0.1:
-        return {'direction': 'slight_down', 'change': change, 'symbol': '↘', 'label': 'Slightly declined'}
-    else:
-        return {'direction': 'stable', 'change': change, 'symbol': '→', 'label': 'Stable'}
+    return {'direction': get_trend_direction(change), 'change': change}
 
 
 def _calculate_peer_benchmarks(cycle, section_summary):
@@ -264,25 +365,13 @@ def _calculate_insights(report_data):
         if others_avg is not None:
             gap = self_avg - others_avg
 
-            if gap < -0.5:
+            if gap_type := get_gap_type(gap):
                 insights['perception_gaps'].append({
-                    'type': 'imposter_syndrome',
-                    'severity': 'high' if gap < -1.0 else 'moderate',
+                    'type': gap_type,
+                    'severity': get_gap_severity(gap),
                     'self_score': round(self_avg, 2),
                     'others_score': round(others_avg, 2),
                     'gap': round(gap, 2),
-                    'message': f'Self-assessment ({self_avg:.1f}) significantly lower than others\' perception ({others_avg:.1f})',
-                    'interpretation': 'Strong performance but may undervalue own contributions'
-                })
-            elif gap > 0.5:
-                insights['perception_gaps'].append({
-                    'type': 'overconfidence',
-                    'severity': 'high' if gap > 1.0 else 'moderate',
-                    'self_score': round(self_avg, 2),
-                    'others_score': round(others_avg, 2),
-                    'gap': round(gap, 2),
-                    'message': f'Self-assessment ({self_avg:.1f}) higher than others\' perception ({others_avg:.1f})',
-                    'interpretation': 'Opportunity to align self-perception with team feedback'
                 })
 
     # Identify strengths (avg >= 4.0) and development areas (avg < 3.0)
@@ -297,7 +386,7 @@ def _calculate_insights(report_data):
                 strength = {
                     'area': section_title,
                     'others_avg': round(avg_score, 2),
-                    'level': 'exceptional' if avg_score >= 4.5 else 'strong'
+                    'level': get_strength_level(avg_score)
                 }
                 # Add self score and gap if available
                 if self_score is not None:
@@ -309,7 +398,7 @@ def _calculate_insights(report_data):
                 dev_area = {
                     'area': section_title,
                     'others_avg': round(avg_score, 2),
-                    'priority': 'high' if avg_score < 2.5 else 'medium'
+                    'priority': get_development_priority(avg_score)
                 }
                 # Add self score and gap if available
                 if self_score is not None:
@@ -351,11 +440,7 @@ def _calculate_insights(report_data):
         overall_avg = mean(others_ratings)
         insights['overall_sentiment'] = {
             'score': round(overall_avg, 2),
-            'rating': 'Outstanding' if overall_avg >= 4.5 else
-                     'Excellent' if overall_avg >= 4.0 else
-                     'Strong' if overall_avg >= 3.5 else
-                     'Developing' if overall_avg >= 3.0 else
-                     'Needs Support',
+            'rating': get_rating_key(overall_avg),
             'based_on': 'others',  # Clarify this excludes self
             'self_avg': round(mean(all_self_ratings), 2) if all_self_ratings else None
         }
@@ -445,8 +530,8 @@ def _calculate_chart_data(report_data, cycle):
                     elif question_type in ['single_choice', 'multiple_choice']:
                         # Choice questions with weights - normalize based on weight range
                         try:
-                            config = question_data.get('question_config', {})
-                            weights = config.get('weights', [])
+                            options = question_data.get('options', [])
+                            weights = [option['weight'] for option in options if option['weight'] is not None]
 
                             if weights:
                                 min_weight = min(weights)
@@ -491,6 +576,12 @@ def _calculate_chart_data(report_data, cycle):
     return chart_data
 
 
+def count_answers(option_ids):
+    """How often each option was chosen, keyed by its id as text: JSON object keys are always text."""
+
+    return {f'{option_id}': count for option_id, count in Counter(option_ids).items()}
+
+
 def generate_report(cycle):
     """Generate aggregated report for a review cycle"""
 
@@ -503,7 +594,7 @@ def generate_report(cycle):
     # Get all responses for this cycle
     responses = Response.objects.filter(cycle=cycle).select_related(
         'question', 'question__section'
-    )
+    ).prefetch_related('question__options')
 
     # Group responses by section and question
     data_by_section = defaultdict(lambda: {
@@ -512,9 +603,12 @@ def generate_report(cycle):
             'question_text': '',
             'question_type': '',
             'question_config': {},
+            'labels': {},
+            'options': [],
             'by_category': defaultdict(lambda: {
                 'responses': [],
                 'count': 0,
+                'unmapped': 0,
                 'avg': None
             })
         })
@@ -532,14 +626,23 @@ def generate_report(cycle):
         question_data['question_text'] = question.question_text
         question_data['question_type'] = question.question_type
         question_data['question_config'] = question.config  # Store config for weight calculations
+        question_data['labels'] = question.labels
+        question_data['options'] = [
+            {'id': option.id, 'label': option.label, 'weight': option.weight}
+            for option in question.options.all()
+        ]
 
         # Add response to category
         category_data = question_data['by_category'][response.category]
         category_data['responses'].append(response.answer_data.get('value'))
         category_data['count'] += 1
 
+        if response.answer_data.get('unmapped'):
+            category_data['unmapped'] += 1
+
     # Calculate averages and apply anonymity threshold
     report_data = {
+        'schema': REPORT_SCHEMA,
         'by_section': {},
         'questionnaire_id': questionnaire.id
     }
@@ -573,9 +676,12 @@ def generate_report(cycle):
                 'question_text': question_data['question_text'],
                 'question_type': question_data['question_type'],
                 'question_config': question_data['question_config'],  # Include config for labels, scales, etc.
+                'labels': question_data['labels'],
+                'options': question_data['options'],
                 'category_order': present_categories,  # Explicit ordering
                 'by_category': {}
             }
+            weight_by_id = {option['id']: option['weight'] for option in question_data['options']}
 
             for category, category_data in ordered_categories.items():
                 count = category_data['count']
@@ -586,6 +692,9 @@ def generate_report(cycle):
                     'count': count,
                     'responses': category_data['responses']
                 }
+
+                if unmapped := category_data['unmapped']:
+                    result['unmapped'] = unmapped
 
                 # Calculate average for rating, scale, and likert questions
                 if question_data['question_type'] == 'rating':
@@ -602,34 +711,24 @@ def generate_report(cycle):
                 elif question_data['question_type'] == 'likert':
                     # Convert likert text responses to numeric scores (1-indexed position in scale)
                     # Store both the text distribution and numeric average
-                    from collections import Counter
                     text_responses = [r for r in category_data['responses'] if r]
                     if text_responses:
-                        result['distribution'] = dict(Counter(text_responses))
+                        result['distribution'] = count_answers(text_responses)
                         # For numeric calculations, use position in scale (1-indexed)
                         # This allows averaging likert responses
                 elif question_data['question_type'] == 'single_choice':
                     # Store distribution of single choice responses (dropdown selection)
-                    from collections import Counter
                     text_responses = [r for r in category_data['responses'] if r]
                     if text_responses:
-                        result['distribution'] = dict(Counter(text_responses))
+                        result['distribution'] = count_answers(text_responses)
 
                         # Calculate weighted score if weights are configured
                         config = question_data.get('question_config', {})
-                        if config.get('scoring_enabled') and config.get('weights'):
-                            choices = config.get('choices', [])
-                            weights = config.get('weights', [])
-                            scores = []
-
-                            for response_text in text_responses:
-                                try:
-                                    # Find the index of the selected choice
-                                    choice_index = choices.index(response_text)
-                                    if 0 <= choice_index < len(weights):
-                                        scores.append(weights[choice_index])
-                                except (ValueError, IndexError):
-                                    pass  # Skip if choice not found or index out of range
+                        if config.get('scoring_enabled'):
+                            scores = [
+                                weight_by_id[option_id] for option_id in text_responses
+                                if weight_by_id.get(option_id) is not None
+                            ]
 
                             if scores:
                                 result['avg'] = round(sum(scores) / len(scores), 2)
@@ -637,32 +736,25 @@ def generate_report(cycle):
                 elif question_data['question_type'] == 'multiple_choice':
                     # Store distribution of multiple choice responses (checkboxes)
                     # Each response is a list of selected options, so we need to flatten
-                    from collections import Counter
                     all_selected_options = []
                     for response in category_data['responses']:
                         if response and isinstance(response, list):
                             all_selected_options.extend(response)
                     if all_selected_options:
-                        result['distribution'] = dict(Counter(all_selected_options))
+                        result['distribution'] = count_answers(all_selected_options)
 
                         # Calculate weighted score if weights are configured
                         config = question_data.get('question_config', {})
-                        if config.get('scoring_enabled') and config.get('weights'):
-                            choices = config.get('choices', [])
-                            weights = config.get('weights', [])
+                        if config.get('scoring_enabled'):
                             response_scores = []
 
                             # For each response (which is a list of selected choices)
                             for response in category_data['responses']:
                                 if response and isinstance(response, list):
-                                    selected_weights = []
-                                    for selected_choice in response:
-                                        try:
-                                            choice_index = choices.index(selected_choice)
-                                            if 0 <= choice_index < len(weights):
-                                                selected_weights.append(weights[choice_index])
-                                        except (ValueError, IndexError):
-                                            pass
+                                    selected_weights = [
+                                        weight_by_id[option_id] for option_id in response
+                                        if weight_by_id.get(option_id) is not None
+                                    ]
 
                                     # Sum the weights for this response (not average)
                                     # This rewards selecting more positive attributes
@@ -832,9 +924,11 @@ def send_report_ready_notification(report, request=None):
 
     try:
         with translation.override(recipient_language(reviewee.language, organization=reviewee.organization)):
+            questionnaire = cycle.questionnaire.translated()
             context = {
                 'reviewee': reviewee,
                 'cycle': cycle,
+                'questionnaire_name': questionnaire.name,
                 'report_url': report_url,
                 'response_count': response_count,
             }

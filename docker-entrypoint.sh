@@ -43,15 +43,16 @@ else
   echo "Using SQLite database - no connection wait needed"
 fi
 
+echo "Compiling translations..."
+# Non-fatal: a malformed .po file must not prevent the container from starting.
+# Before the upgrade steps, which read the translations of the shipped questionnaires.
+python manage.py compilemessages || echo "WARNING: compilemessages failed, using existing .mo files"
+
 echo "Running database migrations..."
 python manage.py migrate --noinput
 
 echo "Running upgrade steps..."
 python manage.py upgrade
-
-echo "Compiling translations..."
-# Non-fatal: a malformed .po file must not prevent the container from starting.
-python manage.py compilemessages || echo "WARNING: compilemessages failed, using existing .mo files"
 
 echo "Collecting static files..."
 python manage.py collectstatic --noinput --clear

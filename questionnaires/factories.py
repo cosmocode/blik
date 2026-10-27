@@ -3,6 +3,7 @@ Factory definitions for questionnaire models
 """
 import factory
 from factory.django import DjangoModelFactory
+from .answer_options import DEFAULT_LIKERT_SCALE, save_options
 from .models import Questionnaire, QuestionSection, Question
 from core.factories import OrganizationFactory
 
@@ -44,11 +45,11 @@ class QuestionFactory(DjangoModelFactory):
     config = factory.LazyFunction(lambda: {
         'min': 1,
         'max': 5,
-        'labels': {
-            '1': 'Poor',
-            '3': 'Average',
-            '5': 'Excellent'
-        }
+    })
+    labels = factory.LazyFunction(lambda: {
+        '1': 'Poor',
+        '3': 'Average',
+        '5': 'Excellent'
     })
     required = True
     order = factory.Sequence(lambda n: n)
@@ -61,11 +62,11 @@ class RatingQuestionFactory(QuestionFactory):
     config = factory.LazyFunction(lambda: {
         'min': 1,
         'max': 5,
-        'labels': {
-            '1': 'Needs improvement',
-            '3': 'Meets expectations',
-            '5': 'Exceeds expectations'
-        }
+    })
+    labels = factory.LazyFunction(lambda: {
+        '1': 'Needs improvement',
+        '3': 'Meets expectations',
+        '5': 'Exceeds expectations'
     })
 
 
@@ -80,12 +81,12 @@ class LikertQuestionFactory(QuestionFactory):
     """Factory for Likert scale questions"""
 
     question_type = 'likert'
-    config = factory.LazyFunction(lambda: {
-        'scale': [
-            'Strongly Disagree',
-            'Disagree',
-            'Neutral',
-            'Agree',
-            'Strongly Agree'
-        ]
-    })
+    config = {}
+
+    @factory.post_generation
+    def answer_options(self, create, extracted, **kwargs):
+        """The default five-point scale, or the labels passed as answer_options=[...]."""
+
+        if create:
+            labels = extracted or DEFAULT_LIKERT_SCALE
+            save_options(self, [(None, label, None) for label in labels])

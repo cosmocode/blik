@@ -9,6 +9,7 @@ from accounts.models import UserProfile, Reviewee
 from reviews.models import ReviewCycle, ReviewerToken, Response
 from reports.models import Report
 from questionnaires.models import Questionnaire
+from questionnaires.translations import get_translations_data
 from subscriptions.models import Subscription
 from subscriptions.services import cancel_subscription_immediately
 
@@ -57,11 +58,16 @@ def export_organization_data(organization):
         })
 
     # Export questionnaires
-    for questionnaire in Questionnaire.objects.for_organization(organization).prefetch_related('sections__questions'):
+    questionnaires = Questionnaire.objects.for_organization(organization)
+
+    for questionnaire in questionnaires.prefetch_related(*Questionnaire.translation_lookups()):
         q_data = {
             'name': questionnaire.name,
             'description': questionnaire.description,
             'is_active': questionnaire.is_active,
+            'source_language': questionnaire.source_language,
+            'template_key': questionnaire.template_key,
+            'translations': get_translations_data(questionnaire),
             'sections': []
         }
         for section in questionnaire.sections.all():
@@ -69,15 +75,21 @@ def export_organization_data(organization):
                 'title': section.title,
                 'description': section.description,
                 'order': section.order,
+                'translations': get_translations_data(section),
                 'questions': []
             }
             for question in section.questions.all():
+                options = zip(question.options_data, question.options.all())
                 s_data['questions'].append({
                     'question_text': question.question_text,
                     'question_type': question.question_type,
                     'config': question.config,
+                    'options': [{**data, 'translations': get_translations_data(option)} for data, option in options],
+                    'labels': question.labels,
+                    'action_items': question.action_items,
                     'required': question.required,
                     'order': question.order,
+                    'translations': get_translations_data(question),
                 })
             q_data['sections'].append(s_data)
         data['questionnaires'].append(q_data)

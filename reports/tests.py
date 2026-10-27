@@ -4,6 +4,7 @@ from django.test import RequestFactory, TestCase, override_settings
 from django.contrib.auth.models import User
 from core.models import Organization
 from accounts.models import UserProfile, Reviewee
+from questionnaires.legacy_config import move_texts_out_of_config
 from questionnaires.models import Questionnaire, QuestionSection, Question
 from reviews.models import ReviewCycle, ReviewerToken, Response
 from .services import generate_report, apply_display_anonymization
@@ -365,10 +366,12 @@ class AnonymizationArchitectureTestCase(TestCase):
             },
             order=3
         )
+        move_texts_out_of_config(weighted_question)
+        option_ids = {option.label: option.id for option in weighted_question.options.all()}
 
-        # Create 2 peer responses
-        self._create_response('peer', weighted_question, "Advanced")
-        self._create_response('peer', weighted_question, "Expert")
+        # Create 2 peer responses (answers store the option id, not the label)
+        self._create_response('peer', weighted_question, option_ids['Advanced'])
+        self._create_response('peer', weighted_question, option_ids['Expert'])
 
         # Generate report
         report = generate_report(self.cycle)

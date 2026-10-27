@@ -4,7 +4,10 @@ from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.core.management import call_command
 from core.models import Organization
-from .models import Questionnaire, QuestionSection, Question
+from .legacy_config import move_all_texts_out_of_config
+from .models import AnswerOption, Questionnaire, QuestionSection, Question
+from .shipped import add_shipped_translations
+from .translations import copy_translations
 import logging
 import uuid
 
@@ -29,8 +32,11 @@ def clone_questionnaire_for_organization(questionnaire, organization):
         name=questionnaire.name,
         description=questionnaire.description,
         is_default=False,  # Only templates should be marked as default
-        is_active=questionnaire.is_active
+        is_active=questionnaire.is_active,
+        source_language=questionnaire.source_language,
+        template_key=questionnaire.template_key,
     )
+    copy_translations(questionnaire.translations.all(), cloned_questionnaire)
 
     # Clone all sections
     sections = QuestionSection.objects.filter(questionnaire_id=original_pk).order_by('order')
@@ -38,21 +44,33 @@ def clone_questionnaire_for_organization(questionnaire, organization):
 
     for section in sections:
         original_section_pk = section.pk
+        translations = list(section.translations.all())
         section.pk = None
         section.id = None
         section.questionnaire = cloned_questionnaire
         section.save()
+        copy_translations(translations, section)
         section_mapping[original_section_pk] = section
 
     # Clone all questions
     for original_section_pk, cloned_section in section_mapping.items():
         questions = Question.objects.filter(section_id=original_section_pk).order_by('order')
         for question in questions:
+            translations = list(question.translations.all())
+            options = list(question.options.prefetch_related('translations'))
             question.pk = None
             question.id = None
             question.uuid = uuid.uuid4()  # Generate a new UUID
             question.section = cloned_section
             question.save()
+            copy_translations(translations, question)
+            cloned_options = AnswerOption.objects.bulk_create([
+                AnswerOption(question=question, order=option.order, label=option.label, weight=option.weight)
+                for option in options
+            ])
+
+            for option, cloned_option in zip(options, cloned_options):
+                copy_translations(option.translations.all(), cloned_option)
 
     return cloned_questionnaire
 
@@ -90,6 +108,8 @@ def load_default_questionnaire_fixtures(sender, **kwargs):
         except Exception as e:
             logger.warning(f"⚠ Could not load {fixture}: {e}")
 
+    move_all_texts_out_of_config()
+    add_shipped_translations()
     logger.info("Default questionnaire fixtures loaded successfully")
 
 

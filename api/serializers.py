@@ -8,9 +8,22 @@ from rest_framework import serializers
 from django.db.models import Count, Q
 from accounts.models import Reviewee
 from reviews.models import CATEGORY_ORDER, ReviewCycle, ReviewerToken, Response
-from questionnaires.models import Questionnaire, QuestionSection, Question
+from questionnaires.legacy_config import config_with_texts
+from questionnaires.models import AnswerOption, Questionnaire, QuestionSection, Question
+from questionnaires.placeholders import personalize
 from reports.models import Report
+from reports.report_texts import with_texts
 from .models import APIToken, WebhookEndpoint, WebhookDelivery
+
+
+class TranslatedSerializerMixin:
+    """Serializes the object translated into the language in the context, where the view puts one there."""
+
+    def to_representation(self, instance):
+        if language := self.context.get("language"):
+            instance = instance.translated(language)
+
+        return super().to_representation(instance)
 
 
 # =============================================================================
@@ -80,8 +93,18 @@ class RevieweeListSerializer(serializers.ModelSerializer):
 # =============================================================================
 
 
+class AnswerOptionSerializer(serializers.ModelSerializer):
+    """Serializer for the options of likert and choice questions."""
+
+    class Meta:
+        model = AnswerOption
+        fields = ["id", "label"]
+
+
 class QuestionSerializer(serializers.ModelSerializer):
     """Serializer for individual questions."""
+
+    options = AnswerOptionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Question
@@ -90,6 +113,8 @@ class QuestionSerializer(serializers.ModelSerializer):
             "question_text",
             "question_type",
             "config",
+            "options",
+            "labels",
             "required",
             "order",
             "section",
@@ -98,14 +123,8 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        reviewee_name = self.context.get("reviewee_name")
-        if reviewee_name:
-            first_name = reviewee_name.split()[0]
-            data["question_text"] = (
-                data["question_text"]
-                .replace("This person", first_name)
-                .replace("this person", first_name)
-            )
+        data["config"] = config_with_texts(instance)
+        data["question_text"] = personalize(data["question_text"], self.context.get("reviewee_name"))
         return data
 
 
@@ -120,7 +139,7 @@ class QuestionSectionSerializer(serializers.ModelSerializer):
         read_only_fields = []
 
 
-class QuestionnaireSerializer(serializers.ModelSerializer):
+class QuestionnaireSerializer(TranslatedSerializerMixin, serializers.ModelSerializer):
     """
     Full questionnaire serializer with sections and questions.
     """
@@ -134,6 +153,7 @@ class QuestionnaireSerializer(serializers.ModelSerializer):
             "uuid",
             "name",
             "description",
+            "source_language",
             "is_default",
             "is_active",
             "created_at",
@@ -148,12 +168,12 @@ class QuestionnaireSerializer(serializers.ModelSerializer):
         return sum(section.questions.count() for section in obj.sections.all())
 
 
-class QuestionnaireListSerializer(serializers.ModelSerializer):
+class QuestionnaireListSerializer(TranslatedSerializerMixin, serializers.ModelSerializer):
     """Minimal serializer for questionnaire lists."""
 
     class Meta:
         model = Questionnaire
-        fields = ["uuid", "name", "description", "is_default", "is_active"]
+        fields = ["uuid", "name", "description", "source_language", "is_default", "is_active"]
 
 
 # =============================================================================
@@ -476,6 +496,12 @@ class ReportSerializer(serializers.ModelSerializer):
             if self.context["view"].action == "list":
                 data.pop("access_token", None)
                 data.pop("report_data", None)  # Too large for lists
+
+        # Clients read the texts of the report, not the codes it stores
+        if "report_data" in data:
+            data["report_data"] = with_texts(
+                instance.report_data, instance.cycle.questionnaire, instance.cycle.reviewee.name
+            )
 
         return data
 

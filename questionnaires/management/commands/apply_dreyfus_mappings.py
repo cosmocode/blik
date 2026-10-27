@@ -201,7 +201,7 @@ class Command(BaseCommand):
                     if dry_run:
                         old_desc = f' (was: {current})' if current else ''
                         self.stdout.write(
-                            f'  Would update: "{question.question_text[:60]}..." '
+                            f'  Would update: "{question.short_text}" '
                             f'-> {mapping}{old_desc}'
                         )
                     else:
@@ -249,10 +249,8 @@ class Command(BaseCommand):
                     continue
 
                 if dry_run:
-                    self.stdout.write(
-                        f'  Would fix: "{question.question_text[:50]}..." '
-                        f'-> "{new_text[:50]}..."'
-                    )
+                    short_new_text = Question(question_text=new_text).short_text
+                    self.stdout.write(f'  Would fix: "{question.short_text}" -> "{short_new_text}"')
                 else:
                     question.question_text = new_text
                     question.save(update_fields=['question_text'])

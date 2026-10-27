@@ -64,6 +64,16 @@
                         {{ questionnaire.created_at|date:'SHORT_DATE_FORMAT' }}
                     </div>
                 </div>
+                {% if questionnaire.translation_states %}
+                <div>
+                    <div style="font-size: 0.875rem; color: #64748b; margin-bottom: 0.25rem;">{% trans 'Translations' %}</div>
+                    {% for state in questionnaire.translation_states %}
+                    <div style="font-size: 0.875rem; color: var(--text-primary);">
+                        {{ state.name }}: {% include 'admin_dashboard/partials/translation_state.html' %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>

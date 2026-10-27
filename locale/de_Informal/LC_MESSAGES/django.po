@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-20 15:33+0000\n"
+"POT-Creation-Date: 2026-10-26 14:26+0000\n"
 "Language: de_Informal\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -841,9 +841,6 @@ msgstr ""
 msgid "Review cycle created for \"%(name)s\" using \"%(questionnaire)s\" with %(count)s reviewer token(s). Go to the cycle details to assign reviewers and send invitations."
 msgstr ""
 
-msgid "Continue deepening expertise and innovating"
-msgstr ""
-
 msgid "Pair with a more senior teammate on a challenging problem this sprint"
 msgstr ""
 
@@ -863,6 +860,10 @@ msgstr ""
 #, python-format
 msgid "Error creating questionnaire: %(error)s"
 msgstr ""
+
+#, python-format
+msgid "This questionnaire is already translated into %(language)s. Empty that translation first to make %(language)s its source language."
+msgstr "Für %(language)s gibt es bereits eine Übersetzung dieses Fragebogens. Leere sie zuerst, um %(language)s zur Ausgangssprache zu machen."
 
 #, python-format
 msgid "Questionnaire \"%(name)s\" updated successfully."
@@ -889,9 +890,6 @@ msgstr ""
 
 #, python-format
 msgid "Error updating section: %(error)s"
-msgstr ""
-
-msgid "Weights count did not match choices count. Scoring disabled for this question."
 msgstr ""
 
 msgid "Invalid weight values. Scoring disabled for this question."
@@ -935,6 +933,9 @@ msgstr ""
 
 #, python-format
 msgid "Error updating Dreyfus configuration: %(error)s"
+msgstr ""
+
+msgid "Translation saved."
 msgstr ""
 
 #, python-format
@@ -1684,10 +1685,31 @@ msgstr ""
 msgid "Question"
 msgstr ""
 
+msgid "Strongly Disagree"
+msgstr ""
+
+msgid "Disagree"
+msgstr ""
+
+msgid "Neutral"
+msgstr ""
+
+msgid "Agree"
+msgstr ""
+
+msgid "Strongly Agree"
+msgstr ""
+
 msgid "description"
 msgstr ""
 
 msgid "default"
+msgstr ""
+
+msgid "source language"
+msgstr ""
+
+msgid "template key"
 msgstr ""
 
 msgid "questionnaire"
@@ -1744,6 +1766,9 @@ msgstr ""
 msgid "configuration"
 msgstr ""
 
+msgid "labels"
+msgstr ""
+
 msgid "action items"
 msgstr ""
 
@@ -1754,6 +1779,77 @@ msgid "question"
 msgstr ""
 
 msgid "questions"
+msgstr ""
+
+msgid "label"
+msgstr ""
+
+msgid "weight"
+msgstr ""
+
+msgid "answer option"
+msgstr ""
+
+msgid "answer options"
+msgstr ""
+
+msgid "source checksums"
+msgstr ""
+
+msgid "questionnaire translation"
+msgstr ""
+
+msgid "questionnaire translations"
+msgstr ""
+
+msgid "section translation"
+msgstr ""
+
+msgid "section translations"
+msgstr ""
+
+msgid "question translation"
+msgstr ""
+
+msgid "question translations"
+msgstr ""
+
+msgid "answer option translation"
+msgstr ""
+
+msgid "answer option translations"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Section title"
+msgstr ""
+
+msgid "Section description"
+msgstr ""
+
+msgid "Action item"
+msgstr ""
+
+msgid "Answer option"
+msgstr ""
+
+msgid "Label of the lowest value"
+msgstr ""
+
+msgid "Label of the highest value"
+msgstr ""
+
+#, python-format
+msgid "Label of rating %(value)s"
+msgstr ""
+
+#, python-format
+msgid "The translation of \"%(text)s\" is longer than %(max_length)s characters."
 msgstr ""
 
 msgid "No expiry"
@@ -1776,6 +1872,427 @@ msgstr ""
 msgid "Token Expiration"
 msgstr ""
 
+msgid "Novice"
+msgstr ""
+
+msgid "Rigid rule follower"
+msgstr ""
+
+msgid "Follows rules rigidly, needs detailed instructions and close guidance"
+msgstr ""
+
+msgid "Requires step-by-step instructions"
+msgstr ""
+
+msgid "Follows rules without understanding context"
+msgstr ""
+
+msgid "Needs close supervision"
+msgstr ""
+
+msgid "Limited ability to recognize patterns"
+msgstr ""
+
+msgid "Task-focused rather than goal-focused"
+msgstr ""
+
+msgid "Asks for detailed procedures"
+msgstr ""
+
+msgid "Struggles with unexpected situations"
+msgstr ""
+
+msgid "Focuses on individual steps"
+msgstr ""
+
+msgid "Needs explicit direction for each task"
+msgstr ""
+
+msgid "Advanced Beginner"
+msgstr ""
+
+msgid "Recognizes patterns, needs guidelines"
+msgstr ""
+
+msgid "Can handle simple tasks independently, recognizes recurring patterns"
+msgstr ""
+
+msgid "Recognizes situational patterns"
+msgstr ""
+
+msgid "Handles routine tasks independently"
+msgstr ""
+
+msgid "Needs guidelines for non-standard situations"
+msgstr ""
+
+msgid "Starts to see similarities across problems"
+msgstr ""
+
+msgid "Still struggles with complex decisions"
+msgstr ""
+
+msgid "Can work independently on familiar tasks"
+msgstr ""
+
+msgid "Asks for guidance on edge cases"
+msgstr ""
+
+msgid "Identifies when something looks wrong"
+msgstr ""
+
+msgid "Follows established patterns"
+msgstr ""
+
+msgid "Competent"
+msgstr ""
+
+msgid "Develops mental models, takes responsibility"
+msgstr ""
+
+msgid "Plans deliberately, solves standard problems, takes ownership"
+msgstr ""
+
+msgid "Creates mental models of the domain"
+msgstr ""
+
+msgid "Plans work deliberately"
+msgstr ""
+
+msgid "Takes responsibility for outcomes"
+msgstr ""
+
+msgid "Solves standard problems independently"
+msgstr ""
+
+msgid "Makes conscious, reasoned decisions"
+msgstr ""
+
+msgid "Troubleshoots problems systematically"
+msgstr ""
+
+msgid "Prioritizes and plans work"
+msgstr ""
+
+msgid "Takes ownership of results"
+msgstr ""
+
+msgid "Follows through on commitments"
+msgstr ""
+
+msgid "Proficient"
+msgstr ""
+
+msgid "Sees the big picture, learns from others"
+msgstr ""
+
+msgid "Sees the big picture, recognizes patterns quickly, handles complexity"
+msgstr ""
+
+msgid "Sees the big picture and context"
+msgstr ""
+
+msgid "Recognizes patterns and deviations quickly"
+msgstr ""
+
+msgid "Learns from others experiences"
+msgstr ""
+
+msgid "Handles complex situations effectively"
+msgstr ""
+
+msgid "Knows when to break the rules"
+msgstr ""
+
+msgid "Quickly identifies root causes"
+msgstr ""
+
+msgid "Anticipates problems before they occur"
+msgstr ""
+
+msgid "Adapts approaches to context"
+msgstr ""
+
+msgid "Mentors less experienced team members"
+msgstr ""
+
+msgid "Expert"
+msgstr ""
+
+msgid "Intuitive, creates new approaches"
+msgstr ""
+
+msgid "Works from intuition, creates novel solutions, recognized authority"
+msgstr ""
+
+msgid "Works from intuition and deep understanding"
+msgstr ""
+
+msgid "Creates new approaches and solutions"
+msgstr ""
+
+msgid "Recognized as domain authority"
+msgstr ""
+
+msgid "Sees possibilities others miss"
+msgstr ""
+
+msgid "Operates at a transcendent level"
+msgstr ""
+
+msgid "Solves problems others cannot"
+msgstr ""
+
+msgid "Innovates and creates best practices"
+msgstr ""
+
+msgid "Trusted for most difficult challenges"
+msgstr ""
+
+msgid "Shapes the direction of the field"
+msgstr ""
+
+msgid "Directed"
+msgstr ""
+
+msgid "Waits for explicit instructions and direction"
+msgstr ""
+
+msgid "Assisted"
+msgstr ""
+
+msgid "Takes initiative when prompted or guided"
+msgstr ""
+
+msgid "Independent"
+msgstr ""
+
+msgid "Proactively identifies and addresses problems"
+msgstr ""
+
+msgid "Proactive"
+msgstr ""
+
+msgid "Regularly proposes improvements and drives change"
+msgstr ""
+
+msgid "Self-Driven"
+msgstr ""
+
+msgid "Self-directed achiever who consistently improves systems"
+msgstr ""
+
+msgid "Developing Contributor"
+msgstr ""
+
+msgid "Building foundational skills and learning to work independently"
+msgstr ""
+
+msgid "Early in career or role"
+msgstr ""
+
+msgid "Requires guidance and support"
+msgstr ""
+
+msgid "Building fundamental capabilities"
+msgstr ""
+
+msgid "Needs structured development"
+msgstr ""
+
+msgid "Focus on building core skills through deliberate practice and seeking guidance. Work on taking more initiative on familiar tasks."
+msgstr ""
+
+msgid "Hungry Learner"
+msgstr ""
+
+msgid "High initiative but developing expertise - eager to learn and contribute"
+msgstr ""
+
+msgid "Strong drive and motivation"
+msgstr ""
+
+msgid "Seeks opportunities to grow"
+msgstr ""
+
+msgid "May overcommit without experience"
+msgstr ""
+
+msgid "Benefits from mentorship"
+msgstr ""
+
+msgid "Channel your energy into deliberate skill development. Seek mentorship from experts. Balance enthusiasm with building depth."
+msgstr ""
+
+msgid "Specialist"
+msgstr ""
+
+msgid "Deep expertise but waits for direction - valuable contributor when engaged"
+msgstr ""
+
+msgid "Strong technical capabilities"
+msgstr ""
+
+msgid "Reliable when given clear objectives"
+msgstr ""
+
+msgid "Prefers depth over breadth"
+msgstr ""
+
+msgid "May need encouragement to lead"
+msgstr ""
+
+msgid "Build confidence in taking initiative. Start with small ownership opportunities. Share your expertise proactively."
+msgstr ""
+
+msgid "Force Multiplier"
+msgstr ""
+
+msgid "High skill and high initiative - drives team success and innovation"
+msgstr ""
+
+msgid "Combines expertise with initiative"
+msgstr ""
+
+msgid "Mentors and elevates others"
+msgstr ""
+
+msgid "Drives meaningful improvements"
+msgstr ""
+
+msgid "Trusted for complex challenges"
+msgstr ""
+
+msgid "Continue expanding your impact. Focus on strategic initiatives and developing others. Consider broader leadership roles."
+msgstr ""
+
+msgid "Build foundational skills through deliberate practice and close guidance from experienced mentors."
+msgstr ""
+
+msgid "Develop deeper pattern recognition and start building mental models of your domain."
+msgstr ""
+
+msgid "Expand your perspective to see the bigger picture and learn from diverse experiences."
+msgstr ""
+
+msgid "Deepen intuition through extensive practice and begin creating novel approaches."
+msgstr ""
+
+msgid "Continue innovating and sharing your expertise to advance the field."
+msgstr ""
+
+msgid "Seek feedback on your work early and often"
+msgstr ""
+
+msgid "Study examples of good work in your domain"
+msgstr ""
+
+msgid "Practice deliberate problem-solving with guidance"
+msgstr ""
+
+msgid "Take ownership of a complete project or feature"
+msgstr ""
+
+msgid "Learn from colleagues at different skill levels"
+msgstr ""
+
+msgid "Document your decision-making process"
+msgstr ""
+
+msgid "Mentor someone less experienced"
+msgstr ""
+
+msgid "Share your knowledge through documentation or talks"
+msgstr ""
+
+msgid "Tackle a novel problem in your domain"
+msgstr ""
+
+msgid "Structured learning programs or courses"
+msgstr ""
+
+msgid "Regular mentorship sessions"
+msgstr ""
+
+msgid "Code reviews and pair programming"
+msgstr ""
+
+msgid "Cross-functional projects"
+msgstr ""
+
+msgid "Technical leadership opportunities"
+msgstr ""
+
+msgid "Industry conferences and communities"
+msgstr ""
+
+msgid "Research and innovation projects"
+msgstr ""
+
+msgid "Teaching and mentoring opportunities"
+msgstr ""
+
+msgid "Speaking at conferences or writing articles"
+msgstr ""
+
+msgid "Take more initiative on projects - your skills are ready for more ownership"
+msgstr ""
+
+msgid "Focus on deepening your technical expertise to match your initiative"
+msgstr ""
+
+msgid "Continue deepening expertise and innovating"
+msgstr ""
+
+#, python-format
+msgid "Develop capabilities of a %(stage)s: %(description)s"
+msgstr ""
+
+msgid "Build experience across diverse situations"
+msgstr ""
+
+msgid "Continuously reflect on your practice and learning"
+msgstr ""
+
+msgid "Recognize recurring patterns in your work"
+msgstr ""
+
+msgid "Handle routine tasks independently"
+msgstr ""
+
+msgid "Build situational awareness beyond just following rules"
+msgstr ""
+
+msgid "Develop mental models of how things work"
+msgstr ""
+
+msgid "Take responsibility for outcomes, not just tasks"
+msgstr ""
+
+msgid "Plan and prioritize work deliberately"
+msgstr ""
+
+msgid "See the big picture and system context"
+msgstr ""
+
+msgid "Learn from others' experiences, not just your own"
+msgstr ""
+
+msgid "Recognize patterns and deviations quickly"
+msgstr ""
+
+msgid "Trust your intuition based on deep experience"
+msgstr ""
+
+msgid "Create novel approaches and solutions"
+msgstr ""
+
+msgid "Become a recognized authority in your domain"
+msgstr ""
+
+msgid "Continue developing expertise"
+msgstr ""
+
 msgid "review cycle"
 msgstr ""
 
@@ -1794,22 +2311,22 @@ msgstr ""
 msgid "available"
 msgstr ""
 
-msgid "Expiration date for access token"
-msgstr ""
-
 msgid "access token expires"
 msgstr ""
 
-msgid "Last time report was accessed"
+msgid "Expiration date for access token"
 msgstr ""
 
 msgid "last accessed"
 msgstr ""
 
-msgid "Number of times report has been accessed"
+msgid "Last time report was accessed"
 msgstr ""
 
 msgid "access count"
+msgstr ""
+
+msgid "Number of times report has been accessed"
 msgstr ""
 
 msgid "report"
@@ -1820,6 +2337,65 @@ msgstr ""
 
 #, python-format
 msgid "Report for %(cycle)s"
+msgstr ""
+
+msgid "Improved"
+msgstr ""
+
+msgid "Slightly improved"
+msgstr ""
+
+msgid "Stable"
+msgstr ""
+
+msgid "Slightly declined"
+msgstr ""
+
+msgid "Declined"
+msgstr ""
+
+#, python-format
+msgid "Self-assessment (%(self)s) significantly lower than others' perception (%(others)s)"
+msgstr ""
+
+msgid "Strong performance but may undervalue own contributions"
+msgstr ""
+
+#, python-format
+msgid "Self-assessment (%(self)s) higher than others' perception (%(others)s)"
+msgstr ""
+
+msgid "Opportunity to align self-perception with team feedback"
+msgstr ""
+
+msgid "Outstanding (4.5+)"
+msgstr ""
+
+msgid "Excellent (4.0-4.4)"
+msgstr ""
+
+msgid "Strong (3.5-3.9)"
+msgstr ""
+
+msgid "Developing (3.0-3.4)"
+msgstr ""
+
+msgid "Needs Support (below 3.0)"
+msgstr ""
+
+msgid "Outstanding"
+msgstr ""
+
+msgid "Excellent"
+msgstr ""
+
+msgid "Strong"
+msgstr ""
+
+msgid "Developing"
+msgstr ""
+
+msgid "Needs Support"
 msgstr ""
 
 #, python-format
@@ -2030,6 +2606,10 @@ msgid "Question \"%(question)s\" is required"
 msgstr ""
 
 #, python-format
+msgid "Invalid option for question \"%(question)s\""
+msgstr ""
+
+#, python-format
 msgid "Rating must be between %(min)s and %(max)s"
 msgstr ""
 
@@ -2085,10 +2665,10 @@ msgstr ""
 msgid "monthly price"
 msgstr ""
 
-msgid "Maximum total: reviewees + team members combined"
+msgid "maximum employees"
 msgstr ""
 
-msgid "maximum employees"
+msgid "Maximum total: reviewees + team members combined"
 msgstr ""
 
 msgid "Stripe price ID"
@@ -2696,9 +3276,6 @@ msgstr ""
 msgid "Reviewees (%(count)s)"
 msgstr ""
 
-msgid "Name"
-msgstr ""
-
 msgid "Department"
 msgstr ""
 
@@ -2955,6 +3532,13 @@ msgstr ""
 msgid "Ask an organization administrator to buy another round."
 msgstr ""
 
+#, python-brace-format
+msgid "{name} stands for the first name of the person reviewed."
+msgstr ""
+
+msgid "Add option"
+msgstr ""
+
 #, python-format
 msgid "Type: %(type)s"
 msgstr ""
@@ -2980,6 +3564,21 @@ msgid "Delete this question?"
 msgstr ""
 
 msgid "Delete"
+msgstr ""
+
+#, python-format
+msgid "%(counter)s text missing"
+msgid_plural "%(counter)s texts missing"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%(counter)s outdated"
+msgid_plural "%(counter)s outdated"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Fully translated"
 msgstr ""
 
 msgid "Delete Product Review"
@@ -3294,6 +3893,9 @@ msgstr ""
 msgid "Comprehensive feedback covering leadership, communication, and technical skills"
 msgstr ""
 
+msgid "The language the questionnaire is written in. Translations into other languages are made from its texts."
+msgstr ""
+
 msgid "Set as default questionnaire"
 msgstr ""
 
@@ -3301,6 +3903,12 @@ msgid "Update Information"
 msgstr ""
 
 msgid "Preview"
+msgstr ""
+
+msgid "Translations"
+msgstr ""
+
+msgid "Translate"
 msgstr ""
 
 msgid "Edit Section"
@@ -3379,7 +3987,10 @@ msgstr ""
 msgid "Multiple Choice (Checkboxes)"
 msgstr ""
 
-msgid "Likert Scale Items (one per line)"
+msgid "Rating labels"
+msgstr ""
+
+msgid "Likert Scale Items"
 msgstr ""
 
 msgid "Scale Configuration"
@@ -3407,13 +4018,10 @@ msgstr ""
 msgid "e.g., Extremely"
 msgstr ""
 
-msgid "Choices (one per line)"
+msgid "Choices"
 msgstr ""
 
 msgid "Enable numeric scoring for analytics"
-msgstr ""
-
-msgid "Assign weights to each option (for scoring)"
 msgstr ""
 
 msgid "Required question"
@@ -3434,7 +4042,8 @@ msgstr ""
 msgid "Add Question to This Section"
 msgstr ""
 
-msgid "How effectively does this person communicate complex ideas?"
+#, python-brace-format
+msgid "How effectively does {name} communicate complex ideas?"
 msgstr ""
 
 msgid "Default 5-point scale provided. Customize or use 3-point, 7-point, etc."
@@ -3443,16 +4052,10 @@ msgstr ""
 msgid "Creates a slider or numeric input for precise measurement (e.g., 1-100 scale)."
 msgstr ""
 
-msgid "Option 1&#10;Option 2&#10;Option 3"
-msgstr ""
-
 msgid "When enabled, this question will contribute to section scores and charts"
 msgstr ""
 
 msgid "Learn more about scoring"
-msgstr ""
-
-msgid "Assign numeric values (e.g., 1-5 scale) to measure this dimension"
 msgstr ""
 
 msgid "Dreyfus/Agency Configuration (Optional)"
@@ -3477,15 +4080,6 @@ msgid "Define action items for development plans when this question scores low"
 msgstr ""
 
 msgid "Add Question"
-msgstr ""
-
-msgid "Option"
-msgstr ""
-
-msgid "Weight"
-msgstr ""
-
-msgid "(empty)"
 msgstr ""
 
 #, python-format
@@ -3660,6 +4254,21 @@ msgstr ""
 msgid "Questions about leadership style, decision-making, and team management"
 msgstr ""
 
+msgid "Option"
+msgstr ""
+
+msgid "Weight"
+msgstr ""
+
+msgid "Move up"
+msgstr ""
+
+msgid "Move down"
+msgstr ""
+
+msgid "Remove option"
+msgstr ""
+
 msgid "Request failed."
 msgstr ""
 
@@ -3749,6 +4358,9 @@ msgstr ""
 msgid "Preview: %(name)s"
 msgstr ""
 
+msgid "Preview language"
+msgstr ""
+
 msgid "Rating scale:"
 msgstr ""
 
@@ -3821,6 +4433,29 @@ msgid "Performance breakdown by competency area"
 msgstr ""
 
 msgid "Overall score (excluding self-assessment)"
+msgstr ""
+
+#, python-format
+msgid "Translate %(name)s into %(language)s"
+msgstr ""
+
+#, python-format
+msgid "Translate into %(language)s"
+msgstr ""
+
+msgid "Back to Editor"
+msgstr ""
+
+msgid "Missing"
+msgstr ""
+
+msgid "Outdated"
+msgstr ""
+
+msgid "Still correct"
+msgstr ""
+
+msgid "Save Translation"
 msgstr ""
 
 msgid "Submit Your Review"
@@ -4944,22 +5579,10 @@ msgstr ""
 msgid "Dreyfus Model of Skill Acquisition"
 msgstr ""
 
-msgid "Novice"
-msgstr ""
-
 msgid "Advanced"
 msgstr ""
 
 msgid "Beginner"
-msgstr ""
-
-msgid "Competent"
-msgstr ""
-
-msgid "Proficient"
-msgstr ""
-
-msgid "Expert"
 msgstr ""
 
 msgid "Rigid rule"
@@ -5596,18 +6219,6 @@ msgstr ""
 msgid "To Reach Level %(level)s:"
 msgstr ""
 
-msgid "Assisted"
-msgstr ""
-
-msgid "Independent"
-msgstr ""
-
-msgid "Proactive"
-msgstr ""
-
-msgid "Self-Driven"
-msgstr ""
-
 msgid "When reporting problems, investigate root causes"
 msgstr ""
 
@@ -5693,6 +6304,12 @@ msgstr ""
 #, python-format
 msgid "%(counter)s response"
 msgid_plural "%(counter)s responses"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%(counter)s answer could not be matched to an option, because the question changed after it was given."
+msgid_plural "%(counter)s answers could not be matched to an option, because the question changed after they were given."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -5810,21 +6427,6 @@ msgstr ""
 
 msgid "How your self-assessment compares to others' feedback (sorted by gap size)"
 msgstr "Deine Selbsteinschätzung im Vergleich zum Feedback der anderen (nach Größe der Abweichung sortiert)"
-
-msgid "Excellent (4.5+)"
-msgstr ""
-
-msgid "Strong (3.5-4.4)"
-msgstr ""
-
-msgid "Good (2.6-3.4)"
-msgstr ""
-
-msgid "Developing (2.0-2.5)"
-msgstr ""
-
-msgid "Needs Development (&lt;2.0)"
-msgstr ""
 
 #, python-format
 msgid "Comparison vs %(count)s peers"

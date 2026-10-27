@@ -32,7 +32,8 @@ class EditQuestionTests(TestCase):
             section=section,
             question_text='How effectively does this person solve problems?',
             question_type='rating',
-            config={'min': 1, 'max': 5, 'labels': LABELS, 'dreyfus_mapping': {'skill': 1.5}},
+            config={'min': 1, 'max': 5, 'dreyfus_mapping': {'skill': 1.5}},
+            labels=LABELS,
         )
 
     def edit(self, **fields):
@@ -42,15 +43,25 @@ class EditQuestionTests(TestCase):
         self.question.refresh_from_db()
 
     def test_fixing_the_text_keeps_the_labels_and_the_dreyfus_weights(self):
-        self.edit(question_type='rating', question_text='How well does this person solve problems?')
+        # The dialog shows the labels and posts them back
+        page = self.client.get(reverse('questionnaire_edit', args=[self.questionnaire.id]))
+        self.assertContains(page, 'Expert problem solver')
+        labels = {f'rating_label_{value}': label for value, label in LABELS.items()}
+
+        self.edit(question_type='rating', question_text='How well does this person solve problems?', **labels)
 
         self.assertEqual(self.question.question_text, 'How well does this person solve problems?')
-        self.assertEqual(self.question.config['labels'], LABELS)
+        self.assertEqual(self.question.labels, LABELS)
         self.assertEqual(self.question.config['dreyfus_mapping'], {'skill': 1.5})
 
     def test_another_type_drops_the_rating_labels_but_keeps_the_dreyfus_weights(self):
-        self.edit(question_type='likert', question_text=self.question.question_text, likert_scale='Never\nOften')
+        self.edit(
+            question_type='likert',
+            question_text=self.question.question_text,
+            likert_option_id=['', ''],
+            likert_option_label=['Never', 'Often'],
+        )
 
-        self.assertEqual(self.question.config['scale'], ['Never', 'Often'])
-        self.assertNotIn('labels', self.question.config)
+        self.assertEqual(list(self.question.options.values_list('label', flat=True)), ['Never', 'Often'])
+        self.assertEqual(self.question.labels, {})
         self.assertEqual(self.question.config['dreyfus_mapping'], {'skill': 1.5})

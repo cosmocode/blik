@@ -119,18 +119,19 @@ def send_reviewer_invitations(cycle, token_ids=None):
             with translation.override(token_language(token)):
                 # Generate feedback URL
                 feedback_url = f"{settings.SITE_PROTOCOL}://{settings.SITE_DOMAIN}/feedback/{token.token}/"
+                questionnaire = cycle.questionnaire.translated()
 
                 # Render email templates
                 context = {
                     'reviewee_name': cycle.reviewee.name,
                     'category': token.get_category_display(),
                     'feedback_url': feedback_url,
-                    'questionnaire_name': cycle.questionnaire.name,
+                    'questionnaire_name': questionnaire.name,
                 }
 
                 if token.category == 'self':
                     context.update(reviewee=cycle.reviewee, cycle=cycle, self_assessment_url=feedback_url)
-                    subject = _('Complete Your Self-Assessment: %(questionnaire)s') % {'questionnaire': cycle.questionnaire.name}
+                    subject = _('Complete Your Self-Assessment: %(questionnaire)s') % {'questionnaire': questionnaire.name}
                     template = 'emails/reviewee_self_assessment'
                 else:
                     subject = _('360 Feedback Request: %(name)s') % {'name': cycle.reviewee.name}
@@ -190,13 +191,14 @@ def send_reminder_emails(cycle, token_ids=None):
             with translation.override(token_language(token)):
                 # Generate feedback URL
                 feedback_url = f"{settings.SITE_PROTOCOL}://{settings.SITE_DOMAIN}/feedback/{token.token}/"
+                questionnaire = cycle.questionnaire.translated()
 
                 # Render email templates
                 context = {
                     'reviewee_name': cycle.reviewee.name,
                     'category': token.get_category_display(),
                     'feedback_url': feedback_url,
-                    'questionnaire_name': cycle.questionnaire.name,
+                    'questionnaire_name': questionnaire.name,
                 }
 
                 html_message = render_to_string('emails/reviewer_reminder.html', context)
@@ -266,10 +268,12 @@ def send_assessment_email(cycle, base_url, stats):
     try:
         with translation.override(reviewee_language(cycle.reviewee)):
             self_assessment_url = f"{base_url}{reverse('reviews:claim_token', kwargs={'invitation_token': cycle.invitation_token_self})}"
+            questionnaire = cycle.questionnaire.translated()
 
             context = {
                 'reviewee': cycle.reviewee,
                 'cycle': cycle,
+                'questionnaire_name': questionnaire.name,
                 'self_assessment_url': self_assessment_url,
             }
 
@@ -277,7 +281,7 @@ def send_assessment_email(cycle, base_url, stats):
             text_message = render_to_string('emails/reviewee_self_assessment.txt', context)
 
             send_email(
-                subject=_('Complete Your Self-Assessment: %(questionnaire)s') % {'questionnaire': cycle.questionnaire.name},
+                subject=_('Complete Your Self-Assessment: %(questionnaire)s') % {'questionnaire': questionnaire.name},
                 message=text_message,
                 recipient_list=[cycle.reviewee.email],
                 html_message=html_message,
@@ -293,9 +297,11 @@ def send_invitation_links_email(cycle, base_url, categories, stats):
     """Send the reviewee the links to share, one per category. Records into `stats`."""
     try:
         with translation.override(reviewee_language(cycle.reviewee)):
+            questionnaire = cycle.questionnaire.translated()
             context = {
                 'reviewee': cycle.reviewee,
                 'cycle': cycle,
+                'questionnaire_name': questionnaire.name,
             }
             for category in categories:
                 token = cycle.get_invitation_token(category)
@@ -308,7 +314,7 @@ def send_invitation_links_email(cycle, base_url, categories, stats):
             text_message = render_to_string('emails/reviewee_invitation_links.txt', context)
 
             send_email(
-                subject=_('Share Your 360 Feedback Links: %(questionnaire)s') % {'questionnaire': cycle.questionnaire.name},
+                subject=_('Share Your 360 Feedback Links: %(questionnaire)s') % {'questionnaire': questionnaire.name},
                 message=text_message,
                 recipient_list=[cycle.reviewee.email],
                 html_message=html_message,
@@ -367,10 +373,11 @@ def send_close_check_emails(dry_run=False):
             dashboard_url = f"{base_url}/dashboard/cycles/{cycle.uuid}/"
 
             with translation.override(reviewee_language(cycle.reviewee)):
+                questionnaire = cycle.questionnaire.translated()
                 context = {
                     'reviewee': cycle.reviewee,
                     'cycle': cycle,
-                    'questionnaire_name': cycle.questionnaire.name,
+                    'questionnaire_name': questionnaire.name,
                     'completed_count': completed_count,
                     'total_count': total_count,
                     'dashboard_url': dashboard_url,
@@ -380,7 +387,7 @@ def send_close_check_emails(dry_run=False):
                 text_message = render_to_string('emails/cycle_close_check.txt', context)
 
                 send_email(
-                    subject=_('Review Check-In: %(questionnaire)s') % {'questionnaire': cycle.questionnaire.name},
+                    subject=_('Review Check-In: %(questionnaire)s') % {'questionnaire': questionnaire.name},
                     message=text_message,
                     recipient_list=[cycle.reviewee.email],
                     html_message=html_message,

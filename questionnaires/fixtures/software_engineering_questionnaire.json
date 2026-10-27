@@ -108,7 +108,7 @@
     "pk": 4,
     "fields": {
       "section": 2,
-      "question_text": "How well does this person work with the team to solve complex problems?",
+      "question_text": "How well does {name} work with the team to solve complex problems?",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -135,7 +135,7 @@
     "pk": 5,
     "fields": {
       "section": 2,
-      "question_text": "This person is friendly, approachable, and creates a positive team environment",
+      "question_text": "{name} is friendly, approachable, and creates a positive team environment",
       "question_type": "likert",
       "config": {
         "scale": [

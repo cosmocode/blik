@@ -8,7 +8,7 @@
 
 {% trans 'This is your opportunity to reflect on your own performance before receiving feedback from others.' %}
 
-{% trans 'Questionnaire:' %} {{ cycle.questionnaire.name }}
+{% trans 'Questionnaire:' %} {{ questionnaire_name }}
 
 {% trans 'Best regards,' %}
 {% trans 'Your Feedback Team' %}

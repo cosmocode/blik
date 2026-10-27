@@ -15,7 +15,7 @@
 
 {% trans 'Your report is completely confidential and accessible only through the secure link above.' %}
 
-{% trans 'Questionnaire:' %} {{ cycle.questionnaire.name }}
+{% trans 'Questionnaire:' %} {{ questionnaire_name }}
 
 {% trans 'Best regards,' %}
 {% trans 'Your Feedback Team' %}

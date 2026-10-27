@@ -2,6 +2,9 @@ from django import template
 from django.utils.translation import gettext_lazy as _
 
 from questionnaires.models import Question
+from questionnaires.placeholders import personalize as personalize_text
+from reports.report_texts import RATING_RANGES
+from reports.services import get_rating_key
 from reviews.models import CATEGORY_ORDER
 
 register = template.Library()
@@ -22,15 +25,6 @@ def get_item(dictionary, key):
     if not isinstance(dictionary, dict):
         return None
     return dictionary.get(str(key))
-
-
-@register.filter
-def mul(value, arg):
-    """Multiply the value by the argument"""
-    try:
-        return float(value) * float(arg)
-    except (ValueError, TypeError):
-        return 0
 
 
 @register.filter
@@ -88,12 +82,101 @@ def sort_by_frequency(distribution):
 
 
 @register.filter
-def get_rating_label(question_config, rating_value):
-    """Get label for a rating value from question config"""
+def report_options(question_data):
+    """Answer options of a report question as [{'id', 'label', 'weight'}, ...].
+
+    Reports generated before answer options existed count their answers by label and carry no 'options'. For those the
+    label doubles as the id, so their stored counts still line up.
+    """
+
+    if options := question_data.get('options'):
+        return options
+
+    config = question_data.get('question_config') or {}
+    labels = config.get('scale') or config.get('choices') or []
+    weights = config.get('weights') or []
+
+    return [
+        {'id': label, 'label': label, 'weight': weights[index] if index < len(weights) else None}
+        for index, label in enumerate(labels)
+    ]
+
+
+def distribution_key(option):
+    """The key a report distribution counts an option under: its id as text."""
+
+    option_id = option['id']
+
+    return f'{option_id}'
+
+
+@register.filter
+def option_count(distribution, option):
+    """How many answers in a report distribution chose the option."""
+
+    return (distribution or {}).get(distribution_key(option), 0)
+
+
+@register.filter
+def option_label(key, question_data):
+    """Label of the option a report distribution key stands for, falling back to the key itself."""
+
+    for option in report_options(question_data):
+        if distribution_key(option) == key:
+            return option['label']
+
+    return key
+
+
+@register.filter
+def option_weights(question_data):
+    """The weights of a report question's options, in their order."""
+
+    return [option['weight'] for option in report_options(question_data) if option['weight'] is not None]
+
+
+@register.filter
+def likert_positive_count(distribution, options):
+    """Answers in the two highest options of a likert scale.
+
+    Counted by position rather than by label, so custom scales and reworded or translated labels are summarised too.
+    """
+
+    return sum(option_count(distribution, option) for option in options[-2:])
+
+
+@register.filter
+def rating_key(score):
+    """The overall rating of an average score; reports colour a score by it."""
+
+    return get_rating_key(score)
+
+
+@register.filter
+def rating_with_range(score):
+    """The overall rating of an average score, with the scores it covers."""
+
+    return RATING_RANGES[get_rating_key(score)]
+
+
+@register.filter
+def report_labels(question_data):
+    """Rating labels of a report question; reports generated before Question.labels existed keep them in the config."""
+
+    config = question_data.get('question_config') or {}
+
+    return question_data.get('labels') or config.get('labels') or {}
+
+
+@register.filter
+def get_rating_label(question_data, rating_value):
+    """Get label for a rating value of a report question"""
+
+    labels = report_labels(question_data)
+
     try:
-        labels = question_config.get('labels', {})
         return labels.get(str(int(rating_value)), '')
-    except (ValueError, TypeError, AttributeError):
+    except (ValueError, TypeError):
         return ''
 
 
@@ -108,13 +191,8 @@ def count_value(lst, value):
 
 @register.filter
 def personalize(text, name):
-    """Replace 'This person' / 'this person' with the reviewee's first name."""
-    if not name:
-        return text
-    first_name = name.split()[0] if name else "This person"
-    text = text.replace("This person", first_name)
-    text = text.replace("this person", first_name)
-    return text
+    """The text with the reviewee's first name, see questionnaires/placeholders.py."""
+    return personalize_text(text, name)
 
 
 @register.filter

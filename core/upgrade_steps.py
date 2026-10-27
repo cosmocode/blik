@@ -12,8 +12,14 @@ import json
 from pathlib import Path
 
 from django.apps import apps
+from django.db import transaction
 
+from questionnaires.action_items import add_action_item_keys
+from questionnaires.answer_options import migrate_responses
+from questionnaires.legacy_config import move_all_texts_out_of_config
 from questionnaires.management.commands.apply_dreyfus_mappings import Command as DreyfusCommand
+from questionnaires.models import Question
+from questionnaires.shipped import add_shipped_translations
 
 
 def _apply_dreyfus_mappings(stdout):
@@ -130,10 +136,46 @@ def _fill_the_collaboration_section(stdout):
                  f'empty {title} section(s).')
 
 
+def move_question_texts(stdout):
+    """Move the options and labels of questions out of their config and point the answers at the options.
+
+    Runs in one transaction: a converted answer holds an option id, which a second run would take for a likert scale
+    position, so a step that fails halfway must leave everything as it was.
+    """
+
+    with transaction.atomic():
+        count = move_all_texts_out_of_config()
+        stdout.write(f'Moved the texts of {count} question(s) out of their config.')
+        migrate_responses(stdout)
+
+
+def key_action_items(stdout):
+    """Give every action item a key, which a translation of the item refers to."""
+
+    questions = Question.objects.exclude(action_items=[])
+
+    for question in questions:
+        question.action_items = add_action_item_keys(question.action_items)
+        question.save(update_fields=['action_items'])
+
+    count = len(questions)
+    stdout.write(f'Keyed the action items of {count} question(s).')
+
+
+def translate_shipped_questionnaires(stdout):
+    """Put {name} into the questions of the questionnaires made from a shipped template and add their translations."""
+
+    count = add_shipped_translations()
+    stdout.write(f'Translated {count} questionnaire(s) made from a shipped template.')
+
+
 STEPS = [
     ('0001_apply_dreyfus_mappings', _apply_dreyfus_mappings),
     ('0002_reapply_dreyfus_mappings', _reapply_dreyfus_mappings),
     ('0003_move_setup_admins_into_the_admin_group',
      _move_setup_admins_into_the_admin_group),
     ('0004_fill_the_collaboration_section', _fill_the_collaboration_section),
+    ('0005_move_question_texts', move_question_texts),
+    ('0006_key_action_items', key_action_items),
+    ('0007_translate_shipped_questionnaires', translate_shipped_questionnaires),
 ]

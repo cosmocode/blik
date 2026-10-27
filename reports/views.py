@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 from accounts.permissions import can_view_all_reports
 from reviews.models import ReviewCycle
 from .models import Report
+from .report_texts import with_texts
 from .services import generate_report, get_report_summary, apply_display_anonymization
 import uuid
 
@@ -57,17 +58,19 @@ def view_report(request, cycle_uuid):
 
     # Apply display-level anonymization based on organization settings
     min_threshold = cycle.organization.min_responses_for_anonymity
+    report_data = with_texts(report.report_data, cycle.questionnaire, cycle.reviewee.name)
     display_data = apply_display_anonymization(
-        report.report_data,
+        report_data,
         min_threshold=min_threshold
     )
 
     context = {
         'cycle': cycle,
         'report': report,
+        'report_data': report_data,
         'display_data': display_data,  # For detailed report sections
         'summary': summary,
-        'questionnaire': cycle.questionnaire,
+        'questionnaire': cycle.questionnaire.translated(),
         'is_admin_view': True,
     }
 
@@ -122,17 +125,19 @@ def reviewee_report(request, access_token):
 
     # Apply display-level anonymization based on organization settings
     min_threshold = cycle.organization.min_responses_for_anonymity
+    report_data = with_texts(report.report_data, cycle.questionnaire, cycle.reviewee.name)
     display_data = apply_display_anonymization(
-        report.report_data,
+        report_data,
         min_threshold=min_threshold
     )
 
     context = {
         'cycle': cycle,
         'report': report,
+        'report_data': report_data,
         'display_data': display_data,  # For detailed report sections
         'summary': summary,
-        'questionnaire': cycle.questionnaire,
+        'questionnaire': cycle.questionnaire.translated(),
         'is_public_view': True,
     }
 

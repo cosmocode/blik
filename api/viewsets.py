@@ -9,13 +9,15 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from django.db.models import Count, Q
-from django.utils import timezone
+from django.utils import timezone, translation
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
 
 from accounts.models import Reviewee
 from accounts.permissions import visible_cycles
+from core.languages import request_language
 from reviews.models import ReviewCycle, ReviewerToken
+from questionnaires.answer_options import OPTION_TYPES, resolve_answer
 from questionnaires.models import Questionnaire
 from reports.models import Report
 
@@ -39,6 +41,35 @@ from .permissions import (
     CanCreateCycles,
     CanViewAllReports,
 )
+
+LANGUAGE_PARAMETER = OpenApiParameter(
+    name="lang",
+    type=str,
+    location=OpenApiParameter.QUERY,
+    description="Language of the questionnaire texts, e.g. de. Defaults to the Accept-Language header, "
+    "then to the organization's default language. Texts not translated into it are in the source language.",
+)
+
+
+def get_request_language(request):
+    """
+    The language the client asks for with ?lang=, else its Accept-Language, else the organization's default.
+
+    The language middleware cannot pick it: it runs before the API token tells which organization is asking.
+    """
+
+    return request_language(request, request.query_params.get("lang"), organization=request.organization)
+
+
+class RequestLanguageMixin:
+    """Serves its texts, those of questionnaires included, in the language from get_request_language()."""
+
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        translation.activate(get_request_language(request))
+
+    def get_serializer_context(self):
+        return {**super().get_serializer_context(), "language": translation.get_language()}
 
 
 # =============================================================================
@@ -497,11 +528,11 @@ class ReviewCycleViewSet(viewsets.ModelViewSet):
             )
 
         # Get all questions for validation
-        questions = Question.objects.filter(section__questionnaire=cycle.questionnaire)
+        questions = Question.objects.filter(section__questionnaire=cycle.questionnaire).prefetch_related('options')
         question_dict = {str(q.uuid): q for q in questions}
 
-        # Process responses
-        created_responses = []
+        # Validate every answer before creating any, so a rejected request leaves no partial set of responses behind
+        answers = []
         for resp_data in responses_data:
             question_uuid = resp_data.get('question_uuid')
             value = resp_data.get('value')
@@ -511,15 +542,35 @@ class ReviewCycleViewSet(viewsets.ModelViewSet):
 
             question = question_dict[question_uuid]
 
-            # Create response with answer_data
-            response = QuestionResponse.objects.create(
+            # Clients may send the option id or its label; both are stored as the id
+            if question.question_type in OPTION_TYPES:
+                options = list(question.options.all())
+                given = value if isinstance(value, list) else [value]
+                resolved = [resolve_answer(options, answer) for answer in given]
+
+                if None in resolved:
+                    return Response(
+                        {'error': f'Invalid option for question {question_uuid}'},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+                if isinstance(value, list):
+                    value = resolved
+                else:
+                    [value] = resolved
+
+            answers.append((question, value))
+
+        created_responses = [
+            QuestionResponse.objects.create(
                 cycle=cycle,
                 question=question,
                 token=reviewer_token,
                 category=reviewer_token.category,
                 answer_data={'value': value}
             )
-            created_responses.append(response)
+            for question, value in answers
+        ]
 
         # Mark token as completed
         reviewer_token.completed_at = timezone.now()
@@ -533,6 +584,7 @@ class ReviewCycleViewSet(viewsets.ModelViewSet):
     @extend_schema(
         tags=["cycles"],
         description="Get the full questionnaire for this cycle, personalized with the reviewee's name",
+        parameters=[LANGUAGE_PARAMETER],
         responses=QuestionnaireSerializer,
     )
     @action(detail=True, methods=["get"])
@@ -545,7 +597,11 @@ class ReviewCycleViewSet(viewsets.ModelViewSet):
         cycle = self.get_object()
         serializer = QuestionnaireSerializer(
             cycle.questionnaire,
-            context={**self.get_serializer_context(), "reviewee_name": cycle.reviewee.name},
+            context={
+                **self.get_serializer_context(),
+                "reviewee_name": cycle.reviewee.name,
+                "language": get_request_language(request),
+            },
         )
         return Response(serializer.data)
 
@@ -600,13 +656,15 @@ class ReviewCycleViewSet(viewsets.ModelViewSet):
     list=extend_schema(
         tags=["questionnaires"],
         description="List available questionnaires",
+        parameters=[LANGUAGE_PARAMETER],
     ),
     retrieve=extend_schema(
         tags=["questionnaires"],
         description="Get questionnaire details with all questions",
+        parameters=[LANGUAGE_PARAMETER],
     ),
 )
-class QuestionnaireViewSet(viewsets.ReadOnlyModelViewSet):
+class QuestionnaireViewSet(RequestLanguageMixin, viewsets.ReadOnlyModelViewSet):
     """
     API endpoints for questionnaires.
 
@@ -635,7 +693,7 @@ class QuestionnaireViewSet(viewsets.ReadOnlyModelViewSet):
             Questionnaire.objects.filter(
                 Q(organization=org) | Q(organization__isnull=True), is_active=True
             )
-            .prefetch_related("sections__questions")
+            .prefetch_related(*Questionnaire.translation_lookups())
             .order_by("name")
         )
 
@@ -653,9 +711,10 @@ class QuestionnaireViewSet(viewsets.ReadOnlyModelViewSet):
     retrieve=extend_schema(
         tags=["reports"],
         description="Get full report with data and access token",
+        parameters=[LANGUAGE_PARAMETER],
     ),
 )
-class ReportViewSet(viewsets.ReadOnlyModelViewSet):
+class ReportViewSet(RequestLanguageMixin, viewsets.ReadOnlyModelViewSet):
     """
     API endpoints for reports.
 

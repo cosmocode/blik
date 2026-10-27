@@ -333,6 +333,10 @@ class Command(BaseCommand):
                         rating = 4
 
                     answer_data = {'value': rating}
+                    if question.question_type == 'likert':
+                        # Likert answers store the id of the option at that scale position
+                        options = list(question.options.all())
+                        answer_data = {'value': options[min(rating, len(options)) - 1].id if options else ''}
 
                 elif question.question_type == 'scale':
                     # Scale questions (e.g., 1-100)
@@ -361,8 +365,9 @@ class Command(BaseCommand):
                 elif question.question_type == 'single_choice':
                     # Single choice questions - select based on weights if available
                     config = question.config or {}
-                    choices = config.get('choices', [])
-                    weights = config.get('weights', [])
+                    options = list(question.options.all())
+                    choices = [option.id for option in options]
+                    weights = [option.weight for option in options if option.weight is not None]
 
                     if choices:
                         if weights and config.get('scoring_enabled'):
@@ -385,8 +390,7 @@ class Command(BaseCommand):
 
                 elif question.question_type == 'multiple_choice':
                     # Multiple choice questions - select multiple options
-                    config = question.config or {}
-                    choices = config.get('choices', [])
+                    choices = [option.id for option in question.options.all()]
 
                     if choices:
                         # Select 1-3 options based on category
@@ -471,8 +475,11 @@ class Command(BaseCommand):
                 ).order_by('section__order', 'order'))
 
                 for question in questions:
-                    if question.question_type in ['rating', 'likert']:
+                    if question.question_type == 'rating':
                         answer_data = {'value': 4}
+                    elif question.question_type == 'likert':
+                        options = list(question.options.all())
+                        answer_data = {'value': options[min(4, len(options)) - 1].id if options else ''}
                     elif question.question_type == 'scale':
                         config = question.config or {}
                         min_val = config.get('min', 1)
@@ -480,15 +487,13 @@ class Command(BaseCommand):
                         scale_range = max_val - min_val
                         answer_data = {'value': min_val + int(scale_range * 0.7)}
                     elif question.question_type == 'single_choice':
-                        config = question.config or {}
-                        choices = config.get('choices', [])
+                        choices = [option.id for option in question.options.all()]
                         if choices:
                             answer_data = {'value': choices[len(choices) // 2]}
                         else:
                             answer_data = {'value': ''}
                     elif question.question_type == 'multiple_choice':
-                        config = question.config or {}
-                        choices = config.get('choices', [])
+                        choices = [option.id for option in question.options.all()]
                         if choices:
                             # Select 2 options from middle
                             selected = [choices[i] for i in range(min(2, len(choices)))]

@@ -7,12 +7,19 @@ enabling backup restoration, data migration, and organization cloning.
 
 import json
 from datetime import datetime
+from django.conf import settings
 from django.db import transaction
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from core.languages import is_language
+from questionnaires.action_items import add_action_item_keys
+from questionnaires.answer_options import save_options
+from questionnaires.legacy_config import move_texts_out_of_config
+from questionnaires.shipped import TEMPLATE_NAMES
+from questionnaires.translations import import_translations
 from subscriptions.utils import NoCycleCredits
 
 
@@ -307,6 +314,16 @@ def import_questionnaires(organization, questionnaires_data, conflict_resolution
     for q_data in questionnaires_data:
         try:
             name = q_data['name']
+            source_language = q_data.get('source_language')
+
+            # Exports from before translations are in the default language
+            if not is_language(source_language):
+                source_language = settings.LANGUAGE_CODE
+
+            template_key = q_data.get('template_key')
+
+            if not isinstance(template_key, str) or template_key not in TEMPLATE_NAMES:
+                template_key = ''
 
             # Check if questionnaire exists
             existing = Questionnaire.objects.filter(
@@ -325,6 +342,7 @@ def import_questionnaires(organization, questionnaires_data, conflict_resolution
                 elif conflict_resolution == 'overwrite':
                     # Delete existing sections/questions and recreate
                     existing.sections.all().delete()
+                    existing.translations.all().delete()
                     questionnaire_to_update = existing
 
                 elif conflict_resolution == 'duplicate':
@@ -342,6 +360,8 @@ def import_questionnaires(organization, questionnaires_data, conflict_resolution
                 questionnaire = questionnaire_to_update
                 questionnaire.description = q_data.get('description', '')
                 questionnaire.is_active = q_data.get('is_active', True)
+                questionnaire.source_language = source_language
+                questionnaire.template_key = template_key
                 questionnaire.save()
                 result['updated'] += 1
             else:
@@ -350,8 +370,12 @@ def import_questionnaires(organization, questionnaires_data, conflict_resolution
                     name=name,
                     description=q_data.get('description', ''),
                     is_active=q_data.get('is_active', True),
+                    source_language=source_language,
+                    template_key=template_key,
                 )
                 result['created'] += 1
+
+            import_translations(questionnaire, q_data.get('translations'), source_language)
 
             # Store mapping
             result['questionnaire_map'][q_data['name']] = questionnaire
@@ -364,17 +388,29 @@ def import_questionnaires(organization, questionnaires_data, conflict_resolution
                     description=section_data.get('description', ''),
                     order=section_data.get('order', 0),
                 )
+                import_translations(section, section_data.get('translations'), source_language)
 
                 # Import questions
                 for question_data in section_data.get('questions', []):
-                    Question.objects.create(
+                    question = Question.objects.create(
                         section=section,
                         question_text=question_data['question_text'],
                         question_type=question_data.get('question_type', 'text'),
                         config=question_data.get('config', {}),
+                        labels=question_data.get('labels', {}),
+                        action_items=add_action_item_keys(question_data.get('action_items') or []),
                         required=question_data.get('required', False),
                         order=question_data.get('order', 0),
                     )
+                    import_translations(question, question_data.get('translations'), source_language)
+                    options = question_data.get('options', [])
+                    save_options(question, [(None, option['label'], option.get('weight')) for option in options])
+
+                    for option, option_data in zip(question.options.all(), options):
+                        import_translations(option, option_data.get('translations'), source_language)
+
+                    # Older exports keep the options and labels in the config
+                    move_texts_out_of_config(question)
 
         except Exception as e:
             result['errors'].append(_('Failed to import questionnaire %(questionnaire)s: %(error)s') % {

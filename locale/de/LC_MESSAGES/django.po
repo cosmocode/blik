@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-20 15:33+0000\n"
+"POT-Creation-Date: 2026-10-26 14:26+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -841,9 +841,6 @@ msgstr "Feedbackrunde für „%(name)s“ mit „%(questionnaire)s“ angelegt. 
 msgid "Review cycle created for \"%(name)s\" using \"%(questionnaire)s\" with %(count)s reviewer token(s). Go to the cycle details to assign reviewers and send invitations."
 msgstr "Feedbackrunde für „%(name)s“ mit „%(questionnaire)s“ und %(count)s Token(s) für Beurteilende angelegt. In den Details der Feedbackrunde lassen sich Beurteilende zuweisen und Einladungen versenden."
 
-msgid "Continue deepening expertise and innovating"
-msgstr "Fachwissen weiter vertiefen und Neues entwickeln"
-
 msgid "Pair with a more senior teammate on a challenging problem this sprint"
 msgstr "In diesem Sprint gemeinsam mit einem erfahreneren Teammitglied ein anspruchsvolles Problem lösen"
 
@@ -863,6 +860,10 @@ msgstr "Fragebogen „%(name)s“ angelegt."
 #, python-format
 msgid "Error creating questionnaire: %(error)s"
 msgstr "Fehler beim Anlegen des Fragebogens: %(error)s"
+
+#, python-format
+msgid "This questionnaire is already translated into %(language)s. Empty that translation first to make %(language)s its source language."
+msgstr "Für %(language)s gibt es bereits eine Übersetzung dieses Fragebogens. Leeren Sie diese zuerst, um %(language)s zur Ausgangssprache zu machen."
 
 #, python-format
 msgid "Questionnaire \"%(name)s\" updated successfully."
@@ -890,9 +891,6 @@ msgstr "Abschnitt nicht gefunden."
 #, python-format
 msgid "Error updating section: %(error)s"
 msgstr "Fehler beim Aktualisieren des Abschnitts: %(error)s"
-
-msgid "Weights count did not match choices count. Scoring disabled for this question."
-msgstr "Die Anzahl der Gewichtungen passt nicht zur Anzahl der Antwortoptionen. Die Bewertung ist für diese Frage deaktiviert."
 
 msgid "Invalid weight values. Scoring disabled for this question."
 msgstr "Ungültige Gewichtungen. Die Bewertung ist für diese Frage deaktiviert."
@@ -936,6 +934,9 @@ msgstr "Frage nicht gefunden."
 #, python-format
 msgid "Error updating Dreyfus configuration: %(error)s"
 msgstr "Fehler beim Aktualisieren der Dreyfus-Konfiguration: %(error)s"
+
+msgid "Translation saved."
+msgstr "Übersetzung gespeichert."
 
 #, python-format
 msgid "Questionnaire \"%(name)s\" archived. It is used by %(count)s review cycle(s) and cannot be deleted."
@@ -1684,11 +1685,32 @@ msgstr "Produktbewertung"
 msgid "Question"
 msgstr "Frage"
 
+msgid "Strongly Disagree"
+msgstr "Stimme überhaupt nicht zu"
+
+msgid "Disagree"
+msgstr "Stimme nicht zu"
+
+msgid "Neutral"
+msgstr "Neutral"
+
+msgid "Agree"
+msgstr "Stimme zu"
+
+msgid "Strongly Agree"
+msgstr "Stimme voll zu"
+
 msgid "description"
 msgstr "Beschreibung"
 
 msgid "default"
 msgstr "Standard"
+
+msgid "source language"
+msgstr "Ausgangssprache"
+
+msgid "template key"
+msgstr "Vorlagenschlüssel"
 
 msgid "questionnaire"
 msgstr "Fragebogen"
@@ -1744,6 +1766,9 @@ msgstr "Fragetyp"
 msgid "configuration"
 msgstr "Konfiguration"
 
+msgid "labels"
+msgstr "Beschriftungen"
+
 msgid "action items"
 msgstr "Maßnahmen"
 
@@ -1755,6 +1780,77 @@ msgstr "Frage"
 
 msgid "questions"
 msgstr "Fragen"
+
+msgid "label"
+msgstr "Beschriftung"
+
+msgid "weight"
+msgstr "Gewichtung"
+
+msgid "answer option"
+msgstr "Antwortoption"
+
+msgid "answer options"
+msgstr "Antwortoptionen"
+
+msgid "source checksums"
+msgstr "Prüfsummen der Ausgangstexte"
+
+msgid "questionnaire translation"
+msgstr "Übersetzung eines Fragebogens"
+
+msgid "questionnaire translations"
+msgstr "Übersetzungen von Fragebögen"
+
+msgid "section translation"
+msgstr "Übersetzung eines Abschnitts"
+
+msgid "section translations"
+msgstr "Übersetzungen von Abschnitten"
+
+msgid "question translation"
+msgstr "Übersetzung einer Frage"
+
+msgid "question translations"
+msgstr "Übersetzungen von Fragen"
+
+msgid "answer option translation"
+msgstr "Übersetzung einer Antwortoption"
+
+msgid "answer option translations"
+msgstr "Übersetzungen von Antwortoptionen"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Description"
+msgstr "Beschreibung"
+
+msgid "Section title"
+msgstr "Titel des Abschnitts"
+
+msgid "Section description"
+msgstr "Beschreibung des Abschnitts"
+
+msgid "Action item"
+msgstr "Maßnahme"
+
+msgid "Answer option"
+msgstr "Antwortoption"
+
+msgid "Label of the lowest value"
+msgstr "Beschriftung des niedrigsten Werts"
+
+msgid "Label of the highest value"
+msgstr "Beschriftung des höchsten Werts"
+
+#, python-format
+msgid "Label of rating %(value)s"
+msgstr "Beschriftung der Bewertung %(value)s"
+
+#, python-format
+msgid "The translation of \"%(text)s\" is longer than %(max_length)s characters."
+msgstr "Die Übersetzung von „%(text)s“ ist länger als %(max_length)s Zeichen."
 
 msgid "No expiry"
 msgstr "Kein Ablauf"
@@ -1776,6 +1872,427 @@ msgstr "Kein Ablaufdatum gesetzt"
 msgid "Token Expiration"
 msgstr "Ablauf des Tokens"
 
+msgid "Novice"
+msgstr "Neuling"
+
+msgid "Rigid rule follower"
+msgstr "Hält sich starr an Regeln"
+
+msgid "Follows rules rigidly, needs detailed instructions and close guidance"
+msgstr "Hält sich starr an Regeln, braucht genaue Anweisungen und enge Begleitung"
+
+msgid "Requires step-by-step instructions"
+msgstr "Braucht Schritt-für-Schritt-Anleitungen"
+
+msgid "Follows rules without understanding context"
+msgstr "Befolgt Regeln, ohne den Zusammenhang zu verstehen"
+
+msgid "Needs close supervision"
+msgstr "Braucht enge Begleitung"
+
+msgid "Limited ability to recognize patterns"
+msgstr "Erkennt Muster nur eingeschränkt"
+
+msgid "Task-focused rather than goal-focused"
+msgstr "Denkt eher in Aufgaben als in Zielen"
+
+msgid "Asks for detailed procedures"
+msgstr "Fragt nach genauen Abläufen"
+
+msgid "Struggles with unexpected situations"
+msgstr "Tut sich mit unerwarteten Situationen schwer"
+
+msgid "Focuses on individual steps"
+msgstr "Konzentriert sich auf einzelne Schritte"
+
+msgid "Needs explicit direction for each task"
+msgstr "Braucht für jede Aufgabe klare Vorgaben"
+
+msgid "Advanced Beginner"
+msgstr "Fortgeschrittene:r Anfänger:in"
+
+msgid "Recognizes patterns, needs guidelines"
+msgstr "Erkennt Muster, braucht Leitlinien"
+
+msgid "Can handle simple tasks independently, recognizes recurring patterns"
+msgstr "Erledigt einfache Aufgaben selbstständig, erkennt wiederkehrende Muster"
+
+msgid "Recognizes situational patterns"
+msgstr "Erkennt Muster in Situationen"
+
+msgid "Handles routine tasks independently"
+msgstr "Erledigt Routineaufgaben selbstständig"
+
+msgid "Needs guidelines for non-standard situations"
+msgstr "Braucht Leitlinien für ungewöhnliche Situationen"
+
+msgid "Starts to see similarities across problems"
+msgstr "Erkennt allmählich Gemeinsamkeiten zwischen Problemen"
+
+msgid "Still struggles with complex decisions"
+msgstr "Tut sich mit komplexen Entscheidungen noch schwer"
+
+msgid "Can work independently on familiar tasks"
+msgstr "Arbeitet an vertrauten Aufgaben selbstständig"
+
+msgid "Asks for guidance on edge cases"
+msgstr "Fragt bei Sonderfällen nach"
+
+msgid "Identifies when something looks wrong"
+msgstr "Bemerkt, wenn etwas nicht stimmt"
+
+msgid "Follows established patterns"
+msgstr "Folgt bewährten Mustern"
+
+msgid "Competent"
+msgstr "Kompetent"
+
+msgid "Develops mental models, takes responsibility"
+msgstr "Entwickelt mentale Modelle, übernimmt Verantwortung"
+
+msgid "Plans deliberately, solves standard problems, takes ownership"
+msgstr "Plant bewusst, löst Standardprobleme, übernimmt Verantwortung"
+
+msgid "Creates mental models of the domain"
+msgstr "Entwickelt mentale Modelle des Fachgebiets"
+
+msgid "Plans work deliberately"
+msgstr "Plant die Arbeit bewusst"
+
+msgid "Takes responsibility for outcomes"
+msgstr "Übernimmt Verantwortung für Ergebnisse"
+
+msgid "Solves standard problems independently"
+msgstr "Löst Standardprobleme selbstständig"
+
+msgid "Makes conscious, reasoned decisions"
+msgstr "Trifft bewusste, begründete Entscheidungen"
+
+msgid "Troubleshoots problems systematically"
+msgstr "Geht Fehlern systematisch auf den Grund"
+
+msgid "Prioritizes and plans work"
+msgstr "Priorisiert und plant die Arbeit"
+
+msgid "Takes ownership of results"
+msgstr "Steht für Ergebnisse ein"
+
+msgid "Follows through on commitments"
+msgstr "Hält Zusagen ein"
+
+msgid "Proficient"
+msgstr "Gewandt"
+
+msgid "Sees the big picture, learns from others"
+msgstr "Sieht das große Ganze, lernt von anderen"
+
+msgid "Sees the big picture, recognizes patterns quickly, handles complexity"
+msgstr "Sieht das große Ganze, erkennt Muster schnell, beherrscht Komplexität"
+
+msgid "Sees the big picture and context"
+msgstr "Sieht das große Ganze und den Zusammenhang"
+
+msgid "Recognizes patterns and deviations quickly"
+msgstr "Erkennt Muster und Abweichungen schnell"
+
+msgid "Learns from others experiences"
+msgstr "Lernt aus den Erfahrungen anderer"
+
+msgid "Handles complex situations effectively"
+msgstr "Bewältigt komplexe Situationen wirksam"
+
+msgid "Knows when to break the rules"
+msgstr "Weiß, wann Regeln gebrochen werden dürfen"
+
+msgid "Quickly identifies root causes"
+msgstr "Findet Ursachen schnell"
+
+msgid "Anticipates problems before they occur"
+msgstr "Sieht Probleme kommen, bevor sie entstehen"
+
+msgid "Adapts approaches to context"
+msgstr "Passt das Vorgehen an die Lage an"
+
+msgid "Mentors less experienced team members"
+msgstr "Begleitet weniger erfahrene Teammitglieder als Mentor:in"
+
+msgid "Expert"
+msgstr "Expert:in"
+
+msgid "Intuitive, creates new approaches"
+msgstr "Intuitiv, entwickelt neue Ansätze"
+
+msgid "Works from intuition, creates novel solutions, recognized authority"
+msgstr "Arbeitet intuitiv, findet neuartige Lösungen, anerkannte Autorität"
+
+msgid "Works from intuition and deep understanding"
+msgstr "Arbeitet aus Intuition und tiefem Verständnis"
+
+msgid "Creates new approaches and solutions"
+msgstr "Entwickelt neue Ansätze und Lösungen"
+
+msgid "Recognized as domain authority"
+msgstr "Gilt als Autorität im Fachgebiet"
+
+msgid "Sees possibilities others miss"
+msgstr "Sieht Möglichkeiten, die anderen entgehen"
+
+msgid "Operates at a transcendent level"
+msgstr "Arbeitet auf einer übergeordneten Ebene"
+
+msgid "Solves problems others cannot"
+msgstr "Löst Probleme, an denen andere scheitern"
+
+msgid "Innovates and creates best practices"
+msgstr "Setzt Neuerungen um und schafft bewährte Verfahren"
+
+msgid "Trusted for most difficult challenges"
+msgstr "Bekommt die schwierigsten Aufgaben anvertraut"
+
+msgid "Shapes the direction of the field"
+msgstr "Prägt die Richtung des Fachgebiets"
+
+msgid "Directed"
+msgstr "Angeleitet"
+
+msgid "Waits for explicit instructions and direction"
+msgstr "Wartet auf klare Anweisungen und Vorgaben"
+
+msgid "Assisted"
+msgstr "Unterstützt"
+
+msgid "Takes initiative when prompted or guided"
+msgstr "Ergreift die Initiative, wenn jemand dazu anregt oder anleitet"
+
+msgid "Independent"
+msgstr "Selbstständig"
+
+msgid "Proactively identifies and addresses problems"
+msgstr "Erkennt Probleme von sich aus und geht sie an"
+
+msgid "Proactive"
+msgstr "Proaktiv"
+
+msgid "Regularly proposes improvements and drives change"
+msgstr "Schlägt regelmäßig Verbesserungen vor und treibt Veränderungen voran"
+
+msgid "Self-Driven"
+msgstr "Selbstgesteuert"
+
+msgid "Self-directed achiever who consistently improves systems"
+msgstr "Arbeitet selbstgesteuert und verbessert Abläufe beständig"
+
+msgid "Developing Contributor"
+msgstr "Mitwirkende:r im Aufbau"
+
+msgid "Building foundational skills and learning to work independently"
+msgstr "Baut Grundlagen auf und lernt, selbstständig zu arbeiten"
+
+msgid "Early in career or role"
+msgstr "Am Anfang der Laufbahn oder Rolle"
+
+msgid "Requires guidance and support"
+msgstr "Braucht Anleitung und Unterstützung"
+
+msgid "Building fundamental capabilities"
+msgstr "Baut grundlegende Fähigkeiten auf"
+
+msgid "Needs structured development"
+msgstr "Braucht eine strukturierte Entwicklung"
+
+msgid "Focus on building core skills through deliberate practice and seeking guidance. Work on taking more initiative on familiar tasks."
+msgstr "Kernkompetenzen durch gezieltes Üben und mit Anleitung aufbauen. Bei vertrauten Aufgaben mehr Initiative ergreifen."
+
+msgid "Hungry Learner"
+msgstr "Wissbegierige:r Lernende:r"
+
+msgid "High initiative but developing expertise - eager to learn and contribute"
+msgstr "Viel Initiative bei wachsender Expertise – lernt und beteiligt sich gern"
+
+msgid "Strong drive and motivation"
+msgstr "Starker Antrieb und hohe Motivation"
+
+msgid "Seeks opportunities to grow"
+msgstr "Sucht Gelegenheiten, sich weiterzuentwickeln"
+
+msgid "May overcommit without experience"
+msgstr "Übernimmt sich mangels Erfahrung womöglich"
+
+msgid "Benefits from mentorship"
+msgstr "Profitiert von Mentoring"
+
+msgid "Channel your energy into deliberate skill development. Seek mentorship from experts. Balance enthusiasm with building depth."
+msgstr "Die eigene Energie in gezielte Kompetenzentwicklung lenken. Mentoring durch Expert:innen suchen. Begeisterung mit wachsender Tiefe verbinden."
+
+msgid "Specialist"
+msgstr "Spezialist:in"
+
+msgid "Deep expertise but waits for direction - valuable contributor when engaged"
+msgstr "Tiefe Expertise, wartet aber auf Vorgaben – wertvoll, wenn eingebunden"
+
+msgid "Strong technical capabilities"
+msgstr "Starke fachliche Fähigkeiten"
+
+msgid "Reliable when given clear objectives"
+msgstr "Zuverlässig bei klaren Zielen"
+
+msgid "Prefers depth over breadth"
+msgstr "Geht lieber in die Tiefe als in die Breite"
+
+msgid "May need encouragement to lead"
+msgstr "Braucht womöglich Ermutigung, um Führung zu übernehmen"
+
+msgid "Build confidence in taking initiative. Start with small ownership opportunities. Share your expertise proactively."
+msgstr "Sicherheit im Ergreifen der Initiative gewinnen. Mit kleinen Verantwortungsbereichen beginnen. Die eigene Expertise von sich aus teilen."
+
+msgid "Force Multiplier"
+msgstr "Wirkungsstarke:r Multiplikator:in"
+
+msgid "High skill and high initiative - drives team success and innovation"
+msgstr "Hohe Kompetenz und viel Initiative – treibt Teamerfolg und Innovation voran"
+
+msgid "Combines expertise with initiative"
+msgstr "Verbindet Expertise mit Initiative"
+
+msgid "Mentors and elevates others"
+msgstr "Begleitet andere und bringt sie weiter"
+
+msgid "Drives meaningful improvements"
+msgstr "Treibt spürbare Verbesserungen voran"
+
+msgid "Trusted for complex challenges"
+msgstr "Bekommt komplexe Aufgaben anvertraut"
+
+msgid "Continue expanding your impact. Focus on strategic initiatives and developing others. Consider broader leadership roles."
+msgstr "Die eigene Wirkung weiter ausbauen. Auf strategische Vorhaben und die Entwicklung anderer setzen. Breitere Führungsrollen in Betracht ziehen."
+
+msgid "Build foundational skills through deliberate practice and close guidance from experienced mentors."
+msgstr "Grundlagen durch gezieltes Üben und enge Begleitung durch erfahrene Mentor:innen aufbauen."
+
+msgid "Develop deeper pattern recognition and start building mental models of your domain."
+msgstr "Muster besser erkennen lernen und beginnen, mentale Modelle des eigenen Fachgebiets aufzubauen."
+
+msgid "Expand your perspective to see the bigger picture and learn from diverse experiences."
+msgstr "Den Blick weiten, um das große Ganze zu sehen, und aus vielfältigen Erfahrungen lernen."
+
+msgid "Deepen intuition through extensive practice and begin creating novel approaches."
+msgstr "Die Intuition durch viel Praxis vertiefen und beginnen, neue Ansätze zu entwickeln."
+
+msgid "Continue innovating and sharing your expertise to advance the field."
+msgstr "Weiter Neues schaffen und die eigene Expertise teilen, um das Fachgebiet voranzubringen."
+
+msgid "Seek feedback on your work early and often"
+msgstr "Früh und oft Feedback zur eigenen Arbeit einholen"
+
+msgid "Study examples of good work in your domain"
+msgstr "Gute Beispiele aus dem eigenen Fachgebiet studieren"
+
+msgid "Practice deliberate problem-solving with guidance"
+msgstr "Gezielt und mit Anleitung Probleme lösen üben"
+
+msgid "Take ownership of a complete project or feature"
+msgstr "Die Verantwortung für ein ganzes Projekt oder Feature übernehmen"
+
+msgid "Learn from colleagues at different skill levels"
+msgstr "Von Kolleg:innen mit unterschiedlicher Erfahrung lernen"
+
+msgid "Document your decision-making process"
+msgstr "Die eigenen Entscheidungswege dokumentieren"
+
+msgid "Mentor someone less experienced"
+msgstr "Eine weniger erfahrene Person als Mentor:in begleiten"
+
+msgid "Share your knowledge through documentation or talks"
+msgstr "Wissen über Dokumentation oder Vorträge teilen"
+
+msgid "Tackle a novel problem in your domain"
+msgstr "Ein neuartiges Problem im eigenen Fachgebiet angehen"
+
+msgid "Structured learning programs or courses"
+msgstr "Strukturierte Lernprogramme oder Kurse"
+
+msgid "Regular mentorship sessions"
+msgstr "Regelmäßige Mentoring-Gespräche"
+
+msgid "Code reviews and pair programming"
+msgstr "Code-Reviews und Pair-Programming"
+
+msgid "Cross-functional projects"
+msgstr "Bereichsübergreifende Projekte"
+
+msgid "Technical leadership opportunities"
+msgstr "Gelegenheiten zur fachlichen Führung"
+
+msgid "Industry conferences and communities"
+msgstr "Fachkonferenzen und Communitys"
+
+msgid "Research and innovation projects"
+msgstr "Forschungs- und Innovationsprojekte"
+
+msgid "Teaching and mentoring opportunities"
+msgstr "Gelegenheiten zum Lehren und Begleiten"
+
+msgid "Speaking at conferences or writing articles"
+msgstr "Vorträge auf Konferenzen oder Fachartikel"
+
+msgid "Take more initiative on projects - your skills are ready for more ownership"
+msgstr "Mehr Initiative in Projekten ergreifen – die Fähigkeiten reichen für mehr Verantwortung"
+
+msgid "Focus on deepening your technical expertise to match your initiative"
+msgstr "Die fachliche Expertise vertiefen, damit sie mit der Initiative Schritt hält"
+
+msgid "Continue deepening expertise and innovating"
+msgstr "Fachwissen weiter vertiefen und Neues entwickeln"
+
+#, python-format
+msgid "Develop capabilities of a %(stage)s: %(description)s"
+msgstr "Fähigkeiten der Stufe „%(stage)s“ entwickeln: %(description)s"
+
+msgid "Build experience across diverse situations"
+msgstr "Erfahrung in unterschiedlichen Situationen sammeln"
+
+msgid "Continuously reflect on your practice and learning"
+msgstr "Die eigene Praxis und das eigene Lernen laufend reflektieren"
+
+msgid "Recognize recurring patterns in your work"
+msgstr "Wiederkehrende Muster in der eigenen Arbeit erkennen"
+
+msgid "Handle routine tasks independently"
+msgstr "Routineaufgaben selbstständig erledigen"
+
+msgid "Build situational awareness beyond just following rules"
+msgstr "Ein Gespür für Situationen entwickeln, statt nur Regeln zu folgen"
+
+msgid "Develop mental models of how things work"
+msgstr "Mentale Modelle davon entwickeln, wie Dinge funktionieren"
+
+msgid "Take responsibility for outcomes, not just tasks"
+msgstr "Verantwortung für Ergebnisse übernehmen, nicht nur für Aufgaben"
+
+msgid "Plan and prioritize work deliberately"
+msgstr "Arbeit bewusst planen und priorisieren"
+
+msgid "See the big picture and system context"
+msgstr "Das große Ganze und den Systemzusammenhang sehen"
+
+msgid "Learn from others' experiences, not just your own"
+msgstr "Aus den Erfahrungen anderer lernen, nicht nur aus den eigenen"
+
+msgid "Recognize patterns and deviations quickly"
+msgstr "Muster und Abweichungen schnell erkennen"
+
+msgid "Trust your intuition based on deep experience"
+msgstr "Der eigenen, auf tiefer Erfahrung beruhenden Intuition vertrauen"
+
+msgid "Create novel approaches and solutions"
+msgstr "Neue Ansätze und Lösungen entwickeln"
+
+msgid "Become a recognized authority in your domain"
+msgstr "Zu einer anerkannten Autorität im eigenen Fachgebiet werden"
+
+msgid "Continue developing expertise"
+msgstr "Die Expertise weiter ausbauen"
+
 msgid "review cycle"
 msgstr "Feedbackrunde"
 
@@ -1794,23 +2311,23 @@ msgstr "erstellt am"
 msgid "available"
 msgstr "verfügbar"
 
-msgid "Expiration date for access token"
-msgstr "Ablaufdatum des Zugangstokens"
-
 msgid "access token expires"
 msgstr "Zugangstoken läuft ab"
 
-msgid "Last time report was accessed"
-msgstr "Letzter Zugriff auf den Bericht"
+msgid "Expiration date for access token"
+msgstr "Ablaufdatum des Zugangstokens"
 
 msgid "last accessed"
 msgstr "letzter Zugriff"
 
-msgid "Number of times report has been accessed"
-msgstr "Anzahl der Zugriffe auf den Bericht"
+msgid "Last time report was accessed"
+msgstr "Letzter Zugriff auf den Bericht"
 
 msgid "access count"
 msgstr "Anzahl Zugriffe"
+
+msgid "Number of times report has been accessed"
+msgstr "Anzahl der Zugriffe auf den Bericht"
 
 msgid "report"
 msgstr "Bericht"
@@ -1821,6 +2338,65 @@ msgstr "Berichte"
 #, python-format
 msgid "Report for %(cycle)s"
 msgstr "Bericht für %(cycle)s"
+
+msgid "Improved"
+msgstr "Verbessert"
+
+msgid "Slightly improved"
+msgstr "Leicht verbessert"
+
+msgid "Stable"
+msgstr "Stabil"
+
+msgid "Slightly declined"
+msgstr "Leicht verschlechtert"
+
+msgid "Declined"
+msgstr "Verschlechtert"
+
+#, python-format
+msgid "Self-assessment (%(self)s) significantly lower than others' perception (%(others)s)"
+msgstr "Selbsteinschätzung (%(self)s) deutlich niedriger als die Wahrnehmung der anderen (%(others)s)"
+
+msgid "Strong performance but may undervalue own contributions"
+msgstr "Starke Leistung, unterschätzt aber womöglich die eigenen Beiträge"
+
+#, python-format
+msgid "Self-assessment (%(self)s) higher than others' perception (%(others)s)"
+msgstr "Selbsteinschätzung (%(self)s) höher als die Wahrnehmung der anderen (%(others)s)"
+
+msgid "Opportunity to align self-perception with team feedback"
+msgstr "Gelegenheit, das Selbstbild mit dem Feedback des Teams abzugleichen"
+
+msgid "Outstanding (4.5+)"
+msgstr "Herausragend (4,5+)"
+
+msgid "Excellent (4.0-4.4)"
+msgstr "Ausgezeichnet (4,0–4,4)"
+
+msgid "Strong (3.5-3.9)"
+msgstr "Stark (3,5–3,9)"
+
+msgid "Developing (3.0-3.4)"
+msgstr "In Entwicklung (3,0–3,4)"
+
+msgid "Needs Support (below 3.0)"
+msgstr "Braucht Unterstützung (unter 3,0)"
+
+msgid "Outstanding"
+msgstr "Herausragend"
+
+msgid "Excellent"
+msgstr "Ausgezeichnet"
+
+msgid "Strong"
+msgstr "Stark"
+
+msgid "Developing"
+msgstr "In Entwicklung"
+
+msgid "Needs Support"
+msgstr "Braucht Unterstützung"
 
 #, python-format
 msgid "Insufficient responses (minimum %(count)s required)"
@@ -2030,6 +2606,10 @@ msgid "Question \"%(question)s\" is required"
 msgstr "Die Frage „%(question)s“ ist eine Pflichtfrage"
 
 #, python-format
+msgid "Invalid option for question \"%(question)s\""
+msgstr "Ungültige Option bei der Frage „%(question)s“"
+
+#, python-format
 msgid "Rating must be between %(min)s and %(max)s"
 msgstr "Die Bewertung muss zwischen %(min)s und %(max)s liegen"
 
@@ -2085,11 +2665,11 @@ msgstr "Tariftyp"
 msgid "monthly price"
 msgstr "Monatspreis"
 
-msgid "Maximum total: reviewees + team members combined"
-msgstr "Maximum insgesamt: Beurteilte und Teammitglieder zusammen"
-
 msgid "maximum employees"
 msgstr "maximale Anzahl an Beschäftigten"
+
+msgid "Maximum total: reviewees + team members combined"
+msgstr "Maximum insgesamt: Beurteilte und Teammitglieder zusammen"
 
 msgid "Stripe price ID"
 msgstr "Stripe-Preis-ID"
@@ -2696,9 +3276,6 @@ msgstr "<strong>Endgültig löschen (vollständige Entfernung):</strong> Entfern
 msgid "Reviewees (%(count)s)"
 msgstr "Beurteilte (%(count)s)"
 
-msgid "Name"
-msgstr "Name"
-
 msgid "Department"
 msgstr "Abteilung"
 
@@ -2955,6 +3532,13 @@ msgstr "Abonnement „Enterprise“ starten"
 msgid "Ask an organization administrator to buy another round."
 msgstr "Weitere Pakete können nur Organisations-Admins kaufen."
 
+#, python-brace-format
+msgid "{name} stands for the first name of the person reviewed."
+msgstr "{name} steht für den Vornamen der beurteilten Person."
+
+msgid "Add option"
+msgstr "Option hinzufügen"
+
 #, python-format
 msgid "Type: %(type)s"
 msgstr "Typ: %(type)s"
@@ -2981,6 +3565,21 @@ msgstr "Diese Frage löschen?"
 
 msgid "Delete"
 msgstr "Löschen"
+
+#, python-format
+msgid "%(counter)s text missing"
+msgid_plural "%(counter)s texts missing"
+msgstr[0] "%(counter)s Text fehlt"
+msgstr[1] "%(counter)s Texte fehlen"
+
+#, python-format
+msgid "%(counter)s outdated"
+msgid_plural "%(counter)s outdated"
+msgstr[0] "%(counter)s veraltet"
+msgstr[1] "%(counter)s veraltet"
+
+msgid "Fully translated"
+msgstr "Vollständig übersetzt"
 
 msgid "Delete Product Review"
 msgstr "Produktbewertung löschen"
@@ -3294,6 +3893,9 @@ msgstr "Beschreibung (optional)"
 msgid "Comprehensive feedback covering leadership, communication, and technical skills"
 msgstr "Umfassendes Feedback zu Führung, Kommunikation und fachlichen Fähigkeiten"
 
+msgid "The language the questionnaire is written in. Translations into other languages are made from its texts."
+msgstr "Die Sprache, in der der Fragebogen geschrieben ist. Übersetzungen in andere Sprachen entstehen aus seinen Texten."
+
 msgid "Set as default questionnaire"
 msgstr "Als Standardfragebogen festlegen"
 
@@ -3302,6 +3904,12 @@ msgstr "Angaben aktualisieren"
 
 msgid "Preview"
 msgstr "Vorschau"
+
+msgid "Translations"
+msgstr "Übersetzungen"
+
+msgid "Translate"
+msgstr "Übersetzen"
 
 msgid "Edit Section"
 msgstr "Abschnitt bearbeiten"
@@ -3379,8 +3987,11 @@ msgstr "Einfachauswahl (Dropdown)"
 msgid "Multiple Choice (Checkboxes)"
 msgstr "Mehrfachauswahl (Checkboxen)"
 
-msgid "Likert Scale Items (one per line)"
-msgstr "Stufen der Likert-Skala (eine pro Zeile)"
+msgid "Rating labels"
+msgstr "Beschriftungen der Bewertungsskala"
+
+msgid "Likert Scale Items"
+msgstr "Stufen der Likert-Skala"
 
 msgid "Scale Configuration"
 msgstr "Skalenkonfiguration"
@@ -3407,14 +4018,11 @@ msgstr "Beschriftung Maximum (optional)"
 msgid "e.g., Extremely"
 msgstr "z. B. Extrem"
 
-msgid "Choices (one per line)"
-msgstr "Optionen (eine pro Zeile)"
+msgid "Choices"
+msgstr "Optionen"
 
 msgid "Enable numeric scoring for analytics"
 msgstr "Numerische Wertung für Auswertungen aktivieren"
-
-msgid "Assign weights to each option (for scoring)"
-msgstr "Jeder Option eine Gewichtung zuweisen (für die Wertung)"
 
 msgid "Required question"
 msgstr "Pflichtfrage"
@@ -3434,8 +4042,9 @@ msgstr "Noch keine Fragen in diesem Abschnitt."
 msgid "Add Question to This Section"
 msgstr "Frage zu diesem Abschnitt hinzufügen"
 
-msgid "How effectively does this person communicate complex ideas?"
-msgstr "Wie wirksam vermittelt diese Person komplexe Ideen?"
+#, python-brace-format
+msgid "How effectively does {name} communicate complex ideas?"
+msgstr "Wie wirkungsvoll vermittelt {name} komplexe Ideen?"
 
 msgid "Default 5-point scale provided. Customize or use 3-point, 7-point, etc."
 msgstr "Standardmäßig ist eine 5-stufige Skala vorgegeben, anpassbar z. B. auf 3 oder 7 Stufen."
@@ -3443,17 +4052,11 @@ msgstr "Standardmäßig ist eine 5-stufige Skala vorgegeben, anpassbar z. B. auf
 msgid "Creates a slider or numeric input for precise measurement (e.g., 1-100 scale)."
 msgstr "Erzeugt einen Schieberegler oder ein Zahlenfeld für genaue Messungen (z. B. Skala 1-100)."
 
-msgid "Option 1&#10;Option 2&#10;Option 3"
-msgstr "Option 1&#10;Option 2&#10;Option 3"
-
 msgid "When enabled, this question will contribute to section scores and charts"
 msgstr "Wenn aktiviert, fließt diese Frage in die Abschnittswerte und Diagramme ein"
 
 msgid "Learn more about scoring"
 msgstr "Mehr zur Wertung"
-
-msgid "Assign numeric values (e.g., 1-5 scale) to measure this dimension"
-msgstr "Zahlenwerte zuweisen (z. B. Skala 1-5), um diese Dimension zu messen"
 
 msgid "Dreyfus/Agency Configuration (Optional)"
 msgstr "Konfiguration Dreyfus/Eigeninitiative (optional)"
@@ -3478,15 +4081,6 @@ msgstr "Maßnahmen für Entwicklungspläne festlegen, wenn diese Frage niedrig b
 
 msgid "Add Question"
 msgstr "Frage hinzufügen"
-
-msgid "Option"
-msgstr "Option"
-
-msgid "Weight"
-msgstr "Gewichtung"
-
-msgid "(empty)"
-msgstr "(leer)"
 
 #, python-format
 msgid "Action Item #%(number)s"
@@ -3660,6 +4254,21 @@ msgstr "Abschnittsbeschreibung (optional)"
 msgid "Questions about leadership style, decision-making, and team management"
 msgstr "Fragen zu Führungsstil, Entscheidungsfindung und Teamführung"
 
+msgid "Option"
+msgstr "Option"
+
+msgid "Weight"
+msgstr "Gewichtung"
+
+msgid "Move up"
+msgstr "Nach oben"
+
+msgid "Move down"
+msgstr "Nach unten"
+
+msgid "Remove option"
+msgstr "Option entfernen"
+
 msgid "Request failed."
 msgstr "Anfrage fehlgeschlagen."
 
@@ -3749,6 +4358,9 @@ msgstr "Es wurde noch kein Fragebogen eingerichtet"
 msgid "Preview: %(name)s"
 msgstr "Vorschau: %(name)s"
 
+msgid "Preview language"
+msgstr "Sprache der Vorschau"
+
 msgid "Rating scale:"
 msgstr "Bewertungsskala:"
 
@@ -3822,6 +4434,29 @@ msgstr "Leistung aufgeschlüsselt nach Kompetenzbereichen"
 
 msgid "Overall score (excluding self-assessment)"
 msgstr "Gesamtwert (ohne Selbsteinschätzung)"
+
+#, python-format
+msgid "Translate %(name)s into %(language)s"
+msgstr "%(name)s übersetzen: %(language)s"
+
+#, python-format
+msgid "Translate into %(language)s"
+msgstr "Übersetzung: %(language)s"
+
+msgid "Back to Editor"
+msgstr "Zurück zum Editor"
+
+msgid "Missing"
+msgstr "Fehlt"
+
+msgid "Outdated"
+msgstr "Veraltet"
+
+msgid "Still correct"
+msgstr "Passt noch"
+
+msgid "Save Translation"
+msgstr "Übersetzung speichern"
 
 msgid "Submit Your Review"
 msgstr "Bewertung abgeben"
@@ -4944,23 +5579,11 @@ msgstr "Stufen der Eigeninitiative"
 msgid "Dreyfus Model of Skill Acquisition"
 msgstr "Dreyfus-Modell des Kompetenzerwerbs"
 
-msgid "Novice"
-msgstr "Neuling"
-
 msgid "Advanced"
 msgstr "Fortgeschrittene:r"
 
 msgid "Beginner"
 msgstr "Anfänger:in"
-
-msgid "Competent"
-msgstr "Kompetent"
-
-msgid "Proficient"
-msgstr "Gewandt"
-
-msgid "Expert"
-msgstr "Expert:in"
 
 msgid "Rigid rule"
 msgstr "Befolgt Regeln"
@@ -5596,18 +6219,6 @@ msgstr "Weg zur Stufe %(stage)s"
 msgid "To Reach Level %(level)s:"
 msgstr "Weg zu Stufe %(level)s:"
 
-msgid "Assisted"
-msgstr "Unterstützt"
-
-msgid "Independent"
-msgstr "Selbstständig"
-
-msgid "Proactive"
-msgstr "Proaktiv"
-
-msgid "Self-Driven"
-msgstr "Selbstgesteuert"
-
 msgid "When reporting problems, investigate root causes"
 msgstr "Bei gemeldeten Problemen die Ursachen untersuchen"
 
@@ -5695,6 +6306,12 @@ msgid "%(counter)s response"
 msgid_plural "%(counter)s responses"
 msgstr[0] "%(counter)s Antwort"
 msgstr[1] "%(counter)s Antworten"
+
+#, python-format
+msgid "%(counter)s answer could not be matched to an option, because the question changed after it was given."
+msgid_plural "%(counter)s answers could not be matched to an option, because the question changed after they were given."
+msgstr[0] "%(counter)s Antwort ließ sich keiner Option zuordnen, weil die Frage nach ihrer Abgabe geändert wurde."
+msgstr[1] "%(counter)s Antworten ließen sich keiner Option zuordnen, weil die Frage nach ihrer Abgabe geändert wurde."
 
 #, python-format
 msgid "Strong consensus: %(pct)s%% positive (%(positive)s of %(total)s respondents)"
@@ -5810,21 +6427,6 @@ msgstr "Selbsteinschätzung im Vergleich zum Feedback der anderen (nach Größe 
 
 msgid "How your self-assessment compares to others' feedback (sorted by gap size)"
 msgstr "Ihre Selbsteinschätzung im Vergleich zum Feedback der anderen (nach Größe der Abweichung sortiert)"
-
-msgid "Excellent (4.5+)"
-msgstr "Ausgezeichnet (4,5+)"
-
-msgid "Strong (3.5-4.4)"
-msgstr "Stark (3,5–4,4)"
-
-msgid "Good (2.6-3.4)"
-msgstr "Gut (2,6–3,4)"
-
-msgid "Developing (2.0-2.5)"
-msgstr "In Entwicklung (2,0–2,5)"
-
-msgid "Needs Development (&lt;2.0)"
-msgstr "Entwicklungsbedarf (&lt;2,0)"
 
 #, python-format
 msgid "Comparison vs %(count)s peers"

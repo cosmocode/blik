@@ -28,7 +28,7 @@
     "pk": 2001,
     "fields": {
       "section": 201,
-      "question_text": "This person is visible and engaged with the team",
+      "question_text": "{name} is visible and engaged with the team",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -55,7 +55,7 @@
     "pk": 2002,
     "fields": {
       "section": 201,
-      "question_text": "I trust this person's intentions and decisions",
+      "question_text": "I trust {name}'s intentions and decisions",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -82,7 +82,7 @@
     "pk": 2003,
     "fields": {
       "section": 201,
-      "question_text": "This person communicates clearly about decisions and their reasoning",
+      "question_text": "{name} communicates clearly about decisions and their reasoning",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -148,7 +148,7 @@
     "pk": 2005,
     "fields": {
       "section": 202,
-      "question_text": "This person provides clear direction and gives appropriate autonomy to execute",
+      "question_text": "{name} provides clear direction and gives appropriate autonomy to execute",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -216,7 +216,7 @@
     "pk": 2007,
     "fields": {
       "section": 203,
-      "question_text": "This person understands the content of our work well enough to guide effectively",
+      "question_text": "{name} understands the content of our work well enough to guide effectively",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -243,7 +243,7 @@
     "pk": 2008,
     "fields": {
       "section": 203,
-      "question_text": "This person makes informed decisions about our work",
+      "question_text": "{name} makes informed decisions about our work",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -282,7 +282,7 @@
     "pk": 2009,
     "fields": {
       "section": 204,
-      "question_text": "This person's way of leading contributes visibly to team performance",
+      "question_text": "{name}'s way of leading contributes visibly to team performance",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -310,7 +310,7 @@
     "pk": 2010,
     "fields": {
       "section": 204,
-      "question_text": "This person encourages results-oriented work",
+      "question_text": "{name} encourages results-oriented work",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -349,7 +349,7 @@
     "pk": 2011,
     "fields": {
       "section": 205,
-      "question_text": "I receive regular, useful feedback from this person",
+      "question_text": "I receive regular, useful feedback from {name}",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -377,7 +377,7 @@
     "pk": 2012,
     "fields": {
       "section": 205,
-      "question_text": "This person recognizes good work when it happens",
+      "question_text": "{name} recognizes good work when it happens",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -416,7 +416,7 @@
     "pk": 2013,
     "fields": {
       "section": 206,
-      "question_text": "This person encourages personal and professional growth",
+      "question_text": "{name} encourages personal and professional growth",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -443,7 +443,7 @@
     "pk": 2014,
     "fields": {
       "section": 206,
-      "question_text": "This person recognizes and names individual strengths",
+      "question_text": "{name} recognizes and names individual strengths",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -470,7 +470,7 @@
     "pk": 2015,
     "fields": {
       "section": 206,
-      "question_text": "This person supports the development of new skills",
+      "question_text": "{name} supports the development of new skills",
       "question_type": "rating",
       "config": {
         "min": 1,
@@ -510,7 +510,7 @@
     "pk": 2016,
     "fields": {
       "section": 207,
-      "question_text": "What should this person keep doing?",
+      "question_text": "What should {name} keep doing?",
       "question_type": "text",
       "config": {},
       "required": false,
@@ -524,7 +524,7 @@
     "pk": 2017,
     "fields": {
       "section": 207,
-      "question_text": "What should this person do differently?",
+      "question_text": "What should {name} do differently?",
       "question_type": "text",
       "config": {},
       "required": false,

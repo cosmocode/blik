@@ -14,11 +14,11 @@ from django.core.validators import validate_email
 from django.db import transaction
 from django.db.models import ProtectedError
 from django.db.models import Avg, Count, Max, OuterRef, Q, Subquery
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import timezone, translation
 from django.utils.functional import partition
 from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.http import require_POST
@@ -41,12 +41,21 @@ from core.languages import default_language, is_language, language_name
 from core.gdpr import GDPRDeletionService
 from core.models import Organization
 from productreviews.models import ProductReview, anonymous_name
+from questionnaires.action_items import add_action_item_keys
+from questionnaires.answer_options import DEFAULT_LIKERT_SCALE, save_options
 from questionnaires.models import Question, QuestionSection, Questionnaire
+from questionnaires.translations import (
+    LanguageState,
+    get_language_states,
+    get_text_translations,
+    has_translation,
+    save_text_translations,
+)
 from reports.dreyfus_service import (
-    AGENCY_STAGES,
-    DREYFUS_STAGES,
+    agency_profile_with_texts,
     calculate_dreyfus_quadrant,
-    _get_development_focus,
+    quadrant_with_texts,
+    skill_profile_with_texts,
     _level_to_stage,
 )
 from reports.models import Report
@@ -68,6 +77,19 @@ from subscriptions.utils import (
 )
 
 logger = logging.getLogger(__name__)
+
+# A new rating question reads its five values like the default likert scale
+DEFAULT_RATING_LABELS = {f'{value}': label for value, label in enumerate(DEFAULT_LIKERT_SCALE, 1)}
+
+
+def get_default_labels(questionnaire):
+    """The default likert scale and rating labels of a new question, in the questionnaire's source language."""
+
+    with translation.override(questionnaire.source_language):
+        likert_scale = [f'{label}' for label in DEFAULT_LIKERT_SCALE]
+        rating_labels = {key: f'{label}' for key, label in DEFAULT_RATING_LABELS.items()}
+
+    return likert_scale, rating_labels
 
 
 def get_cycle_or_404(request, cycle_uuid):
@@ -636,8 +658,12 @@ def questionnaire_list(request):
         question_count=Subquery(question_count_subquery),
         cycle_count=Count('review_cycles')
     ).prefetch_related(
-        'sections__questions'
+        *Questionnaire.translation_lookups()
     ).order_by('-is_default', 'name')
+
+    # The languages it is translated into, at least in part
+    for questionnaire in questionnaires:
+        questionnaire.translation_states = [state for state in get_language_states(questionnaire) if state.translated]
 
     # Archived ones are kept out of the way but stay reachable: their cycles
     # and reports still reference them, so they cannot simply disappear.
@@ -654,13 +680,19 @@ def questionnaire_list(request):
 
 @login_required
 def questionnaire_preview(request, questionnaire_id):
-    """Preview a questionnaire"""
+    """Preview a questionnaire in its source language, or in the language that ?lang= picks."""
     questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
-    sections = questionnaire.sections.prefetch_related('questions').all()
+    language = request.GET.get('lang')
+
+    if not is_language(language):
+        language = questionnaire.source_language
+
+    questionnaire = questionnaire.translated(language)
 
     context = {
         'questionnaire': questionnaire,
-        'sections': sections,
+        'sections': questionnaire.sections.all(),
+        'preview_language': language,
     }
 
     return render(request, 'admin_dashboard/questionnaire_preview.html', context)
@@ -674,10 +706,7 @@ def questionnaire_sample_report(request, questionnaire_id):
     can reuse the real Dreyfus diamond + agency SVGs and Chart.js radar/gap
     graphs. Seeded by questionnaire id so reloads look identical.
     """
-    questionnaire = get_object_or_404(
-        Questionnaire.objects.prefetch_related('sections__questions'),
-        id=questionnaire_id,
-    )
+    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id).translated()
 
     rng = random.Random(questionnaire.id)
 
@@ -722,39 +751,26 @@ def questionnaire_sample_report(request, questionnaire_id):
 
     if has_skill:
         skill_level = round(rng.uniform(3.2, 4.1), 2)
-        stage_num = _level_to_stage(skill_level)
-        stage_info = DREYFUS_STAGES[stage_num].copy()
-        next_stage_num = min(5, stage_num + 1)
-        if next_stage_num > stage_num:
-            stage_info['next_stage'] = DREYFUS_STAGES[next_stage_num]['name']
-            stage_info['development_focus'] = _get_development_focus(stage_num, next_stage_num)
-        else:
-            stage_info['next_stage'] = None
-            stage_info['development_focus'] = [_('Continue deepening expertise and innovating')]
-
-        insights['skill_profile'] = {
+        insights['skill_profile'] = skill_profile_with_texts({
             'skill_level': skill_level,
-            'skill_stage': stage_info['name'],
+            'stage': _level_to_stage(skill_level),
             'confidence': 0.85,
-            'stage_info': stage_info,
-        }
+        })
 
     if has_agency:
         agency_level = round(rng.uniform(3.4, 4.3), 2)
-        agency_stage_num = max(1, min(5, round(agency_level)))
-        agency_stage_info = AGENCY_STAGES[agency_stage_num]
-        insights['agency_profile'] = {
+        insights['agency_profile'] = agency_profile_with_texts({
             'agency_level': agency_level,
-            'agency_stage': agency_stage_info['name'],
+            'stage': _level_to_stage(agency_level),
             'confidence': 0.85,
-            'description': agency_stage_info['description'],
-        }
+        })
 
     if has_skill and has_agency:
-        insights['dreyfus_quadrant'] = calculate_dreyfus_quadrant(
+        quadrant = calculate_dreyfus_quadrant(
             insights['skill_profile']['skill_level'],
             insights['agency_profile']['agency_level'],
         )
+        insights['dreyfus_quadrant'] = quadrant_with_texts(quadrant)
 
     # Minimal development plan so the "next level" cards render.
     if has_skill:
@@ -788,10 +804,17 @@ def questionnaire_create(request):
         name = request.POST.get('name')
         description = request.POST.get('description', '')
         is_default = request.POST.get('is_default') == 'on'
+        source_language = request.POST.get('source_language')
+
+        if not is_language(source_language):
+            source_language = translation.get_language()
 
         if not name:
             messages.error(request, _('Questionnaire name is required.'))
-            return render(request, 'admin_dashboard/questionnaire_form.html', {'action': 'Create'})
+            return render(request, 'admin_dashboard/questionnaire_form.html', {
+                'action': 'Create',
+                'source_language': source_language,
+            })
 
         try:
             # Get organization from request context
@@ -801,7 +824,8 @@ def questionnaire_create(request):
                 name=name,
                 description=description,
                 is_default=is_default,
-                organization=org
+                organization=org,
+                source_language=source_language,
             )
             messages.success(request, _('Questionnaire "%(name)s" created successfully.') % {'name': questionnaire.name})
             return redirect('questionnaire_edit', questionnaire_id=questionnaire.id)
@@ -810,9 +834,46 @@ def questionnaire_create(request):
 
     context = {
         'action': 'Create',
+        # New questionnaires are most likely written in the language their author works in
+        'source_language': translation.get_language(),
     }
 
     return render(request, 'admin_dashboard/questionnaire_form.html', context)
+
+
+def posted_labels(post, question_type):
+    """The rating or scale labels the question editor posted, without the empty ones."""
+
+    if question_type == 'rating':
+        fields = {key: f'rating_label_{key}' for key in DEFAULT_RATING_LABELS}
+    elif question_type == 'scale':
+        fields = {'min': 'scale_min_label', 'max': 'scale_max_label'}
+    else:
+        return {}
+
+    labels = {key: post.get(field, '').strip() for key, field in fields.items()}
+
+    return {key: label for key, label in labels.items() if label}
+
+
+def posted_option_rows(post, prefix, with_weights=False):
+    """The answer options the question editor posted, as [(id or None, label, weight), ...].
+
+    Each row posts the id of its option (empty for a new one), its label and, for choice questions, its weight. Rows
+    without a label are dropped. Raises ValueError for a weight that is not a number.
+    """
+
+    ids = post.getlist(f'{prefix}_option_id')
+    labels = post.getlist(f'{prefix}_option_label')
+    weights = post.getlist(f'{prefix}_option_weight') if with_weights else [''] * len(labels)
+    rows = []
+
+    for posted_id, label, weight in zip(ids, labels, weights):
+        if label := label.strip():
+            option_id = int(posted_id) if posted_id.isdigit() else None
+            rows.append((option_id, label, float(weight) if with_weights else None))
+
+    return rows
 
 
 @login_required
@@ -829,13 +890,30 @@ def questionnaire_edit(request, questionnaire_id):
         organization=org
     )
 
+    default_likert_scale, default_rating_labels = get_default_labels(questionnaire)
+
     if request.method == 'POST':
         action = request.POST.get('action')
 
         if action == 'update_info':
+            source_language = request.POST.get('source_language')
+
+            if not is_language(source_language):
+                source_language = questionnaire.source_language
+
+            # The source language cannot also have a translation
+            if source_language != questionnaire.source_language and has_translation(questionnaire, source_language):
+                messages.error(
+                    request,
+                    _('This questionnaire is already translated into %(language)s. Empty that translation first to '
+                      'make %(language)s its source language.') % {'language': language_name(source_language)},
+                )
+                return redirect('questionnaire_edit', questionnaire_id=questionnaire.id)
+
             questionnaire.name = request.POST.get('name', questionnaire.name)
             questionnaire.description = request.POST.get('description', '')
             questionnaire.is_default = request.POST.get('is_default') == 'on'
+            questionnaire.source_language = source_language
 
             try:
                 questionnaire.save()
@@ -893,62 +971,38 @@ def questionnaire_edit(request, questionnaire_id):
 
                     # Build config based on question type
                     config = {}
+                    option_rows = []
+                    labels = posted_labels(request.POST, question_type)
                     if question_type == 'rating':
-                        config = {
-                            'min': 1,
-                            'max': 5,
-                            'labels': {
-                                '1': 'Strongly Disagree',
-                                '2': 'Disagree',
-                                '3': 'Neutral',
-                                '4': 'Agree',
-                                '5': 'Strongly Agree'
-                            }
-                        }
+                        config = {'min': 1, 'max': 5}
+                        labels = labels or default_rating_labels
                     elif question_type == 'likert':
-                        scale_raw = request.POST.get('likert_scale', '')
-                        if scale_raw:
-                            scale = [s.strip() for s in scale_raw.split('\n') if s.strip()]
-                        else:
-                            scale = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree']
-                        config = {'scale': scale}
-                    elif question_type == 'single_choice' or question_type == 'multiple_choice':
-                        choices_raw = request.POST.get('choices', '')
-                        choices = [c.strip() for c in choices_raw.split('\n') if c.strip()]
-                        config = {'choices': choices}
+                        option_rows = posted_option_rows(request.POST, 'likert')
 
-                        # Check if scoring is enabled and weights are provided
+                        if not option_rows:
+                            option_rows = [(None, label, None) for label in default_likert_scale]
+                    elif question_type == 'single_choice' or question_type == 'multiple_choice':
+                        # Weights only count with scoring enabled
                         enable_scoring = request.POST.get('enable_scoring') == 'on'
-                        if enable_scoring:
-                            weights_raw = request.POST.getlist('weights[]')
-                            try:
-                                # Parse weights as floats
-                                weights = [float(w) for w in weights_raw if w.strip()]
-                                # Validate: weights must match choices length
-                                if len(weights) == len(choices):
-                                    config['weights'] = weights
-                                    config['scoring_enabled'] = True
-                                else:
-                                    messages.warning(request, _('Weights count did not match choices count. Scoring disabled for this question.'))
-                            except (ValueError, TypeError):
-                                messages.warning(request, _('Invalid weight values. Scoring disabled for this question.'))
+
+                        try:
+                            option_rows = posted_option_rows(request.POST, 'choice', with_weights=enable_scoring)
+                        except ValueError:
+                            option_rows = posted_option_rows(request.POST, 'choice')
+                            messages.warning(request, _('Invalid weight values. Scoring disabled for this question.'))
+                        else:
+                            config = {'scoring_enabled': True} if enable_scoring else {}
                     elif question_type == 'scale':
                         try:
                             min_val = int(request.POST.get('scale_min', 1))
                             max_val = int(request.POST.get('scale_max', 100))
                             step_val = int(request.POST.get('scale_step', 1))
-                            min_label = request.POST.get('scale_min_label', '').strip()
-                            max_label = request.POST.get('scale_max_label', '').strip()
 
                             config = {
                                 'min': min_val,
                                 'max': max_val,
                                 'step': step_val
                             }
-                            if min_label:
-                                config['min_label'] = min_label
-                            if max_label:
-                                config['max_label'] = max_label
                         except (ValueError, TypeError):
                             # Use defaults if parsing fails
                             config = {'min': 1, 'max': 100, 'step': 1}
@@ -994,10 +1048,12 @@ def questionnaire_edit(request, questionnaire_id):
                         question_text=question_text,
                         question_type=question_type,
                         config=config,
+                        labels=labels,
                         required=required,
                         order=next_order,
-                        action_items=action_items
+                        action_items=add_action_item_keys(action_items)
                     )
+                    save_options(question, option_rows)
 
                     if is_ajax:
                         question_html = render_to_string(
@@ -1052,7 +1108,6 @@ def questionnaire_edit(request, questionnaire_id):
             if question_id and question_text:
                 try:
                     question = Question.objects.get(id=question_id, section__questionnaire=questionnaire)
-                    previous_type = question.question_type
                     previous_config = question.config
 
                     # Update basic fields
@@ -1062,75 +1117,51 @@ def questionnaire_edit(request, questionnaire_id):
 
                     # Build config based on question type
                     config = {}
+                    option_rows = []
+                    labels = posted_labels(request.POST, question_type)
                     if question_type == 'rating':
-                        config = {
-                            'min': 1,
-                            'max': 5,
-                            'labels': {
-                                '1': 'Strongly Disagree',
-                                '2': 'Disagree',
-                                '3': 'Neutral',
-                                '4': 'Agree',
-                                '5': 'Strongly Agree'
-                            }
-                        }
+                        config = {'min': 1, 'max': 5}
+                        labels = labels or default_rating_labels
                     elif question_type == 'likert':
-                        scale_raw = request.POST.get('likert_scale', '')
-                        if scale_raw:
-                            scale = [s.strip() for s in scale_raw.split('\n') if s.strip()]
-                        else:
-                            scale = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree']
-                        config = {'scale': scale}
-                    elif question_type == 'single_choice' or question_type == 'multiple_choice':
-                        choices_raw = request.POST.get('choices', '')
-                        choices = [c.strip() for c in choices_raw.split('\n') if c.strip()]
-                        config = {'choices': choices}
+                        option_rows = posted_option_rows(request.POST, 'likert')
 
-                        # Check if scoring is enabled and weights are provided
+                        if not option_rows:
+                            option_rows = [(None, label, None) for label in default_likert_scale]
+                    elif question_type == 'single_choice' or question_type == 'multiple_choice':
+                        # Weights only count with scoring enabled
                         enable_scoring = request.POST.get('enable_scoring') == 'on'
-                        if enable_scoring:
-                            weights_raw = request.POST.getlist('weights[]')
-                            try:
-                                # Parse weights as floats
-                                weights = [float(w) for w in weights_raw if w.strip()]
-                                # Validate: weights must match choices length
-                                if len(weights) == len(choices):
-                                    config['weights'] = weights
-                                    config['scoring_enabled'] = True
-                                else:
-                                    messages.warning(request, _('Weights count did not match choices count. Scoring disabled for this question.'))
-                            except (ValueError, TypeError):
-                                messages.warning(request, _('Invalid weight values. Scoring disabled for this question.'))
+
+                        try:
+                            option_rows = posted_option_rows(request.POST, 'choice', with_weights=enable_scoring)
+                        except ValueError:
+                            option_rows = posted_option_rows(request.POST, 'choice')
+                            messages.warning(request, _('Invalid weight values. Scoring disabled for this question.'))
+                        else:
+                            config = {'scoring_enabled': True} if enable_scoring else {}
                     elif question_type == 'scale':
                         try:
                             min_val = int(request.POST.get('scale_min', 1))
                             max_val = int(request.POST.get('scale_max', 100))
                             step_val = int(request.POST.get('scale_step', 1))
-                            min_label = request.POST.get('scale_min_label', '').strip()
-                            max_label = request.POST.get('scale_max_label', '').strip()
 
                             config = {
                                 'min': min_val,
                                 'max': max_val,
                                 'step': step_val
                             }
-                            if min_label:
-                                config['min_label'] = min_label
-                            if max_label:
-                                config['max_label'] = max_label
                         except (ValueError, TypeError):
                             # Use defaults if parsing fails
                             config = {'min': 1, 'max': 100, 'step': 1}
                             messages.warning(request, _('Invalid scale values. Using defaults (1-100, step 1).'))
 
-                    # The dialog shows neither the Dreyfus weights nor the labels of a rating scale, so keep them
+                    # The dialog doesn't show the Dreyfus weights, so keep them
                     if 'dreyfus_mapping' in previous_config:
                         config['dreyfus_mapping'] = previous_config['dreyfus_mapping']
-                    if question_type == previous_type == 'rating' and 'labels' in previous_config:
-                        config['labels'] = previous_config['labels']
 
                     question.config = config
+                    question.labels = labels
                     question.save()
+                    save_options(question, option_rows)
 
                     if is_ajax:
                         return JsonResponse({
@@ -1143,6 +1174,8 @@ def questionnaire_edit(request, questionnaire_id):
                                 'question_type_display': question.get_question_type_display(),
                                 'required': question.required,
                                 'config': question.config,
+                                'options': question.options_data,
+                                'labels': question.labels,
                             },
                         })
 
@@ -1188,6 +1221,7 @@ def questionnaire_edit(request, questionnaire_id):
                         text = request.POST.get(f'action_items[{idx}][text]', '').strip()
                         threshold = request.POST.get(f'action_items[{idx}][threshold]', 3.0)
                         stages_raw = request.POST.getlist(f'action_items[{idx}][stages][]')
+                        key = request.POST.get(f'action_items[{idx}][key]', '').strip()
 
                         if text:  # Only add if text is not empty
                             item = {
@@ -1195,13 +1229,16 @@ def questionnaire_edit(request, questionnaire_id):
                                 'threshold': float(threshold)
                             }
 
+                            if key:
+                                item['key'] = key
+
                             # Add stages if any are selected
                             if stages_raw:
                                 item['stages'] = [int(s) for s in stages_raw]
 
                             action_items.append(item)
 
-                    question.action_items = action_items
+                    question.action_items = add_action_item_keys(action_items)
                     question.save()
 
                     messages.success(request, _('Dreyfus/Agency configuration updated successfully.'))
@@ -1212,15 +1249,52 @@ def questionnaire_edit(request, questionnaire_id):
 
         return redirect('questionnaire_edit', questionnaire_id=questionnaire.id)
 
-    sections = questionnaire.sections.prefetch_related('questions').all()
-
     context = {
         'action': 'Edit',
         'questionnaire': questionnaire,
-        'sections': sections,
+        'source_language': questionnaire.source_language,
+        'translation_states': get_language_states(questionnaire),
+        # The translation states prefetched the sections, questions and options
+        'sections': questionnaire.sections.all(),
+        'default_likert_scale': default_likert_scale,
+        'default_rating_labels': default_rating_labels,
     }
 
     return render(request, 'admin_dashboard/questionnaire_form.html', context)
+
+
+@login_required
+@can_manage_questionnaires_required
+def questionnaire_translate(request, questionnaire_id, language):
+    """Translate the texts of a questionnaire into another language, next to its source texts."""
+
+    questionnaire = get_object_or_404(
+        Questionnaire,
+        id=questionnaire_id,
+        organization=getattr(request, 'organization', None),
+    )
+
+    if not is_language(language) or language == questionnaire.source_language:
+        raise Http404
+
+    if request.method == 'POST':
+        if errors := save_text_translations(questionnaire, language, request.POST):
+            for error in errors:
+                messages.error(request, error)
+        else:
+            messages.success(request, _('Translation saved.'))
+
+        return redirect('questionnaire_translate', questionnaire_id=questionnaire.id, language=language)
+
+    texts = get_text_translations(questionnaire, language)
+    context = {
+        'questionnaire': questionnaire,
+        'texts': texts,
+        'state': LanguageState.from_texts(language, texts),
+        'source_language_name': language_name(questionnaire.source_language),
+    }
+
+    return render(request, 'admin_dashboard/questionnaire_translate.html', context)
 
 
 @login_required
