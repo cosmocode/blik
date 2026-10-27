@@ -2,6 +2,8 @@ import os
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.core.management.color import no_style
+from django.db import connection
 
 from core.languages import is_language
 from core.models import Organization
@@ -72,6 +74,11 @@ class Command(BaseCommand):
                 org.default_language = self.language(os.environ['ORGANIZATION_LANGUAGE'], settings.LANGUAGE_CODE)
             org.is_active = True
             org.save()
+            # Saving with an explicit id does not advance the PostgreSQL id
+            # sequence, so the next Organization insert would reuse id 1.
+            with connection.cursor() as cursor:
+                for sql in connection.ops.sequence_reset_sql(no_style(), [Organization]):
+                    cursor.execute(sql)
             self.stdout.write(
                 self.style.SUCCESS(f'Created organization: {org.name}')
             )

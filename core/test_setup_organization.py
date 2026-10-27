@@ -5,9 +5,11 @@ Organization row on first run, and on subsequent runs it must not
 silently overwrite fields that the user has edited through the admin UI.
 """
 import os
+from unittest import skipUnless
 from unittest.mock import patch
 
 from django.core.management import call_command
+from django.db import connection
 from django.test import TestCase
 
 from core.models import Organization
@@ -117,3 +119,17 @@ class SetupOrganizationCommandTests(TestCase):
 
         org = Organization.objects.get(id=1)
         self.assertEqual(org.smtp_password, 's3cret')
+
+    @skipUnless(connection.vendor == 'postgresql', 'id sequences are PostgreSQL-only')
+    def test_first_run_leaves_room_for_the_next_organization(self):
+        """Creating id=1 explicitly must advance the id sequence, or the next
+        Organization insert collides with it (fresh DB, then screenshot data)."""
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT setval(pg_get_serial_sequence('organizations', 'id'), 1, false)"
+            )
+        self._run()
+
+        other = Organization.objects.create(name='Other', email='other@example.com')
+
+        self.assertNotEqual(other.id, 1)
