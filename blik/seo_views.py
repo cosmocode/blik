@@ -39,6 +39,7 @@ def sitemap(request):
     exclude_names = {
         'og_image', 'robots', 'sitemap', 'signup',
         'dreyfus_assessment_submit', 'dreyfus_capture_email',
+        'how_it_works_a', 'how_it_works_b',  # design drafts, not public yet
     }
 
     # Priority overrides (default is 0.8)

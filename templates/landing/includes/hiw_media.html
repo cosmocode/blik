@@ -1,0 +1,29 @@
+{% load static %}
+{# One screenshot for the how-it-works drafts. m: {kind: browser|phone, shot, alt, placeholder} #}
+{% with base='img/screenshots/'|add:m.shot %}
+{% if m.placeholder %}
+<figure class="hiw-shot hiw-shot--{{ m.kind }} hiw-shot--pending">
+    <div class="hiw-pending" role="img" aria-label="{{ m.alt }} (screenshot not ready)">
+        <span class="hiw-pending-title">Screenshot pending</span>
+        <span class="hiw-pending-desc">{{ m.alt }}</span>
+        <code class="hiw-pending-file">{{ m.shot }}_light.webp</code>
+        <code class="hiw-pending-file">{{ m.shot }}_dark.webp</code>
+    </div>
+</figure>
+{% elif m.kind == 'phone' %}
+<figure class="hiw-shot hiw-shot--phone">
+    <div class="hiw-phone">
+        <img class="img-light" src="{% static base|add:'_light.webp' %}" alt="{{ m.alt }}" width="375" height="812" loading="lazy">
+        <img class="img-dark" src="{% static base|add:'_dark.webp' %}" alt="" width="375" height="812" loading="lazy">
+    </div>
+</figure>
+{% else %}
+<figure class="hiw-shot hiw-shot--browser"{% if m.focus %} style="--focus: {{ m.focus }}"{% endif %}>
+    <div class="browser-frame">
+        <div class="browser-frame-bar"><span></span><span></span><span></span></div>
+        <img class="img-light" src="{% static base|add:'_light.webp' %}" alt="{{ m.alt }}" width="1920" height="1080" loading="lazy">
+        <img class="img-dark" src="{% static base|add:'_dark.webp' %}" alt="" width="1920" height="1080" loading="lazy">
+    </div>
+</figure>
+{% endif %}
+{% endwith %}
