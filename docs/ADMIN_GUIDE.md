@@ -60,6 +60,7 @@ can't be silently reverted by the next restart.
 | Setting | Environment variable |
 |---------|----------------------|
 | Organization Name | `ORGANIZATION_NAME` |
+| Default Language | `ORGANIZATION_LANGUAGE` |
 | Contact Email / From Email | `DEFAULT_FROM_EMAIL` |
 | SMTP Host | `EMAIL_HOST` |
 | SMTP Port | `EMAIL_PORT` |

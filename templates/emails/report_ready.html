@@ -1,3 +1,4 @@
+{% load i18n %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,40 +18,40 @@
     <div class="container">
         <div class="header">
             <div style="font-size: 3rem; margin-bottom: 10px;">📊</div>
-            <h1 style="margin: 0; font-size: 1.75rem;">Your Report is Ready!</h1>
+            <h1 style="margin: 0; font-size: 1.75rem;">{% trans 'Your Report is Ready!' %}</h1>
         </div>
         <div class="content">
-            <p>Hi <strong>{{ reviewee.name }}</strong>,</p>
+            <p>{% blocktrans trimmed with name=reviewee.name %}Hi <strong>{{ name }}</strong>,{% endblocktrans %}</p>
 
-            <p>Your 360-degree feedback report is now ready!</p>
+            <p>{% trans 'Your 360-degree feedback report is now ready!' %}</p>
 
             <div style="text-align: center;">
-                <a href="{{ report_url }}" class="button">View Your Report</a>
+                <a href="{{ report_url }}" class="button">{% trans 'View Your Report' %}</a>
             </div>
 
             <div class="stats">
-                <p style="margin: 0; font-weight: 600; color: #065f46;">Report Summary</p>
+                <p style="margin: 0; font-weight: 600; color: #065f46;">{% trans 'Report Summary' %}</p>
                 <p style="margin: 10px 0 0 0; color: #047857;">
-                    This report contains feedback from <strong>{{ response_count }} reviewer(s)</strong> across different categories.
+                    {% blocktrans trimmed %}This report contains feedback from <strong>{{ response_count }} reviewer(s)</strong> across different categories.{% endblocktrans %}
                 </p>
             </div>
 
-            <p><strong>The report includes:</strong></p>
+            <p><strong>{% trans 'The report includes:' %}</strong></p>
             <ul style="color: #4b5563;">
-                <li>Overall performance insights</li>
-                <li>Strength areas and development opportunities</li>
-                <li>Perception gap analysis (if applicable)</li>
-                <li>Detailed feedback by competency area</li>
+                <li>{% trans 'Overall performance insights' %}</li>
+                <li>{% trans 'Strength areas and development opportunities' %}</li>
+                <li>{% trans 'Perception gap analysis (if applicable)' %}</li>
+                <li>{% trans 'Detailed feedback by competency area' %}</li>
             </ul>
 
             <div class="info-box">
-                <strong>Privacy:</strong> Your report is completely confidential and accessible only through the secure link above.
+                <strong>{% trans 'Privacy:' %}</strong> {% trans 'Your report is completely confidential and accessible only through the secure link above.' %}
             </div>
 
-            <p><strong>Questionnaire:</strong> {{ cycle.questionnaire.name }}</p>
+            <p><strong>{% trans 'Questionnaire:' %}</strong> {{ cycle.questionnaire.name }}</p>
         </div>
         <div class="footer">
-            <p>This is an automated email from your feedback system.</p>
+            <p>{% trans 'This is an automated email from your feedback system.' %}</p>
         </div>
     </div>
 </body>

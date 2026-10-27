@@ -1,10 +1,11 @@
+{% load i18n %}
 {% load static feedback_tags %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback - {{ reviewee.name }}</title>
+    <title>{% trans 'Feedback' %} - {{ reviewee.name }}</title>
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <script>
         // Theme detection and initialization
@@ -32,9 +33,11 @@
     </script>
 </head>
 <body style="background: var(--bg-body);">
+    {% url 'reviews:feedback_language' token.token as language_url %}
+    {% include 'components/language_switcher.html' with action=language_url corner=True %}
     <div class="feedback-container">
         <div class="feedback-header">
-            <h1>360 Feedback</h1>
+            <h1>{% trans '360 Feedback' %}</h1>
             <div class="reviewee-name">{{ reviewee.name }}</div>
             <div class="category-badge">{{ token.get_category_display }}</div>
         </div>
@@ -43,7 +46,7 @@
             <div class="progress-bar">
                 <div class="progress-fill"></div>
             </div>
-            <div class="progress-text">Step 1 of {{ sections|length }}</div>
+            <div class="progress-text">{% blocktrans trimmed with total=sections|length %}Step 1 of {{ total }}{% endblocktrans %}</div>
         </div>
 
         <div id="error-container" class="error-message" style="display: none;"></div>
@@ -113,7 +116,7 @@
                         name="question_{{ question.id }}"
                         class="text-input"
                         {% if question.required %}required{% endif %}
-                        placeholder="Share your thoughts..."
+                        placeholder="{% trans 'Share your thoughts...' %}"
                     >{% if existing_responses|get_item:question.id %}{{ existing_responses|get_item:question.id }}{% endif %}</textarea>
 
                     {% elif question.question_type == 'single_choice' %}
@@ -122,7 +125,7 @@
                         class="text-input"
                         {% if question.required %}required{% endif %}
                     >
-                        <option value="">Select an option</option>
+                        <option value="">{% trans 'Select an option' %}</option>
                         {% for choice in question.config.choices %}
                         <option value="{{ choice }}" {% if existing_responses|get_item:question.id == choice %}selected{% endif %}>
                             {{ choice }}
@@ -190,18 +193,19 @@
 
             <div class="form-actions">
                 <button type="button" id="prev-btn" class="btn btn-secondary" style="display: none;">
-                    Previous
+                    {% trans 'Previous' %}
                 </button>
                 <button type="button" id="next-btn" class="btn btn-primary">
-                    Next
+                    {% trans 'Next' %}
                 </button>
                 <button type="submit" id="submit-btn" class="btn btn-primary" style="display: none;">
-                    Submit Feedback
+                    {% trans 'Submit Feedback' %}
                 </button>
             </div>
         </form>
     </div>
 
+    <script src="{% url 'javascript-catalog' %}?language={{ LANGUAGE_CODE }}"></script>
     <script src="{% static 'js/multistep-feedback.js' %}"></script>
     <script>
         // Store token in localStorage for easy return

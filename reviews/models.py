@@ -1,6 +1,7 @@
 import uuid
 from django.db import models, transaction
 from django.contrib.auth.models import User
+from django.utils.translation import gettext_lazy as _
 from core.models import TimeStampedModel
 from core.managers import ReviewCycleManager, ReviewerTokenManager, ResponseManager
 from accounts.models import Reviewee
@@ -16,8 +17,8 @@ class ReviewCycle(TimeStampedModel):
     """360 feedback review cycle for a reviewee"""
 
     STATUS_CHOICES = [
-        ('active', 'Active'),
-        ('completed', 'Completed'),
+        ('active', _('Active')),
+        ('completed', _('Completed')),
     ]
 
     # Public UUID for external references (API, URLs)
@@ -26,30 +27,35 @@ class ReviewCycle(TimeStampedModel):
         unique=True,
         editable=False,
         db_index=True,
-        help_text="Public identifier for API and URL usage (non-enumerable)"
+        help_text=_('Public identifier for API and URL usage (non-enumerable)'),
+        verbose_name=_('UUID')
     )
 
     reviewee = models.ForeignKey(
         Reviewee,
         on_delete=models.CASCADE,
-        related_name='review_cycles'
+        related_name='review_cycles',
+        verbose_name=_('reviewee')
     )
     questionnaire = models.ForeignKey(
         Questionnaire,
         on_delete=models.PROTECT,
-        related_name='review_cycles'
+        related_name='review_cycles',
+        verbose_name=_('questionnaire')
     )
     created_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='created_review_cycles'
+        related_name='created_review_cycles',
+        verbose_name=_('created by')
     )
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    status = models.CharField(_('status'), max_length=20, choices=STATUS_CHOICES, default='active')
     close_check_sent_at = models.DateTimeField(
         null=True,
         blank=True,
-        help_text="When the close check-in email was sent to the reviewee"
+        help_text=_('When the close check-in email was sent to the reviewee'),
+        verbose_name=_('close check sent at')
     )
 
     @property
@@ -59,20 +65,22 @@ class ReviewCycle(TimeStampedModel):
 
     # Which categories this cycle collects feedback for. All four by default,
     # which is what every cycle did before these flags existed.
-    include_self = models.BooleanField(default=True, verbose_name='Self assessment')
-    include_peer = models.BooleanField(default=True, verbose_name='Peer review')
-    include_manager = models.BooleanField(default=True, verbose_name='Manager review')
-    include_direct_report = models.BooleanField(default=True, verbose_name='Direct report review')
+    include_self = models.BooleanField(_('Self assessment'), default=True)
+    include_peer = models.BooleanField(_('Peer review'), default=True)
+    include_manager = models.BooleanField(_('Manager review'), default=True)
+    include_direct_report = models.BooleanField(_('Direct report review'), default=True)
 
     # Secure invitation tokens per category (non-enumerable)
-    invitation_token_self = models.UUIDField(unique=True, db_index=True, null=True, blank=True)
-    invitation_token_peer = models.UUIDField(unique=True, db_index=True, null=True, blank=True)
-    invitation_token_manager = models.UUIDField(unique=True, db_index=True, null=True, blank=True)
-    invitation_token_direct_report = models.UUIDField(unique=True, db_index=True, null=True, blank=True)
+    invitation_token_self = models.UUIDField(_('self assessment invitation token'), unique=True, db_index=True, null=True, blank=True)
+    invitation_token_peer = models.UUIDField(_('peer review invitation token'), unique=True, db_index=True, null=True, blank=True)
+    invitation_token_manager = models.UUIDField(_('manager review invitation token'), unique=True, db_index=True, null=True, blank=True)
+    invitation_token_direct_report = models.UUIDField(_('direct report review invitation token'), unique=True, db_index=True, null=True, blank=True)
 
     objects = ReviewCycleManager()
 
     class Meta:
+        verbose_name = _('review cycle')
+        verbose_name_plural = _('review cycles')
         db_table = 'review_cycles'
         ordering = ['-created_at']
 
@@ -126,40 +134,53 @@ class ReviewerToken(TimeStampedModel):
     """Anonymous token for reviewer access"""
 
     CATEGORY_CHOICES = [
-        ('self', 'Self Assessment'),
-        ('peer', 'Peer Review'),
-        ('manager', 'Manager Review'),
-        ('direct_report', 'Direct Report Review'),
+        ('self', _('Self Assessment')),
+        ('peer', _('Peer Review')),
+        ('manager', _('Manager Review')),
+        ('direct_report', _('Direct Report Review')),
     ]
 
     cycle = models.ForeignKey(
         ReviewCycle,
         on_delete=models.CASCADE,
-        related_name='tokens'
+        related_name='tokens',
+        verbose_name=_('review cycle')
     )
-    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    token = models.UUIDField(_('token'), default=uuid.uuid4, unique=True, editable=False, db_index=True)
+    category = models.CharField(_('feedback category'), max_length=20, choices=CATEGORY_CHOICES)
     reviewer_email = models.EmailField(
         null=True,
         blank=True,
-        help_text="Email to send invitation to (not stored with responses for anonymity)"
+        help_text=_('Email to send invitation to (not stored with responses for anonymity)'),
+        verbose_name=_('reviewer email')
     )
-    invitation_sent_at = models.DateTimeField(null=True, blank=True)
+    invitation_sent_at = models.DateTimeField(_('invitation sent at'), null=True, blank=True)
     last_reminder_sent_at = models.DateTimeField(
         null=True,
         blank=True,
-        help_text="When the last reminder email was sent to this reviewer"
+        help_text=_('When the last reminder email was sent to this reviewer'),
+        verbose_name=_('last reminder sent at')
     )
     claimed_at = models.DateTimeField(
         null=True,
         blank=True,
-        help_text="When someone claimed this token by clicking the invitation link"
+        help_text=_('When someone claimed this token by clicking the invitation link'),
+        verbose_name=_('claimed at')
     )
-    completed_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(_('completed at'), null=True, blank=True)
+    language = models.CharField(
+        max_length=20,
+        blank=True,
+        default='',
+        help_text=_('Language of the form and of emails to this reviewer. Empty until the form is first opened.'),
+        verbose_name=_('language')
+    )
 
     objects = ReviewerTokenManager()
 
     class Meta:
+        verbose_name = _('reviewer token')
+        verbose_name_plural = _('reviewer tokens')
         db_table = 'reviewer_tokens'
         ordering = ['cycle', 'category']
 
@@ -177,19 +198,22 @@ class Response(TimeStampedModel):
     cycle = models.ForeignKey(
         ReviewCycle,
         on_delete=models.CASCADE,
-        related_name='responses'
+        related_name='responses',
+        verbose_name=_('review cycle')
     )
     question = models.ForeignKey(
         Question,
         on_delete=models.CASCADE,
-        related_name='responses'
+        related_name='responses',
+        verbose_name=_('question')
     )
     token = models.ForeignKey(
         ReviewerToken,
         on_delete=models.CASCADE,
-        related_name='responses'
+        related_name='responses',
+        verbose_name=_('reviewer token')
     )
-    category = models.CharField(max_length=20)  # Denormalized from token for reporting
+    category = models.CharField(_('feedback category'), max_length=20)  # Denormalized from token for reporting
 
     # JSON field for storing answer data
     # For rating: {"value": 4}
@@ -197,11 +221,13 @@ class Response(TimeStampedModel):
     # For text: {"value": "text response"}
     # For single_choice: {"value": "Option 1"}
     # For multiple_choice: {"value": ["Option 1", "Option 2"]}
-    answer_data = models.JSONField()
+    answer_data = models.JSONField(_('answer data'))
 
     objects = ResponseManager()
 
     class Meta:
+        verbose_name = _('response')
+        verbose_name_plural = _('responses')
         db_table = 'responses'
         ordering = ['cycle', 'question']
         unique_together = ['token', 'question']

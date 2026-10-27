@@ -1,17 +1,17 @@
-360 Degree Feedback Request
+{% load i18n %}{% trans '360 Degree Feedback Request' %}
 
-Hello,
+{% trans 'Hello,' %}
 
-You have been invited to provide {{ category }} feedback for {{ reviewee_name }}.
+{% blocktrans trimmed %}You have been invited to provide {{ category }} feedback for {{ reviewee_name }}.{% endblocktrans %}
 
-Your feedback is completely anonymous and will be aggregated with other responses to help {{ reviewee_name }} with their professional development.
+{% blocktrans trimmed %}Your feedback is completely anonymous and will be aggregated with other responses to help {{ reviewee_name }} with their professional development.{% endblocktrans %}
 
-Please complete the feedback questionnaire at:
+{% trans 'Please complete the feedback questionnaire at:' %}
 {{ feedback_url }}
 
-This is a secure, one-time link that only you can use.
+{% trans 'This is a secure, one-time link that only you can use.' %}
 
-Thank you for taking the time to provide thoughtful feedback.
+{% trans 'Thank you for taking the time to provide thoughtful feedback.' %}
 
-Best regards,
-Blik Feedback System
+{% trans 'Best regards,' %}
+{% trans 'Blik Feedback System' %}

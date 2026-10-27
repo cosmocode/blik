@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.utils.translation import gettext as _
 
 from core.models import Organization
 from accounts.models import UserProfile
@@ -35,16 +36,16 @@ def create_organization(request):
 
         # Validation
         if not org_name:
-            messages.error(request, 'Organization name is required.')
+            messages.error(request, _('Organization name is required.'))
             return render(request, 'superuser/create_organization.html')
 
         if not admin_email:
-            messages.error(request, 'Admin email is required.')
+            messages.error(request, _('Admin email is required.'))
             return render(request, 'superuser/create_organization.html')
 
         # Check if organization with this name already exists
         if Organization.objects.filter(name=org_name).exists():
-            messages.error(request, f'Organization "{org_name}" already exists.')
+            messages.error(request, _('Organization "%(name)s" already exists.') % {'name': org_name})
             return render(request, 'superuser/create_organization.html')
 
         # Check if user with this email already exists
@@ -54,7 +55,8 @@ def create_organization(request):
             if hasattr(existing_user, 'profile') and existing_user.profile.organization:
                 messages.error(
                     request,
-                    f'User with email {admin_email} already belongs to organization: {existing_user.profile.organization.name}'
+                    _('User with email %(email)s already belongs to organization: %(organization)s')
+                    % {'email': admin_email, 'organization': existing_user.profile.organization.name}
                 )
                 return render(request, 'superuser/create_organization.html')
 
@@ -76,7 +78,7 @@ def create_organization(request):
                         password=None  # Generate random password
                     )
                 except ValueError as e:
-                    messages.error(request, f'Failed to create user: {e}')
+                    messages.error(request, _('Failed to create user: %(error)s') % {'error': e})
                     return redirect('superuser_dashboard')
 
                 # Create user profile with admin privileges
@@ -94,15 +96,16 @@ def create_organization(request):
                     send_welcome_email(user, org, password=password)
                     messages.success(
                         request,
-                        f'Organization "{org_name}" created successfully. Login credentials sent to {admin_email}.'
+                        _('Organization "%(name)s" created successfully. Login credentials sent to %(email)s.')
+                        % {'name': org_name, 'email': admin_email}
                     )
                     return redirect('superuser_create_organization')
                 except Exception as e:
                     # Rollback will happen automatically due to transaction.atomic()
-                    raise Exception(f'Failed to send welcome email: {e}')
+                    raise Exception(_('Failed to send welcome email: %(error)s') % {'error': e})
 
         except Exception as e:
-            messages.error(request, f'Failed to create organization: {e}')
+            messages.error(request, _('Failed to create organization: %(error)s') % {'error': e})
             return render(request, 'superuser/create_organization.html')
 
     # GET request - show form

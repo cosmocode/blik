@@ -1,11 +1,12 @@
 {% extends "admin_dashboard/base.html" %}
+{% load i18n %}
 
-{% block title %}Delete Reviewee{% endblock %}
+{% block title %}{% trans 'Delete Reviewee' %}{% endblock %}
 
 {% block content %}
 <div style="margin-bottom: 2rem;">
-    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">Delete Reviewee</h1>
-    <p style="color: #64748b;">Are you sure you want to deactivate this reviewee?</p>
+    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">{% trans 'Delete Reviewee' %}</h1>
+    <p style="color: #64748b;">{% trans 'Are you sure you want to deactivate this reviewee?' %}</p>
 </div>
 
 <div style="max-width: 600px;">
@@ -13,23 +14,23 @@
         <div class="card-body">
             <div style="padding: 1rem; background: #fef3c7; border-radius: 6px; margin-bottom: 1.5rem;">
                 <p style="margin: 0; color: #92400e;">
-                    <strong>Warning:</strong> This will deactivate the reviewee. Their past review cycles will remain accessible, but they will not appear in active lists.
+                    {% blocktrans trimmed %}<strong>Warning:</strong> This will deactivate the reviewee. Their past review cycles will remain accessible, but they will not appear in active lists.{% endblocktrans %}
                 </p>
             </div>
 
             <div style="margin-bottom: 1.5rem;">
-                <p><strong>Name:</strong> {{ reviewee.name }}</p>
-                <p><strong>Email:</strong> {{ reviewee.email }}</p>
+                <p><strong>{% trans 'Name:' %}</strong> {{ reviewee.name }}</p>
+                <p><strong>{% trans 'Email:' %}</strong> {{ reviewee.email }}</p>
                 {% if reviewee.department %}
-                <p><strong>Department:</strong> {{ reviewee.department }}</p>
+                <p><strong>{% trans 'Department:' %}</strong> {{ reviewee.department }}</p>
                 {% endif %}
             </div>
 
             <form method="post">
                 {% csrf_token %}
                 <div style="display: flex; gap: 1rem;">
-                    <button type="submit" class="btn btn-danger">Deactivate Reviewee</button>
-                    <a href="{% url 'reviewee_list' %}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-danger">{% trans 'Deactivate Reviewee' %}</button>
+                    <a href="{% url 'reviewee_list' %}" class="btn btn-secondary">{% trans 'Cancel' %}</a>
                 </div>
             </form>
         </div>

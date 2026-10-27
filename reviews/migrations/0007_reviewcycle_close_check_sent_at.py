@@ -15,6 +15,7 @@ class Migration(migrations.Migration):
                 null=True,
                 blank=True,
                 help_text='When the close check-in email was sent to the reviewee',
+                verbose_name='close check sent at',
             ),
         ),
     ]

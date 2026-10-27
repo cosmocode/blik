@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils import timezone
+from django.utils.translation import gettext as _, gettext_lazy
 from .models import Report
 
 
@@ -15,34 +16,33 @@ class ReportAdmin(admin.ModelAdmin):
     def token_status(self, obj):
         """Display token expiration status with color coding"""
         if not obj.access_token_expires:
-            return format_html('<span style="color: gray;">No expiry</span>')
+            return format_html('<span style="color: gray;">{}</span>', _('No expiry'))
 
-        now = timezone.now()
-        if obj.access_token_expires < now:
-            return format_html('<span style="color: red; font-weight: bold;">Expired</span>')
+        if obj.access_token_expired:
+            return format_html('<span style="color: red; font-weight: bold;">{}</span>', _('Expired'))
 
-        time_left = obj.access_token_expires - now
+        time_left = obj.access_token_expires - timezone.now()
         if time_left.days < 7:
-            return format_html('<span style="color: orange;">Expires in {} days</span>', time_left.days)
+            return format_html('<span style="color: orange;">{}</span>', _('Expires in %(days)s days') % {'days': time_left.days})
 
-        return format_html('<span style="color: green;">Valid ({} days)</span>', time_left.days)
+        return format_html('<span style="color: green;">{}</span>', _('Valid (%(days)s days)') % {'days': time_left.days})
 
-    token_status.short_description = 'Token Status'
+    token_status.short_description = gettext_lazy('Token Status')
 
     def token_expiry_status(self, obj):
         """Detailed token expiration info for detail view"""
         if not obj.access_token_expires:
-            return 'No expiration set'
+            return _('No expiration set')
 
-        now = timezone.now()
-        if obj.access_token_expires < now:
-            return format_html('<span style="color: red; font-weight: bold;">EXPIRED on {}</span>',
-                             obj.access_token_expires.strftime('%Y-%m-%d %H:%M'))
+        if obj.access_token_expired:
+            return format_html('<span style="color: red; font-weight: bold;">{}</span>',
+                             _('EXPIRED on %(date)s') % {'date': obj.access_token_expires.strftime('%Y-%m-%d %H:%M')})
 
-        time_left = obj.access_token_expires - now
-        return format_html('<span style="color: green;">Expires on {} ({} days, {} hours remaining)</span>',
-                         obj.access_token_expires.strftime('%Y-%m-%d %H:%M'),
-                         time_left.days,
-                         time_left.seconds // 3600)
+        time_left = obj.access_token_expires - timezone.now()
+        return format_html('<span style="color: green;">{}</span>',
+                         _('Expires on %(date)s (%(days)s days, %(hours)s hours remaining)') % {
+                             'date': obj.access_token_expires.strftime('%Y-%m-%d %H:%M'),
+                             'days': time_left.days,
+                             'hours': time_left.seconds // 3600})
 
-    token_expiry_status.short_description = 'Token Expiration'
+    token_expiry_status.short_description = gettext_lazy('Token Expiration')

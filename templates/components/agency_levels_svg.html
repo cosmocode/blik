@@ -1,3 +1,4 @@
+{% load i18n %}
 <svg class="agency-model framework-diagram framework-diagram--outlined" data-current-level="{{ current_level|default:'' }}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1008 816">
     <g id="items" class="framework-diagram-layers">
         <g id="blend" class="framework-diagram-blend">
@@ -19,61 +20,61 @@
             <g id="g-root-ic_all_zn6kwbvfrqbp-fill" data-item-order="0" transform="translate(336, 307)"></g>
             <g id="g-root-tx_suggesti_1lvj1orvft3ih-fill" data-item-order="0" transform="translate(746, 326)">
                 <g id="tx_suggesti_1lvj1orvft3ih-fill-merged" stroke="none" fill="var(--text-primary)" fill-opacity="1">
-                    <g><text class="framework-diagram-caption" transform="translate(238, 34)" font-size="20px" font-family="Roboto, sans-serif"><tspan x="-203.78" y="-0.5" dominant-baseline="ideographic">Suggesting a preferred </tspan><tspan x="-224.68" y="23.5" dominant-baseline="ideographic">solution with justification</tspan></text></g>
+                    <g><text text-anchor="end" class="framework-diagram-caption" transform="translate(238, 34)" font-size="20px" font-family="Roboto, sans-serif"><tspan x="0" y="-0.5" dominant-baseline="ideographic">{% trans 'Suggesting a preferred' %}</tspan><tspan x="0" y="23.5" dominant-baseline="ideographic">{% trans 'solution with justification' %}</tspan></text></g>
                 </g>
             </g>
             <g id="g-root-tx_solution_1hfpjkbvft4aq-fill" data-item-order="0" transform="translate(722, 278)">
                 <g id="tx_solution_1hfpjkbvft4aq-fill-merged" stroke="none" fill="var(--text-primary)" fill-opacity="1">
-                    <g><text class="framework-diagram-label" transform="translate(262, 22)" font-weight="bold" font-size="20px" font-family="Roboto, sans-serif"><tspan x="-240.18" y="11.5" dominant-baseline="ideographic">Solution Recommendation</tspan></text></g>
+                    <g><text text-anchor="end" class="framework-diagram-label" transform="translate(262, 22)" font-weight="bold" font-size="20px" font-family="Roboto, sans-serif"><tspan x="0" y="11.5" dominant-baseline="ideographic">{% trans 'Solution Recommendation' %}</tspan></text></g>
                 </g>
             </g>
             <g id="g-root-tx_solution_1uqjkujvft5vk-fill" data-item-order="0" transform="translate(782, 398)">
                 <g id="tx_solution_1uqjkujvft5vk-fill-merged" stroke="none" fill="var(--text-primary)" fill-opacity="1">
-                    <g><text class="framework-diagram-label" transform="translate(202, 22)" font-weight="bold" font-size="20px" font-family="Roboto, sans-serif"><tspan x="-183.18" y="11.5" dominant-baseline="ideographic">Solution Exploration</tspan></text></g>
+                    <g><text text-anchor="end" class="framework-diagram-label" transform="translate(202, 22)" font-weight="bold" font-size="20px" font-family="Roboto, sans-serif"><tspan x="0" y="11.5" dominant-baseline="ideographic">{% trans 'Solution Exploration' %}</tspan></text></g>
                 </g>
             </g>
             <g id="g-root-ic_netw_vccvgrvfqccu-fill" data-item-order="0" transform="translate(336, 427)"></g>
             <g id="g-root-tx_recogniz_qrjknfvft5ab-fill" data-item-order="0" transform="translate(734, 686)">
                 <g id="tx_recogniz_qrjknfvft5ab-fill-merged" stroke="none" fill="var(--text-primary)" fill-opacity="1">
-                    <g><text class="framework-diagram-caption" transform="translate(250, 34)" font-size="20px" font-family="Roboto, sans-serif"><tspan x="-231.4" y="-0.5" dominant-baseline="ideographic">Recognizing and stating a </tspan><tspan x="-75.46" y="23.5" dominant-baseline="ideographic">problem</tspan></text></g>
+                    <g><text text-anchor="end" class="framework-diagram-caption" transform="translate(250, 34)" font-size="20px" font-family="Roboto, sans-serif"><tspan x="0" y="-0.5" dominant-baseline="ideographic">{% trans 'Recognizing and stating a' %}</tspan><tspan x="0" y="23.5" dominant-baseline="ideographic">{% trans 'problem' %}</tspan></text></g>
                 </g>
             </g>
             <g id="g-root-tx_implemen_1hfpjkbvft4ar-fill" data-item-order="0" transform="translate(722, 206)">
                 <g id="tx_implemen_1hfpjkbvft4ar-fill-merged" stroke="none" fill="var(--text-primary)" fill-opacity="1">
-                    <g><text class="framework-diagram-caption" transform="translate(262, 34)" font-size="20px" font-family="Roboto, sans-serif"><tspan x="-248.29" y="-0.5" dominant-baseline="ideographic">Implementing and resolving </tspan><tspan x="-195.71" y="23.5" dominant-baseline="ideographic">the identified problem</tspan></text></g>
+                    <g><text text-anchor="end" class="framework-diagram-caption" transform="translate(262, 34)" font-size="20px" font-family="Roboto, sans-serif"><tspan x="0" y="-0.5" dominant-baseline="ideographic">{% trans 'Implementing and resolving' %}</tspan><tspan x="0" y="23.5" dominant-baseline="ideographic">{% trans 'the identified problem' %}</tspan></text></g>
                 </g>
             </g>
             <g id="g-root-tx_proposin_1qaq2q3vft5vz-fill" data-item-order="0" transform="translate(746, 446)">
                 <g id="tx_proposin_1qaq2q3vft5vz-fill-merged" stroke="none" fill="var(--text-primary)" fill-opacity="1">
-                    <g><text class="framework-diagram-caption" transform="translate(238, 34)" font-size="20px" font-family="Roboto, sans-serif"><tspan x="-172.51" y="-0.5" dominant-baseline="ideographic">Proposing possible </tspan><tspan x="-218.05" y="23.5" dominant-baseline="ideographic">solutions to the problem</tspan></text></g>
+                    <g><text text-anchor="end" class="framework-diagram-caption" transform="translate(238, 34)" font-size="20px" font-family="Roboto, sans-serif"><tspan x="0" y="-0.5" dominant-baseline="ideographic">{% trans 'Proposing possible' %}</tspan><tspan x="0" y="23.5" dominant-baseline="ideographic">{% trans 'solutions to the problem' %}</tspan></text></g>
                 </g>
             </g>
             <g id="g-root-tx_causeana_590zvvft5ae-fill" data-item-order="0" transform="translate(830, 518)">
                 <g id="tx_causeana_590zvvft5ae-fill-merged" stroke="none" fill="var(--text-primary)" fill-opacity="1">
-                    <g><text class="framework-diagram-label" transform="translate(154, 22)" font-weight="bold" font-size="20px" font-family="Roboto, sans-serif"><tspan x="-139.3" y="11.5" dominant-baseline="ideographic">Cause Analysis</tspan></text></g>
+                    <g><text text-anchor="end" class="framework-diagram-label" transform="translate(154, 22)" font-weight="bold" font-size="20px" font-family="Roboto, sans-serif"><tspan x="0" y="11.5" dominant-baseline="ideographic">{% trans 'Cause Analysis' %}</tspan></text></g>
                 </g>
             </g>
             <g id="g-root-ic_warn_zp205nvfqb5z-fill" data-item-order="0" transform="translate(336, 547)"></g>
             <g id="g-root-ic_opti_mgpv7vvfrrbg-fill" data-item-order="0" transform="translate(336, 199)"></g>
             <g id="g-root-tx_identify_4l2j4bvft4i5-fill" data-item-order="0" transform="translate(722, 566)">
                 <g id="tx_identify_4l2j4bvft4i5-fill-merged" stroke="none" fill="var(--text-primary)" fill-opacity="1">
-                    <g><text class="framework-diagram-caption" transform="translate(262, 34)" font-size="20px" font-family="Roboto, sans-serif"><tspan x="-246.86" y="-0.5" dominant-baseline="ideographic">Identifying potential causes </tspan><tspan x="-131.91" y="23.5" dominant-baseline="ideographic">of the problem</tspan></text></g>
+                    <g><text text-anchor="end" class="framework-diagram-caption" transform="translate(262, 34)" font-size="20px" font-family="Roboto, sans-serif"><tspan x="0" y="-0.5" dominant-baseline="ideographic">{% trans 'Identifying potential causes' %}</tspan><tspan x="0" y="23.5" dominant-baseline="ideographic">{% trans 'of the problem' %}</tspan></text></g>
                 </g>
             </g>
             <g id="g-root-tx_problemr_144916zvft5vo-fill" data-item-order="0" transform="translate(782, 158)">
                 <g id="tx_problemr_144916zvft5vo-fill-merged" stroke="none" fill="var(--text-primary)" fill-opacity="1">
-                    <g><text class="framework-diagram-label" transform="translate(202, 22)" font-weight="bold" font-size="20px" font-family="Roboto, sans-serif"><tspan x="-179.11" y="11.5" dominant-baseline="ideographic">Problem Resolution</tspan></text></g>
+                    <g><text text-anchor="end" class="framework-diagram-label" transform="translate(202, 22)" font-weight="bold" font-size="20px" font-family="Roboto, sans-serif"><tspan x="0" y="11.5" dominant-baseline="ideographic">{% trans 'Problem Resolution' %}</tspan></text></g>
                 </g>
             </g>
             <g id="g-root-tx_problemi_hvwkejvft630-fill" data-item-order="0" transform="translate(770, 638)">
                 <g id="tx_problemi_hvwkejvft630-fill-merged" stroke="none" fill="var(--text-primary)" fill-opacity="1">
-                    <g><text class="framework-diagram-label" transform="translate(214, 22)" font-weight="bold" font-size="20px" font-family="Roboto, sans-serif"><tspan x="-201.94" y="11.5" dominant-baseline="ideographic">Problem Identification</tspan></text></g>
+                    <g><text text-anchor="end" class="framework-diagram-label" transform="translate(214, 22)" font-weight="bold" font-size="20px" font-family="Roboto, sans-serif"><tspan x="0" y="11.5" dominant-baseline="ideographic">{% trans 'Problem Identification' %}</tspan></text></g>
                 </g>
             </g>
             <g id="g-root-ic_user_94mvrfvfnh1e-fill" data-item-order="0" transform="translate(336, 667)"></g>
             <g id="g-root-tx_levelsof_mfgx1nvfnim9-fill" data-item-order="0" transform="translate(375, 38)">
                 <g id="tx_levelsof_mfgx1nvfnim9-fill-merged" stroke="none" fill="var(--text-primary)" fill-opacity="1">
-                    <g><text class="framework-diagram-title" transform="translate(142, 28)" font-weight="bold" font-size="25px" font-family="Roboto, sans-serif"><tspan x="-128.19" y="14.5" dominant-baseline="ideographic">Levels of Work Agency</tspan></text></g>
+                    <g><text text-anchor="middle" class="framework-diagram-title" transform="translate(142, 28)" font-weight="bold" font-size="25px" font-family="Roboto, sans-serif"><tspan x="0" y="14.5" dominant-baseline="ideographic">{% trans 'Levels of Work Agency' %}</tspan></text></g>
                 </g>
             </g>
             <g id="g-root-sy_5_cu_Vector_1lxegy3vfnh1e-stroke" data-item-order="-587509" transform="translate(14, 638)">

@@ -41,6 +41,7 @@ class Migration(migrations.Migration):
                 editable=False,
                 db_index=True,
                 help_text='Public identifier for API and URL usage (non-enumerable)',
+                verbose_name='UUID',
             ),
         ),
     ]

@@ -1,22 +1,23 @@
 {% extends "admin_dashboard/base.html" %}
+{% load i18n %}
 
-{% block title %}Send Bulk Invitations{% endblock %}
+{% block title %}{% trans 'Send Bulk Invitations' %}{% endblock %}
 
 {% block content %}
 <div class="page-header">
     <div>
-        <h1>Send invitations</h1>
-        <p>Review the cycles you just created, then send invitation emails.</p>
+        <h1>{% trans 'Send invitations' %}</h1>
+        <p>{% trans 'Review the cycles you just created, then send invitation emails.' %}</p>
     </div>
-    <a href="{% url 'review_cycle_list' %}" class="btn btn-secondary">Back to cycles</a>
+    <a href="{% url 'review_cycle_list' %}" class="btn btn-secondary">{% trans 'Back to cycles' %}</a>
 </div>
 
 {% if cycles %}
 <div class="alert alert-warning" style="margin-bottom: 1.5rem;">
     <div>
-        <strong>No emails have been sent yet.</strong>
-        Review the list below and click <em>Send invitations now</em> to notify every reviewee.
-        You can also skip for now and send individual invitations later from the cycles list.
+        <strong>{% trans 'No emails have been sent yet.' %}</strong>
+        {% blocktrans trimmed %}Review the list below and click <em>Send invitations now</em> to notify every reviewee.{% endblocktrans %}
+        {% trans 'You can also skip for now and send individual invitations later from the cycles list.' %}
     </div>
 </div>
 
@@ -26,9 +27,9 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Reviewee</th>
-                    <th>Questionnaire</th>
-                    <th>Created</th>
+                    <th>{% trans 'Reviewee' %}</th>
+                    <th>{% trans 'Questionnaire' %}</th>
+                    <th>{% trans 'Created' %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,7 +43,7 @@
                         {{ cycle.questionnaire.name }}
                         <div style="font-size: 0.75rem; color: var(--text-secondary);">{{ cycle.questionnaire.report_type_label }}</div>
                     </td>
-                    <td style="color: var(--text-secondary); font-size: 0.875rem;">{{ cycle.created_at|date:"M d, Y H:i" }}</td>
+                    <td style="color: var(--text-secondary); font-size: 0.875rem;">{{ cycle.created_at|date:'SHORT_DATETIME_FORMAT' }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -54,16 +55,17 @@
 <form method="post" style="display: flex; gap: 1rem; margin-top: 1.5rem;">
     {% csrf_token %}
     <button type="submit" class="btn btn-primary">
-        Send invitations for all {{ cycles|length }} reviewee{{ cycles|length|pluralize }}
+        {% blocktrans trimmed count counter=cycles|length %}Send invitations for all {{ counter }} reviewee{% plural %}Send invitations for all {{ counter }} reviewees{% endblocktrans %}
     </button>
-    <a href="{% url 'review_cycle_list' %}" class="btn btn-secondary">Skip — I'll send later</a>
+    <a href="{% url 'review_cycle_list' %}" class="btn btn-secondary">{% trans "Skip — I'll send later" %}</a>
 </form>
 {% else %}
 <div class="card">
     <div class="card-body">
+        {% url 'review_cycle_list' as cycles_url %}
         <p style="margin: 0; color: var(--text-secondary);">
-            No pending bulk invitations. If you just created cycles, they're already in the
-            <a href="{% url 'review_cycle_list' %}">cycles list</a>.
+            {% blocktrans trimmed %}No pending bulk invitations. If you just created cycles, they're already in the
+            <a href="{{ cycles_url }}">cycles list</a>.{% endblocktrans %}
         </p>
     </div>
 </div>

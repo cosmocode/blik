@@ -1,7 +1,9 @@
 from django import forms
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _, gettext
 from accounts.models import UserProfile
 
 
@@ -13,7 +15,7 @@ class ProfileEditForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'First name'
+            'placeholder': _('First name')
         })
     )
 
@@ -22,7 +24,7 @@ class ProfileEditForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Last name'
+            'placeholder': _('Last name')
         })
     )
 
@@ -30,8 +32,14 @@ class ProfileEditForm(forms.ModelForm):
         required=True,
         widget=forms.EmailInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Email address'
+            'placeholder': _('Email address')
         })
+    )
+
+    # Stored on the profile, not on the user
+    language = forms.ChoiceField(
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
     )
 
     class Meta:
@@ -46,12 +54,27 @@ class ProfileEditForm(forms.ModelForm):
             self.fields['last_name'].initial = self.instance.last_name
             self.fields['email'].initial = self.instance.email
 
+        self.fields['language'].choices = [('', _('Browser language'))] + list(settings.LANGUAGES)
+        profile = getattr(self.instance, 'profile', None)
+        if profile:
+            self.fields['language'].initial = profile.language
+
     def clean_email(self):
         email = self.cleaned_data.get('email')
         # Check if email is already taken by another user
         if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
-            raise forms.ValidationError('This email address is already in use.')
+            raise forms.ValidationError(gettext('This email address is already in use.'))
         return email
+
+    def save(self, commit=True):
+        user = super().save(commit)
+        profile = getattr(user, 'profile', None)
+
+        if commit and profile:
+            profile.language = self.cleaned_data['language']
+            profile.save(update_fields=['language'])
+
+        return user
 
 
 class ForgotPasswordForm(forms.Form):
@@ -60,7 +83,7 @@ class ForgotPasswordForm(forms.Form):
         required=True,
         widget=forms.EmailInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Enter your email address',
+            'placeholder': _('Enter your email address'),
             'autofocus': True
         })
     )
@@ -69,18 +92,18 @@ class ForgotPasswordForm(forms.Form):
 class ResetPasswordForm(forms.Form):
     """Form for setting a new password"""
     password1 = forms.CharField(
-        label='New Password',
+        label=_('New Password'),
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
-            'placeholder': 'New password',
+            'placeholder': _('New password'),
             'autofocus': True
         })
     )
     password2 = forms.CharField(
-        label='Confirm Password',
+        label=_('Confirm Password'),
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Confirm new password'
+            'placeholder': _('Confirm new password')
         })
     )
 
@@ -91,7 +114,7 @@ class ResetPasswordForm(forms.Form):
 
         if password1 and password2:
             if password1 != password2:
-                raise ValidationError('Passwords do not match.')
+                raise ValidationError(gettext('Passwords do not match.'))
             try:
                 validate_password(password1)
             except ValidationError as e:

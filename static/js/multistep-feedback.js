@@ -234,11 +234,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const notification = document.createElement('div');
         notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 10000; font-size: 14px;';
 
-        let message = `✓ Restored ${count} draft answer${count > 1 ? 's' : ''}`;
+        let message;
         if (step !== undefined && step > 0) {
-            message += ` (Step ${step + 1})`;
+            message = ngettext(
+                'Restored %(count)s draft answer (Step %(step)s)',
+                'Restored %(count)s draft answers (Step %(step)s)',
+                count
+            );
+        } else {
+            message = ngettext('Restored %(count)s draft answer', 'Restored %(count)s draft answers', count);
         }
-        notification.textContent = message;
+        notification.textContent = '✓ ' + interpolate(message, {count: count, step: step + 1}, true);
 
         document.body.appendChild(notification);
 
@@ -285,7 +291,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const progress = ((stepIndex + 1) / sections.length) * 100;
         progressFill.style.width = progress + '%';
-        progressText.textContent = `Step ${stepIndex + 1} of ${sections.length}`;
+        const stepLabel = gettext('Step %(step)s of %(total)s');
+        progressText.textContent = interpolate(stepLabel, {step: stepIndex + 1, total: sections.length}, true);
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -352,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     nextBtn.addEventListener('click', function() {
         if (!validateCurrentSection()) {
-            showErrors(['Please answer all required questions before continuing.']);
+            showErrors([gettext('Please answer all required questions before continuing.')]);
             return;
         }
 
@@ -375,12 +382,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Navigate to the first section with errors
                 currentStep = firstInvalidSection;
                 showStep(currentStep);
-                showErrors([`Please complete all required questions. Check step ${firstInvalidSection + 1}.`]);
+                const message = gettext('Please complete all required questions. Check step %(step)s.');
+                showErrors([interpolate(message, {step: firstInvalidSection + 1}, true)]);
                 return;
             }
 
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
+            submitBtn.textContent = gettext('Submitting...');
 
             errorContainer.innerHTML = '';
             errorContainer.style.display = 'none';
@@ -407,16 +415,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else if (data.error) {
                         showErrors([data.error]);
                     } else {
-                        showErrors(['An error occurred. Please try again.']);
+                        showErrors([gettext('An error occurred. Please try again.')]);
                     }
 
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'Submit Feedback';
+                    submitBtn.textContent = gettext('Submit Feedback');
                 }
             } catch (error) {
-                showErrors(['Network error. Please check your connection and try again.']);
+                showErrors([gettext('Network error. Please check your connection and try again.')]);
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Feedback';
+                submitBtn.textContent = gettext('Submit Feedback');
             }
         });
     }
@@ -432,7 +440,7 @@ document.addEventListener('DOMContentLoaded', function() {
             errorList.appendChild(li);
         });
 
-        errorContainer.innerHTML = '<strong>Please fix the following:</strong>';
+        errorContainer.innerHTML = '<strong>' + gettext('Please fix the following:') + '</strong>';
         errorContainer.appendChild(errorList);
 
         errorContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });

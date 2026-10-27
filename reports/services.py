@@ -3,6 +3,9 @@ from collections import defaultdict
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.urls import reverse
+from django.utils import translation
+from django.utils.translation import gettext as _
+from core.languages import recipient_language
 from core.email import send_email
 from .models import Report
 from reviews.models import CATEGORY_ORDER, Response, ReviewCycle
@@ -167,7 +170,7 @@ def apply_display_anonymization(report_data, min_threshold, exempt_categories=No
                 if category not in exempt_categories and count < min_threshold:
                     # Mark as insufficient for display
                     cat_data['insufficient'] = True
-                    cat_data['message'] = f'Insufficient responses (minimum {min_threshold} required)'
+                    cat_data['message'] = _('Insufficient responses (minimum %(count)s required)') % {'count': min_threshold}
                     # Remove detailed responses and distributions for privacy
                     if 'responses' in cat_data:
                         del cat_data['responses']
@@ -809,11 +812,11 @@ def send_report_ready_notification(report, request=None):
     reviewee = cycle.reviewee
 
     if not reviewee.email:
-        stats['errors'].append(f"No email address for reviewee {reviewee.name}")
+        stats['errors'].append(_('No email address for reviewee %(name)s') % {'name': reviewee.name})
         return stats
 
     if not report.access_token:
-        stats['errors'].append("Report does not have an access token")
+        stats['errors'].append(_('Report does not have an access token'))
         return stats
 
     # Always use SITE_DOMAIN for consistent URLs across all email contexts.
@@ -828,26 +831,27 @@ def send_report_ready_notification(report, request=None):
     response_count = summary.get('total_responses', 0)
 
     try:
-        context = {
-            'reviewee': reviewee,
-            'cycle': cycle,
-            'report_url': report_url,
-            'response_count': response_count,
-        }
+        with translation.override(recipient_language(reviewee.language, organization=reviewee.organization)):
+            context = {
+                'reviewee': reviewee,
+                'cycle': cycle,
+                'report_url': report_url,
+                'response_count': response_count,
+            }
 
-        html_message = render_to_string('emails/report_ready.html', context)
-        text_message = render_to_string('emails/report_ready.txt', context)
+            html_message = render_to_string('emails/report_ready.html', context)
+            text_message = render_to_string('emails/report_ready.txt', context)
 
-        send_email(
-            subject=f'Your 360 Feedback Report is Ready!',
-            message=text_message,
-            recipient_list=[reviewee.email],
-            html_message=html_message,
-        )
+            send_email(
+                subject=_('Your 360 Feedback Report is Ready!'),
+                message=text_message,
+                recipient_list=[reviewee.email],
+                html_message=html_message,
+            )
 
         stats['sent'] += 1
 
     except Exception as e:
-        stats['errors'].append(f"Failed to send report ready email: {str(e)}")
+        stats['errors'].append(_('Failed to send report ready email: %(error)s') % {'error': str(e)})
 
     return stats

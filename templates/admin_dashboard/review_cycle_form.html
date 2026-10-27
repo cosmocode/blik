@@ -1,11 +1,12 @@
 {% extends "admin_dashboard/base.html" %}
+{% load i18n %}
 
-{% block title %}Create Review Cycle{% endblock %}
+{% block title %}{% trans 'Create Review Cycle' %}{% endblock %}
 
 {% block content %}
 <div style="margin-bottom: 2rem;">
-    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">Create Review Cycle</h1>
-    <p style="color: #64748b;">Set up a new 360-degree feedback review cycle</p>
+    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">{% trans 'Create Review Cycle' %}</h1>
+    <p style="color: #64748b;">{% trans 'Set up a new 360-degree feedback review cycle' %}</p>
 </div>
 
 <div style="max-width: 700px;">
@@ -13,11 +14,11 @@
     <div class="card" style="margin-bottom: 1.5rem;">
         <div class="card-body">
             {% if cycle_credits == 0 %}
-            <p style="margin: 0 0 1rem; font-weight: 600;">You have no review cycles left.</p>
-            <p style="margin: 0 0 1rem; font-size: 0.875rem; color: #64748b;">Cycles in progress continue and your reports stay available. To start a new cycle, buy another round or start a subscription.</p>
+            <p style="margin: 0 0 1rem; font-weight: 600;">{% trans 'You have no review cycles left.' %}</p>
+            <p style="margin: 0 0 1rem; font-size: 0.875rem; color: #64748b;">{% trans 'Cycles in progress continue and your reports stay available. To start a new cycle, buy another round or start a subscription.' %}</p>
             {% include "admin_dashboard/partials/billing_actions.html" %}
             {% else %}
-            <p style="margin: 0; font-size: 0.875rem;">Review cycles remaining: <strong>{{ cycle_credits }}</strong>. Each cycle you create uses one.</p>
+            <p style="margin: 0; font-size: 0.875rem;">{% blocktrans trimmed %}Review cycles remaining: <strong>{{ cycle_credits }}</strong>. Each cycle you create uses one.{% endblocktrans %}</p>
             {% endif %}
         </div>
     </div>
@@ -28,27 +29,27 @@
         {% if can_create_for_others %}
         <div class="card" style="margin-bottom: 1.5rem;">
             <div class="card-header">
-                <h2 class="card-title">Creation Mode</h2>
+                <h2 class="card-title">{% trans 'Creation Mode' %}</h2>
             </div>
             <div class="card-body">
                 <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 8px; flex: 1;">
                         <input type="radio" name="creation_mode" value="single" checked onchange="toggleRevieweeSelect()">
                         <div>
-                            <div style="font-weight: 600;">Single Reviewee</div>
-                            <div style="font-size: 0.875rem; color: #64748b;">Create cycle for one person</div>
+                            <div style="font-weight: 600;">{% trans 'Single Reviewee' %}</div>
+                            <div style="font-size: 0.875rem; color: #64748b;">{% trans 'Create cycle for one person' %}</div>
                         </div>
                     </label>
                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 8px; flex: 1;">
                         <input type="radio" name="creation_mode" value="bulk" onchange="toggleRevieweeSelect()">
                         <div>
-                            <div style="font-weight: 600;">Bulk Create</div>
-                            <div style="font-size: 0.875rem; color: #64748b;">Create for all active reviewees</div>
+                            <div style="font-weight: 600;">{% trans 'Bulk Create' %}</div>
+                            <div style="font-size: 0.875rem; color: #64748b;">{% trans 'Create for all active reviewees' %}</div>
                         </div>
                     </label>
                 </div>
                 <div id="bulkModeNote" class="alert alert-warning" style="display: none; font-size: 0.875rem;">
-                    Bulk creation does not send any emails. You'll review the new cycles and send invitations in the next step.
+                    {% trans "Bulk creation does not send any emails. You'll review the new cycles and send invitations in the next step." %}
                 </div>
             </div>
         </div>
@@ -57,7 +58,7 @@
         <div class="card" style="margin-bottom: 1.5rem; background: #fffbeb; border: 1px solid #fde047;">
             <div class="card-body">
                 <p style="margin: 0; color: #854d0e;">
-                    <strong>Note:</strong> You can only create review cycles for yourself. Contact an administrator to create cycles for other team members.
+                    <strong>{% trans 'Note:' %}</strong> {% trans 'You can only create review cycles for yourself. Contact an administrator to create cycles for other team members.' %}
                 </p>
             </div>
         </div>
@@ -65,50 +66,50 @@
 
         <div class="card" style="margin-bottom: 1.5rem;">
             <div class="card-header">
-                <h2 class="card-title">Basic Information</h2>
+                <h2 class="card-title">{% trans 'Basic Information' %}</h2>
             </div>
             <div class="card-body">
                 <div class="form-group" id="revieweeGroup">
-                    <label for="reviewee" class="form-label">Reviewee *</label>
+                    <label for="reviewee" class="form-label">{% trans 'Reviewee' %} *</label>
                     <select id="reviewee" name="reviewee" class="form-control">
-                        <option value="">Select a reviewee...</option>
+                        <option value="">{% trans 'Select a reviewee...' %}</option>
                         {% for reviewee in reviewees %}
                         <option value="{{ reviewee.id }}">{{ reviewee.name }} ({{ reviewee.email }})</option>
                         {% endfor %}
                     </select>
                     <div style="font-size: 0.875rem; color: #64748b; margin-top: 0.5rem;">
-                        Person who will receive 360-degree feedback
+                        {% trans 'Person who will receive 360-degree feedback' %}
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="questionnaire" class="form-label">Questionnaire *</label>
+                    <label for="questionnaire" class="form-label">{% trans 'Questionnaire' %} *</label>
                     <select id="questionnaire" name="questionnaire" class="form-control" required>
-                        <option value="">Select a questionnaire...</option>
+                        <option value="">{% trans 'Select a questionnaire...' %}</option>
                         {% for q in questionnaires %}
                         <option value="{{ q.id }}"
                                 data-report-type="{{ q.report_type_label }}"
                                 data-description="{{ q.description|default_if_none:'' }}"
                                 data-sample-url="{% url 'questionnaire_sample_report' q.id %}"
                                 {% if q.is_default %}selected{% endif %}>
-                            {{ q.name }} — {{ q.report_type_label }}{% if q.is_default %} (Default){% endif %}
+                            {{ q.name }} — {{ q.report_type_label }}{% if q.is_default %} ({% trans 'Default' %}){% endif %}
                         </option>
                         {% endfor %}
                     </select>
                     <div style="font-size: 0.875rem; color: #64748b; margin-top: 0.5rem;">
-                        Questions that reviewers will answer
+                        {% trans 'Questions that reviewers will answer' %}
                     </div>
                     <div id="questionnaireDetails" style="margin-top: 0.75rem; padding: 0.75rem 1rem; background: var(--bg-light); border: 1px solid var(--border); border-radius: 8px; display: none;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
                             <div style="flex: 1; min-width: 0;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-                                    <span style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary);">Report type:</span>
+                                    <span style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary);">{% trans 'Report type:' %}</span>
                                     <span id="questionnaireReportType" style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary);"></span>
                                 </div>
                                 <div id="questionnaireDescription" style="font-size: 0.875rem; color: var(--text-secondary);"></div>
                             </div>
                             <a id="questionnaireSampleLink" href="#" target="_blank" rel="noopener" class="btn btn-sm btn-secondary" style="flex-shrink: 0; white-space: nowrap;">
-                                Preview sample report
+                                {% trans 'Preview sample report' %}
                             </a>
                         </div>
                     </div>
@@ -118,12 +119,12 @@
 
         <div class="card" style="margin-bottom: 1.5rem;">
             <div class="card-header">
-                <h2 class="card-title" style="margin: 0;">Feedback Categories</h2>
+                <h2 class="card-title" style="margin: 0;">{% trans 'Feedback Categories' %}</h2>
             </div>
             <div class="card-body">
                 <p style="color: #64748b; margin-bottom: 1.5rem;">
-                    Who gives feedback in this cycle. Categories you clear are left out
-                    of the invitation email and the report.
+                    {% blocktrans trimmed %}Who gives feedback in this cycle. Categories you clear are left out
+                    of the invitation email and the report.{% endblocktrans %}
                 </p>
 
                 <input type="hidden" name="categories_submitted" value="1">
@@ -132,9 +133,9 @@
                     <input type="checkbox" id="includeSelf" name="include_self"
                            class="form-check-input category-toggle" data-category="self" checked>
                     <label for="includeSelf" style="display: inline; font-weight: normal;">
-                        Self assessment
+                        {% trans 'Self assessment' %}
                         <small style="display: block; color: var(--text-secondary);">
-                            The reviewee rates themselves
+                            {% trans 'The reviewee rates themselves' %}
                         </small>
                     </label>
                 </div>
@@ -143,9 +144,9 @@
                     <input type="checkbox" id="includeManager" name="include_manager"
                            class="form-check-input category-toggle" data-category="manager" checked>
                     <label for="includeManager" style="display: inline; font-weight: normal;">
-                        Manager review
+                        {% trans 'Manager review' %}
                         <small style="display: block; color: var(--text-secondary);">
-                            Direct manager or supervisor
+                            {% trans 'Direct manager or supervisor' %}
                         </small>
                     </label>
                 </div>
@@ -154,9 +155,9 @@
                     <input type="checkbox" id="includePeer" name="include_peer"
                            class="form-check-input category-toggle" data-category="peer" checked>
                     <label for="includePeer" style="display: inline; font-weight: normal;">
-                        Peer review
+                        {% trans 'Peer review' %}
                         <small style="display: block; color: var(--text-secondary);">
-                            Colleagues at the same level
+                            {% trans 'Colleagues at the same level' %}
                         </small>
                     </label>
                 </div>
@@ -165,15 +166,15 @@
                     <input type="checkbox" id="includeDirectReport" name="include_direct_report"
                            class="form-check-input category-toggle" data-category="direct_report" checked>
                     <label for="includeDirectReport" style="display: inline; font-weight: normal;">
-                        Direct report review
+                        {% trans 'Direct report review' %}
                         <small style="display: block; color: var(--text-secondary);">
-                            People who report to this reviewee
+                            {% trans 'People who report to this reviewee' %}
                         </small>
                     </label>
                 </div>
 
                 <div id="noCategoryWarning" style="display: none; margin-top: 1rem; padding: 0.75rem; background: #fef3c7; border-radius: 6px; color: #92400e; font-size: 0.875rem;">
-                    Select at least one category.
+                    {% trans 'Select at least one category.' %}
                 </div>
             </div>
         </div>
@@ -181,7 +182,7 @@
         <div class="card" style="margin-bottom: 1.5rem;" id="inviteSection">
             <div class="card-header" style="cursor: pointer;" onclick="toggleInviteForm()">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h2 class="card-title" style="margin: 0;">Invite Reviewers (Optional)</h2>
+                    <h2 class="card-title" style="margin: 0;">{% trans 'Invite Reviewers (Optional)' %}</h2>
                     <svg id="inviteChevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
@@ -189,11 +190,11 @@
             </div>
             <div class="card-body" id="inviteFormBody" style="display: none;">
                 <p style="color: #64748b; margin-bottom: 1.5rem;">
-                    Enter email addresses for reviewers now, or skip and add them later. Separate multiple emails with commas or newlines.
+                    {% trans 'Enter email addresses for reviewers now, or skip and add them later. Separate multiple emails with commas or newlines.' %}
                 </p>
 
                 <div class="form-group category-emails" data-category="self" style="margin-bottom: 1.5rem;">
-                    <label class="form-label">Self Assessment</label>
+                    <label class="form-label">{% trans 'Self Assessment' %}</label>
                     <textarea
                         name="self_emails"
                         id="selfEmails"
@@ -202,12 +203,12 @@
                         placeholder="reviewee@example.com"
                     ></textarea>
                     <div style="font-size: 0.875rem; color: #64748b; margin-top: 0.5rem;">
-                        Usually the reviewee's own email (auto-filled when reviewee selected)
+                        {% trans "Usually the reviewee's own email (auto-filled when reviewee selected)" %}
                     </div>
                 </div>
 
                 <div class="form-group category-emails" data-category="manager" style="margin-bottom: 1.5rem;">
-                    <label class="form-label">Manager/Supervisor</label>
+                    <label class="form-label">{% trans 'Manager/Supervisor' %}</label>
                     <textarea
                         name="manager_emails"
                         class="form-control"
@@ -215,12 +216,12 @@
                         placeholder="manager@example.com"
                     ></textarea>
                     <div style="font-size: 0.875rem; color: #64748b; margin-top: 0.5rem;">
-                        Direct manager or supervisor
+                        {% trans 'Direct manager or supervisor' %}
                     </div>
                 </div>
 
                 <div class="form-group category-emails" data-category="peer" style="margin-bottom: 1.5rem;">
-                    <label class="form-label">Peers</label>
+                    <label class="form-label">{% trans 'Peers' %}</label>
                     <textarea
                         name="peer_emails"
                         class="form-control"
@@ -228,12 +229,12 @@
                         placeholder="peer1@example.com, peer2@example.com"
                     ></textarea>
                     <div style="font-size: 0.875rem; color: #64748b; margin-top: 0.5rem;">
-                        Colleagues at the same level
+                        {% trans 'Colleagues at the same level' %}
                     </div>
                 </div>
 
                 <div class="form-group category-emails" data-category="direct_report" style="margin-bottom: 1.5rem;">
-                    <label class="form-label">Direct Reports</label>
+                    <label class="form-label">{% trans 'Direct Reports' %}</label>
                     <textarea
                         name="direct_report_emails"
                         class="form-control"
@@ -241,14 +242,14 @@
                         placeholder="report1@example.com, report2@example.com"
                     ></textarea>
                     <div style="font-size: 0.875rem; color: #64748b; margin-top: 0.5rem;">
-                        People who report to this reviewee
+                        {% trans 'People who report to this reviewee' %}
                     </div>
                 </div>
 
                 <div style="display: flex; gap: 0.5rem; align-items: center; padding: 1rem; background: var(--bg-light); border-radius: 8px; border: 1px solid var(--border);">
                     <input type="checkbox" name="send_invitations_now" id="sendInvitationsNow" value="1" style="width: 18px; height: 18px; cursor: pointer;">
                     <label for="sendInvitationsNow" style="margin: 0; cursor: pointer; font-size: 0.875rem; color: var(--text-primary);">
-                        Send invitation emails immediately after creating cycle
+                        {% trans 'Send invitation emails immediately after creating cycle' %}
                     </label>
                 </div>
             </div>
@@ -256,9 +257,9 @@
 
         <div style="display: flex; gap: 1rem;">
             {% if cycle_credits != 0 %}
-            <button type="submit" class="btn btn-primary" id="submitBtn">Create Review Cycle</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">{% trans 'Create Review Cycle' %}</button>
             {% endif %}
-            <a href="{% url 'review_cycle_list' %}" class="btn btn-secondary">Cancel</a>
+            <a href="{% url 'review_cycle_list' %}" class="btn btn-secondary">{% trans 'Cancel' %}</a>
         </div>
     </form>
 </div>
@@ -283,13 +284,13 @@ function toggleRevieweeSelect() {
     if (mode === 'bulk') {
         revieweeGroup.style.display = 'none';
         revieweeSelect.removeAttribute('required');
-        if (submitBtn) submitBtn.textContent = 'Create Cycles (no emails yet)';
+        if (submitBtn) submitBtn.textContent = '{{ _('Create Cycles (no emails yet)')|escapejs }}';
         inviteSection.style.display = 'none'; // Hide invite section for bulk mode
         if (bulkNote) bulkNote.style.display = 'block';
     } else {
         revieweeGroup.style.display = 'block';
         revieweeSelect.setAttribute('required', 'required');
-        if (submitBtn) submitBtn.textContent = 'Create Review Cycle';
+        if (submitBtn) submitBtn.textContent = '{{ _('Create Review Cycle')|escapejs }}';
         inviteSection.style.display = 'block'; // Show invite section for single mode
         if (bulkNote) bulkNote.style.display = 'none';
     }

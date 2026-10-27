@@ -6,13 +6,13 @@ enabling backup restoration, data migration, and organization cloning.
 """
 
 import json
-import secrets
-import string
 from datetime import datetime
 from django.db import transaction
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.utils.crypto import get_random_string
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from subscriptions.utils import NoCycleCredits
 
 
@@ -33,112 +33,123 @@ def validate_import_data(data):
     errors = []
     warnings = []
 
+    def add_warning(msg, **context):
+        warnings.append(msg % context)
+
     # Check top-level structure
     if not isinstance(data, dict):
-        errors.append("Import data must be a JSON object")
+        errors.append(_('Import data must be a JSON object'))
         return {'valid': False, 'errors': errors, 'warnings': warnings}
 
     # Required top-level keys
     required_keys = ['organization']
     for key in required_keys:
         if key not in data:
-            errors.append(f"Missing required top-level key: '{key}'")
+            errors.append(_("Missing required top-level key: '%(key)s'") % {'key': key})
 
     # Validate organization structure
     if 'organization' in data:
         org_data = data['organization']
         if not isinstance(org_data, dict):
-            errors.append("'organization' must be an object")
+            errors.append(_("'%(key)s' must be an object") % {'key': 'organization'})
         else:
             if 'name' not in org_data:
-                errors.append("Organization missing required field: 'name'")
+                errors.append(_("Organization missing required field: '%(field)s'") % {'field': 'name'})
             if 'email' not in org_data:
-                warnings.append("Organization missing 'email' field")
+                add_warning(_("Organization missing '%(field)s' field"), field='email')
 
     # Validate users structure
     if 'users' in data:
         if not isinstance(data['users'], list):
-            errors.append("'users' must be an array")
+            errors.append(_("'%(key)s' must be an array") % {'key': 'users'})
         else:
             for idx, user in enumerate(data['users']):
                 if not isinstance(user, dict):
-                    errors.append(f"User at index {idx} must be an object")
+                    errors.append(_('User at index %(index)s must be an object') % {'index': idx})
                     continue
 
                 required_user_fields = ['username', 'email']
                 for field in required_user_fields:
                     if field not in user:
-                        errors.append(f"User at index {idx} missing required field: '{field}'")
+                        errors.append(_("User at index %(index)s missing required field: '%(field)s'") % {'index': idx, 'field': field})
 
     # Validate reviewees structure
     if 'reviewees' in data:
         if not isinstance(data['reviewees'], list):
-            errors.append("'reviewees' must be an array")
+            errors.append(_("'%(key)s' must be an array") % {'key': 'reviewees'})
         else:
             for idx, reviewee in enumerate(data['reviewees']):
                 if not isinstance(reviewee, dict):
-                    errors.append(f"Reviewee at index {idx} must be an object")
+                    errors.append(_('Reviewee at index %(index)s must be an object') % {'index': idx})
                     continue
 
                 required_fields = ['name', 'email']
                 for field in required_fields:
                     if field not in reviewee:
-                        errors.append(f"Reviewee at index {idx} missing required field: '{field}'")
+                        errors.append(_("Reviewee at index %(index)s missing required field: '%(field)s'") % {'index': idx, 'field': field})
 
     # Validate questionnaires structure
     if 'questionnaires' in data:
         if not isinstance(data['questionnaires'], list):
-            errors.append("'questionnaires' must be an array")
+            errors.append(_("'%(key)s' must be an array") % {'key': 'questionnaires'})
         else:
             for idx, questionnaire in enumerate(data['questionnaires']):
                 if not isinstance(questionnaire, dict):
-                    errors.append(f"Questionnaire at index {idx} must be an object")
+                    errors.append(_('Questionnaire at index %(index)s must be an object') % {'index': idx})
                     continue
 
                 if 'name' not in questionnaire:
-                    errors.append(f"Questionnaire at index {idx} missing 'name'")
+                    errors.append(_("Questionnaire at index %(index)s missing '%(field)s'") % {'index': idx, 'field': 'name'})
 
                 if 'sections' not in questionnaire:
-                    warnings.append(f"Questionnaire at index {idx} missing 'sections' (empty questionnaire)")
+                    add_warning(
+                        _("Questionnaire at index %(index)s missing '%(field)s' (empty questionnaire)"),
+                        index=idx,
+                        field='sections',
+                    )
                 elif not isinstance(questionnaire['sections'], list):
-                    errors.append(f"Questionnaire at index {idx} 'sections' must be an array")
+                    errors.append(_("Questionnaire at index %(index)s '%(field)s' must be an array") % {'index': idx, 'field': 'sections'})
                 else:
                     # Validate sections
                     for s_idx, section in enumerate(questionnaire['sections']):
                         if 'title' not in section:
-                            errors.append(f"Questionnaire {idx} section {s_idx} missing 'title'")
+                            errors.append(_("Questionnaire %(index)s section %(section)s missing '%(field)s'") % {'index': idx, 'section': s_idx, 'field': 'title'})
                         if 'questions' in section and not isinstance(section['questions'], list):
-                            errors.append(f"Questionnaire {idx} section {s_idx} 'questions' must be an array")
+                            errors.append(_("Questionnaire %(index)s section %(section)s '%(field)s' must be an array") % {'index': idx, 'section': s_idx, 'field': 'questions'})
 
     # Validate review_cycles structure
     if 'review_cycles' in data:
         if not isinstance(data['review_cycles'], list):
-            errors.append("'review_cycles' must be an array")
+            errors.append(_("'%(key)s' must be an array") % {'key': 'review_cycles'})
         else:
             for idx, cycle in enumerate(data['review_cycles']):
                 if not isinstance(cycle, dict):
-                    errors.append(f"Review cycle at index {idx} must be an object")
+                    errors.append(_('Review cycle at index %(index)s must be an object') % {'index': idx})
                     continue
 
                 required_fields = ['reviewee', 'questionnaire', 'status']
                 for field in required_fields:
                     if field not in cycle:
-                        errors.append(f"Review cycle at index {idx} missing '{field}'")
+                        errors.append(_("Review cycle at index %(index)s missing '%(field)s'") % {'index': idx, 'field': field})
 
     # Validate reports structure
     if 'reports' in data:
         if not isinstance(data['reports'], list):
-            errors.append("'reports' must be an array")
+            errors.append(_("'%(key)s' must be an array") % {'key': 'reports'})
         else:
             for idx, report in enumerate(data['reports']):
                 if not isinstance(report, dict):
-                    errors.append(f"Report at index {idx} must be an object")
+                    errors.append(_('Report at index %(index)s must be an object') % {'index': idx})
                     continue
 
                 if 'reviewee' not in report:
-                    errors.append(f"Report at index {idx} missing 'reviewee'")
+                    errors.append(_("Report at index %(index)s missing '%(field)s'") % {'index': idx, 'field': 'reviewee'})
                 if 'report_data' not in report:
-                    warnings.append(f"Report at index {idx} missing 'report_data' (empty report)")
+                    add_warning(
+                        _("Report at index %(index)s missing '%(field)s' (empty report)"),
+                        index=idx,
+                        field='report_data',
+                    )
 
     return {
         'valid': len(errors) == 0,
@@ -158,8 +169,8 @@ def generate_import_preview(data):
         dict: Preview information for display to user
     """
     preview = {
-        'organization_name': data.get('organization', {}).get('name', 'Unknown'),
-        'organization_email': data.get('organization', {}).get('email', 'Not specified'),
+        'organization_name': data.get('organization', {}).get('name', _('Unknown')),
+        'organization_email': data.get('organization', {}).get('email', _('Not specified')),
         'counts': {
             'users': len(data.get('users', [])),
             'reviewees': len(data.get('reviewees', [])),
@@ -180,7 +191,7 @@ def generate_import_preview(data):
         )
 
         preview['questionnaire_details'].append({
-            'name': q.get('name', 'Unnamed'),
+            'name': q.get('name', _('Unnamed')),
             'sections': sections_count,
             'questions': questions_count,
         })
@@ -211,6 +222,9 @@ def import_reviewees(organization, reviewees_data, conflict_resolution='skip'):
         'errors': [],
     }
 
+    def add_warning(msg, **context):
+        result['warnings'].append(msg % context)
+
     for reviewee_data in reviewees_data:
         try:
             name = reviewee_data['name']
@@ -239,7 +253,12 @@ def import_reviewees(organization, reviewees_data, conflict_resolution='skip'):
                     # Create with modified email
                     original_email = email
                     email = f"imported_{email}"
-                    result['warnings'].append(f"Created duplicate reviewee: {name} with email {email} (original: {original_email})")
+                    add_warning(
+                        _('Created duplicate reviewee: %(name)s with email %(email)s (original: %(original)s)'),
+                        name=name,
+                        email=email,
+                        original=original_email,
+                    )
 
             # Create new reviewee
             Reviewee.objects.create(
@@ -252,7 +271,9 @@ def import_reviewees(organization, reviewees_data, conflict_resolution='skip'):
             result['created'] += 1
 
         except Exception as e:
-            result['errors'].append(f"Failed to import reviewee {reviewee_data.get('email', 'unknown')}: {str(e)}")
+            result['errors'].append(_('Failed to import reviewee %(reviewee)s: %(error)s') % {
+                'reviewee': reviewee_data.get('email', _('unknown')), 'error': str(e),
+            })
 
     return result
 
@@ -280,6 +301,9 @@ def import_questionnaires(organization, questionnaires_data, conflict_resolution
         'questionnaire_map': {},  # name -> instance for later reference
     }
 
+    def add_warning(msg, **context):
+        result['warnings'].append(msg % context)
+
     for q_data in questionnaires_data:
         try:
             name = q_data['name']
@@ -306,8 +330,12 @@ def import_questionnaires(organization, questionnaires_data, conflict_resolution
                 elif conflict_resolution == 'duplicate':
                     # Create with modified name
                     original_name = name
-                    name = f"{name} (imported)"
-                    result['warnings'].append(f"Created duplicate questionnaire: {name} (original: {original_name})")
+                    name = _('%(name)s (imported)') % {'name': name}
+                    add_warning(
+                        _('Created duplicate questionnaire: %(name)s (original: %(original)s)'),
+                        name=name,
+                        original=original_name,
+                    )
 
             # Create or update questionnaire
             if questionnaire_to_update:
@@ -349,7 +377,9 @@ def import_questionnaires(organization, questionnaires_data, conflict_resolution
                     )
 
         except Exception as e:
-            result['errors'].append(f"Failed to import questionnaire {q_data.get('name', 'unknown')}: {str(e)}")
+            result['errors'].append(_('Failed to import questionnaire %(questionnaire)s: %(error)s') % {
+                'questionnaire': q_data.get('name', _('unknown')), 'error': str(e),
+            })
 
     return result
 
@@ -379,6 +409,9 @@ def import_review_cycles(organization, cycles_data, questionnaire_map, conflict_
         'imported_cycles': [],  # Track imported cycles for report attachment
     }
 
+    def add_warning(msg, **context):
+        result['warnings'].append(msg % context)
+
     for cycle_data in cycles_data:
         try:
             # Find referenced reviewee
@@ -389,7 +422,7 @@ def import_review_cycles(organization, cycles_data, questionnaire_map, conflict_
             ).first()
 
             if not reviewee:
-                result['warnings'].append(f"Reviewee '{reviewee_name}' not found - skipping cycle")
+                add_warning(_("Reviewee '%(name)s' not found - skipping cycle"), name=reviewee_name)
                 result['skipped'] += 1
                 continue
 
@@ -405,7 +438,7 @@ def import_review_cycles(organization, cycles_data, questionnaire_map, conflict_
                 ).first()
 
             if not questionnaire:
-                result['warnings'].append(f"Questionnaire '{questionnaire_name}' not found - skipping cycle")
+                add_warning(_("Questionnaire '%(name)s' not found - skipping cycle"), name=questionnaire_name)
                 result['skipped'] += 1
                 continue
 
@@ -438,9 +471,9 @@ def import_review_cycles(organization, cycles_data, questionnaire_map, conflict_
             # Responses reference question IDs which change on import
             # To properly import responses, implement UUID-based question matching
             if cycle_data.get('responses'):
-                result['warnings'].append(
-                    f"Skipped {len(cycle_data['responses'])} responses for cycle - "
-                    "response import requires UUID-based question matching"
+                add_warning(
+                    _('Skipped %(count)s responses for cycle - response import requires UUID-based question matching'),
+                    count=len(cycle_data['responses']),
                 )
 
             result['created'] += 1
@@ -450,7 +483,7 @@ def import_review_cycles(organization, cycles_data, questionnaire_map, conflict_
             # Not a per-row problem: abort the import so nothing is half-imported.
             raise
         except Exception as e:
-            result['errors'].append(f"Failed to import review cycle: {str(e)}")
+            result['errors'].append(_('Failed to import review cycle: %(error)s') % {'error': str(e)})
 
     return result
 
@@ -479,6 +512,9 @@ def import_users(organization, users_data, conflict_resolution='skip', send_welc
         'errors': [],
     }
 
+    def add_warning(msg, **context):
+        result['warnings'].append(msg % context)
+
     for user_data in users_data:
         try:
             username = user_data['username']
@@ -494,7 +530,7 @@ def import_users(organization, users_data, conflict_resolution='skip', send_welc
 
             if existing_user and not in_organization and conflict_resolution != 'duplicate':
                 result['skipped'] += 1
-                result['warnings'].append(f"Username '{username}' belongs to another organization - skipped")
+                add_warning(_("Username '%(username)s' belongs to another organization - skipped"), username=username)
                 continue
 
             # Email is used for login and password reset, so it must stay unique
@@ -504,7 +540,11 @@ def import_users(organization, users_data, conflict_resolution='skip', send_welc
 
             if email_owner and creates_user:
                 result['skipped'] += 1
-                result['warnings'].append(f"Email '{email}' is already used by another user - skipped user {username}")
+                add_warning(
+                    _("Email '%(email)s' is already used by another user - skipped user %(username)s"),
+                    email=email,
+                    username=username,
+                )
                 continue
 
             if existing_user:
@@ -517,7 +557,11 @@ def import_users(organization, users_data, conflict_resolution='skip', send_welc
                     if existing_user.email != email:
                         if email_owner and email_owner != existing_user:
                             result['skipped'] += 1
-                            result['warnings'].append(f"Email '{email}' is already used by another user - skipped user {username}")
+                            add_warning(
+                                _("Email '%(email)s' is already used by another user - skipped user %(username)s"),
+                                email=email,
+                                username=username,
+                            )
                             continue
                         existing_user.email = email
                         existing_user.save()
@@ -541,16 +585,17 @@ def import_users(organization, users_data, conflict_resolution='skip', send_welc
                     while User.objects.filter(username=username).exists():
                         username = f"{original_username}_imported{suffix}"
                         suffix += 1
-                    result['warnings'].append(f"Created user with modified username: {username} (original: {original_username})")
+                    add_warning(
+                        _('Created user with modified username: %(username)s (original: %(original)s)'),
+                        username=username,
+                        original=original_username,
+                    )
 
-            # Create new user with random password (same method as subscription signup)
-            alphabet = string.ascii_letters + string.digits
-            password = ''.join(secrets.choice(alphabet) for _ in range(16))
-
+            # Create new user with random password
             user = User.objects.create_user(
                 username=username,
                 email=email,
-                password=password,
+                password=get_random_string(16),
             )
 
             # Create profile
@@ -567,13 +612,16 @@ def import_users(organization, users_data, conflict_resolution='skip', send_welc
                 assign_organization_admin(user)
 
             result['created'] += 1
-            result['warnings'].append(
-                f"User '{username}' created with random password. "
-                "They will need to use password reset to access their account."
+            add_warning(
+                _("User '%(username)s' created with random password. "
+                  "They will need to use password reset to access their account."),
+                username=username,
             )
 
         except Exception as e:
-            result['errors'].append(f"Failed to import user {user_data.get('username', 'unknown')}: {str(e)}")
+            result['errors'].append(_('Failed to import user %(username)s: %(error)s') % {
+                'username': user_data.get('username', _('unknown')), 'error': str(e),
+            })
 
     return result
 
@@ -607,6 +655,9 @@ def import_reports(organization, reports_data, questionnaire_map, conflict_resol
         'errors': [],
     }
 
+    def add_warning(msg, **context):
+        result['warnings'].append(msg % context)
+
     # Build map of imported cycles for quick lookup
     cycle_map = {}  # (reviewee_name, questionnaire_name) -> cycle
     if imported_cycles:
@@ -624,7 +675,7 @@ def import_reports(organization, reports_data, questionnaire_map, conflict_resol
             ).first()
 
             if not reviewee:
-                result['warnings'].append(f"Reviewee '{reviewee_name}' not found for report - skipping")
+                add_warning(_("Reviewee '%(name)s' not found for report - skipping"), name=reviewee_name)
                 result['skipped'] += 1
                 continue
 
@@ -651,7 +702,7 @@ def import_reports(organization, reports_data, questionnaire_map, conflict_resol
                 ).order_by('-is_default', 'created_at').first()
 
             if not questionnaire:
-                result['warnings'].append(f"No questionnaire found for report (reviewee: {reviewee_name}) - skipping")
+                add_warning(_('No questionnaire found for report (reviewee: %(name)s) - skipping'), name=reviewee_name)
                 result['skipped'] += 1
                 continue
 
@@ -700,7 +751,7 @@ def import_reports(organization, reports_data, questionnaire_map, conflict_resol
             # Not a per-row problem: abort the import so nothing is half-imported.
             raise
         except Exception as e:
-            result['errors'].append(f"Failed to import report: {str(e)}")
+            result['errors'].append(_('Failed to import report: %(error)s') % {'error': str(e)})
 
     return result
 
@@ -820,7 +871,7 @@ def import_organization_data(
                     imported_cycles = cycle_result.get('imported_cycles', [])
                 else:
                     result['warnings'].append(
-                        "Skipped cycle import: requires both reviewees and questionnaires to be imported"
+                        _('Skipped cycle import: requires both reviewees and questionnaires to be imported')
                     )
 
             # 2.5 Import Reports (if enabled)
@@ -839,6 +890,13 @@ def import_organization_data(
                 result['errors'].extend(report_result.get('errors', []))
 
             # Step 3: Generate summary
+            type_labels = {
+                'reviewees': _('Reviewees'),
+                'questionnaires': _('Questionnaires'),
+                'users': _('Users'),
+                'cycles': _('Cycles'),
+                'reports': _('Reports'),
+            }
             summary_parts = []
             for data_type, type_result in result['details'].items():
                 created = type_result.get('created', 0)
@@ -847,21 +905,21 @@ def import_organization_data(
 
                 parts = []
                 if created > 0:
-                    parts.append(f"{created} created")
+                    parts.append(_('%(count)s created') % {'count': created})
                 if updated > 0:
-                    parts.append(f"{updated} updated")
+                    parts.append(_('%(count)s updated') % {'count': updated})
                 if skipped > 0:
-                    parts.append(f"{skipped} skipped")
+                    parts.append(_('%(count)s skipped') % {'count': skipped})
 
                 if parts:
-                    summary_parts.append(f"{data_type.title()}: {', '.join(parts)}")
+                    summary_parts.append(f"{type_labels[data_type]}: {', '.join(parts)}")
 
-            result['summary'] = "; ".join(summary_parts) if summary_parts else "No data imported"
+            result['summary'] = "; ".join(summary_parts) if summary_parts else _('No data imported')
             result['success'] = True
 
             # If there were critical errors, raise exception to rollback
             if result['errors']:
-                raise Exception(f"Import failed with errors: {'; '.join(result['errors'][:3])}")
+                raise Exception(_('Import failed with errors: %(errors)s') % {'errors': '; '.join(result['errors'][:3])})
 
     except Exception as e:
         result['success'] = False

@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='plan',
             name='max_employees',
-            field=models.IntegerField(help_text='Maximum total: reviewees + team members combined'),
+            field=models.IntegerField(help_text='Maximum total: reviewees + team members combined', verbose_name='maximum employees'),
         ),
     ]

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib import messages
+from django.utils.translation import gettext as _, gettext_lazy
 from .models import ReviewCycle, ReviewerToken, Response
 
 
@@ -25,18 +26,18 @@ def send_feedback_invitations(modeladmin, request, queryset):
             # or we'd need to add email field to ReviewerToken
             messages.warning(
                 request,
-                f"Token {token.token} generated. Copy feedback URL and send to reviewer manually: "
-                f"http://localhost:8000/feedback/{token.token}/"
+                _('Token %(token)s generated. Copy feedback URL and send to reviewer manually: %(url)s')
+                % {'token': token.token, 'url': f"http://localhost:8000/feedback/{token.token}/"}
             )
             sent_count += 1
         except Exception as e:
             error_count += 1
-            messages.error(request, f"Error with token {token.token}: {str(e)}")
+            messages.error(request, _('Error with token %(token)s: %(error)s') % {'token': token.token, 'error': str(e)})
 
     if sent_count > 0:
-        messages.success(request, f"Generated {sent_count} feedback URLs. Copy and send manually.")
+        messages.success(request, _('Generated %(count)s feedback URLs. Copy and send manually.') % {'count': sent_count})
 
-send_feedback_invitations.short_description = "Generate feedback URLs for selected tokens"
+send_feedback_invitations.short_description = gettext_lazy('Generate feedback URLs for selected tokens')
 
 
 @admin.register(ReviewCycle)
@@ -52,8 +53,8 @@ class ReviewCycleAdmin(admin.ModelAdmin):
         from django.utils.html import format_html
         from django.urls import reverse
         url = reverse('reports:view_report', args=[obj.id])
-        return format_html('<a href="{}" target="_blank">View Report</a>', url)
-    view_report_link.short_description = 'Report'
+        return format_html('<a href="{}" target="_blank">{}</a>', url, _('View Report'))
+    view_report_link.short_description = gettext_lazy('Report')
 
 
 @admin.register(ReviewerToken)
@@ -76,4 +77,4 @@ class ResponseAdmin(admin.ModelAdmin):
 
     def question_short(self, obj):
         return obj.question.question_text[:50] + '...' if len(obj.question.question_text) > 50 else obj.question.question_text
-    question_short.short_description = 'Question'
+    question_short.short_description = gettext_lazy('Question')

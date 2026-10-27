@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='organization',
             name='auto_send_report_email',
-            field=models.BooleanField(default=True, help_text='Automatically send email to reviewee when their report is generated'),
+            field=models.BooleanField(default=True, help_text='Automatically send email to reviewee when their report is generated', verbose_name='automatically send report email'),
         ),
     ]

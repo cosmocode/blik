@@ -57,6 +57,8 @@ class Migration(migrations.Migration):
                     ('can_view_all_reports', 'Can view all organization reports'),
                     ('can_manage_questionnaires', 'Can create and edit questionnaires'),
                 ],
+                'verbose_name': 'user profile',
+                'verbose_name_plural': 'user profiles',
             },
         ),
         migrations.RunPython(grant_to_admin_group, revoke_from_admin_group),

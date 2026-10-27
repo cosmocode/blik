@@ -1,0 +1,56 @@
+msgid ""
+msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-20 10:15+0000\n"
+"Language: de\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Restored %(count)s draft answer (Step %(step)s)"
+msgid_plural "Restored %(count)s draft answers (Step %(step)s)"
+msgstr[0] "%(count)s Antwortentwurf wiederhergestellt (Schritt %(step)s)"
+msgstr[1] "%(count)s Antwortentwürfe wiederhergestellt (Schritt %(step)s)"
+
+msgid "Restored %(count)s draft answer"
+msgid_plural "Restored %(count)s draft answers"
+msgstr[0] "%(count)s Antwortentwurf wiederhergestellt"
+msgstr[1] "%(count)s Antwortentwürfe wiederhergestellt"
+
+msgid "Step %(step)s of %(total)s"
+msgstr "Schritt %(step)s von %(total)s"
+
+msgid "Please answer all required questions before continuing."
+msgstr "Bitte beantworten Sie alle Pflichtfragen, bevor Sie fortfahren."
+
+msgid "Please complete all required questions. Check step %(step)s."
+msgstr "Bitte beantworten Sie alle Pflichtfragen. Siehe Schritt %(step)s."
+
+msgid "Submitting..."
+msgstr "Wird gesendet..."
+
+msgid "An error occurred. Please try again."
+msgstr "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+
+msgid "Submit Feedback"
+msgstr "Feedback absenden"
+
+msgid "Network error. Please check your connection and try again."
+msgstr "Netzwerkfehler. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es erneut."
+
+msgid "Please fix the following:"
+msgstr "Bitte korrigieren Sie Folgendes:"
+
+msgid "Self"
+msgstr "Selbst"
+
+msgid "Peers"
+msgstr "Kolleg:innen"
+
+msgid "Manager"
+msgstr "Führungskraft"
+
+msgid "Direct Reports"
+msgstr "Unterstellte"
+
+msgid "Others Average"
+msgstr "Durchschnitt der anderen"

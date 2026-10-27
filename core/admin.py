@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from .models import Organization, UpgradeStep, WelcomeEmailFact
 
 
@@ -8,7 +9,8 @@ class OrganizationAdminForm(forms.ModelForm):
     smtp_password = forms.CharField(
         required=False,
         widget=forms.PasswordInput(render_value=False),
-        help_text='Enter a new SMTP password or leave blank to keep the existing one'
+        help_text=_('Enter a new SMTP password or leave blank to keep the existing one'),
+        label=_('SMTP password')
     )
 
     class Meta:
@@ -39,10 +41,10 @@ class OrganizationAdmin(admin.ModelAdmin):
     list_filter = ['is_active', 'created_at']
     search_fields = ['name', 'email']
     fieldsets = [
-        ('Basic Information', {
+        (_('Basic Information'), {
             'fields': ['name', 'email', 'is_active']
         }),
-        ('Email Settings', {
+        (_('Email Settings'), {
             'fields': ['smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'smtp_use_tls', 'from_email'],
             'classes': ['collapse']
         }),

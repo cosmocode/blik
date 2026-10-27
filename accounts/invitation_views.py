@@ -6,10 +6,14 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.urls import reverse
+from django.utils import translation
+from django.utils.translation import gettext as _
 from accounts.models import OrganizationInvitation
 from accounts.permissions import organization_admin_required
+from core.languages import recipient_language
 from core.email import send_email
 from subscriptions.utils import check_user_limit
 
@@ -31,11 +35,11 @@ def send_invitation(request):
             org = request.user.profile.organization
 
         if not org:
-            messages.error(request, 'No organization found.')
+            messages.error(request, _('No organization found.'))
             return redirect('admin_dashboard')
 
         if not email:
-            messages.error(request, 'Email address is required.')
+            messages.error(request, _('Email address is required.'))
             return redirect('admin_dashboard')
 
         # Check user limit
@@ -52,7 +56,7 @@ def send_invitation(request):
         ).first()
 
         if existing and existing.is_valid():
-            messages.info(request, f'Invitation already sent to {email}')
+            messages.info(request, _('Invitation already sent to %(email)s') % {'email': email})
             return redirect('admin_dashboard')
 
         # Create new invitation
@@ -68,43 +72,19 @@ def send_invitation(request):
 
         # Send invitation email
         try:
-            send_email(
-                subject=f'Invitation to join {org.name} on Blik',
-                message=f'''
-Hello,
-
-You've been invited to join {org.name} on Blik 360 Feedback Platform.
-
-Click the link below to accept this invitation and create your account:
-{invite_url}
-
-This invitation will expire in 7 days.
-
-Best regards,
-{org.name} Team
-                '''.strip(),
-                recipient_list=[email],
-                html_message=f'''
-<!DOCTYPE html>
-<html>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2>You're Invited!</h2>
-        <p>You've been invited to join <strong>{org.name}</strong> on Blik 360 Feedback Platform.</p>
-        <p style="margin: 30px 0;">
-            <a href="{invite_url}" style="display: inline-block; padding: 12px 24px; background-color: #4f46e5; color: white; text-decoration: none; border-radius: 8px;">Accept Invitation</a>
-        </p>
-        <p style="color: #666; font-size: 14px;">This invitation will expire in 7 days.</p>
-        <p>Best regards,<br>{org.name} Team</p>
-    </div>
-</body>
-</html>
-                ''',
-                from_email=org.from_email if org.from_email else None
-            )
-            messages.success(request, f'Invitation sent to {email}')
+            # There is no profile yet: the language chosen in the invitation form, else the organization's
+            with translation.override(recipient_language(request.POST.get('language'), organization=org)):
+                context = {'organization': org, 'invite_url': invite_url}
+                send_email(
+                    subject=_('Invitation to join %(organization)s on Blik') % {'organization': org.name},
+                    message=render_to_string('emails/team_invitation.txt', context),
+                    recipient_list=[email],
+                    html_message=render_to_string('emails/team_invitation.html', context),
+                    from_email=org.from_email if org.from_email else None
+                )
+            messages.success(request, _('Invitation sent to %(email)s') % {'email': email})
         except Exception as e:
-            messages.error(request, f'Failed to send invitation: {e}')
+            messages.error(request, _('Failed to send invitation: %(error)s') % {'error': e})
 
     return redirect('team_list')
 
@@ -114,7 +94,7 @@ def accept_invitation(request, token):
     invitation = get_object_or_404(OrganizationInvitation, token=token)
 
     if not invitation.is_valid():
-        messages.error(request, 'This invitation has expired or been used.')
+        messages.error(request, _('This invitation has expired or been used.'))
         return redirect('login')
 
     # Check if user already exists with this email
@@ -137,8 +117,9 @@ def accept_invitation(request, token):
         if not created and profile.organization != invitation.organization:
             messages.error(
                 request,
-                f'Your account is already linked to {profile.organization.name}. '
-                'Please contact support for multi-organization access.'
+                _('Your account is already linked to %(organization)s. '
+                  'Please contact support for multi-organization access.')
+                % {'organization': profile.organization.name}
             )
             return redirect('login')
 
@@ -155,7 +136,7 @@ def accept_invitation(request, token):
 
         messages.success(
             request,
-            f'Welcome to {invitation.organization.name}! Please log in.'
+            _('Welcome to %(organization)s! Please log in.') % {'organization': invitation.organization.name}
         )
         return redirect('login')
 
@@ -166,6 +147,6 @@ def accept_invitation(request, token):
 
     messages.info(
         request,
-        f'Welcome! Create your account to join {invitation.organization.name}'
+        _('Welcome! Create your account to join %(organization)s') % {'organization': invitation.organization.name}
     )
     return redirect('signup_from_invitation')

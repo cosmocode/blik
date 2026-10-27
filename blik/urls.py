@@ -17,6 +17,8 @@ urlpatterns = [
     path('health/', views.health_check, name='health_check'),
     path('sitemap.xml', seo_views.sitemap, name='sitemap'),
     path('robots.txt', seo_views.robots, name='robots'),
+    path('i18n/js/', views.JavaScriptCatalog.as_view(), name='javascript-catalog'),
+    path('i18n/setlang/', views.set_language, name='set_language'),
     path('admin/', admin.site.urls),
 
     # Superuser tools

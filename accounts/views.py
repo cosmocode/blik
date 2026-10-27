@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.utils.translation import gettext as _
 from django_ratelimit.decorators import ratelimit
 from accounts.models import UserProfile, OrganizationInvitation, PasswordResetToken
 from accounts.services import create_user_with_email_as_username
@@ -33,7 +34,7 @@ def register_view(request):
 
     messages.warning(
         request,
-        'Please use the signup page to create an account.'
+        _('Please use the signup page to create an account.')
     )
     return redirect('login')
 
@@ -52,17 +53,17 @@ def signup_view(request):
     invitation_email = request.session.get('invitation_email')
 
     if not invitation_token:
-        messages.error(request, 'Invalid signup link. Please use your invitation email.')
+        messages.error(request, _('Invalid signup link. Please use your invitation email.'))
         return redirect('login')
 
     # Get the invitation
     try:
         invitation = OrganizationInvitation.objects.get(token=invitation_token)
         if not invitation.is_valid():
-            messages.error(request, 'This invitation has expired.')
+            messages.error(request, _('This invitation has expired.'))
             return redirect('login')
     except OrganizationInvitation.DoesNotExist:
-        messages.error(request, 'Invalid invitation.')
+        messages.error(request, _('Invalid invitation.'))
         return redirect('login')
 
     if request.method == 'POST':
@@ -72,14 +73,14 @@ def signup_view(request):
 
         # Validate
         if email != invitation.email.lower():
-            messages.error(request, f'You must use the invited email: {invitation.email}')
+            messages.error(request, _('You must use the invited email: %(email)s') % {'email': invitation.email})
             return render(request, 'accounts/register.html', {
                 'organization': invitation.organization,
                 'invitation_email': invitation.email
             })
 
         if password1 != password2:
-            messages.error(request, 'Passwords do not match.')
+            messages.error(request, _('Passwords do not match.'))
             return render(request, 'accounts/register.html', {
                 'organization': invitation.organization,
                 'invitation_email': invitation.email
@@ -100,7 +101,7 @@ def signup_view(request):
 
         # Create user using centralized function
         try:
-            user, _ = create_user_with_email_as_username(email=email, password=password1)
+            user, generated_password = create_user_with_email_as_username(email=email, password=password1)
         except ValueError as e:
             messages.error(request, str(e))
             return redirect('login')
@@ -140,7 +141,7 @@ def signup_view(request):
         user.backend = 'django.contrib.auth.backends.ModelBackend'
         login(request, user)
 
-        messages.success(request, f'Welcome to {invitation.organization.name}!')
+        messages.success(request, _('Welcome to %(organization)s!') % {'organization': invitation.organization.name})
         return redirect('admin_dashboard')
 
     # GET request - show form
@@ -181,7 +182,7 @@ def forgot_password_view(request):
             # Always show success message to prevent email enumeration
             messages.success(
                 request,
-                'If an account with that email exists, we\'ve sent password reset instructions.'
+                _("If an account with that email exists, we've sent password reset instructions.")
             )
             return redirect('login')
     else:
@@ -200,11 +201,11 @@ def reset_password_view(request, token):
     try:
         reset_token = PasswordResetToken.objects.get(token=token)
     except PasswordResetToken.DoesNotExist:
-        messages.error(request, 'Invalid or expired password reset link.')
+        messages.error(request, _('Invalid or expired password reset link.'))
         return redirect('login')
 
     if not reset_token.is_valid():
-        messages.error(request, 'This password reset link has expired. Please request a new one.')
+        messages.error(request, _('This password reset link has expired. Please request a new one.'))
         return redirect('forgot_password')
 
     if request.method == 'POST':
@@ -219,7 +220,7 @@ def reset_password_view(request, token):
             reset_token.used_at = timezone.now()
             reset_token.save()
 
-            messages.success(request, 'Your password has been reset successfully. Please log in.')
+            messages.success(request, _('Your password has been reset successfully. Please log in.'))
             return redirect('login')
         else:
             # Show form errors
@@ -243,7 +244,7 @@ def profile_view(request):
     try:
         profile = request.user.profile
     except UserProfile.DoesNotExist:
-        messages.error(request, 'Profile not found. Please contact support.')
+        messages.error(request, _('Profile not found. Please contact support.'))
         return redirect('admin_dashboard')
 
     # Handle profile edit form
@@ -251,7 +252,7 @@ def profile_view(request):
         form = ProfileEditForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Your profile has been updated successfully.')
+            messages.success(request, _('Your profile has been updated successfully.'))
             return redirect('profile')
     else:
         form = ProfileEditForm(instance=request.user)

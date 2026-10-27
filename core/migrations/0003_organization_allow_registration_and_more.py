@@ -13,11 +13,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='organization',
             name='allow_registration',
-            field=models.BooleanField(default=False, help_text='Allow new users to register for this organization'),
+            field=models.BooleanField(default=False, help_text='Allow new users to register for this organization', verbose_name='allow user registration'),
         ),
         migrations.AddField(
             model_name='organization',
             name='default_users_can_create_cycles',
-            field=models.BooleanField(default=False, help_text='By default, new users can create cycles for others (not just themselves)'),
+            field=models.BooleanField(default=False, help_text='By default, new users can create cycles for others (not just themselves)', verbose_name='new users can create cycles for others'),
         ),
     ]

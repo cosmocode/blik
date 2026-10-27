@@ -1,19 +1,20 @@
 {% extends "admin_dashboard/base.html" %}
+{% load i18n %}
 
-{% block title %}Product Review - {{ review.reviewer_name }}{% endblock %}
+{% block title %}{% blocktrans trimmed with name=review.reviewer_name %}Product Review - {{ name }}{% endblocktrans %}{% endblock %}
 
 {% block content %}
 <div class="page-header">
     <div>
-        <h1>Product Review</h1>
-        <p>Review from {{ review.reviewer_name }}</p>
+        <h1>{% trans 'Product Review' %}</h1>
+        <p>{% blocktrans trimmed with name=review.reviewer_name %}Review from {{ name }}{% endblocktrans %}</p>
     </div>
     <div style="display: flex; gap: 0.5rem;">
         {% if perms.accounts.can_manage_organization %}
-        <a href="{% url 'product_review_edit' review.id %}" class="btn btn-primary">Edit</a>
-        <a href="{% url 'product_review_delete' review.id %}" class="btn btn-danger">Delete</a>
+        <a href="{% url 'product_review_edit' review.id %}" class="btn btn-primary">{% trans 'Edit' %}</a>
+        <a href="{% url 'product_review_delete' review.id %}" class="btn btn-danger">{% trans 'Delete' %}</a>
         {% endif %}
-        <a href="{% url 'product_review_list' %}" class="btn btn-secondary">Back to List</a>
+        <a href="{% url 'product_review_list' %}" class="btn btn-secondary">{% trans 'Back to List' %}</a>
     </div>
 </div>
 
@@ -23,9 +24,9 @@
             <div>
                 <h2 style="margin: 0; font-size: 1.25rem;">{{ review.review_title }}</h2>
                 <div style="margin-top: 0.5rem; color: #64748b; font-size: 0.875rem;">
-                    by <strong>{{ review.reviewer_name }}</strong>
+                    {% blocktrans trimmed with name=review.reviewer_name %}by <strong>{{ name }}</strong>{% endblocktrans %}
                     {% if review.reviewer_title %}• {{ review.reviewer_title }}{% endif %}
-                    {% if review.reviewer_company %}at {{ review.reviewer_company }}{% endif %}
+                    {% if review.reviewer_company %}{% blocktrans trimmed with company=review.reviewer_company %}at {{ company }}{% endblocktrans %}{% endif %}
                 </div>
             </div>
             <div style="text-align: right;">
@@ -42,7 +43,7 @@
     </div>
     <div class="card-body">
         <div style="margin-bottom: 1.5rem;">
-            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: #64748b;">Review Text</h3>
+            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: #64748b;">{% trans 'Review Text' %}</h3>
             <p style="line-height: 1.6; white-space: pre-wrap;">{{ review.review_text }}</p>
         </div>
 
@@ -50,47 +51,47 @@
 
         <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
             <div>
-                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">Status</h4>
+                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">{% trans 'Status' %}</h4>
                 <div>
                     {% if review.status == 'approved' %}
-                    <span class="badge badge-success">Approved</span>
+                    <span class="badge badge-success">{% trans 'Approved' %}</span>
                     {% elif review.status == 'pending' %}
-                    <span class="badge badge-warning">Pending</span>
+                    <span class="badge badge-warning">{% trans 'Pending' %}</span>
                     {% else %}
-                    <span class="badge badge-danger">Rejected</span>
+                    <span class="badge badge-danger">{% trans 'Rejected' %}</span>
                     {% endif %}
                 </div>
             </div>
 
             <div>
-                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">Verification</h4>
+                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">{% trans 'Verification' %}</h4>
                 <div>
                     {% if review.verified_customer %}
-                    <span class="badge badge-success">✓ Verified Customer</span>
+                    <span class="badge badge-success">✓ {% trans 'Verified Customer' %}</span>
                     {% else %}
-                    <span class="badge badge-secondary">Not Verified</span>
+                    <span class="badge badge-secondary">{% trans 'Not Verified' %}</span>
                     {% endif %}
                 </div>
             </div>
 
             <div>
-                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">Featured</h4>
+                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">{% trans 'Featured' %}</h4>
                 <div>
                     {% if review.featured %}
-                    <span class="badge badge-warning">★ Featured</span>
+                    <span class="badge badge-warning">★ {% trans 'Featured' %}</span>
                     {% else %}
-                    <span class="badge badge-secondary">Not Featured</span>
+                    <span class="badge badge-secondary">{% trans 'Not Featured' %}</span>
                     {% endif %}
                 </div>
             </div>
 
             <div>
-                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">Published</h4>
+                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">{% trans 'Published' %}</h4>
                 <div>
                     {% if review.published_date %}
-                    {{ review.published_date|date:"F d, Y" }}
+                    {{ review.published_date|date:'DATE_FORMAT' }}
                     {% else %}
-                    <span style="color: #cbd5e1;">Not Published</span>
+                    <span style="color: #cbd5e1;">{% trans 'Not Published' %}</span>
                     {% endif %}
                 </div>
             </div>
@@ -98,30 +99,30 @@
 
         <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid var(--border);">
 
-        <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Reviewer Details</h3>
+        <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">{% trans 'Reviewer Details' %}</h3>
         <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
             <div>
-                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">Email</h4>
+                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">{% trans 'Email' %}</h4>
                 <div>{{ review.reviewer_email }}</div>
             </div>
 
             {% if review.reviewer_title %}
             <div>
-                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">Title</h4>
+                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">{% trans 'Title' context 'job title' %}</h4>
                 <div>{{ review.reviewer_title }}</div>
             </div>
             {% endif %}
 
             {% if review.reviewer_company %}
             <div>
-                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">Company</h4>
+                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">{% trans 'Company' %}</h4>
                 <div>{{ review.reviewer_company }}</div>
             </div>
             {% endif %}
 
             {% if review.source %}
             <div>
-                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">Source</h4>
+                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">{% trans 'Source' %}</h4>
                 <div>{{ review.source }}</div>
             </div>
             {% endif %}
@@ -130,7 +131,7 @@
         {% if review.notes %}
         <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid var(--border);">
         <div>
-            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">Internal Notes</h3>
+            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">{% trans 'Internal Notes' %}</h3>
             <p style="line-height: 1.6; white-space: pre-wrap; color: #64748b;">{{ review.notes }}</p>
         </div>
         {% endif %}
@@ -139,12 +140,12 @@
 
         <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); font-size: 0.875rem; color: #64748b;">
             <div>
-                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">Created</h4>
-                <div>{{ review.created_at|date:"F d, Y g:i A" }}</div>
+                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">{% trans 'Created' %}</h4>
+                <div>{{ review.created_at|date:'DATETIME_FORMAT' }}</div>
             </div>
             <div>
-                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">Last Updated</h4>
-                <div>{{ review.updated_at|date:"F d, Y g:i A" }}</div>
+                <h4 style="font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem;">{% trans 'Last Updated' %}</h4>
+                <div>{{ review.updated_at|date:'DATETIME_FORMAT' }}</div>
             </div>
         </div>
     </div>
@@ -156,9 +157,9 @@
         <div style="display: flex; align-items: start; gap: 1rem;">
             <div style="font-size: 2rem; color: #10b981;">✓</div>
             <div>
-                <h3 style="margin: 0; font-size: 1rem; color: #10b981;">Published Review</h3>
+                <h3 style="margin: 0; font-size: 1rem; color: #10b981;">{% trans 'Published Review' %}</h3>
                 <p style="margin: 0.5rem 0 0 0; color: #64748b;">
-                    This review is approved and active. It will be included in aggregate ratings on landing pages and in JSON-LD structured data for SEO.
+                    {% trans 'This review is approved and active. It will be included in aggregate ratings on landing pages and in JSON-LD structured data for SEO.' %}
                 </p>
             </div>
         </div>

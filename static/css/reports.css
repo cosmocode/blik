@@ -91,6 +91,7 @@ body.report-page {
     border-radius: 12px;
     font-size: 0.875rem;
     font-weight: 500;
+    text-transform: uppercase;
 }
 
 .severity-high { background: #fee2e2; color: #991b1b; }

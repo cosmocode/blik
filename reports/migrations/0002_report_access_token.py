@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='report',
             name='access_token',
-            field=models.UUIDField(blank=True, db_index=True, editable=False, help_text='Secure token for reviewee access to their report', null=True, unique=True),
+            field=models.UUIDField(blank=True, db_index=True, editable=False, help_text='Secure token for reviewee access to their report', null=True, unique=True, verbose_name='access token'),
         ),
     ]

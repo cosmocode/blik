@@ -30,11 +30,11 @@
 
     // Category display names
     const categoryLabels = {
-        'self': 'Self',
-        'peer': 'Peers',
-        'manager': 'Manager',
-        'direct_report': 'Direct Reports',
-        'others_avg': 'Others Average'
+        'self': gettext('Self'),
+        'peer': gettext('Peers'),
+        'manager': gettext('Manager'),
+        'direct_report': gettext('Direct Reports'),
+        'others_avg': gettext('Others Average')
     };
 
     /**
@@ -251,13 +251,13 @@
                 labels: gaps.map(g => g.section),
                 datasets: [
                     {
-                        label: 'Self',
+                        label: categoryLabels.self,
                         data: gaps.map(g => g.self),
                         backgroundColor: colors.self + 'cc',
                         borderWidth: 0
                     },
                     {
-                        label: 'Others Average',
+                        label: categoryLabels.others_avg,
                         data: gaps.map(g => g.others),
                         backgroundColor: colors.others + 'cc',
                         borderWidth: 0

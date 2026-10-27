@@ -2,6 +2,7 @@
 Django admin configuration for API models.
 """
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 from .models import APIToken, WebhookEndpoint, WebhookDelivery
 
 
@@ -23,11 +24,11 @@ class APITokenAdmin(admin.ModelAdmin):
     readonly_fields = ["token", "created_at", "updated_at", "last_used_at"]
 
     fieldsets = (
-        ("Basic Info", {"fields": ("organization", "created_by", "name", "is_active")}),
-        ("Token", {"fields": ("token", "expires_at")}),
-        ("Permissions", {"fields": ("permissions", "rate_limit")}),
+        (_("Basic Info"), {"fields": ("organization", "created_by", "name", "is_active")}),
+        (_("Token"), {"fields": ("token", "expires_at")}),
+        (_("Permissions"), {"fields": ("permissions", "rate_limit")}),
         (
-            "Stats",
+            _("Stats"),
             {"fields": ("last_used_at", "created_at", "updated_at"), "classes": ("collapse",)},
         ),
     )
@@ -64,11 +65,11 @@ class WebhookEndpointAdmin(admin.ModelAdmin):
     ]
 
     fieldsets = (
-        ("Basic Info", {"fields": ("organization", "created_by", "name", "url", "is_active")}),
-        ("Events", {"fields": ("events",)}),
-        ("Security", {"fields": ("secret",)}),
+        (_("Basic Info"), {"fields": ("organization", "created_by", "name", "url", "is_active")}),
+        (_("Events"), {"fields": ("events",)}),
+        (_("Security"), {"fields": ("secret",)}),
         (
-            "Stats",
+            _("Stats"),
             {
                 "fields": (
                     "success_count",
@@ -118,10 +119,10 @@ class WebhookDeliveryAdmin(admin.ModelAdmin):
     ]
 
     fieldsets = (
-        ("Delivery Info", {"fields": ("endpoint", "event_type", "created_at")}),
-        ("Payload", {"fields": ("payload",), "classes": ("collapse",)}),
+        (_("Delivery Info"), {"fields": ("endpoint", "event_type", "created_at")}),
+        (_("Payload"), {"fields": ("payload",), "classes": ("collapse",)}),
         (
-            "Response",
+            _("Response"),
             {
                 "fields": (
                     "delivered_at",
@@ -147,4 +148,4 @@ class WebhookDeliveryAdmin(admin.ModelAdmin):
         return obj.is_successful
 
     is_successful.boolean = True
-    is_successful.short_description = "Success"
+    is_successful.short_description = _("Success")

@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.views.decorators.http import require_http_methods
+from django.utils.translation import gettext as _
 from accounts.permissions import can_view_all_reports
 from reviews.models import ReviewCycle
 from .models import Report
@@ -96,9 +97,9 @@ def reviewee_report(request, access_token):
         return render(request, 'reports/access_denied.html', status=403)
 
     # Check if access token has expired
-    if report.access_token_expires and report.access_token_expires < timezone.now():
+    if report.access_token_expired:
         return render(request, 'reports/access_denied.html', {
-            'error': 'This report link has expired. Please contact your administrator for a new link.'
+            'error': _('This report link has expired. Please contact your administrator for a new link.')
         }, status=403)
 
     # Log access for security auditing

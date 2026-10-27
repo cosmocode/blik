@@ -1,12 +1,13 @@
 {% extends 'base_public.html' %}
+{% load i18n %}
 
-{% block title %}Login - Blik 360 Feedback{% endblock %}
+{% block title %}{% trans 'Login - Blik 360 Feedback' %}{% endblock %}
 
 {% block content %}
 <div class="login-container">
     <div class="login-header">
-        <h1>Welcome Back</h1>
-        <p>Sign in to your account</p>
+        <h1>{% trans 'Welcome Back' %}</h1>
+        <p>{% trans 'Sign in to your account' %}</p>
     </div>
 
     {% if messages %}
@@ -26,20 +27,20 @@
         <input type="hidden" name="next" value="{{ next }}">
 
         <div class="form-group">
-            <label for="id_username">Email</label>
+            <label for="id_username">{% trans 'Email' %}</label>
             <input type="text" name="username" id="id_username" class="form-control" value="{{ form.username.value|default_if_none:'' }}" required autofocus>
         </div>
 
         <div class="form-group">
-            <label for="id_password">Password</label>
+            <label for="id_password">{% trans 'Password' %}</label>
             <input type="password" name="password" id="id_password" class="form-control" required>
         </div>
 
-        <button type="submit" class="btn-primary">Sign In</button>
+        <button type="submit" class="btn-primary">{% trans 'Sign In' %}</button>
     </form>
 
     <div class="register-link">
-        <p><a href="{% url 'forgot_password' %}">Forgot your password?</a></p>
+        <p><a href="{% url 'forgot_password' %}">{% trans 'Forgot your password?' %}</a></p>
     </div>
 </div>
 {% endblock %}

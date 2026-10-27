@@ -1,15 +1,16 @@
 {% extends "admin_dashboard/base.html" %}
+{% load i18n %}
 
-{% block title %}{{ action }} Reviewee{% endblock %}
+{% block title %}{% if reviewee %}{% trans 'Edit Reviewee' %}{% else %}{% trans 'Create Reviewee' %}{% endif %}{% endblock %}
 
 {% block content %}
 <div style="margin-bottom: 2rem;">
-    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">{{ action }} Reviewee</h1>
+    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">{% if reviewee %}{% trans 'Edit Reviewee' %}{% else %}{% trans 'Create Reviewee' %}{% endif %}</h1>
     <p style="color: #64748b;">
         {% if reviewee %}
-        Update information for {{ reviewee.name }}
+        {% blocktrans trimmed with name=reviewee.name %}Update information for {{ name }}{% endblocktrans %}
         {% else %}
-        Add a new person who will receive 360-degree feedback
+        {% trans 'Add a new person who will receive 360-degree feedback' %}
         {% endif %}
     </p>
 </div>
@@ -21,7 +22,7 @@
                 {% csrf_token %}
 
                 <div class="form-group">
-                    <label for="name" class="form-label">Name *</label>
+                    <label for="name" class="form-label">{% trans 'Name' %} *</label>
                     <input
                         type="text"
                         id="name"
@@ -29,12 +30,12 @@
                         class="form-control"
                         value="{% if reviewee %}{{ reviewee.name }}{% endif %}"
                         required
-                        placeholder="John Doe"
+                        placeholder="{% trans 'John Doe' %}"
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="email" class="form-label">Email *</label>
+                    <label for="email" class="form-label">{% trans 'Email' %} *</label>
                     <input
                         type="email"
                         id="email"
@@ -42,27 +43,38 @@
                         class="form-control"
                         value="{% if reviewee %}{{ reviewee.email }}{% endif %}"
                         required
-                        placeholder="john.doe@company.com"
+                        placeholder="{% trans 'john.doe@company.com' %}"
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="department" class="form-label">Department (Optional)</label>
+                    <label for="department" class="form-label">{% trans 'Department (Optional)' %}</label>
                     <input
                         type="text"
                         id="department"
                         name="department"
                         class="form-control"
                         value="{% if reviewee %}{{ reviewee.department }}{% endif %}"
-                        placeholder="Engineering, Marketing, etc."
+                        placeholder="{% trans 'Engineering, Marketing, etc.' %}"
                     >
+                </div>
+
+                <div class="form-group">
+                    <label for="language" class="form-label">{% trans 'Language' %}</label>
+                    <select id="language" name="language" class="form-control">
+                        <option value="">{% blocktrans trimmed with language=default_language_name %}Organization default ({{ language }}){% endblocktrans %}</option>
+                        {% for code, name in LANGUAGES %}
+                        <option value="{{ code }}"{% if reviewee.language == code %} selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="help-text">{% trans 'Language of the emails to this person and of their self-assessment.' %}</small>
                 </div>
 
                 <div style="display: flex; gap: 1rem; margin-top: 2rem;">
                     <button type="submit" class="btn btn-primary">
-                        {% if reviewee %}Update{% else %}Create{% endif %} Reviewee
+                        {% if reviewee %}{% trans 'Update Reviewee' %}{% else %}{% trans 'Create Reviewee' %}{% endif %}
                     </button>
-                    <a href="{% url 'reviewee_list' %}" class="btn btn-secondary">Cancel</a>
+                    <a href="{% url 'reviewee_list' %}" class="btn btn-secondary">{% trans 'Cancel' %}</a>
                 </div>
             </form>
         </div>

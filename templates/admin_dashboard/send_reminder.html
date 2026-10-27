@@ -1,27 +1,28 @@
 {% extends "admin_dashboard/base.html" %}
+{% load i18n %}
 
-{% block title %}Send Reminders - {{ cycle.reviewee.name }}{% endblock %}
+{% block title %}{% blocktrans trimmed with name=cycle.reviewee.name %}Send Reminders - {{ name }}{% endblocktrans %}{% endblock %}
 
 {% block content %}
 <div style="margin-bottom: 2rem;">
-    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">Send Reminders</h1>
-    <p style="color: #64748b;">Send reminder emails for pending reviews in this cycle</p>
+    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">{% trans 'Send Reminders' %}</h1>
+    <p style="color: #64748b;">{% trans 'Send reminder emails for pending reviews in this cycle' %}</p>
 </div>
 
 <div style="max-width: 800px;">
     <div class="card" style="margin-bottom: 2rem;">
         <div class="card-header">
-            <h2 class="card-title">Review Cycle Details</h2>
+            <h2 class="card-title">{% trans 'Review Cycle Details' %}</h2>
         </div>
         <div class="card-body">
             <div style="display: grid; grid-template-columns: auto 1fr; gap: 1rem;">
-                <div style="font-weight: 500;">Reviewee:</div>
+                <div style="font-weight: 500;">{% trans 'Reviewee:' %}</div>
                 <div>{{ cycle.reviewee.name }} ({{ cycle.reviewee.email }})</div>
 
-                <div style="font-weight: 500;">Questionnaire:</div>
+                <div style="font-weight: 500;">{% trans 'Questionnaire:' %}</div>
                 <div>{{ cycle.questionnaire.name }}</div>
 
-                <div style="font-weight: 500;">Pending Reviews:</div>
+                <div style="font-weight: 500;">{% trans 'Pending Reviews:' %}</div>
                 <div>{{ pending_tokens.count }}</div>
             </div>
         </div>
@@ -30,7 +31,7 @@
     {% if pending_tokens %}
     <div class="card" style="margin-bottom: 2rem;">
         <div class="card-header">
-            <h2 class="card-title">Pending Reviewer Tokens</h2>
+            <h2 class="card-title">{% trans 'Pending Reviewer Tokens' %}</h2>
         </div>
         <div class="card-body">
             <div class="table-wrapper">
@@ -38,9 +39,9 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Category</th>
-                        <th>Token</th>
-                        <th>Review Link</th>
+                        <th>{% trans 'Category' %}</th>
+                        <th>{% trans 'Token' %}</th>
+                        <th>{% trans 'Review Link' %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,7 +56,7 @@
                         </td>
                         <td>
                             <button onclick="copyToken('{{ token.token }}')" class="btn btn-sm btn-secondary">
-                                Copy Link
+                                {% trans 'Copy Link' %}
                             </button>
                         </td>
                     </tr>
@@ -68,25 +69,25 @@
 
     <div class="card">
         <div class="card-header">
-            <h2 class="card-title">Send Reminder Emails</h2>
+            <h2 class="card-title">{% trans 'Send Reminder Emails' %}</h2>
         </div>
         <div class="card-body">
             <form method="post" action="{% url 'send_reminder' cycle.uuid %}">
                 {% csrf_token %}
 
                 <div style="padding: 1rem; background: #dbeafe; border-radius: 6px; margin-bottom: 1.5rem;">
-                    <p style="margin: 0 0 0.5rem 0; color: #1e40af; font-weight: 500;">Instructions:</p>
+                    <p style="margin: 0 0 0.5rem 0; color: #1e40af; font-weight: 500;">{% trans 'Instructions:' %}</p>
                     <ul style="margin: 0; padding-left: 1.5rem; color: #1e40af;">
-                        <li>Enter one email address per line (or comma-separated)</li>
-                        <li>The number of emails must match the number of pending tokens ({{ pending_tokens.count }})</li>
-                        <li>Emails will be sent in the order shown in the table above</li>
-                        <li>Each email will contain a unique anonymous review link</li>
+                        <li>{% trans 'Enter one email address per line (or comma-separated)' %}</li>
+                        <li>{% blocktrans trimmed with count=pending_tokens.count %}The number of emails must match the number of pending tokens ({{ count }}){% endblocktrans %}</li>
+                        <li>{% trans 'Emails will be sent in the order shown in the table above' %}</li>
+                        <li>{% trans 'Each email will contain a unique anonymous review link' %}</li>
                     </ul>
                 </div>
 
                 <div class="form-group">
                     <label for="emails" class="form-label">
-                        Reviewer Email Addresses ({{ pending_tokens.count }} required)
+                        {% blocktrans trimmed with count=pending_tokens.count %}Reviewer Email Addresses ({{ count }} required){% endblocktrans %}
                     </label>
                     <textarea
                         id="emails"
@@ -98,13 +99,13 @@
                         style="font-family: monospace;"
                     ></textarea>
                     <div style="font-size: 0.875rem; color: #64748b; margin-top: 0.5rem;">
-                        Enter {{ pending_tokens.count }} email address(es), one per line
+                        {% blocktrans trimmed with count=pending_tokens.count %}Enter {{ count }} email address(es), one per line{% endblocktrans %}
                     </div>
                 </div>
 
                 <div style="display: flex; gap: 1rem;">
-                    <button type="submit" class="btn btn-primary">Send {{ pending_tokens.count }} Reminder(s)</button>
-                    <a href="{% url 'review_cycle_detail' cycle.uuid %}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">{% blocktrans trimmed with count=pending_tokens.count %}Send {{ count }} Reminder(s){% endblocktrans %}</button>
+                    <a href="{% url 'review_cycle_detail' cycle.uuid %}" class="btn btn-secondary">{% trans 'Cancel' %}</a>
                 </div>
             </form>
         </div>
@@ -113,22 +114,23 @@
     <div class="card">
         <div class="card-body">
             <div class="empty-state">
-                <h3 style="margin-bottom: 0.5rem;">All reviews completed</h3>
-                <p style="margin-bottom: 1.5rem;">There are no pending reviews for this cycle.</p>
-                <a href="{% url 'review_cycle_detail' cycle.uuid %}" class="btn btn-primary">Back to Cycle</a>
+                <h3 style="margin-bottom: 0.5rem;">{% trans 'All reviews completed' %}</h3>
+                <p style="margin-bottom: 1.5rem;">{% trans 'There are no pending reviews for this cycle.' %}</p>
+                <a href="{% url 'review_cycle_detail' cycle.uuid %}" class="btn btn-primary">{% trans 'Back to Cycle' %}</a>
             </div>
         </div>
     </div>
     {% endif %}
 </div>
 
+{% blocktrans trimmed asvar copy_failed_msg with url='%(url)s' %}Failed to copy. URL: {{ url }}{% endblocktrans %}
 <script>
 function copyToken(token) {
     const url = `${window.location.origin}/feedback/${token}/`;
     navigator.clipboard.writeText(url).then(() => {
-        showCopyFeedback('Link copied to clipboard');
+        showCopyFeedback('{{ _('Link copied to clipboard')|escapejs }}');
     }).catch(() => {
-        showCopyFeedback('Failed to copy. URL: ' + url);
+        showCopyFeedback('{{ copy_failed_msg|escapejs }}'.replace('%(url)s', url));
     });
 }
 

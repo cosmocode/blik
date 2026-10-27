@@ -20,6 +20,7 @@ ENV_MANAGED_FIELDS = {
     'smtp_username': 'EMAIL_HOST_USER',
     'smtp_password': 'EMAIL_HOST_PASSWORD',
     'smtp_use_tls': 'EMAIL_USE_TLS',
+    'default_language': 'ORGANIZATION_LANGUAGE',
 }
 
 
