@@ -180,6 +180,12 @@ def about(request):
     return render(request, 'landing/about.html')
 
 
+def how_it_works(request, variant):
+    """Design variants of the start-to-finish walkthrough (not linked yet)."""
+    from .how_it_works import context
+    return render(request, f'landing/how_it_works_{variant}.html', context())
+
+
 def pricing(request):
     """Pricing page - transparent, indexed pricing information."""
     return render(request, 'landing/pricing.html')

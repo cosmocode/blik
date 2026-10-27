@@ -1,0 +1,76 @@
+{% extends 'landing/base.html' %}
+{% load static landing_tags %}
+{# Design draft A: one vertical walkthrough, large step numbers on a rail, who-sees-what under each step. #}
+
+{% block meta %}
+    <title>How Blik works, start to finish | Blik360</title>
+    <meta name="description" content="Eight steps from sign-up to the report, with what the admin, the reviewee and the reviewers see at each step.">
+    <meta name="robots" content="noindex">
+{% endblock %}
+
+{% block content %}
+<div class="hiw hiw-a">
+    <section class="hiw-hero">
+        <div class="container">
+            <h1 class="hiw-title">How Blik works, start to finish</h1>
+            <p class="hiw-intro">Eight steps, from sign-up to the report. Under each step you see who can see what.</p>
+            <ul class="hiw-legend" aria-label="The three roles">
+                {% for role in roles %}
+                <li><span class="hiw-glyph hiw-glyph--{{ role.key }}" aria-hidden="true"></span><strong>{{ role.name }}</strong> <span>{{ role.desc }}</span></li>
+                {% endfor %}
+            </ul>
+            <p class="hiw-promise">Blik never shows which person gave which answer. Not to the reviewee, and not to the admin.</p>
+        </div>
+    </section>
+
+    <ol class="hiw-a-steps container">
+        {% for step in steps %}
+        <li class="hiw-a-step" id="{{ step.slug }}">
+            <div class="hiw-a-num" aria-hidden="true">{{ step.number }}</div>
+            <div class="hiw-a-body">
+                <h2 class="hiw-a-title">{{ step.title }}{% if step.upcoming %} <span class="hiw-badge">Coming soon</span>{% endif %}</h2>
+                <p class="hiw-lead">{{ step.lead }}</p>
+                <ul class="hiw-points">
+                    {% for p in step.points %}<li>{{ p }}</li>{% endfor %}
+                </ul>
+                <h3 class="hiw-vis-title">Who sees what</h3>
+                {% include 'landing/includes/hiw_visibility.html' %}
+                {% if step.note %}<p class="hiw-note">{{ step.note }}</p>{% endif %}
+            </div>
+            <div class="hiw-a-media">
+                {% for m in step.media %}{% include 'landing/includes/hiw_media.html' %}{% endfor %}
+            </div>
+        </li>
+        {% endfor %}
+    </ol>
+
+    {% include 'landing/includes/hiw_founder.html' with style='card' %}
+
+    <section class="section hiw-next" aria-labelledby="next-title">
+        <div class="container">
+            <h2 id="next-title" class="hiw-next-title">Try it with your own team</h2>
+            <div class="hiw-next-grid">
+                <div class="hiw-next-card hiw-next-card--main">
+                    <h3>Run one round</h3>
+                    <p class="hiw-next-price">€{{ plan_single_price }}, once</p>
+                    <p>One hosted round for up to {{ plan_single_max }} people. No subscription. Reviewers are free.</p>
+                    <a href="{% landing_url 'signup' %}?plan=single" class="btn btn-primary">Run a round for €{{ plan_single_price }}</a>
+                </div>
+                <div class="hiw-next-card">
+                    <h3>Start a free trial</h3>
+                    <p class="hiw-next-price">{{ trial_days }} days free</p>
+                    <p>Then €{{ plan_saas_price }} a month for up to {{ plan_saas_max }} people. A credit card is required.</p>
+                    <a href="{% landing_url 'signup' %}" class="btn btn-secondary">Start the trial</a>
+                </div>
+                <div class="hiw-next-card">
+                    <h3>Talk to Thijs</h3>
+                    <p class="hiw-next-price">No sales team</p>
+                    <p>Ask how Blik fits your company. You talk to the person who built it.</p>
+                    {# TODO: contact mechanism not decided (email, calendar link or form). #}
+                    <a href="#contact-thijs" class="btn btn-secondary">Contact Thijs</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
