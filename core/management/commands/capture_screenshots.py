@@ -484,7 +484,7 @@ class Command(BaseCommand):
                 ('reviewees_desktop', '/dashboard/reviewees/', 'table', {}),
                 # Slot for the self-vs-others gap column (built separately). Skipped
                 # until the reviewee overview renders an element matching skip_unless.
-                ('reviewees_gap_desktop', '/dashboard/reviewees/', 'table',
+                ('reviewees_gap_desktop', '/dashboard/reviewees/?sort=gap', 'table',
                  {'skip_unless': '[data-gap-column]'}),
                 ('cycle_create_desktop', '/dashboard/cycles/create/', '#cycleForm',
                  {'prepare_js': CYCLE_FORM_JS, 'viewport': {'width': 1920, 'height': 1600}}),

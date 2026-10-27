@@ -1,27 +1,5 @@
 {% load landing_tags %}
-{# Founder block for the homepage. style: "card" (variant A) or "letter" (variant B). Facts from landing/about.html only. #}
-{% if style == 'letter' %}
-<section class="section hiw-founder hiw-founder--letter" aria-labelledby="founder-title">
-    <div class="container">
-        <div class="hiw-letter">
-            <h2 id="founder-title" class="hiw-letter-title">Why I built Blik</h2>
-            <div class="hiw-letter-body">
-                <p>I run Tinify, an image optimisation company. I wanted honest 360° feedback for my team.</p>
-                <p>The tools I found cost €15,000 to €18,000 a year for 50 people. They had many features we did not need. Our feedback would sit on someone else's servers.</p>
-                <p>So I built Blik. It is open source. You can host it yourself. The price is on the website. I use it with my own team.</p>
-            </div>
-            <div class="hiw-letter-sign">
-                <img src="https://github.com/thijsdezoete.png?size=400" alt="Thijs de Zoete" width="64" height="64" loading="lazy">
-                <div>
-                    <strong>Thijs de Zoete</strong>
-                    <span>Founder of Blik, CEO of Tinify</span>
-                    <a href="{% landing_url 'about' %}">Read the full story</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-{% else %}
+{# Founder block (how-it-works pages, later the homepage). Facts from landing/about.html only. #}
 <section class="section section-alt hiw-founder hiw-founder--card" aria-labelledby="founder-title">
     <div class="container">
         <div class="hiw-founder-card">
@@ -36,4 +14,3 @@
         </div>
     </div>
 </section>
-{% endif %}

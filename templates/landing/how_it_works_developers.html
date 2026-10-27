@@ -1,11 +1,21 @@
 {% extends 'landing/base.html' %}
 {% load static landing_tags %}
-{# Design draft B: a who-sees-what ledger up front, a role lens, then the flow in three parts with rendered emails. #}
+{# How it works for developers: a who-sees-what ledger up front, a role lens, then the flow in three parts with rendered emails. #}
 
 {% block meta %}
-    <title>How Blik works, start to finish | Blik360</title>
-    <meta name="description" content="Eight steps from sign-up to the report, with what the admin, the reviewee and the reviewers see at each step.">
-    <meta name="robots" content="noindex">
+    <title>How Blik Works: Who Sees What in a 360 Round | Blik360</title>
+    <meta name="description" content="What the admin, the reviewee and the reviewers can see at each step of a Blik 360 round, and how answers stay anonymous. With screenshots of every step.">
+    <link rel="canonical" href="{{ site_protocol }}://{{ site_domain }}{% landing_url 'how_it_works_developers' %}">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ site_protocol }}://{{ site_domain }}{% landing_url 'how_it_works_developers' %}">
+    <meta property="og:title" content="How Blik Works: Who Sees What in a 360 Round | Blik360">
+    <meta property="og:description" content="What the admin, the reviewee and the reviewers can see at each step of a Blik 360 round, and how answers stay anonymous. With screenshots of every step.">
+    <meta property="og:site_name" content="{{ site_name }}">
+    <meta property="og:image" content="{{ site_protocol }}://{{ site_domain }}{% landing_url 'og_image' %}?title=How%20Blik%20works&subtitle=Who%20sees%20what">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
 {% endblock %}
 
 {% block content %}
@@ -66,7 +76,7 @@
             <article class="hiw-b-step{% if forloop.counter|divisibleby:2 %} hiw-b-step--flip{% endif %}" id="{{ step.slug }}">
                 <div class="hiw-b-text">
                     <p class="hiw-b-stepn">Step {{ step.number }} of 8</p>
-                    <h3 class="hiw-b-title">{{ step.title }}{% if step.upcoming %} <span class="hiw-badge">Coming soon</span>{% endif %}</h3>
+                    <h3 class="hiw-b-title">{{ step.title }}</h3>
                     <p class="hiw-lead">{{ step.lead }}</p>
                     <ul class="hiw-points">
                         {% for p in step.points %}<li>{{ p }}</li>{% endfor %}
@@ -98,28 +108,7 @@
     </section>
     {% endfor %}
 
-    {% include 'landing/includes/hiw_founder.html' with style='letter' %}
-
-    <section class="section hiw-b-next" aria-labelledby="next-title">
-        <div class="container">
-            <h2 id="next-title" class="hiw-b-h2">Three ways to start</h2>
-            <ul class="hiw-b-next-list">
-                <li>
-                    <div><strong>Buy one test round</strong><span>€{{ plan_single_price }} once. One hosted round for up to {{ plan_single_max }} people. Reviewers are free.</span></div>
-                    <a href="{% landing_url 'signup' %}?plan=single" class="btn btn-primary">Buy a round for €{{ plan_single_price }}</a>
-                </li>
-                <li>
-                    <div><strong>Start a free trial</strong><span>{{ trial_days }} days free, then €{{ plan_saas_price }} a month for up to {{ plan_saas_max }} people. A credit card is required.</span></div>
-                    <a href="{% landing_url 'signup' %}" class="btn btn-secondary">Start the trial</a>
-                </li>
-                <li>
-                    <div><strong>Talk to Thijs</strong><span>Ask how Blik fits your company. You talk to the person who built it.</span></div>
-                    {# TODO: contact mechanism not decided (email, calendar link or form). #}
-                    <a href="#contact-thijs" class="btn btn-secondary">Contact Thijs</a>
-                </li>
-            </ul>
-        </div>
-    </section>
+    {% include 'landing/includes/hiw_footer.html' %}
 </div>
 {% endblock %}
 

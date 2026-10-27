@@ -1,7 +1,8 @@
 """
-Content for the "How Blik works, start to finish" design variants.
+Content for the "How Blik works, start to finish" pages.
 
-Both variants (how_it_works_a.html, how_it_works_b.html) render this one list,
+The HR page (how_it_works_hr.html) and the developers page
+(how_it_works_developers.html) render this one list,
 so the copy and the visibility rules stay the same while the layout differs.
 
 Visibility rules come from the code, not from marketing:
@@ -16,7 +17,7 @@ Visibility rules come from the code, not from marketing:
 - admin_dashboard/manage_invitations.html: admins see which invited email has
   finished, never what that person answered.
 
-Media with "placeholder": True are screenshots another task still captures;
+Media with "placeholder": True are screenshots not captured yet;
 the template shows a labelled box with the expected filename.
 """
 
@@ -43,7 +44,7 @@ STEPS = [
             "Or self-host the open source version for free.",
         ],
         "media": [
-            {"kind": "browser", "shot": "signup_desktop", "placeholder": True,
+            {"kind": "browser", "shot": "signup_desktop",
              "alt": "The Blik sign-up page with the plan choice"},
         ],
         "visibility": {
@@ -64,7 +65,7 @@ STEPS = [
             "Choose if Blik sends the report to the reviewee when the round ends.",
         ],
         "media": [
-            {"kind": "browser", "shot": "questionnaire_edit_desktop", "placeholder": True,
+            {"kind": "browser", "shot": "questionnaire_edit_desktop",
              "alt": "Editing a questionnaire in Blik"},
         ],
         "visibility": {
@@ -84,8 +85,8 @@ STEPS = [
             "Reviewers do not need an account. They never appear in this list.",
         ],
         "media": [
-            {"kind": "browser", "shot": "team_desktop", "focus": "15%",
-             "alt": "The team page with admins and members and their permissions"},
+            {"kind": "browser", "shot": "reviewees_desktop", "focus": "15%",
+             "alt": "The reviewees page: each person with their questionnaire and rounds"},
         ],
         "visibility": {
             "admin": _see("The list of reviewees and colleagues.", ""),
@@ -105,7 +106,7 @@ STEPS = [
             "Send the invitations now or later. Send reminders from the round page.",
         ],
         "media": [
-            {"kind": "browser", "shot": "cycle_create_desktop", "placeholder": True,
+            {"kind": "browser", "shot": "cycle_create_desktop",
              "alt": "Creating a review round: reviewee, questionnaire and reviewer emails"},
             {"kind": "browser", "shot": "cycle_detail_desktop", "focus": "15%",
              "alt": "A running round: how many reviewers finished, and the invitation links"},
@@ -137,9 +138,9 @@ STEPS = [
             "button": "Complete Self-Assessment",
         },
         "media": [
-            {"kind": "phone", "shot": "email_reviewee_mobile", "placeholder": True,
+            {"kind": "phone", "shot": "email_reviewee_self_assessment_mobile",
              "alt": "The self-assessment email on a phone"},
-            {"kind": "browser", "shot": "feedback_desktop",
+            {"kind": "browser", "shot": "self_assessment_desktop",
              "alt": "The self-assessment questionnaire in the browser"},
         ],
         "visibility": {
@@ -170,7 +171,7 @@ STEPS = [
             "button": "Start Your Review",
         },
         "media": [
-            {"kind": "phone", "shot": "email_reviewer_mobile", "placeholder": True,
+            {"kind": "phone", "shot": "email_reviewer_invitation_mobile",
              "alt": "The reviewer invitation email on a phone"},
             {"kind": "phone", "shot": "feedback_mobile",
              "alt": "A reviewer answering questions on a phone"},
@@ -210,15 +211,14 @@ STEPS = [
         "slug": "manager",
         "act": "result",
         "title": "The manager view",
-        "lead": "Admins open every report from one place. A new overview shows where each person differs most from how others see them.",
+        "lead": "Admins open every report from one place. The reviewees page shows where each person differs most from how others see them.",
         "points": [
             "One row per reviewee, with the gap between self and others.",
             "The largest gaps come first, so you know who to talk to first.",
             "Open a row to go to that person's report.",
         ],
-        "upcoming": True,
         "media": [
-            {"kind": "browser", "shot": "manager_gap_overview_desktop", "placeholder": True,
+            {"kind": "browser", "shot": "reviewees_gap_desktop",
              "alt": "Overview of all reviewees, sorted by the gap between self-assessment and others"},
         ],
         "visibility": {

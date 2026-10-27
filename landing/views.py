@@ -180,10 +180,10 @@ def about(request):
     return render(request, 'landing/about.html')
 
 
-def how_it_works(request, variant):
-    """Design variants of the start-to-finish walkthrough (not linked yet)."""
+def how_it_works(request, audience):
+    """Start-to-finish walkthrough; same content, one layout per audience (hr, developers)."""
     from .how_it_works import context
-    return render(request, f'landing/how_it_works_{variant}.html', context())
+    return render(request, f'landing/how_it_works_{audience}.html', context())
 
 
 def pricing(request):
