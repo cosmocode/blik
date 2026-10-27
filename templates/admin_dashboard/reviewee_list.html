@@ -33,7 +33,7 @@
                     <th>Email</th>
                     <th>Questionnaire</th>
                     <th>Review Cycles</th>
-                    <th title="{% trans 'Self-assessment minus the average of other reviewers, latest completed report' %}">
+                    <th data-gap-column title="{% trans 'Self-assessment minus the average of other reviewers, latest completed report' %}">
                         {% if sort == 'gap' %}
                         <a href="?per_page={{ per_page }}" class="sort-link">{% trans "Self vs others" %} ▾</a>
                         {% else %}
