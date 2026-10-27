@@ -1,0 +1,16 @@
+{% load landing_tags %}
+{# Founder block (how-it-works pages, later the homepage). Facts from landing/about.html only. #}
+<section class="section section-alt hiw-founder hiw-founder--card" aria-labelledby="founder-title">
+    <div class="container">
+        <div class="hiw-founder-card">
+            <img class="hiw-founder-photo" src="https://github.com/thijsdezoete.png?size=400" alt="Thijs de Zoete" width="400" height="400" loading="lazy">
+            <div class="hiw-founder-text">
+                <h2 id="founder-title">Built by a founder who needed it</h2>
+                <p>Thijs de Zoete runs Tinify, an image optimisation company. He wanted honest 360° feedback for his team. The tools he found cost €15,000 to €18,000 a year for 50 people, and kept the feedback on someone else's servers.</p>
+                <p>So he built Blik: open source, simple to run, with the price on the website. He uses it with his own team.</p>
+                <p class="hiw-founder-name"><strong>Thijs de Zoete</strong>, founder</p>
+                <a class="hiw-founder-link" href="{% landing_url 'about' %}">Read why Thijs built Blik</a>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,59 @@
+{% extends 'landing/base.html' %}
+{% load static landing_tags %}
+{# How it works for HR: one vertical walkthrough, large step numbers on a rail, who-sees-what under each step. #}
+
+{% block meta %}
+    <title>How a 360 Feedback Round Works, Step by Step | Blik360</title>
+    <meta name="description" content="Every step of a Blik 360 feedback round, from sign-up to the report. With screenshots, and what the admin, the reviewee and the reviewers see at each step.">
+    <link rel="canonical" href="{{ site_protocol }}://{{ site_domain }}{% landing_url 'how_it_works_hr' %}">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ site_protocol }}://{{ site_domain }}{% landing_url 'how_it_works_hr' %}">
+    <meta property="og:title" content="How a 360 Feedback Round Works, Step by Step | Blik360">
+    <meta property="og:description" content="Every step of a Blik 360 feedback round, from sign-up to the report. With screenshots, and what the admin, the reviewee and the reviewers see at each step.">
+    <meta property="og:site_name" content="{{ site_name }}">
+    <meta property="og:image" content="{{ site_protocol }}://{{ site_domain }}{% landing_url 'og_image' %}?title=How%20Blik%20works&subtitle=Step%20by%20step">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+{% endblock %}
+
+{% block content %}
+<div class="hiw hiw-a">
+    <section class="hiw-hero">
+        <div class="container">
+            <h1 class="hiw-title">How Blik works, start to finish</h1>
+            <p class="hiw-intro">Eight steps, from sign-up to the report. Under each step you see who can see what.</p>
+            <ul class="hiw-legend" aria-label="The three roles">
+                {% for role in roles %}
+                <li><span class="hiw-glyph hiw-glyph--{{ role.key }}" aria-hidden="true"></span><strong>{{ role.name }}</strong> <span>{{ role.desc }}</span></li>
+                {% endfor %}
+            </ul>
+            <p class="hiw-promise">Blik never shows which person gave which answer. Not to the reviewee, and not to the admin.</p>
+        </div>
+    </section>
+
+    <ol class="hiw-a-steps container">
+        {% for step in steps %}
+        <li class="hiw-a-step" id="{{ step.slug }}">
+            <div class="hiw-a-num" aria-hidden="true">{{ step.number }}</div>
+            <div class="hiw-a-body">
+                <h2 class="hiw-a-title">{{ step.title }}</h2>
+                <p class="hiw-lead">{{ step.lead }}</p>
+                <ul class="hiw-points">
+                    {% for p in step.points %}<li>{{ p }}</li>{% endfor %}
+                </ul>
+                <h3 class="hiw-vis-title">Who sees what</h3>
+                {% include 'landing/includes/hiw_visibility.html' %}
+                {% if step.note %}<p class="hiw-note">{{ step.note }}</p>{% endif %}
+            </div>
+            <div class="hiw-a-media">
+                {% for m in step.media %}{% include 'landing/includes/hiw_media.html' %}{% endfor %}
+            </div>
+        </li>
+        {% endfor %}
+    </ol>
+
+    {% include 'landing/includes/hiw_footer.html' %}
+</div>
+{% endblock %}

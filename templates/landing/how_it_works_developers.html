@@ -1,0 +1,129 @@
+{% extends 'landing/base.html' %}
+{% load static landing_tags %}
+{# How it works for developers: a who-sees-what ledger up front, a role lens, then the flow in three parts with rendered emails. #}
+
+{% block meta %}
+    <title>How Blik Works: Who Sees What in a 360 Round | Blik360</title>
+    <meta name="description" content="What the admin, the reviewee and the reviewers can see at each step of a Blik 360 round, and how answers stay anonymous. With screenshots of every step.">
+    <link rel="canonical" href="{{ site_protocol }}://{{ site_domain }}{% landing_url 'how_it_works_developers' %}">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ site_protocol }}://{{ site_domain }}{% landing_url 'how_it_works_developers' %}">
+    <meta property="og:title" content="How Blik Works: Who Sees What in a 360 Round | Blik360">
+    <meta property="og:description" content="What the admin, the reviewee and the reviewers can see at each step of a Blik 360 round, and how answers stay anonymous. With screenshots of every step.">
+    <meta property="og:site_name" content="{{ site_name }}">
+    <meta property="og:image" content="{{ site_protocol }}://{{ site_domain }}{% landing_url 'og_image' %}?title=How%20Blik%20works&subtitle=Who%20sees%20what">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+{% endblock %}
+
+{% block content %}
+<div class="hiw hiw-b" data-lens="all">
+    <section class="hiw-hero">
+        <div class="container">
+            <h1 class="hiw-title">How Blik works, start to finish</h1>
+            <p class="hiw-intro">Three people take part in a review round. Each sees a different part of it. Pick one and follow the round through their eyes.</p>
+            <div class="hiw-lens" role="group" aria-label="Show the flow as">
+                <span class="hiw-lens-label" aria-hidden="true">Show the flow as</span>
+                <button type="button" class="hiw-lens-btn" data-lens="all" aria-pressed="true">Everyone</button>
+                {% for role in roles %}
+                <button type="button" class="hiw-lens-btn" data-lens="{{ role.key }}" aria-pressed="false"><span class="hiw-glyph hiw-glyph--{{ role.key }}" aria-hidden="true"></span>{{ role.name }}</button>
+                {% endfor %}
+            </div>
+            <ul class="hiw-legend hiw-legend--compact">
+                {% for role in roles %}<li data-role="{{ role.key }}"><strong>{{ role.name }}:</strong> {{ role.desc }}</li>{% endfor %}
+            </ul>
+        </div>
+    </section>
+
+    <section class="hiw-b-ledger-wrap" aria-labelledby="ledger-title">
+        <div class="container">
+            <h2 id="ledger-title" class="hiw-b-h2">Who sees what, step by step</h2>
+            <p class="hiw-b-sub">Blik never shows which person gave which answer. Not to the reviewee, and not to the admin.</p>
+            <table class="hiw-ledger">
+                <thead>
+                    <tr>
+                        <th scope="col">Step</th>
+                        {% for role in roles %}<th scope="col" data-role="{{ role.key }}"><span class="hiw-glyph hiw-glyph--{{ role.key }}" aria-hidden="true"></span>{{ role.name }}</th>{% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for step in steps %}
+                    <tr>
+                        <th scope="row"><a href="#{{ step.slug }}"><span class="hiw-ledger-n">{{ step.number }}</span>{{ step.title }}</a></th>
+                        {% for role in roles %}{% with v=step.visibility|get_item:role.key %}
+                        <td data-role="{{ role.key }}" data-label="{{ role.name }}">
+                            {% if v.sees %}<span class="hiw-ledger-sees">{{ v.sees }}</span>{% else %}<span class="hiw-ledger-none">Nothing</span>{% endif %}
+                        </td>
+                        {% endwith %}{% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    {% for act in acts %}
+    <section class="hiw-b-act{% if forloop.counter == 2 %} hiw-b-act--alt{% endif %}" aria-labelledby="act-{{ act.key }}">
+        <div class="container">
+            <header class="hiw-b-act-head">
+                <span class="hiw-b-act-n">Part {{ forloop.counter }} of 3</span>
+                <h2 id="act-{{ act.key }}" class="hiw-b-h2">{{ act.name }}</h2>
+                <span class="hiw-b-act-who">{{ act.who }}</span>
+            </header>
+            {% for step in act.steps %}
+            <article class="hiw-b-step{% if forloop.counter|divisibleby:2 %} hiw-b-step--flip{% endif %}" id="{{ step.slug }}">
+                <div class="hiw-b-text">
+                    <p class="hiw-b-stepn">Step {{ step.number }} of 8</p>
+                    <h3 class="hiw-b-title">{{ step.title }}</h3>
+                    <p class="hiw-lead">{{ step.lead }}</p>
+                    <ul class="hiw-points">
+                        {% for p in step.points %}<li>{{ p }}</li>{% endfor %}
+                    </ul>
+                    {% include 'landing/includes/hiw_visibility.html' %}
+                    {% if step.note %}<p class="hiw-note">{{ step.note }}</p>{% endif %}
+                </div>
+                <div class="hiw-b-media">
+                    {% if step.email %}
+                    <div class="hiw-email" role="img" aria-label="The email: {{ step.email.subject }}">
+                        <div class="hiw-email-head">
+                            <span class="hiw-email-from">Blik</span>
+                            <span class="hiw-email-subject">{{ step.email.subject }}</span>
+                        </div>
+                        <div class="hiw-email-body">
+                            {% for line in step.email.lines %}<p>{{ line }}</p>{% endfor %}
+                            <span class="hiw-email-btn">{{ step.email.button }}</span>
+                        </div>
+                        <p class="hiw-email-caption">Text from the real email. A screenshot follows.</p>
+                    </div>
+                    {% for m in step.media %}{% if not m.placeholder %}{% include 'landing/includes/hiw_media.html' %}{% endif %}{% endfor %}
+                    {% else %}
+                    {% for m in step.media %}{% include 'landing/includes/hiw_media.html' %}{% endfor %}
+                    {% endif %}
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endfor %}
+
+    {% include 'landing/includes/hiw_footer.html' %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Role lens: dims the rows of the other roles. Without JS every row shows.
+    (function () {
+        var root = document.querySelector('.hiw-b');
+        var buttons = root.querySelectorAll('.hiw-lens-btn');
+        buttons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                root.setAttribute('data-lens', btn.dataset.lens);
+                buttons.forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+            });
+        });
+    })();
+</script>
+{% endblock %}

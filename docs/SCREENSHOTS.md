@@ -88,12 +88,26 @@ Uses Playwright to capture screenshots of key pages.
 
 **Total: 19 screenshots**
 
+"How Blik works" flow (added on top of the set above):
+- Sign up / plan picker: `signup_desktop_*` (the landing page has no dark theme, so both look the same)
+- Questionnaires: `questionnaires_desktop_*`, `questionnaire_edit_desktop_*`
+- Reviewees: `reviewees_desktop_*`; `reviewees_gap_desktop_*` is a slot for the
+  self-vs-others gap column and is skipped until the page has a `[data-gap-column]` element
+- New review cycle form (filled in, invite section open): `cycle_create_desktop_*`
+- Emails, rendered from `templates/emails/` with sample data in an inbox frame (nothing is sent):
+  `email_welcome_desktop_*`, and desktop + mobile for `email_reviewee_self_assessment`,
+  `email_reviewee_invitation_links`, `email_reviewer_invitation`, `email_reviewer_reminder`,
+  `email_report_ready`
+- Reviewee: `self_assessment_{desktop,mobile}_*`, `report_mobile_*`
+- Reviewer thank-you page: `feedback_complete_{desktop,mobile}_*`
+
 **Note:** Report desktop screenshots are split into two parts (header/summary and charts) to capture all key information while keeping standard viewport sizes (1920x1080, 1024x768).
 
 **Options:**
 - `--config PATH`: Path to config JSON (default: `/tmp/blik_screenshot_config.json`)
 - `--output-dir DIR`: Output directory (default: `static/img/screenshots`)
 - `--base-url URL`: Application URL (default: `http://localhost:8000`)
+- `--only PREFIXES`: Comma-separated name prefixes to capture, e.g. `--only email_,cycle_create`
 
 **Example:**
 ```bash

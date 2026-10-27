@@ -1,0 +1,25 @@
+{% load static landing_tags %}
+{# Teaser card that sends visitors to a how-it-works page. url_name: how_it_works_hr or how_it_works_developers #}
+{% landing_url url_name as hiw_url %}
+<aside class="hiw-teaser" aria-labelledby="hiw-teaser-title">
+    <div class="hiw-teaser-text">
+        <p class="hiw-teaser-eyebrow">Before you buy anything</p>
+        <h3 id="hiw-teaser-title" class="hiw-teaser-title">How would this work in your company?</h3>
+        <p class="hiw-teaser-copy">Follow one review round, screen by screen. See what you set up, what lands in your people's inbox, and who can see which answer.</p>
+        <ul class="hiw-teaser-facts">
+            <li>8 steps</li>
+            <li>Every screen</li>
+            <li>Who sees what</li>
+        </ul>
+        <a href="{{ hiw_url }}" class="btn btn-primary">Show me the whole round</a>
+        <p class="hiw-teaser-note">No sign-up. No sales call.</p>
+    </div>
+    <a href="{{ hiw_url }}" class="hiw-teaser-peek" tabindex="-1" aria-hidden="true">
+        <img class="hiw-teaser-shot hiw-teaser-shot--back img-light" src="{% static 'img/screenshots/cycle_create_desktop_light.webp' %}" alt="" loading="lazy">
+        <img class="hiw-teaser-shot hiw-teaser-shot--back img-dark" src="{% static 'img/screenshots/cycle_create_desktop_dark.webp' %}" alt="" loading="lazy">
+        <img class="hiw-teaser-shot hiw-teaser-shot--front img-light" src="{% static 'img/screenshots/reviewees_gap_desktop_light.webp' %}" alt="" loading="lazy">
+        <img class="hiw-teaser-shot hiw-teaser-shot--front img-dark" src="{% static 'img/screenshots/reviewees_gap_desktop_dark.webp' %}" alt="" loading="lazy">
+        <img class="hiw-teaser-shot hiw-teaser-shot--phone img-light" src="{% static 'img/screenshots/email_reviewer_invitation_mobile_light.webp' %}" alt="" loading="lazy">
+        <img class="hiw-teaser-shot hiw-teaser-shot--phone img-dark" src="{% static 'img/screenshots/email_reviewer_invitation_mobile_dark.webp' %}" alt="" loading="lazy">
+    </a>
+</aside>

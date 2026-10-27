@@ -1,0 +1,30 @@
+{% load landing_tags %}
+{# Ending of both how-it-works pages: founder card and the three ways to start. #}
+    {% include 'landing/includes/hiw_founder.html' %}
+
+    <section class="section hiw-next" aria-labelledby="next-title">
+        <div class="container">
+            <h2 id="next-title" class="hiw-next-title">Try it with your own team</h2>
+            <div class="hiw-next-grid">
+                <div class="hiw-next-card hiw-next-card--main">
+                    <h3>Run one round</h3>
+                    <p class="hiw-next-price">€{{ plan_single_price }}, once</p>
+                    <p>One hosted round for up to {{ plan_single_max }} people. No subscription. Reviewers are free.</p>
+                    <a href="{% landing_url 'signup' %}?plan=single" class="btn btn-primary">Run a round for €{{ plan_single_price }}</a>
+                </div>
+                <div class="hiw-next-card">
+                    <h3>Start a free trial</h3>
+                    <p class="hiw-next-price">{{ trial_days }} days free</p>
+                    <p>Then €{{ plan_saas_price }} a month for up to {{ plan_saas_max }} people. A credit card is required.</p>
+                    <a href="{% landing_url 'signup' %}" class="btn btn-secondary">Start the trial</a>
+                </div>
+                <div class="hiw-next-card">
+                    <h3>Talk to Thijs</h3>
+                    <p class="hiw-next-price">No sales team</p>
+                    <p>Ask how Blik fits your company. You talk to the person who built it.</p>
+                    {# TODO: contact mechanism not decided (email, calendar link or form). #}
+                    <a href="#contact-thijs" class="btn btn-secondary">Contact Thijs</a>
+                </div>
+            </div>
+        </div>
+    </section>
