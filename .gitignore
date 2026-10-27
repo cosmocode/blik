@@ -38,6 +38,10 @@ db.sqlite3-journal
 .env
 .env.local
 .env.*.local
+.env.cron
+
+# Cloud credentials
+.aws/
 
 # IDE
 .vscode/
