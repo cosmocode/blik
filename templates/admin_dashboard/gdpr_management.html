@@ -107,7 +107,7 @@
                         </td>
                         <td>
                             <button type="button" class="btn btn-sm btn-secondary"
-                                    onclick="showDeleteRevieweeModal({{ reviewee.id }}, '{{ reviewee.name|escapejs }}', {{ reviewee.gdpr_summary.review_cycles.total|default:0 }}, {{ reviewee.gdpr_summary.responses|default:0 }})">
+                                    onclick="showDeleteRevieweeModal('{{ reviewee.uuid }}', '{{ reviewee.name|escapejs }}', {{ reviewee.gdpr_summary.review_cycles.total|default:0 }}, {{ reviewee.gdpr_summary.responses|default:0 }})">
                                 {% trans 'Delete Data' %}
                             </button>
                         </td>
@@ -147,7 +147,7 @@
                     </div>
                     {% endif %}
                     <button type="button" class="btn btn-sm btn-secondary" style="width: 100%; margin-top: 0.5rem;"
-                            onclick="showDeleteRevieweeModal({{ reviewee.id }}, '{{ reviewee.name|escapejs }}', {{ reviewee.gdpr_summary.review_cycles.total|default:0 }}, {{ reviewee.gdpr_summary.responses|default:0 }})">
+                            onclick="showDeleteRevieweeModal('{{ reviewee.uuid }}', '{{ reviewee.name|escapejs }}', {{ reviewee.gdpr_summary.review_cycles.total|default:0 }}, {{ reviewee.gdpr_summary.responses|default:0 }})">
                         {% trans 'Delete Data' %}
                     </button>
                 </div>
@@ -440,7 +440,7 @@ function showDeleteRevieweeModal(revieweeId, name, cyclesCount, responsesCount) 
     document.getElementById('modal-reviewee-name').textContent = name;
     document.getElementById('modal-cycles-count').textContent = cyclesCount;
     document.getElementById('modal-responses-count').textContent = responsesCount;
-    document.getElementById('delete-reviewee-form').action = '{% url "gdpr_delete_reviewee" reviewee_id=0 %}'.replace('0', revieweeId);
+    document.getElementById('delete-reviewee-form').action = '{% url "gdpr_delete_reviewee" reviewee_uuid="00000000-0000-0000-0000-000000000000" %}'.replace('00000000-0000-0000-0000-000000000000', revieweeId);
     document.getElementById('delete-reviewee-modal').style.display = 'flex';
 }
 

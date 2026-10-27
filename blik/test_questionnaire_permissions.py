@@ -75,7 +75,7 @@ class QuestionnaireCreateAccessTests(QuestionnairePermissionTestCase):
 
 class QuestionnaireEditAccessTests(QuestionnairePermissionTestCase):
     def _edit_url(self):
-        return reverse('questionnaire_edit', args=[self.questionnaire.id])
+        return reverse('questionnaire_edit', args=[self.questionnaire.uuid])
 
     def test_member_cannot_open_the_edit_form(self):
         self.client.force_login(self.member)
@@ -143,7 +143,7 @@ class QuestionnaireListVisibilityTests(QuestionnairePermissionTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, reverse('questionnaire_create'))
         self.assertNotContains(
-            response, reverse('questionnaire_edit', args=[self.questionnaire.id]))
+            response, reverse('questionnaire_edit', args=[self.questionnaire.uuid]))
 
     def test_admin_sees_the_edit_controls(self):
         self.client.force_login(self.admin)
@@ -151,7 +151,7 @@ class QuestionnaireListVisibilityTests(QuestionnairePermissionTestCase):
 
         self.assertContains(response, reverse('questionnaire_create'))
         self.assertContains(
-            response, reverse('questionnaire_edit', args=[self.questionnaire.id]))
+            response, reverse('questionnaire_edit', args=[self.questionnaire.uuid]))
 
 
 class QuestionnaireImportAccessTests(QuestionnairePermissionTestCase):

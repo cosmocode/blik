@@ -44,7 +44,7 @@ class QuestionnaireDeleteTestCase(TestCase):
             organization=self.org, name='Dana Doe', email='dana@acme.example')
 
     def _url(self, name='questionnaire_delete'):
-        return reverse(name, args=[self.questionnaire.id])
+        return reverse(name, args=[self.questionnaire.uuid])
 
     def _use_in_a_cycle(self):
         return ReviewCycle.objects.create(
@@ -128,7 +128,7 @@ class ArchivedQuestionnaireIsOutOfCirculationTests(QuestionnaireDeleteTestCase):
         before = ReviewCycle.objects.count()
 
         self.client.post(
-            reverse('quick_cycle_create', args=[self.reviewee.id]),
+            reverse('quick_cycle_create', args=[self.reviewee.uuid]),
             {'questionnaire_id': self.questionnaire.id},
         )
 
@@ -175,7 +175,7 @@ class QuestionnaireDeletePermissionTests(QuestionnaireDeleteTestCase):
         foreign = Questionnaire.objects.create(name='Foreign', organization=other_org)
         self.client.force_login(self.admin)
 
-        response = self.client.get(reverse('questionnaire_delete', args=[foreign.id]))
+        response = self.client.get(reverse('questionnaire_delete', args=[foreign.uuid]))
 
         self.assertEqual(response.status_code, 404)
         self.assertTrue(Questionnaire.objects.filter(pk=foreign.pk).exists())

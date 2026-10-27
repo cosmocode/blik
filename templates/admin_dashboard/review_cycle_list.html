@@ -65,7 +65,7 @@
                             <!-- Split button: New Cycle (main action) + dropdown for other questionnaires -->
                             <div class="btn-group" style="position: relative; display: inline-flex;">
                                 <!-- Main action button: Create cycle with last-used or default questionnaire -->
-                                <form method="POST" action="{% url 'quick_cycle_create' item.cycle.reviewee.id %}" style="margin: 0; display: inline;">
+                                <form method="POST" action="{% url 'quick_cycle_create' item.cycle.reviewee.uuid %}" style="margin: 0; display: inline;">
                                     {% csrf_token %}
                                     <input type="hidden" name="source_cycle_uuid" value="{{ item.cycle.uuid }}">
                                     {% if item.latest_questionnaire %}
@@ -108,7 +108,7 @@
                                     {% for q in questionnaires %}
                                     {% if item.latest_questionnaire and item.latest_questionnaire.id == q.id or not item.latest_questionnaire and q.is_default %}
                                         {# This is the questionnaire that will be used for quick create #}
-                                        <form method="POST" action="{% url 'quick_cycle_create' item.cycle.reviewee.id %}" style="margin: 0;">
+                                        <form method="POST" action="{% url 'quick_cycle_create' item.cycle.reviewee.uuid %}" style="margin: 0;">
                                             {% csrf_token %}
                                             <input type="hidden" name="source_cycle_uuid" value="{{ item.cycle.uuid }}">
                                             <input type="hidden" name="questionnaire_id" value="{{ q.id }}">
@@ -121,7 +121,7 @@
                                             </button>
                                         </form>
                                     {% else %}
-                                        <form method="POST" action="{% url 'quick_cycle_create' item.cycle.reviewee.id %}" style="margin: 0;">
+                                        <form method="POST" action="{% url 'quick_cycle_create' item.cycle.reviewee.uuid %}" style="margin: 0;">
                                             {% csrf_token %}
                                             <input type="hidden" name="source_cycle_uuid" value="{{ item.cycle.uuid }}">
                                             <input type="hidden" name="questionnaire_id" value="{{ q.id }}">

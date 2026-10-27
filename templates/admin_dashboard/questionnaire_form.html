@@ -80,7 +80,7 @@
                     {% endif %}
                     <a href="{% url 'questionnaire_list' %}" class="btn btn-secondary">{% trans 'Cancel' %}</a>
                     {% if questionnaire %}
-                    <a href="{% url 'questionnaire_preview' questionnaire.id %}" class="btn btn-secondary">{% trans 'Preview' %}</a>
+                    <a href="{% url 'questionnaire_preview' questionnaire.uuid %}" class="btn btn-secondary">{% trans 'Preview' %}</a>
                     {% endif %}
                 </div>
             </form>
@@ -103,8 +103,8 @@
                     </div>
                 </div>
                 <div style="display: flex; gap: 0.5rem;">
-                    <a href="{% url 'questionnaire_preview' questionnaire.id %}?lang={{ state.code }}" class="btn btn-sm btn-secondary">{% trans 'Preview' %}</a>
-                    <a href="{% url 'questionnaire_translate' questionnaire.id state.code %}" class="btn btn-sm btn-primary">{% trans 'Translate' %}</a>
+                    <a href="{% url 'questionnaire_preview' questionnaire.uuid %}?lang={{ state.code }}" class="btn btn-sm btn-secondary">{% trans 'Preview' %}</a>
+                    <a href="{% url 'questionnaire_translate' questionnaire.uuid state.code %}" class="btn btn-sm btn-primary">{% trans 'Translate' %}</a>
                 </div>
             </div>
             {% endfor %}

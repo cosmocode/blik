@@ -90,7 +90,7 @@
                         <option value="{{ q.id }}"
                                 data-report-type="{{ q.report_type_label }}"
                                 data-description="{{ q.description|default_if_none:'' }}"
-                                data-sample-url="{% url 'questionnaire_sample_report' q.id %}"
+                                data-sample-url="{% url 'questionnaire_sample_report' q.uuid %}"
                                 {% if q.is_default %}selected{% endif %}>
                             {{ q.name }} — {{ q.report_type_label }}{% if q.is_default %} ({% trans 'Default' %}){% endif %}
                         </option>
