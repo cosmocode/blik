@@ -2137,11 +2137,12 @@
 
 .landing-page .audience-screenshot-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(450px, 100%), 1fr));
     gap: 2rem;
 }
 
 .landing-page .screenshot-hover-wrapper.audience-screenshot-frame {
+    height: auto;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -7996,4 +7997,36 @@
     .landing-page :is(.features-grid, .audience-card-grid):has(> .feature-card:last-child:nth-child(4)):has(> .feature-card > .audience-step-number):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))) {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
+}
+
+/* Odd counts. Two columns: the last item spans the row, so no item sits
+   alone in half a row. Five items from 1024px: a row of three, then a row
+   of two (six-track grid, items span two or three tracks). */
+@media (min-width: 640px) {
+    .landing-page :is(.features-grid, .audience-card-grid):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))) > .feature-card:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (min-width: 1024px) {
+    .landing-page :is(.features-grid, .audience-card-grid):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))):has(> .feature-card:last-child:nth-child(3n)) > .feature-card:last-child {
+        grid-column: auto;
+    }
+
+    .landing-page :is(.features-grid, .audience-card-grid):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))):has(> .feature-card:last-child:nth-child(5)) {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .landing-page :is(.features-grid, .audience-card-grid):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))):has(> .feature-card:last-child:nth-child(5)) > .feature-card {
+        grid-column: span 2;
+    }
+
+    .landing-page :is(.features-grid, .audience-card-grid):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))):has(> .feature-card:last-child:nth-child(5)) > .feature-card:nth-child(n+4) {
+        grid-column: span 3;
+    }
+}
+
+/* Dark mode: --border is too faint for a hairline that carries the layout. */
+[data-theme="dark"] .landing-page :is(.features-grid, .audience-card-grid):not(:has(> .feature-card:is([class*="feature-card-"], [class*="comparison-"], [class*="dreyfus-"], [class*="portfolio-"], [class*="archetype-"], [class*="audience-"], [class*="about-"], [class*="framework-"], [class*="product-"]))) > .feature-card {
+    border-top-color: color-mix(in srgb, var(--text-secondary) 35%, transparent);
 }
