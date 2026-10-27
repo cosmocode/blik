@@ -7076,3 +7076,18 @@ msgstr "Doku"
 
 msgid "Command copied to clipboard"
 msgstr "Befehl in die Zwischenablage kopiert"
+
+msgid "Self vs others"
+msgstr "Selbst- vs. Fremdeinschätzung"
+
+msgid "Rates self higher than others"
+msgstr "Schätzt sich höher ein als andere"
+
+msgid "Rates self lower than others"
+msgstr "Schätzt sich niedriger ein als andere"
+
+msgid "Same as others"
+msgstr "Gleiche Einschätzung wie andere"
+
+msgid "You do not have permission to create organizations."
+msgstr "Keine Berechtigung, Organisationen zu erstellen."
