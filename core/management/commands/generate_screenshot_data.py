@@ -242,6 +242,14 @@ class Command(BaseCommand):
         # Find partial cycle for screenshots
         partial_cycle = next((c for c in cycles_output if c.get('completion')), None)
 
+        # Tokens for the reviewee's self-assessment and the reviewer thank-you page
+        self_token = ReviewerToken.objects.filter(
+            category='self', completed_at__isnull=True, cycle__status='active'
+        ).first()
+        completed_token = ReviewerToken.objects.filter(
+            category='peer', completed_at__isnull=False, cycle__status='active'
+        ).first()
+
         # Output JSON for screenshot script
         output_data = {
             'organization_id': org.id,
@@ -254,6 +262,9 @@ class Command(BaseCommand):
             'partial_cycle_id': partial_cycle['cycle_id'] if partial_cycle else None,
             'partial_cycle_uuid': partial_cycle['cycle_uuid'] if partial_cycle else None,
             'feedback_token': feedback_token_for_screenshots,
+            'self_feedback_token': str(self_token.token) if self_token else None,
+            'completed_feedback_token': str(completed_token.token) if completed_token else None,
+            'questionnaire_id': default_questionnaire.id,
             'team_count': len(team_members) + 1,
             'base_url': 'http://localhost:8000'
         }
