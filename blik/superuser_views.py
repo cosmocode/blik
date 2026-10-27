@@ -75,7 +75,7 @@ def create_organization(request):
                     )
                 except ValueError as e:
                     messages.error(request, f'Failed to create user: {e}')
-                    return redirect('superuser_dashboard')
+                    return redirect('superuser_create_organization')
 
                 # Create user profile with admin privileges
                 UserProfile.objects.create(
