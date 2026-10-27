@@ -122,7 +122,7 @@ class QuickCycleTests(CycleCategoryTestCase):
             include_self=False, include_direct_report=False)
 
         self.client.post(
-            reverse('quick_cycle_create', args=[self.reviewee.id]),
+            reverse('quick_cycle_create', args=[self.reviewee.uuid]),
             {'questionnaire_id': self.questionnaire.id},
         )
 
@@ -131,7 +131,7 @@ class QuickCycleTests(CycleCategoryTestCase):
 
     def test_without_a_previous_cycle_it_collects_everything(self):
         self.client.post(
-            reverse('quick_cycle_create', args=[self.reviewee.id]),
+            reverse('quick_cycle_create', args=[self.reviewee.uuid]),
             {'questionnaire_id': self.questionnaire.id},
         )
 
@@ -144,7 +144,7 @@ class QuickCycleTests(CycleCategoryTestCase):
             include_peer=False)
 
         self.client.post(
-            reverse('quick_cycle_create', args=[self.reviewee.id]),
+            reverse('quick_cycle_create', args=[self.reviewee.uuid]),
             {'questionnaire_id': self.questionnaire.id},
         )
 

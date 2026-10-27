@@ -37,14 +37,14 @@ class EditQuestionTests(TestCase):
         )
 
     def edit(self, **fields):
-        self.client.post(reverse('questionnaire_edit', args=[self.questionnaire.id]), {
+        self.client.post(reverse('questionnaire_edit', args=[self.questionnaire.uuid]), {
             'action': 'edit_question', 'question_id': self.question.id, 'required': 'on', **fields,
         })
         self.question.refresh_from_db()
 
     def test_fixing_the_text_keeps_the_labels_and_the_dreyfus_weights(self):
         # The dialog shows the labels and posts them back
-        page = self.client.get(reverse('questionnaire_edit', args=[self.questionnaire.id]))
+        page = self.client.get(reverse('questionnaire_edit', args=[self.questionnaire.uuid]))
         self.assertContains(page, 'Expert problem solver')
         labels = {f'rating_label_{value}': label for value, label in LABELS.items()}
 

@@ -118,7 +118,7 @@ class QuestionnaireFlowTests(TestCase):
         )
 
     def edit(self, **data):
-        return self.client.post(reverse('questionnaire_edit', args=[self.questionnaire.id]), data)
+        return self.client.post(reverse('questionnaire_edit', args=[self.questionnaire.uuid]), data)
 
     def build_questionnaire(self):
         """Build a questionnaire with every question type the way the editor does."""
@@ -191,7 +191,7 @@ class QuestionnaireFlowTests(TestCase):
         ]
 
     def test_the_editor_shows_every_question_and_its_options(self):
-        response = self.client.get(reverse('questionnaire_edit', args=[self.questionnaire.id]))
+        response = self.client.get(reverse('questionnaire_edit', args=[self.questionnaire.uuid]))
         page = page_text(response)
 
         for text in ['Shares knowledge', 'Gives useful feedback', 'Asks for help', 'Seniority',
@@ -218,7 +218,8 @@ class QuestionnaireFlowTests(TestCase):
         self.assertEqual(labels('Seniority'), {'Novice', 'Advanced', 'Expert'})
         self.assertEqual(labels('Strong areas'), {'Code', 'Docs', 'Talks'})
         self.assertEqual(labels('Shares knowledge'), {
-            '1 Strongly Disagree', '2 Disagree', '3 Neutral', '4 Agree', '5 Strongly Agree'})
+            '1 Strongly Disagree', '2 Disagree', '3 Neutral', '4 Agree', '5 Strongly Agree',
+            'Did not observe'})
         self.assertIn('Drained', page_text(form))
         self.assertIn('Energised', page_text(form))
 

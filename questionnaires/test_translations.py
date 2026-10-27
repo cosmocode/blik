@@ -198,7 +198,7 @@ class TranslatedPreviewTest(TranslatedQuestionnaireTestCase):
         self.client.force_login(self.admin)
 
     def preview(self, **params):
-        return self.client.get(reverse('questionnaire_preview', args=[self.questionnaire.id]), params)
+        return self.client.get(reverse('questionnaire_preview', args=[self.questionnaire.uuid]), params)
 
     def test_the_preview_shows_the_source_language(self):
         page = self.preview()
@@ -390,10 +390,10 @@ class TranslationEditorTest(TranslatedQuestionnaireTestCase):
     def translate_url(self, language='de', questionnaire=None):
         questionnaire = questionnaire or self.questionnaire
 
-        return reverse('questionnaire_translate', args=[questionnaire.id, language])
+        return reverse('questionnaire_translate', args=[questionnaire.uuid, language])
 
     def edit(self, **data):
-        return self.client.post(reverse('questionnaire_edit', args=[self.questionnaire.id]), data)
+        return self.client.post(reverse('questionnaire_edit', args=[self.questionnaire.uuid]), data)
 
     def test_the_translation_page_shows_source_and_translation_side_by_side(self):
         page = self.client.get(self.translate_url())
@@ -437,7 +437,7 @@ class TranslationEditorTest(TranslatedQuestionnaireTestCase):
         self.assertFalse(self.likert.translations.exists())
 
     def test_the_editor_and_the_list_show_how_far_the_translations_are(self):
-        editor = self.client.get(reverse('questionnaire_edit', args=[self.questionnaire.id]))
+        editor = self.client.get(reverse('questionnaire_edit', args=[self.questionnaire.uuid]))
         listing = self.client.get(reverse('questionnaire_list'))
 
         self.assertContains(editor, self.translate_url())

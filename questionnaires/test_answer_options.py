@@ -126,7 +126,7 @@ class EditorTest(AnswerOptionTestCase):
     def edit(self, **data):
         self.client.force_login(self.admin)
 
-        return self.client.post(reverse('questionnaire_edit', args=[self.questionnaire.id]), data)
+        return self.client.post(reverse('questionnaire_edit', args=[self.questionnaire.uuid]), data)
 
     def test_adding_a_question_stores_its_rows(self):
         self.edit(

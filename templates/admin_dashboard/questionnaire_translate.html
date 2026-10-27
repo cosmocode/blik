@@ -14,8 +14,8 @@
         </p>
     </div>
     <div style="display: flex; gap: 0.5rem;">
-        <a href="{% url 'questionnaire_preview' questionnaire.id %}?lang={{ state.code }}" class="btn btn-secondary">{% trans 'Preview' %}</a>
-        <a href="{% url 'questionnaire_edit' questionnaire.id %}" class="btn btn-secondary">{% trans 'Back to Editor' %}</a>
+        <a href="{% url 'questionnaire_preview' questionnaire.uuid %}?lang={{ state.code }}" class="btn btn-secondary">{% trans 'Preview' %}</a>
+        <a href="{% url 'questionnaire_edit' questionnaire.uuid %}" class="btn btn-secondary">{% trans 'Back to Editor' %}</a>
     </div>
 </div>
 
@@ -65,7 +65,7 @@
 
     <div style="display: flex; gap: 1rem; margin-top: 1rem;">
         <button type="submit" class="btn btn-primary">{% trans 'Save Translation' %}</button>
-        <a href="{% url 'questionnaire_edit' questionnaire.id %}" class="btn btn-secondary">{% trans 'Cancel' %}</a>
+        <a href="{% url 'questionnaire_edit' questionnaire.uuid %}" class="btn btn-secondary">{% trans 'Cancel' %}</a>
     </div>
 </form>
 {% endblock %}

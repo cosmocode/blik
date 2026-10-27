@@ -6745,3 +6745,6 @@ msgstr "Aktiv"
 msgctxt "organization status"
 msgid "Inactive"
 msgstr "Inaktiv"
+
+msgid "Did not observe"
+msgstr "Nicht beobachtet"

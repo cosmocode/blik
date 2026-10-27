@@ -32,7 +32,7 @@ class ActionItemKeyTests(TestCase):
         )
 
     def edit(self, **data):
-        return self.client.post(reverse('questionnaire_edit', args=[self.questionnaire.id]), data)
+        return self.client.post(reverse('questionnaire_edit', args=[self.questionnaire.uuid]), data)
 
     def test_the_upgrade_step_keys_existing_items_once(self):
         key_action_items(StringIO())
