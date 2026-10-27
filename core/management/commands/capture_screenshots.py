@@ -508,6 +508,15 @@ class Command(BaseCommand):
                 ('step_report', f'/my-report/{report_tokens[0]}/' if report_tokens else None,
                  '.report-section:has(#sectionRadarChart)', {}),
             ]
+            # Homepage hero: the report summary in a browser frame, and a phone
+            # answering a question on top of it
+            step_cards += [
+                ('hero_report', step_cards[2][1], '#overall-performance',
+                 {'focus_options': {'aspect': 16 / 10}}),
+                ('hero_phone', step_cards[1][1], '.section',
+                 {'viewport': {'width': 390, 'height': 844},
+                  'focus_options': {'padding': 16, 'aspect': 390 / 720}}),
+            ]
             for name, path, focus, extra in step_cards:
                 if not path:
                     continue
@@ -678,7 +687,8 @@ class Command(BaseCommand):
                     path=str(output_file),
                     full_page=False,  # Viewport only
                     type='png',
-                    clip=await self._focus_clip(page, screenshot_config.get('focus')),
+                    clip=await self._focus_clip(page, screenshot_config.get('focus'),
+                                                **screenshot_config.get('focus_options', {})),
                 )
 
                 self.stdout.write(self.style.SUCCESS(f'  ✓ Saved: {output_file}'))

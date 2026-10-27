@@ -107,6 +107,8 @@ Uses Playwright to capture screenshots of key pages.
 - Homepage "How it works" cards: `step_people_*`, `step_answer_*`, `step_report_*`. One element
   each (the cycle form's Basic Information card, the first questionnaire section, the radar
   chart), cut to 4:3 at 2x pixel density so the text stays readable at card size
+- Homepage hero: `hero_report_*` (the report's Overall Performance card and development path,
+  16:10) in a browser frame, with `hero_phone_*` (the first question at phone width) on top
 
 **Note:** Report desktop screenshots are split into two parts (header/summary and charts) to capture all key information while keeping standard viewport sizes (1920x1080, 1024x768).
 
