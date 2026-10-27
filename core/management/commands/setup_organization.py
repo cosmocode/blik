@@ -1,6 +1,8 @@
 import os
 
 from django.core.management.base import BaseCommand
+from django.core.management.color import no_style
+from django.db import connection
 from core.models import Organization
 
 
@@ -57,6 +59,11 @@ class Command(BaseCommand):
             org.from_email = os.getenv('DEFAULT_FROM_EMAIL', org.email)
             org.is_active = True
             org.save()
+            # Saving with an explicit id does not advance the PostgreSQL id
+            # sequence, so the next Organization insert would reuse id 1.
+            with connection.cursor() as cursor:
+                for sql in connection.ops.sequence_reset_sql(no_style(), [Organization]):
+                    cursor.execute(sql)
             self.stdout.write(
                 self.style.SUCCESS(f'Created organization: {org.name}')
             )
