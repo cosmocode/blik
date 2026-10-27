@@ -498,6 +498,31 @@ class Command(BaseCommand):
                 ('cycle_create_desktop', '/dashboard/cycles/create/', '#cycleForm',
                  {'prepare_js': CYCLE_FORM_JS, 'viewport': {'width': 1920, 'height': 1600}}),
             ]
+            # Homepage "How it works" cards: one element per step, see _focus_clip()
+            report_tokens = list(config.get('report_tokens', {}).values())
+            step_cards = [
+                ('step_people', '/dashboard/cycles/create/', '.card:has(#reviewee)',
+                 {'prepare_js': CYCLE_FORM_JS}),
+                ('step_answer', f'/feedback/{config.get("feedback_token")}/', '.section',
+                 {}),
+                ('step_report', f'/my-report/{report_tokens[0]}/' if report_tokens else None,
+                 '.report-section:has(#sectionRadarChart)', {}),
+            ]
+            for name, path, focus, extra in step_cards:
+                if not path:
+                    continue
+                for theme in ('light', 'dark'):
+                    screenshot_configs.append({
+                        'name': f'{name}_{theme}',
+                        'url': f'{base_url}{path}',
+                        'viewport': {'width': 1000, 'height': 1000},
+                        'scale': 2,
+                        'theme': theme,
+                        'wait_for': focus,
+                        'focus': focus,
+                        **extra,
+                    })
+
             for name, path, wait_for, extra in flow_pages:
                 for theme in ('light', 'dark'):
                     screenshot_configs.append({
@@ -529,7 +554,7 @@ class Command(BaseCommand):
                 # Create new page with viewport
                 page = await browser.new_page(
                     viewport=screenshot_config['viewport'],
-                    device_scale_factor=1  # No scaling for crisp screenshots
+                    device_scale_factor=screenshot_config.get('scale', 1),
                 )
 
                 # Add cookies
@@ -652,7 +677,8 @@ class Command(BaseCommand):
                 await page.screenshot(
                     path=str(output_file),
                     full_page=False,  # Viewport only
-                    type='png'
+                    type='png',
+                    clip=await self._focus_clip(page, screenshot_config.get('focus')),
                 )
 
                 self.stdout.write(self.style.SUCCESS(f'  ✓ Saved: {output_file}'))
@@ -765,6 +791,25 @@ class Command(BaseCommand):
             await self._capture_emails(browser, output_path)
 
             await browser.close()
+
+    async def _focus_clip(self, page, selector, padding=32, top=16, aspect=4 / 3):
+        """
+        A clip around one element: padded at the sides, cut to aspect, with the
+        element's top near the top. Floating controls (fixed elements) are hidden.
+        None (the whole viewport) without a selector. top stays below the usual
+        1.5rem gap between cards, so the card above does not show.
+        """
+        if not selector:
+            return None
+        element = page.locator(selector).first
+        await page.evaluate("""() => document.querySelectorAll('body *').forEach(el => {
+            if (getComputedStyle(el).position === 'fixed') el.style.visibility = 'hidden';
+        })""")
+        await element.evaluate(f'el => window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - {top})')
+        await page.wait_for_timeout(300)
+        box = await element.bounding_box()
+        width = box['width'] + 2 * padding
+        return {'x': max(box['x'] - padding, 0), 'y': max(box['y'] - top, 0), 'width': width, 'height': width / aspect}
 
     def _filter(self, configs):
         if not self.only:

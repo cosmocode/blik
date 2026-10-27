@@ -104,6 +104,9 @@ Uses Playwright to capture screenshots of key pages.
 - Own language: `feedback_translated_{desktop,mobile}_*` opens a fresh reviewer link with a
   German browser (needs `upgrade` before the demo data, so the questionnaires are translated);
   `questionnaire_translate_desktop_*` is the translation editor
+- Homepage "How it works" cards: `step_people_*`, `step_answer_*`, `step_report_*`. One element
+  each (the cycle form's Basic Information card, the first questionnaire section, the radar
+  chart), cut to 4:3 at 2x pixel density so the text stays readable at card size
 
 **Note:** Report desktop screenshots are split into two parts (header/summary and charts) to capture all key information while keeping standard viewport sizes (1920x1080, 1024x768).
 
