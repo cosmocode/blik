@@ -31,7 +31,8 @@ The screenshot system consists of three Django management commands that work tog
 Generate all screenshots with one command sequence:
 
 ```bash
-# 1. Generate demo data
+# 1. Load the shipped questionnaire translations, then generate demo data
+python manage.py upgrade
 python manage.py generate_screenshot_data --clear
 
 # 2. Capture screenshots (ensure app is running on localhost:8000)
@@ -83,7 +84,7 @@ Uses Playwright to capture screenshots of key pages.
 - Admin dashboard (desktop light/dark, mobile light/dark) - 4 screenshots
 - Review cycle detail (desktop light/dark) - 2 screenshots
 - Team management (desktop light/dark) - 2 screenshots
-- Manage invitations (desktop light) - 1 screenshot
+- Manage invitations (desktop light/dark) - 2 screenshots
 - Feedback form (desktop light/dark, mobile light/dark) - 4 screenshots
 
 **Total: 19 screenshots**
@@ -92,7 +93,7 @@ Uses Playwright to capture screenshots of key pages.
 - Sign up / plan picker: `signup_desktop_*` (the landing page has no dark theme, so both look the same)
 - Questionnaires: `questionnaires_desktop_*`, `questionnaire_edit_desktop_*`
 - Reviewees: `reviewees_desktop_*`; `reviewees_gap_desktop_*` is a slot for the
-  self-vs-others gap column and is skipped until the page has a `[data-gap-column]` element
+  self-vs-others gap column (sorted by gap, which shows the column); skipped if the column is hidden
 - New review cycle form (filled in, invite section open): `cycle_create_desktop_*`
 - Emails, rendered from `templates/emails/` with sample data in an inbox frame (nothing is sent):
   `email_welcome_desktop_*`, and desktop + mobile for `email_reviewee_self_assessment`,
@@ -100,6 +101,14 @@ Uses Playwright to capture screenshots of key pages.
   `email_report_ready`
 - Reviewee: `self_assessment_{desktop,mobile}_*`, `report_mobile_*`
 - Reviewer thank-you page: `feedback_complete_{desktop,mobile}_*`
+- Own language: `feedback_translated_{desktop,mobile}_*` opens a fresh reviewer link with a
+  German browser (needs `upgrade` before the demo data, so the questionnaires are translated);
+  `questionnaire_translate_desktop_*` is the translation editor
+- Homepage "How it works" cards: `step_people_*`, `step_answer_*`, `step_report_*`. One element
+  each (the cycle form's Basic Information card, the first questionnaire section, the radar
+  chart), cut to 4:3 at 2x pixel density so the text stays readable at card size
+- Homepage hero: `hero_report_*` (the report's Overall Performance card and development path,
+  16:10) in a browser frame, with `hero_phone_*` (the first question at phone width) on top
 
 **Note:** Report desktop screenshots are split into two parts (header/summary and charts) to capture all key information while keeping standard viewport sizes (1920x1080, 1024x768).
 

@@ -12,9 +12,39 @@
     <a href="{% url 'review_cycle_create' %}" class="btn btn-primary">{% trans 'Create Review Cycle' %}</a>
 </div>
 
-{% if cycles_with_latest %}
+{% if total_count or is_filtered %}
 <div class="card">
+    <form id="cycle-filters" method="get" class="list-filters">
+        <nav id="cycle-stages" class="stage-tabs" aria-label="{% trans 'Filter by stage' %}">
+            <a href="?{% querystring stage=None page=None %}" class="stage-tab"{% if not stage %} aria-current="true"{% endif %}>{% trans 'All' %} <span>{{ total_count }}</span></a>
+            {% for key, label, count in stages %}
+            <a href="?{% querystring stage=key page=None %}" class="stage-tab"{% if stage == key %} aria-current="true"{% endif %}>{{ label }} <span>{{ count }}</span></a>
+            {% endfor %}
+        </nav>
+        {% if stage %}<input type="hidden" name="stage" value="{{ stage }}">{% endif %}
+        <div class="list-filter-fields">
+            <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="{% trans 'Search reviewee name or email' %}" aria-label="{% trans 'Search reviewee' %}" title="{% trans 'Press / to search' %}">
+            <select name="questionnaire" class="form-control" aria-label="{% trans 'Questionnaire' %}" onchange="this.form.requestSubmit()">
+                <option value="">{% trans 'All questionnaires' %}</option>
+                {% for q_option in used_questionnaires %}
+                <option value="{{ q_option.uuid }}" {% if questionnaire_filter == q_option.uuid|stringformat:'s' %}selected{% endif %}>{{ q_option.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="sort" class="form-control" aria-label="{% trans 'Sort' %}" onchange="this.form.requestSubmit()">
+                {% for key, label in sorts %}
+                <option value="{{ key }}" {% if sort == key %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <span id="cycle-clear">{% if is_filtered %}<a href="?{% querystring stage=None q=None questionnaire=None page=None %}" class="btn btn-sm btn-secondary">{% trans 'Clear filters' %}</a>{% endif %}</span>
+        </div>
+    </form>
+    <div id="cycle-results">
     <div class="card-body">
+        {% if not cycles.object_list %}
+        <div class="empty-state">
+            <p>{% trans 'No review cycles match these filters.' %}</p>
+        </div>
+        {% else %}
         <div class="table-wrapper">
         <table class="table">
             <thead>
@@ -31,18 +61,18 @@
                 </tr>
             </thead>
             <tbody>
-                {% for item in cycles_with_latest %}
+                {% for cycle in cycles %}
                 <tr>
                     <td>
-                        <div style="font-weight: 500;">{{ item.cycle.reviewee.name }}</div>
-                        <div style="font-size: 0.875rem; color: #64748b;">{{ item.cycle.reviewee.email }}</div>
+                        <div style="font-weight: 500;">{{ cycle.reviewee.name }}</div>
+                        <div style="font-size: 0.875rem; color: #64748b;">{{ cycle.reviewee.email }}</div>
                     </td>
                     <td>
-                        <div style="font-weight: 500;">{{ item.cycle.questionnaire.name }}</div>
-                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.125rem;">{{ item.cycle.questionnaire.report_type_label }}</div>
+                        <div style="font-weight: 500;">{{ cycle.questionnaire.name }}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.125rem;">{{ cycle.questionnaire.report_type_label }}</div>
                     </td>
                     <td>
-                        {% if item.cycle.status == 'active' %}
+                        {% if cycle.status == 'active' %}
                         <span class="badge badge-warning">{% trans 'Active' %}</span>
                         {% else %}
                         <span class="badge badge-success">{% trans 'Completed' %}</span>
@@ -50,14 +80,14 @@
                     </td>
                     <td>
                         <div style="font-size: 0.875rem; color: #64748b; margin-bottom: 0.25rem;">
-                            {% blocktrans trimmed with completed=item.cycle.completed_count total=item.cycle.token_count %}{{ completed }} / {{ total }} responses{% endblocktrans %}
+                            {% blocktrans trimmed with completed=cycle.completed_count total=cycle.token_count %}{{ completed }} / {{ total }} responses{% endblocktrans %}
                         </div>
                         <div class="progress">
-                            <div class="progress-bar" style="width: {% widthratio item.cycle.completed_count item.cycle.token_count 100 %}%;"></div>
+                            <div class="progress-bar" style="width: {% widthratio cycle.completed_count cycle.token_count 100 %}%;"></div>
                         </div>
                     </td>
                     <td style="color: #64748b; font-size: 0.875rem;">
-                        {{ item.cycle.created_at|date:'SHORT_DATE_FORMAT' }}
+                        {{ cycle.created_at|date:'SHORT_DATE_FORMAT' }}
                     </td>
                     <td>
                         {% if perms.accounts.can_manage_organization %}
@@ -65,11 +95,11 @@
                             <!-- Split button: New Cycle (main action) + dropdown for other questionnaires -->
                             <div class="btn-group" style="position: relative; display: inline-flex;">
                                 <!-- Main action button: Create cycle with last-used or default questionnaire -->
-                                <form method="POST" action="{% url 'quick_cycle_create' item.cycle.reviewee.uuid %}" style="margin: 0; display: inline;">
+                                <form method="POST" action="{% url 'quick_cycle_create' cycle.reviewee.uuid %}" style="margin: 0; display: inline;">
                                     {% csrf_token %}
-                                    <input type="hidden" name="source_cycle_uuid" value="{{ item.cycle.uuid }}">
-                                    {% if item.latest_questionnaire %}
-                                    <input type="hidden" name="questionnaire_id" value="{{ item.latest_questionnaire.id }}">
+                                    <input type="hidden" name="source_cycle_uuid" value="{{ cycle.uuid }}">
+                                    {% if cycle.latest_questionnaire_id %}
+                                    <input type="hidden" name="questionnaire_id" value="{{ cycle.latest_questionnaire_id }}">
                                     {% else %}
                                     {% for q in questionnaires %}
                                         {% if q.is_default %}
@@ -86,7 +116,7 @@
                                 <button
                                     class="btn btn-sm btn-primary"
                                     type="button"
-                                    data-toggle="cycle-{{ item.cycle.id }}"
+                                    data-toggle="cycle-{{ cycle.id }}"
                                     style="border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 0.25rem 0.5rem; border-left: 1px solid rgba(255,255,255,0.3);"
                                     title="{% trans 'Select different questionnaire' %}"
                                 >
@@ -94,7 +124,7 @@
                                 </button>
 
                                 <!-- Dropdown menu with fixed positioning -->
-                                <div class="dropdown-menu" id="cycle-{{ item.cycle.id }}" style="display: none; position: fixed; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); min-width: 300px; z-index: 9999; margin-top: 0.25rem;">
+                                <div class="dropdown-menu" id="cycle-{{ cycle.id }}" style="display: none; position: fixed; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); min-width: 300px; z-index: 9999; margin-top: 0.25rem;">
                                     <div style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); background: var(--bg-light);">
                                         <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary); margin-bottom: 0.25rem;">
                                             {% trans 'Select Questionnaire' %}
@@ -106,11 +136,11 @@
                                         </div>
                                     </div>
                                     {% for q in questionnaires %}
-                                    {% if item.latest_questionnaire and item.latest_questionnaire.id == q.id or not item.latest_questionnaire and q.is_default %}
+                                    {% if cycle.latest_questionnaire_id and cycle.latest_questionnaire_id == q.id or not cycle.latest_questionnaire_id and q.is_default %}
                                         {# This is the questionnaire that will be used for quick create #}
-                                        <form method="POST" action="{% url 'quick_cycle_create' item.cycle.reviewee.uuid %}" style="margin: 0;">
+                                        <form method="POST" action="{% url 'quick_cycle_create' cycle.reviewee.uuid %}" style="margin: 0;">
                                             {% csrf_token %}
-                                            <input type="hidden" name="source_cycle_uuid" value="{{ item.cycle.uuid }}">
+                                            <input type="hidden" name="source_cycle_uuid" value="{{ cycle.uuid }}">
                                             <input type="hidden" name="questionnaire_id" value="{{ q.id }}">
                                             <button type="submit" class="dropdown-item" style="width: 100%; text-align: left; padding: 0.625rem 1rem; border: none; background: none; cursor: pointer; font-size: 0.875rem; display: flex; justify-content: space-between; align-items: center; transition: background 0.15s; color: var(--text-primary); border-left: 3px solid var(--primary);">
                                                 <span style="flex: 1; padding-right: 0.5rem; font-weight: 500;">{{ q.name }}</span>
@@ -121,9 +151,9 @@
                                             </button>
                                         </form>
                                     {% else %}
-                                        <form method="POST" action="{% url 'quick_cycle_create' item.cycle.reviewee.uuid %}" style="margin: 0;">
+                                        <form method="POST" action="{% url 'quick_cycle_create' cycle.reviewee.uuid %}" style="margin: 0;">
                                             {% csrf_token %}
-                                            <input type="hidden" name="source_cycle_uuid" value="{{ item.cycle.uuid }}">
+                                            <input type="hidden" name="source_cycle_uuid" value="{{ cycle.uuid }}">
                                             <input type="hidden" name="questionnaire_id" value="{{ q.id }}">
                                             <button type="submit" class="dropdown-item" style="width: 100%; text-align: left; padding: 0.625rem 1rem; border: none; background: none; cursor: pointer; font-size: 0.875rem; display: flex; justify-content: space-between; align-items: center; transition: background 0.15s; color: var(--text-primary);">
                                                 <span style="flex: 1; padding-right: 0.5rem;">{{ q.name }}</span>
@@ -137,14 +167,14 @@
                                 </div>
                             </div>
 
-                            <a href="{% url 'review_cycle_detail' item.cycle.uuid %}" class="btn btn-sm btn-secondary">{% trans 'View' %}</a>
+                            <a href="{% url 'review_cycle_detail' cycle.uuid %}" class="btn btn-sm btn-secondary">{% trans 'View' %}</a>
                         </div>
                         {% else %}
-                        <a href="{% url 'review_cycle_detail' item.cycle.uuid %}" class="btn btn-sm btn-secondary">{% trans 'View' %}</a>
+                        <a href="{% url 'review_cycle_detail' cycle.uuid %}" class="btn btn-sm btn-secondary">{% trans 'View' %}</a>
                         {% endif %}
                     </td>
                     <td style="text-align: center;">
-                        <button onclick="showUuidModal('{{ item.cycle.uuid }}', '{{ item.cycle.reviewee.uuid }}', '{{ item.cycle.reviewee.name|escapejs }}')"
+                        <button onclick="showUuidModal('{{ cycle.uuid }}', '{{ cycle.reviewee.uuid }}', '{{ cycle.reviewee.name|escapejs }}')"
                                 style="background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 0.25rem; display: inline-flex; align-items: center; justify-content: center;"
                                 title="{% trans 'Show API Identifiers' %}">
                             <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -155,13 +185,14 @@
             </tbody>
         </table>
         </div>
+        {% endif %}
     </div>
 
-    {% if cycles.has_other_pages %}
+    {% if cycles.has_other_pages or per_page != 25 %}
     <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
         <div style="display: flex; align-items: center; gap: 0.5rem;">
             <span style="color: var(--text-secondary); font-size: 0.875rem;">{% trans 'Items per page:' %}</span>
-            <select onchange="window.location.href='?per_page=' + this.value" style="padding: 0.25rem 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary);">
+            <select name="per_page" form="cycle-filters" onchange="this.form.requestSubmit()" style="padding: 0.25rem 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary);">
                 <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
                 <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
                 <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
@@ -169,8 +200,8 @@
         </div>
         <div class="pagination">
             {% if cycles.has_previous %}
-                <a href="?page=1&per_page={{ per_page }}" class="pagination-link">{% trans 'First' %}</a>
-                <a href="?page={{ cycles.previous_page_number }}&per_page={{ per_page }}" class="pagination-link">{% trans 'Previous' %}</a>
+                <a href="?{% querystring page=1 %}" class="pagination-link">{% trans 'First' %}</a>
+                <a href="?{% querystring page=cycles.previous_page_number %}" class="pagination-link">{% trans 'Previous' %}</a>
             {% endif %}
 
             <span class="pagination-info">
@@ -178,12 +209,13 @@
             </span>
 
             {% if cycles.has_next %}
-                <a href="?page={{ cycles.next_page_number }}&per_page={{ per_page }}" class="pagination-link">{% trans 'Next' %}</a>
-                <a href="?page={{ cycles.paginator.num_pages }}&per_page={{ per_page }}" class="pagination-link">{% trans 'Last' %}</a>
+                <a href="?{% querystring page=cycles.next_page_number %}" class="pagination-link">{% trans 'Next' %}</a>
+                <a href="?{% querystring page=cycles.paginator.num_pages %}" class="pagination-link">{% trans 'Last' %}</a>
             {% endif %}
         </div>
     </div>
     {% endif %}
+    </div>
 </div>
 {% else %}
 <div class="card">
@@ -208,59 +240,64 @@
 </style>
 
 <script>
-// Handle dropdown toggle with proper positioning
-document.addEventListener('DOMContentLoaded', function() {
-    const dropdownToggles = document.querySelectorAll('[data-toggle^="cycle-"]');
+// "/" jumps to the search field, like most list views.
+document.addEventListener('keydown', function(e) {
+    const search = document.querySelector('#cycle-filters input[name="q"]');
+    if (e.key === '/' && search && !e.target.closest('input, textarea, select, [contenteditable]')) {
+        e.preventDefault();
+        search.focus();
+        search.select();
+    }
+});
 
-    dropdownToggles.forEach(toggle => {
-        toggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            const dropdownId = this.getAttribute('data-toggle');
-            const menu = document.getElementById(dropdownId);
-
-            // Close all other dropdowns
-            document.querySelectorAll('.dropdown-menu').forEach(m => {
-                if (m.id !== dropdownId) {
-                    m.style.display = 'none';
-                }
-            });
-
-            // Toggle this dropdown
-            const isVisible = menu.style.display === 'block';
-
-            if (!isVisible) {
-                // Position the dropdown relative to the button
-                const rect = this.getBoundingClientRect();
-                menu.style.top = (rect.bottom + window.scrollY + 4) + 'px';
-                menu.style.left = (rect.left + window.scrollX) + 'px';
-                menu.style.display = 'block';
-            } else {
-                menu.style.display = 'none';
+// Search as you type: fetch the filtered page and swap the parts that
+// change. The search field itself stays put, so focus and typing survive.
+(function() {
+    const search = document.querySelector('#cycle-filters input[name="q"]');
+    if (!search) return;
+    let timer, controller;
+    search.addEventListener('input', () => {
+        clearTimeout(timer);
+        timer = setTimeout(async () => {
+            const params = [...new FormData(search.form)].filter(([, value]) => value);
+            const url = location.pathname + '?' + new URLSearchParams(params);
+            if (controller) controller.abort();
+            controller = new AbortController();
+            try {
+                const response = await fetch(url, {signal: controller.signal});
+                const page = new DOMParser().parseFromString(await response.text(), 'text/html');
+                ['cycle-stages', 'cycle-clear', 'cycle-results'].forEach(id => {
+                    document.getElementById(id).replaceWith(page.getElementById(id));
+                });
+                history.replaceState(null, '', url);
+            } catch (e) {
+                if (e.name !== 'AbortError') search.form.requestSubmit();
             }
-        });
+        }, 30);
     });
+})();
 
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.btn-group')) {
-            document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                menu.style.display = 'none';
-            });
-        }
-    });
-
-    // Prevent dropdown from closing when clicking inside it
+// Row dropdowns. Delegated, so rows swapped in by the search keep working.
+document.addEventListener('click', function(e) {
+    // Close every menu outside the clicked button group.
+    const group = e.target.closest('.btn-group');
     document.querySelectorAll('.dropdown-menu').forEach(menu => {
-        menu.addEventListener('click', function(e) {
-            // Let form submissions go through (they'll navigate away anyway)
-            if (e.target.closest('form')) {
-                return;
-            }
-            e.stopPropagation();
-        });
+        if (!group || !group.contains(menu)) menu.style.display = 'none';
     });
+
+    const toggle = e.target.closest('[data-toggle^="cycle-"]');
+    if (!toggle) return;
+    e.preventDefault();
+    const menu = document.getElementById(toggle.getAttribute('data-toggle'));
+    if (menu.style.display === 'block') {
+        menu.style.display = 'none';
+    } else {
+        // Position the dropdown relative to the button
+        const rect = toggle.getBoundingClientRect();
+        menu.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+        menu.style.left = (rect.left + window.scrollX) + 'px';
+        menu.style.display = 'block';
+    }
 });
 
 // UUID Modal functions
@@ -273,6 +310,7 @@ function showUuidModal(cycleUuid, revieweeUuid, revieweeName) {
     document.getElementById('modal-reviewee-name').textContent = revieweeName;
     document.getElementById('modal-cycle-uuid').textContent = cycleUuid;
     document.getElementById('modal-reviewee-uuid').textContent = revieweeUuid;
+    renderApiExamples(cycleUuid, revieweeUuid);
 
     document.getElementById('uuid-modal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -290,8 +328,10 @@ function createUuidModal() {
     modal.className = 'modal-overlay';
     modal.style.display = 'none';
     {% blocktrans trimmed asvar api_intro with name_id='modal-reviewee-name' %}Use these UUIDs when accessing the REST API for <strong id="{{ name_id }}"></strong>{% endblocktrans %}
+    {% url 'api:swagger-ui' as api_docs_url %}
+    {% if perms.accounts.can_manage_organization %}{% url 'settings' as settings_url %}{% blocktrans trimmed asvar api_token_hint with url=settings_url|add:'#api' %}Replace <code>$BLIK_API_TOKEN</code> with a token from <a href="{{ url }}">Settings → API</a>.{% endblocktrans %}{% else %}{% blocktrans trimmed asvar api_token_hint %}Replace <code>$BLIK_API_TOKEN</code> with an API token from an organization admin.{% endblocktrans %}{% endif %}
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-content" style="max-width: 760px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
                 <h3 style="margin: 0;">{{ _('API Identifiers')|escapejs }}</h3>
                 <button onclick="closeUuidModal()" aria-label="{{ _('Close')|escapejs }}"
@@ -317,6 +357,9 @@ function createUuidModal() {
                         <button onclick="copyUuid('modal-reviewee-uuid')" class="btn btn-sm btn-secondary">{{ _('Copy')|escapejs }}</button>
                     </div>
                 </div>
+                <h4 class="api-examples-title">{{ _('Example calls')|escapejs }}</h4>
+                <p class="help-text">{{ api_token_hint|escapejs }} <a href="{{ api_docs_url|escapejs }}" target="_blank" rel="noopener">{{ _('Full API documentation')|escapejs }}</a></p>
+                <div id="modal-api-examples"></div>
             </div>
         </div>
     `;
@@ -330,12 +373,48 @@ function createUuidModal() {
     });
 }
 
-function copyUuid(elementId) {
-    const element = document.getElementById(elementId);
-    const text = element.textContent;
+// Example calls for the modal: method, path, Swagger operation (tag/operationId), label.
+const API_BASE = '{{ SITE_URL|escapejs }}/api/v1';
+const API_EXAMPLES = [
+    ['GET', ids => `/cycles/${ids.cycle}/`, 'cycles/cycles_retrieve', '{{ _("Cycle details")|escapejs }}'],
+    ['GET', ids => `/cycles/${ids.cycle}/progress/`, 'cycles/cycles_progress_retrieve', '{{ _("Response progress per group")|escapejs }}'],
+    ['POST', ids => `/cycles/${ids.cycle}/send_reminders/`, 'cycles/cycles_send_reminders_create', '{{ _("Remind all pending reviewers")|escapejs }}'],
+    ['POST', ids => `/cycles/${ids.cycle}/complete/`, 'cycles/cycles_complete_create', '{{ _("Close the cycle and generate the report")|escapejs }}'],
+    ['GET', ids => `/reviewees/${ids.reviewee}/`, 'reviewees/reviewees_retrieve', '{{ _("Reviewee details")|escapejs }}'],
+    ['GET', ids => `/reviewees/${ids.reviewee}/cycles/`, 'reviewees/reviewees_cycles_retrieve', '{{ _("All cycles of this reviewee")|escapejs }}'],
+];
 
+function renderApiExamples(cycleUuid, revieweeUuid) {
+    const ids = {cycle: cycleUuid, reviewee: revieweeUuid};
+    const container = document.getElementById('modal-api-examples');
+    container.replaceChildren(...API_EXAMPLES.map(([method, path, operation, label]) => {
+        const example = document.createElement('div');
+        example.className = 'api-example';
+        const command = `curl${method === 'GET' ? '' : ' -X ' + method} -H "Authorization: Bearer $BLIK_API_TOKEN" ${API_BASE}${path(ids)}`;
+        example.innerHTML = `
+            <div class="api-example-head">
+                <span class="api-method api-method--${method.toLowerCase()}">${method}</span>
+                <span class="api-example-label"></span>
+                <a href="{{ api_docs_url|escapejs }}#/${operation}" target="_blank" rel="noopener">{{ _('Docs')|escapejs }}</a>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <code class="uuid-display api-example-code"></code>
+                <button type="button" class="btn btn-sm btn-secondary">{{ _('Copy')|escapejs }}</button>
+            </div>`;
+        example.querySelector('.api-example-label').textContent = label;
+        example.querySelector('code').textContent = command;
+        example.querySelector('button').addEventListener('click', () => copyText(command, '{{ _("Command copied to clipboard")|escapejs }}'));
+        return example;
+    }));
+}
+
+function copyUuid(elementId) {
+    copyText(document.getElementById(elementId).textContent, '{{ _('UUID copied to clipboard')|escapejs }}');
+}
+
+function copyText(text, message) {
     navigator.clipboard.writeText(text).then(() => {
-        showCopyFeedback('{{ _('UUID copied to clipboard')|escapejs }}');
+        showCopyFeedback(message);
     }).catch(() => {
         // Fallback
         const textarea = document.createElement('textarea');
@@ -344,7 +423,7 @@ function copyUuid(elementId) {
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-        showCopyFeedback('{{ _('UUID copied to clipboard')|escapejs }}');
+        showCopyFeedback(message);
     });
 }
 
@@ -367,6 +446,39 @@ function showCopyFeedback(message) {
 </script>
 
 <style>
+.api-examples-title {
+    margin: 1.5rem 0 0.25rem;
+}
+#uuid-modal .help-text a {
+    color: var(--primary);
+}
+.api-example {
+    margin-top: 1rem;
+}
+.api-example-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.375rem;
+    font-size: 0.875rem;
+}
+.api-example-head a {
+    margin-left: auto;
+    color: var(--primary);
+}
+.api-method {
+    font-family: monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    color: white;
+}
+.api-method--get { background: var(--success); }
+.api-method--post { background: var(--primary); }
+.api-example-code {
+    white-space: pre-wrap;
+}
 .uuid-display {
     flex: 1;
     padding: 0.5rem;

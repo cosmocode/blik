@@ -407,6 +407,31 @@
     color: var(--text-tertiary);
 }
 
+/* Home hero: the report in a browser frame, a phone answering on top of it */
+/* The phone sits bottom right: the report's numbers are on the left. */
+.landing-page .home-hero-media {
+    position: relative;
+    padding: 0 var(--space-12) var(--space-12) 0;
+}
+
+.landing-page .hero-phone {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 28%;
+    padding: 6px;
+    border-radius: 26px;
+    background: #0b0f19;
+    box-shadow: var(--shadow-lg);
+}
+
+.landing-page .hero-phone img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+}
+
 .landing-page .browser-frame {
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);

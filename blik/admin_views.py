@@ -5,6 +5,7 @@ import logging
 import random
 import re
 from datetime import date
+from uuid import UUID
 
 from django.conf import settings
 from django.contrib import messages
@@ -13,7 +14,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.validators import validate_email
 from django.db import transaction
 from django.db.models import ProtectedError
-from django.db.models import Avg, Count, Max, OuterRef, Q, Subquery
+from django.db.models import Avg, Count, F, Max, OuterRef, Q, Subquery
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
@@ -44,6 +45,7 @@ from productreviews.models import ProductReview, anonymous_name
 from questionnaires.action_items import add_action_item_keys
 from questionnaires.answer_options import DEFAULT_LIKERT_SCALE, save_options
 from questionnaires.models import Question, QuestionSection, Questionnaire
+from questionnaires.presentation import questionnaire_report_features
 from questionnaires.translations import (
     LanguageState,
     get_language_states,
@@ -334,101 +336,148 @@ def update_user_permissions(request):
     return redirect('team_list')
 
 
+REVIEWEE_STAGES = {
+    'not_started': (gettext_lazy('Not started'), Q(cycle_count=0)),
+    'active': (gettext_lazy('In progress'), Q(active_cycle_count__gt=0)),
+    'completed': (gettext_lazy('Completed'), Q(cycle_count__gt=0, active_cycle_count=0)),
+}
+
+REVIEWEE_SORTS = {
+    'name': gettext_lazy('Name A–Z'),
+    'name_desc': gettext_lazy('Name Z–A'),
+    'gap': gettext_lazy('Largest self/others difference'),
+}
+
+
 @login_required
 def reviewee_list(request):
-    """List and manage reviewees"""
+    """Find people and understand their feedback status before taking action."""
     org = request.organization
-    latest_report_id = Report.objects.filter(
+    people = Reviewee.objects.for_organization(org).filter(is_active=True)
+    latest_cycles = ReviewCycle.objects.filter(reviewee=OuterRef('pk')).order_by('-created_at', '-pk')
+    latest_reports = Report.objects.filter(
         cycle__reviewee=OuterRef('pk'), cycle__status='completed', available=True,
-    ).order_by('-cycle__created_at').values('id')[:1]
-    # Filter out anonymized reviewees (those with @deleted.invalid emails)
-    reviewees_qs = Reviewee.objects.for_organization(org).filter(is_active=True).annotate(
+    ).order_by('-cycle__created_at', '-pk')
+    reviewees_qs = people.annotate(
         cycle_count=Count('review_cycles'),
-        latest_report_id=Subquery(latest_report_id),
-    ).order_by('name')
-    sort = 'gap' if request.GET.get('sort') == 'gap' else None
+        active_cycle_count=Count('review_cycles', filter=Q(review_cycles__status='active')),
+        latest_cycle_id=Subquery(latest_cycles.values('id')[:1]),
+        latest_questionnaire_id=Subquery(latest_cycles.values('questionnaire_id')[:1]),
+        active_cycle_id=Subquery(latest_cycles.filter(status='active').values('id')[:1]),
+        latest_report_id=Subquery(latest_reports.values('id')[:1]),
+    ).order_by('name', 'pk')
 
-    # Get per_page from request, default to 25
-    per_page = request.GET.get('per_page', '25')
+    # Facets come from this organization's visible people, including archived
+    # questionnaires still referenced by their latest cycle.
+    departments = people.exclude(department='').order_by('department').values_list('department', flat=True).distinct()
+    used_questionnaires = Questionnaire.objects.for_organization(org).filter(
+        pk__in=reviewees_qs.values('latest_questionnaire_id'),
+    ).order_by('name')
+    has_reviewees = people.exists()
+
+    q = request.GET.get('q', '').strip()
+    department = request.GET.get('department', '')
+    questionnaire_filter = request.GET.get('questionnaire', '')
+    if q:
+        reviewees_qs = reviewees_qs.filter(
+            Q(name__icontains=q) | Q(email__icontains=q) | Q(department__icontains=q))
+    if department:
+        reviewees_qs = reviewees_qs.filter(department=department)
+    if questionnaire_filter:
+        try:
+            questionnaire_uuid = UUID(questionnaire_filter)
+        except ValueError:
+            questionnaire_filter = ''
+        else:
+            questionnaire_filter = str(questionnaire_uuid)
+            reviewees_qs = reviewees_qs.filter(latest_questionnaire_id__in=
+                Questionnaire.objects.for_organization(org).filter(uuid=questionnaire_uuid).values('id'))
+
+    # Counts describe what each stage will show with the other filters applied.
+    stage_counts = {key: reviewees_qs.filter(condition).count()
+                    for key, (_label, condition) in REVIEWEE_STAGES.items()}
+    stage = request.GET.get('stage', '')
+    if stage in REVIEWEE_STAGES:
+        reviewees_qs = reviewees_qs.filter(REVIEWEE_STAGES[stage][1])
+    else:
+        stage = ''
+    sort = request.GET.get('sort', 'name')
+    if sort not in REVIEWEE_SORTS:
+        sort = 'name'
+    if sort == 'name_desc':
+        reviewees_qs = reviewees_qs.order_by('-name', 'pk')
+
     try:
-        per_page = int(per_page)
-        if per_page not in [25, 50, 100]:
+        per_page = int(request.GET.get('per_page', '25'))
+        if per_page not in (25, 50, 100):
             per_page = 25
     except (ValueError, TypeError):
         per_page = 25
 
-    # Latest completed report and its self-vs-others gap, one query per call.
     min_threshold = org.min_responses_for_anonymity if org else 3
 
     def load_reports(rows):
-        ids = [r.latest_report_id for r in rows if r.latest_report_id]
+        ids = [person.latest_report_id for person in rows if person.latest_report_id]
         return {
             report.id: (report, self_vs_others_gap(report.report_data, min_threshold))
             for report in Report.objects.filter(id__in=ids).select_related('cycle')
         }
 
     if sort == 'gap':
-        # ponytail: sorting across pages loads report_data for every reviewee in
-        # the org; fine at org scale, store the gap on Report if that grows.
+        # Preserve the existing across-page ordering and anonymity threshold.
         reviewees_qs = list(reviewees_qs)
         reports_by_id = load_reports(reviewees_qs)
-        gap_of = lambda r: reports_by_id.get(r.latest_report_id, (None, None))[1]
-        # Largest distance first (either direction); no gap last.
-        reviewees_qs.sort(key=lambda r: (gap_of(r) is None, -abs(gap_of(r) or 0)))
+        gap_of = lambda person: reports_by_id.get(person.latest_report_id, (None, None))[1]
+        reviewees_qs.sort(key=lambda person: (gap_of(person) is None, -abs(gap_of(person) or 0)))
 
-    # Paginate reviewees
-    paginator = Paginator(reviewees_qs, per_page)
-    page = request.GET.get('page')
-    try:
-        reviewees = paginator.page(page)
-    except PageNotAnInteger:
-        reviewees = paginator.page(1)
-    except EmptyPage:
-        reviewees = paginator.page(paginator.num_pages)
-
+    reviewees = Paginator(reviewees_qs, per_page).get_page(request.GET.get('page'))
     if sort != 'gap':
         reports_by_id = load_reports(reviewees)
 
-    # Get subscription status
-    subscription_status = get_subscription_status(org) if org else None
-
-    # Get available questionnaires for quick cycle creation
-    questionnaires = Questionnaire.objects.for_organization(org).filter(is_active=True).order_by('-is_default', 'name')
-
-    # Annotate each reviewee with their latest cycle info
+    questionnaires = list(Questionnaire.objects.for_organization(org).filter(
+        is_active=True).order_by('-is_default', 'name', 'pk'))
+    questionnaire_by_id = {item.id: item for item in questionnaires}
+    default_questionnaire = questionnaires[0] if questionnaires else None
+    cycle_ids = {cycle_id for person in reviewees
+                 for cycle_id in (person.latest_cycle_id, person.active_cycle_id) if cycle_id}
+    cycles_by_id = {
+        cycle.id: cycle for cycle in ReviewCycle.objects.filter(id__in=cycle_ids).select_related('questionnaire')
+    }
     reviewees_with_latest = []
-    for reviewee in reviewees:
-        latest_cycle = (
-            reviewee.review_cycles
-            .select_related('questionnaire')
-            .prefetch_related('questionnaire__sections__questions')
-            .order_by('-created_at')
-            .first()
-        )
-
-        # Get active cycle
-        active_cycle = reviewee.review_cycles.filter(status='active').order_by('-created_at').first()
-
-        latest_completed_report, gap = reports_by_id.get(reviewee.latest_report_id, (None, None))
-
+    for person in reviewees:
+        latest_cycle = cycles_by_id.get(person.latest_cycle_id)
+        latest_questionnaire = latest_cycle.questionnaire if latest_cycle else None
+        report, gap = reports_by_id.get(person.latest_report_id, (None, None))
         reviewees_with_latest.append({
-            'reviewee': reviewee,
-            'latest_questionnaire': latest_cycle.questionnaire if latest_cycle else None,
-            'active_cycle': active_cycle,
-            'latest_completed_report': latest_completed_report,
+            'reviewee': person,
+            'latest_questionnaire': latest_questionnaire,
+            'selected_questionnaire': questionnaire_by_id.get(
+                latest_questionnaire.id if latest_questionnaire else None, default_questionnaire),
+            'active_cycle': cycles_by_id.get(person.active_cycle_id),
+            'latest_completed_report': report,
             'gap': gap,
         })
 
-    context = {
+    return render(request, 'admin_dashboard/reviewee_list.html', {
         'reviewees_with_latest': reviewees_with_latest,
-        'reviewees': reviewees,  # Paginated object
+        'reviewees': reviewees,
         'questionnaires': questionnaires,
-        'subscription_status': subscription_status,
+        'subscription_status': get_subscription_status(org) if org else None,
         'per_page': per_page,
         'sort': sort,
-    }
-
-    return render(request, 'admin_dashboard/reviewee_list.html', context)
+        'sorts': REVIEWEE_SORTS.items(),
+        'q': q,
+        'department': department,
+        'departments': departments,
+        'questionnaire_filter': questionnaire_filter,
+        'used_questionnaires': used_questionnaires,
+        'stage': stage,
+        'stages': [(key, label, stage_counts[key]) for key, (label, _cond) in REVIEWEE_STAGES.items()],
+        'stage_counts': stage_counts,
+        'total_count': sum(stage_counts.values()),
+        'has_reviewees': has_reviewees,
+        'is_filtered': bool(q or department or questionnaire_filter or stage),
+    })
 
 
 @login_required
@@ -690,6 +739,7 @@ def questionnaire_list(request):
     # The languages it is translated into, at least in part
     for questionnaire in questionnaires:
         questionnaire.translation_states = [state for state in get_language_states(questionnaire) if state.translated]
+        questionnaire.report_features = questionnaire_report_features(questionnaire)
 
     # Archived ones are kept out of the way but stay reachable: their cycles
     # and reports still reference them, so they cannot simply disappear.
@@ -721,6 +771,11 @@ def questionnaire_preview(request, questionnaire_uuid):
         'sections': questionnaire.sections.all(),
         'preview_language': language,
     }
+
+    if request.GET.get('fragment') == 'questions':
+        response = render(request, 'admin_dashboard/partials/questionnaire_questions.html', context)
+        response['X-Questionnaire-Preview'] = 'questions'
+        return response
 
     return render(request, 'admin_dashboard/questionnaire_preview.html', context)
 
@@ -1422,6 +1477,26 @@ def question_dreyfus_config_api(request, question_id):
         return JsonResponse({'error': _('Internal server error')}, status=500)
 
 
+# Where a cycle stands, from its status and response counts. Together the
+# stages cover every cycle exactly once. Conditions use the token_count and
+# completed_count annotations of review_cycle_list.
+CYCLE_STAGES = {
+    'waiting': (gettext_lazy('No responses yet'), Q(status='active', completed_count=0)),
+    'in_progress': (gettext_lazy('In progress'),
+                    Q(status='active', completed_count__gt=0, completed_count__lt=F('token_count'))),
+    'all_responded': (gettext_lazy('All responded'),
+                      Q(status='active', completed_count__gt=0, completed_count=F('token_count'))),
+    'completed': (gettext_lazy('Completed'), Q(status='completed')),
+}
+
+CYCLE_SORTS = {
+    'newest': (gettext_lazy('Newest first'), ['-created_at']),
+    'oldest': (gettext_lazy('Oldest first'), ['created_at']),
+    'reviewee': (gettext_lazy('Reviewee A–Z'), ['reviewee__name']),
+    'fewest_responses': (gettext_lazy('Fewest responses'), ['completed_count']),
+}
+
+
 @login_required
 def review_cycle_list(request):
     """List all review cycles"""
@@ -1438,13 +1513,44 @@ def review_cycle_list(request):
         )
 
     cycles_qs = visible_cycles(request.user, cycles_qs)
+    # Questionnaires that occur in this user's cycles, archived ones included.
+    used_questionnaires = Questionnaire.objects.filter(
+        review_cycles__in=cycles_qs).distinct().order_by('name')
 
+    q = request.GET.get('q', '').strip()
+    if q:
+        cycles_qs = cycles_qs.filter(Q(reviewee__name__icontains=q) | Q(reviewee__email__icontains=q))
+    questionnaire_filter = request.GET.get('questionnaire', '')
+    if questionnaire_filter:
+        try:
+            cycles_qs = cycles_qs.filter(questionnaire__uuid=questionnaire_filter)
+        except ValidationError:
+            questionnaire_filter = ''
+
+    latest_questionnaire_id = ReviewCycle.objects.filter(
+        reviewee=OuterRef('reviewee'),
+    ).order_by('-created_at').values('questionnaire_id')[:1]
     cycles_qs = cycles_qs.prefetch_related(
         'questionnaire__sections__questions'
     ).annotate(
         token_count=Count('tokens'),
-        completed_count=Count('tokens', filter=Q(tokens__completed_at__isnull=False))
-    ).order_by('-created_at')
+        completed_count=Count('tokens', filter=Q(tokens__completed_at__isnull=False)),
+        latest_questionnaire_id=Subquery(latest_questionnaire_id),
+    )
+
+    # Counts follow the search and questionnaire filters, so each stage
+    # button shows what clicking it would give.
+    stage_counts = {stage: cycles_qs.filter(cond).count() for stage, (_label, cond) in CYCLE_STAGES.items()}
+    stage = request.GET.get('stage', '')
+    if stage in CYCLE_STAGES:
+        cycles_qs = cycles_qs.filter(CYCLE_STAGES[stage][1])
+    else:
+        stage = ''
+
+    sort = request.GET.get('sort', '')
+    if sort not in CYCLE_SORTS:
+        sort = 'newest'
+    cycles_qs = cycles_qs.order_by(*CYCLE_SORTS[sort][1], '-created_at')
 
     # Get per_page from request, default to 25
     per_page = request.GET.get('per_page', '25')
@@ -1468,20 +1574,19 @@ def review_cycle_list(request):
     # Get available questionnaires for quick cycle creation
     questionnaires = Questionnaire.objects.for_organization(org).filter(is_active=True).order_by('-is_default', 'name')
 
-    # Enhance cycles with latest questionnaire info for each reviewee
-    cycles_with_latest = []
-    for cycle in cycles:
-        latest_cycle = cycle.reviewee.review_cycles.select_related('questionnaire').order_by('-created_at').first()
-        cycles_with_latest.append({
-            'cycle': cycle,
-            'latest_questionnaire': latest_cycle.questionnaire if latest_cycle else None,
-        })
-
     context = {
-        'cycles_with_latest': cycles_with_latest,
         'cycles': cycles,  # Paginated object
         'questionnaires': questionnaires,
         'per_page': per_page,
+        'q': q,
+        'questionnaire_filter': questionnaire_filter,
+        'used_questionnaires': used_questionnaires,
+        'stage': stage,
+        'stages': [(key, label, stage_counts[key]) for key, (label, _cond) in CYCLE_STAGES.items()],
+        'total_count': sum(stage_counts.values()),
+        'sort': sort,
+        'sorts': [(key, label) for key, (label, _fields) in CYCLE_SORTS.items()],
+        'is_filtered': bool(q or questionnaire_filter or stage),
     }
 
     return render(request, 'admin_dashboard/review_cycle_list.html', context)

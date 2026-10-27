@@ -1,0 +1,33 @@
+{% load i18n %}
+<dialog id="profile-welcome-guide" class="modal-content profile-guide" aria-labelledby="profile-guide-title">
+    <div class="card-header">
+        <div>
+            <h2 class="card-title" id="profile-guide-title">{% trans 'Welcome to Blik' %}</h2>
+            <p class="help-text">{% trans 'Your 360-degree feedback platform' %}</p>
+        </div>
+        <form method="dialog">
+            <button class="btn btn-secondary profile-guide-close" aria-label="{% trans 'Close' context 'dismiss dialog' %}" autofocus>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"></path></svg>
+            </button>
+        </form>
+    </div>
+    <div class="card-body">
+        <h3>{% trans 'How Blik helps you:' %}</h3>
+        <ul class="profile-guide-benefits">
+            <li>{% trans 'Gather comprehensive feedback from peers, managers, and direct reports' %}</li>
+            <li>{% trans 'Maintain complete anonymity for honest, constructive input' %}</li>
+            <li>{% trans 'Generate actionable insights to drive professional growth' %}</li>
+        </ul>
+        <h3>{% trans 'Getting started is simple:' %}</h3>
+        <ol class="profile-guide-steps">
+            <li><div><strong>{% trans 'Add reviewees' %}</strong><p class="help-text">{% trans 'People who will receive 360° feedback' %}</p></div></li>
+            <li><div><strong>{% trans 'Create a review cycle' %}</strong><p class="help-text">{% trans 'Choose a questionnaire and invite reviewers' %}</p></div></li>
+            <li><div><strong>{% trans 'Share anonymous invite links' %}</strong><p class="help-text">{% trans 'Copy links and share directly, or optionally send via email' %}</p></div></li>
+            <li><div><strong>{% trans 'Review the report' %}</strong><p class="help-text">{% trans 'View aggregated insights and share with reviewees' %}</p></div></li>
+        </ol>
+    </div>
+    <div class="card-footer">
+        <form method="dialog"><button class="btn btn-secondary">{% trans 'Close' context 'dismiss dialog' %}</button></form>
+        <a href="{% url 'reviewee_create' %}" class="btn btn-primary">{% trans 'Get Started' %}</a>
+    </div>
+</dialog>

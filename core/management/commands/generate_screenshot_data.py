@@ -251,6 +251,11 @@ class Command(BaseCommand):
         completed_token = ReviewerToken.objects.filter(
             category='peer', completed_at__isnull=False, cycle__status='active'
         ).first()
+        # A fresh link for the form in the reviewer's own language: a token keeps
+        # the language of its first visit, so it cannot share one with the others.
+        translated_token = ReviewerToken.objects.filter(
+            category='peer', completed_at__isnull=True, cycle__status='active', language='',
+        ).exclude(token=feedback_token_for_screenshots).first()
 
         # Output JSON for screenshot script
         output_data = {
@@ -266,7 +271,9 @@ class Command(BaseCommand):
             'feedback_token': feedback_token_for_screenshots,
             'self_feedback_token': str(self_token.token) if self_token else None,
             'completed_feedback_token': str(completed_token.token) if completed_token else None,
+            'translated_feedback_token': str(translated_token.token) if translated_token else None,
             'questionnaire_id': default_questionnaire.id,
+            'questionnaire_uuid': str(default_questionnaire.uuid),
             'team_count': len(team_members) + 1,
             'base_url': 'http://localhost:8000'
         }

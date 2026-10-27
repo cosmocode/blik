@@ -448,7 +448,10 @@
         </div>
         {% endif %}
         {% else %}
-        <p style="color: var(--text-secondary); text-align: center; padding: 2rem 0;">{% trans 'No reviewers invited yet.' %} <a href="{% url 'manage_invitations' cycle.uuid %}">{% trans 'Invite reviewers' %}</a></p>
+        <div class="empty-state">
+            <p style="margin-bottom: 1rem;">{% trans 'No reviewers invited yet.' %}</p>
+            <a href="{% url 'manage_invitations' cycle.uuid %}" class="btn btn-primary">{% trans 'Invite reviewers' %}</a>
+        </div>
         {% endif %}
 {% if cycle.status == 'completed' %}
     </div>

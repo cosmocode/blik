@@ -142,10 +142,16 @@ See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for complete environment variable d
 git clone https://github.com/thijsdezoete/blik.git
 cd blik
 cp .env.example .env
-docker compose up -d --build
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
 ```
 
 Unlike the standalone `docker run` example above, this Docker Compose setup uses PostgreSQL by default because [`docker-compose.yml`](docker-compose.yml) starts both `web` and `db` services and sets `DATABASE_TYPE=postgres`.
+
+The development override serves the app on localhost and reloads Python, templates,
+and source assets inside the container. It keeps the same PostgreSQL data volume.
+Use it while editing or merging branches: the base Compose file uses long-running
+Gunicorn workers, whose code and cached templates require a coordinated restart.
+Production continues to use the base Compose file and `blik.settings`.
 
 Check that the web container is healthy:
 

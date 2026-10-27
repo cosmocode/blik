@@ -183,6 +183,30 @@ STEPS = [
         },
     },
     {
+        "slug": "language",
+        "act": "round",
+        "title": "Each reviewer reads it in their own language",
+        "lead": "When a questionnaire is fully translated, each reviewer sees it in their own language. Blik takes the language from their browser. Nobody has to choose.",
+        "points": [
+            "The four questionnaires that come with Blik are fully translated into German, formal and informal.",
+            "Translate your own questionnaires next to the original. Blik shows which texts are missing or out of date.",
+            "The self-assessment uses the language set for the reviewee.",
+            "A reviewer can change the language on the form. Reminders then go out in that language.",
+            "A text without a translation shows in the original language.",
+        ],
+        "media": [
+            {"kind": "phone", "shot": "feedback_translated_mobile",
+             "alt": "A reviewer with a German browser sees the questionnaire in German"},
+            {"kind": "browser", "shot": "questionnaire_translate_desktop",
+             "alt": "Translating a questionnaire into German, next to the English original"},
+        ],
+        "visibility": {
+            "admin": _see("How far each questionnaire is translated, per language.", ""),
+            "reviewee": _see("Their self-assessment in their own language.", ""),
+            "reviewers": _see("The questionnaire in their own language.", ""),
+        },
+    },
+    {
         "slug": "report",
         "act": "result",
         "title": "The report",

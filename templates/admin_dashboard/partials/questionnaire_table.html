@@ -1,0 +1,95 @@
+{% load i18n %}
+<div class="table-wrapper" role="region" aria-label="{% if archived %}{% trans 'Archived' %}{% else %}{% trans 'Questionnaires' %}{% endif %}" tabindex="0">
+    <table class="table questionnaire-table" aria-label="{% if archived %}{% trans 'Archived' %}{% else %}{% trans 'Questionnaires' %}{% endif %}">
+        <thead>
+            <tr>
+                <th scope="col">{% trans 'Questionnaire' %}</th>
+                <th scope="col">{% trans 'Report includes' %}</th>
+                <th scope="col" class="questionnaire-count">{% trans 'Questions' %}</th>
+                <th scope="col">{% trans 'Usage' %}</th>
+                <th scope="col" class="questionnaire-actions-heading">{% trans 'Actions' %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for questionnaire in items %}
+            <tr>
+                <td class="questionnaire-details">
+                    <div class="flex flex-wrap items-center gap-sm">
+                        <a href="{% url 'questionnaire_preview' questionnaire.uuid %}" class="questionnaire-name" data-questionnaire-dialog="questionnaire-{{ questionnaire.uuid }}" aria-haspopup="dialog">
+                            {{ questionnaire.name }}
+                        </a>
+                        {% if questionnaire.is_default %}
+                        <span class="badge badge-success" title="{% trans 'The default choice when no other questionnaire is selected.' %}">{% trans 'Default' %}</span>
+                        {% endif %}
+                    </div>
+                    {% if questionnaire.description %}<p class="help-text questionnaire-purpose">{{ questionnaire.description }}</p>{% endif %}
+                </td>
+                <td>
+                    {% if questionnaire.report_features %}
+                    <button type="button" class="questionnaire-report-trigger" popovertarget="questionnaire-report-{{ questionnaire.uuid }}" aria-label="{% trans 'Report details' %}: {{ questionnaire.name }}">
+                        <span class="questionnaire-report-icons" aria-hidden="true">
+                            {% for feature in questionnaire.report_features %}
+                            {% include 'admin_dashboard/partials/questionnaire_feature_icon.html' %}
+                            {% endfor %}
+                        </span>
+                        <span class="questionnaire-report-label">
+                            {% trans 'Report details' %}
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                        </span>
+                    </button>
+                    <div id="questionnaire-report-{{ questionnaire.uuid }}" class="questionnaire-report-popover" popover="auto" tabindex="0" role="region" aria-labelledby="questionnaire-report-title-{{ questionnaire.uuid }}">
+                        <h3 id="questionnaire-report-title-{{ questionnaire.uuid }}" class="card-title">{% trans 'Report includes' %}</h3>
+                        <p class="help-text">{{ questionnaire.name }}</p>
+                        <ul class="questionnaire-feature-descriptions">
+                            {% for feature in questionnaire.report_features %}
+                            <li>{% include 'admin_dashboard/partials/questionnaire_feature_icon.html' %}<div><strong>{{ feature.label }}</strong><p class="help-text">{{ feature.description }}</p></div></li>
+                            {% endfor %}
+                        </ul>
+                        {% if not archived %}
+                        <a href="{% url 'questionnaire_sample_report' questionnaire.uuid %}" class="questionnaire-report-link">{% trans 'Example Report' %} <span aria-hidden="true">&rarr;</span></a>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <span class="help-text">{% if questionnaire.question_count %}{% trans 'Question results' %}{% else %}—{% endif %}</span>
+                    {% endif %}
+                </td>
+                <td class="questionnaire-count">{{ questionnaire.question_count|default_if_none:0 }}</td>
+                <td class="questionnaire-usage">
+                    {% if questionnaire.cycle_count %}
+                    {% blocktrans trimmed count counter=questionnaire.cycle_count %}{{ counter }} review cycle{% plural %}{{ counter }} review cycles{% endblocktrans %}
+                    {% else %}<span class="help-text">{% trans 'Not used yet' %}</span>{% endif %}
+                </td>
+                <td>
+                    <div class="questionnaire-actions flex items-center gap-sm">
+                        <a href="{% url 'questionnaire_preview' questionnaire.uuid %}" class="btn btn-sm btn-primary" data-questionnaire-dialog="questionnaire-{{ questionnaire.uuid }}" aria-haspopup="dialog">{% trans 'Preview Questions' %}</a>
+                        {% if archived %}
+                            {% if perms.accounts.can_manage_questionnaires %}
+                            <form method="post" action="{% url 'questionnaire_restore' questionnaire.uuid %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-secondary">{% trans 'Restore' %}</button>
+                            </form>
+                            {% endif %}
+                        {% else %}
+                            <button type="button" class="btn btn-sm btn-secondary questionnaire-more" popovertarget="questionnaire-actions-{{ questionnaire.uuid }}" aria-label="{% trans 'Actions' %}: {{ questionnaire.name }}" title="{% trans 'Actions' %}">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg>
+                            </button>
+                            <div id="questionnaire-actions-{{ questionnaire.uuid }}" class="questionnaire-menu" popover="auto" aria-label="{% trans 'Actions' %}: {{ questionnaire.name }}">
+                                <a href="{% url 'questionnaire_sample_report' questionnaire.uuid %}">{% trans 'Example Report' %}</a>
+                                {% if perms.accounts.can_manage_questionnaires %}
+                                <a href="{% url 'questionnaire_edit' questionnaire.uuid %}">{% trans 'Edit' %}</a>
+                                <a href="{% url 'questionnaire_delete' questionnaire.uuid %}" class="questionnaire-menu-last{% if not questionnaire.cycle_count %} questionnaire-menu-danger{% endif %}">
+                                    {% if questionnaire.cycle_count %}{% trans 'Archive' %}{% else %}{% trans 'Delete' %}{% endif %}
+                                </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% for questionnaire in items %}
+{% include 'admin_dashboard/partials/questionnaire_dialog.html' %}
+{% endfor %}

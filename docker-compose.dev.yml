@@ -1,0 +1,11 @@
+# Use with: docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+# Keep the existing PostgreSQL service and volume, but reload local code/templates.
+services:
+  web:
+    command: sh -c "python manage.py runserver 0.0.0.0:$${PORT:-8000}"
+    environment:
+      DJANGO_SETTINGS_MODULE: blik.settings_dev
+      DEBUG: "True"
+      ALLOWED_HOSTS: localhost,127.0.0.1,[::1]
+    ports: !override
+      - "127.0.0.1:${PORT:-8000}:${PORT:-8000}"

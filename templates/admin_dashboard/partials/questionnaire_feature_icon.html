@@ -1,0 +1,14 @@
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    {% if feature.key == 'radar' %}
+    <path d="M12 2 22 9 18 21H6L2 9Z"></path><path d="m12 7 6 4-3 6H8l-2-6Z"></path><path d="M12 2v5m10 2-4 2m0 10-3-4M6 21l2-4M2 9l4 2"></path>
+    {% elif feature.key == 'dreyfus' %}
+    {# Simplified brilliant-cut gemstone from the Dreyfus diagram's Expert stage. #}
+    <path d="M7 4h10l5 6-10 11L2 10Z"></path><path d="M2 10h20M7 4l1 6 4 11 4-11 1-6M8 10l4-6 4 6"></path>
+    {% elif feature.key == 'agency' %}
+    <path d="M4 20h5v-5h5v-5h6M14 4h6v6"></path><path d="m5 12 15-8"></path>
+    {% elif feature.key == 'distribution' %}
+    <path d="M4 4v16h16"></path><path d="M8 16V9m5 7V5m5 11v-4"></path>
+    {% else %}
+    <path d="M4 4h16v12H9l-5 4Z"></path><path d="M8 8h8M8 12h5"></path>
+    {% endif %}
+</svg>

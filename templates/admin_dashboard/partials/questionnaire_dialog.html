@@ -1,0 +1,58 @@
+{% load i18n %}
+<dialog id="questionnaire-{{ questionnaire.uuid }}" class="modal-content questionnaire-dialog" aria-labelledby="questionnaire-title-{{ questionnaire.uuid }}" data-preview-url="{% url 'questionnaire_preview' questionnaire.uuid %}">
+    <div class="questionnaire-dialog-header flex justify-between items-center gap-sm">
+        <div>
+            <h2 id="questionnaire-title-{{ questionnaire.uuid }}" class="card-title">{{ questionnaire.name }}</h2>
+            <p class="help-text">{% blocktrans trimmed count counter=questionnaire.question_count|default_if_none:0 %}{{ counter }} question{% plural %}{{ counter }} questions{% endblocktrans %}</p>
+        </div>
+        <form method="dialog">
+            <button class="btn btn-sm btn-secondary" aria-label="{% trans 'Close' %}" autofocus>&times;</button>
+        </form>
+    </div>
+    <div class="questionnaire-dialog-body">
+        {% if questionnaire.description %}<p class="questionnaire-dialog-description mb-1">{{ questionnaire.description }}</p>{% endif %}
+        <details class="questionnaire-report-details mb-1">
+            <summary>{% trans 'About this questionnaire' %}</summary>
+            {% if questionnaire.report_features %}
+            <h3 class="card-title mt-1">{% trans 'Report includes' %}</h3>
+            <ul class="questionnaire-feature-descriptions">
+                {% for feature in questionnaire.report_features %}
+                <li>{% include 'admin_dashboard/partials/questionnaire_feature_icon.html' %}<div><strong>{{ feature.label }}</strong><p class="help-text">{{ feature.description }}</p></div></li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            <h3 class="card-title mt-1">{% trans 'Language' %}</h3>
+            <p class="help-text">{% for code, name in LANGUAGES %}{% if code == questionnaire.source_language %}{{ name }}{% endif %}{% endfor %}</p>
+            {% if questionnaire.translation_states %}
+            <h3 class="card-title mt-1">{% trans 'Translations' %}</h3>
+            <ul class="questionnaire-translations mt-1">
+                {% for state in questionnaire.translation_states %}
+                <li class="flex flex-wrap justify-between items-center gap-sm">
+                    <span>{{ state.name }}:</span>
+                    <span class="badge {% if state.missing or state.outdated %}badge-warning{% else %}badge-success{% endif %}">{% include 'admin_dashboard/partials/translation_state.html' %}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </details>
+        <div class="flex flex-wrap justify-between items-center gap-sm mb-1">
+            <h3 class="card-title">{% trans 'Questions' %}</h3>
+            <div class="flex items-center gap-sm">
+                <label for="preview-language-{{ questionnaire.uuid }}" class="help-text">{% trans 'Preview language' %}</label>
+                <select id="preview-language-{{ questionnaire.uuid }}" class="form-control questionnaire-preview-language">
+                    {% for code, name in LANGUAGES %}<option value="{{ code }}" {% if code == questionnaire.source_language %}selected{% endif %}>{{ name }}</option>{% endfor %}
+                </select>
+            </div>
+        </div>
+        <p class="help-text" data-preview-loading role="status">{% trans 'Loading questions…' %}</p>
+        <div class="alert alert-error" data-preview-error role="alert" hidden>
+            <p>{% trans 'The questions could not be loaded. Please try again.' %}</p>
+            <button type="button" class="btn btn-sm btn-secondary mt-1" data-preview-retry>{% trans 'Try again' %}</button>
+        </div>
+        <div data-preview-content aria-live="polite" aria-busy="false"></div>
+    </div>
+    <div class="questionnaire-dialog-footer flex flex-wrap justify-between items-center gap-sm">
+        <a href="{% url 'questionnaire_preview' questionnaire.uuid %}" class="btn btn-secondary" data-full-preview>{% trans 'Open full preview' %}</a>
+        {% if not archived %}<a href="{% url 'questionnaire_sample_report' questionnaire.uuid %}" class="btn btn-primary">{% trans 'Example Report' %}</a>{% endif %}
+    </div>
+</dialog>

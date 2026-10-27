@@ -473,6 +473,13 @@ class Command(BaseCommand):
                     'theme': 'light',
                     'wait_for': '#inviteForm',
                 },
+                {
+                    'name': 'invitations_desktop_dark',
+                    'url': f'{base_url}/dashboard/cycles/{config["partial_cycle_uuid"]}/invitations/',
+                    'viewport': {'width': 1920, 'height': 1080},
+                    'theme': 'dark',
+                    'wait_for': '#inviteForm',
+                },
             ])
 
             # "How Blik works" flow: sign up, configure, add reviewees, start a cycle
@@ -480,15 +487,51 @@ class Command(BaseCommand):
                 ('signup_desktop', '/landing/signup/', '.plans-grid', {}),
                 ('questionnaires_desktop', '/dashboard/questionnaires/', 'table', {}),
                 ('questionnaire_edit_desktop',
-                 f'/dashboard/questionnaires/{config.get("questionnaire_id")}/edit/', 'form', {}),
+                 f'/dashboard/questionnaires/{config.get("questionnaire_id")}/edit/', '.container form', {}),
+                ('questionnaire_translate_desktop',
+                 f'/dashboard/questionnaires/{config.get("questionnaire_uuid")}/translate/de/', '.container form', {}),
                 ('reviewees_desktop', '/dashboard/reviewees/', 'table', {}),
-                # Slot for the self-vs-others gap column (built separately). Skipped
-                # until the reviewee overview renders an element matching skip_unless.
+                # Sorting by gap switches on the self-vs-others column; skipped if
+                # the column is not shown.
                 ('reviewees_gap_desktop', '/dashboard/reviewees/?sort=gap', 'table',
-                 {'skip_unless': '[data-gap-column]'}),
+                 {'skip_unless': '[data-reviewee-column="gap"]:not([hidden])'}),
                 ('cycle_create_desktop', '/dashboard/cycles/create/', '#cycleForm',
                  {'prepare_js': CYCLE_FORM_JS, 'viewport': {'width': 1920, 'height': 1600}}),
             ]
+            # Homepage "How it works" cards: one element per step, see _focus_clip()
+            report_tokens = list(config.get('report_tokens', {}).values())
+            step_cards = [
+                ('step_people', '/dashboard/cycles/create/', '.card:has(#reviewee)',
+                 {'prepare_js': CYCLE_FORM_JS}),
+                ('step_answer', f'/feedback/{config.get("feedback_token")}/', '.section',
+                 {}),
+                ('step_report', f'/my-report/{report_tokens[0]}/' if report_tokens else None,
+                 '.report-section:has(#sectionRadarChart)', {}),
+            ]
+            # Homepage hero: the report summary in a browser frame, and a phone
+            # answering a question on top of it
+            step_cards += [
+                ('hero_report', step_cards[2][1], '#overall-performance',
+                 {'focus_options': {'aspect': 16 / 10}}),
+                ('hero_phone', step_cards[1][1], '.section',
+                 {'viewport': {'width': 390, 'height': 844},
+                  'focus_options': {'padding': 16, 'aspect': 390 / 720}}),
+            ]
+            for name, path, focus, extra in step_cards:
+                if not path:
+                    continue
+                for theme in ('light', 'dark'):
+                    screenshot_configs.append({
+                        'name': f'{name}_{theme}',
+                        'url': f'{base_url}{path}',
+                        'viewport': {'width': 1000, 'height': 1000},
+                        'scale': 2,
+                        'theme': theme,
+                        'wait_for': focus,
+                        'focus': focus,
+                        **extra,
+                    })
+
             for name, path, wait_for, extra in flow_pages:
                 for theme in ('light', 'dark'):
                     screenshot_configs.append({
@@ -520,7 +563,7 @@ class Command(BaseCommand):
                 # Create new page with viewport
                 page = await browser.new_page(
                     viewport=screenshot_config['viewport'],
-                    device_scale_factor=1  # No scaling for crisp screenshots
+                    device_scale_factor=screenshot_config.get('scale', 1),
                 )
 
                 # Add cookies
@@ -643,7 +686,9 @@ class Command(BaseCommand):
                 await page.screenshot(
                     path=str(output_file),
                     full_page=False,  # Viewport only
-                    type='png'
+                    type='png',
+                    clip=await self._focus_clip(page, screenshot_config.get('focus'),
+                                                **screenshot_config.get('focus_options', {})),
                 )
 
                 self.stdout.write(self.style.SUCCESS(f'  ✓ Saved: {output_file}'))
@@ -690,12 +735,14 @@ class Command(BaseCommand):
                     },
                 ]
 
-                # Reviewee self-assessment and the reviewer thank-you page
+                # Reviewee self-assessment, the reviewer thank-you page, and the form
+                # opened by a German browser (the questionnaire is translated)
                 public_pages = [
-                    ('self_assessment', config.get('self_feedback_token'), 'form'),
-                    ('feedback_complete', config.get('completed_feedback_token'), 'body'),
+                    ('self_assessment', config.get('self_feedback_token'), 'form', None),
+                    ('feedback_complete', config.get('completed_feedback_token'), 'body', None),
+                    ('feedback_translated', config.get('translated_feedback_token'), 'form', 'de-DE'),
                 ]
-                for name, token, wait_for in public_pages:
+                for name, token, wait_for, locale in public_pages:
                     if not token:
                         continue
                     for device, viewport in (('desktop', {'width': 1920, 'height': 1080}),
@@ -707,6 +754,7 @@ class Command(BaseCommand):
                                 'viewport': viewport,
                                 'theme': theme,
                                 'wait_for': wait_for,
+                                'locale': locale,
                             })
                 feedback_configs = self._filter(feedback_configs)
 
@@ -718,7 +766,8 @@ class Command(BaseCommand):
 
                     page = await browser.new_page(
                         viewport=screenshot_config['viewport'],
-                        device_scale_factor=1
+                        device_scale_factor=1,
+                        locale=screenshot_config.get('locale'),
                     )
 
                     await page.add_init_script(f'''
@@ -752,6 +801,25 @@ class Command(BaseCommand):
             await self._capture_emails(browser, output_path)
 
             await browser.close()
+
+    async def _focus_clip(self, page, selector, padding=32, top=16, aspect=4 / 3):
+        """
+        A clip around one element: padded at the sides, cut to aspect, with the
+        element's top near the top. Floating controls (fixed elements) are hidden.
+        None (the whole viewport) without a selector. top stays below the usual
+        1.5rem gap between cards, so the card above does not show.
+        """
+        if not selector:
+            return None
+        element = page.locator(selector).first
+        await page.evaluate("""() => document.querySelectorAll('body *').forEach(el => {
+            if (getComputedStyle(el).position === 'fixed') el.style.visibility = 'hidden';
+        })""")
+        await element.evaluate(f'el => window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - {top})')
+        await page.wait_for_timeout(300)
+        box = await element.bounding_box()
+        width = box['width'] + 2 * padding
+        return {'x': max(box['x'] - padding, 0), 'y': max(box['y'] - top, 0), 'width': width, 'height': width / aspect}
 
     def _filter(self, configs):
         if not self.only:

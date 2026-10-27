@@ -1,321 +1,165 @@
 {% extends "admin_dashboard/base.html" %}
-{% load i18n %}
-
+{% load i18n static %}
 {% block title %}{% trans 'Reviewees' %}{% endblock %}
-
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/reviewees.css' %}">{% endblock %}
 {% block content %}
 <div class="page-header">
     <div>
         <h1>{% trans 'Reviewees' %}</h1>
-        <p>{% trans 'Manage people who receive 360-degree feedback' %}</p>
+        <p>{% trans 'Find people, follow their feedback, and plan the next review.' %}</p>
         {% if subscription_status.has_subscription %}
-        <p style="font-size: 0.875rem; color: {% if subscription_status.reviewees_remaining <= 5 %}#ef4444{% else %}#64748b{% endif %}; margin-top: 0.25rem;">
-            {% blocktrans trimmed with current=subscription_status.current_reviewees max=subscription_status.max_employees remaining=subscription_status.reviewees_remaining %}
-            {{ current }} / {{ max }} reviewees
-            ({{ remaining }} remaining)
-            {% endblocktrans %}
-        </p>
+        <p class="help-text">{% blocktrans trimmed with current=subscription_status.current_reviewees max=subscription_status.max_employees remaining=subscription_status.reviewees_remaining %}{{ current }} / {{ max }} reviewees ({{ remaining }} remaining){% endblocktrans %}</p>
         {% endif %}
     </div>
-    {% if perms.accounts.can_manage_organization %}
-    <a href="{% url 'reviewee_create' %}" class="btn btn-primary">{% trans 'Add Reviewee' %}</a>
-    {% else %}
-    <a href="{% url 'reviewee_create' %}" class="btn btn-primary">{% trans 'Add Myself' %}</a>
-    {% endif %}
+    <a href="{% url 'reviewee_create' %}" class="btn btn-primary">{% if perms.accounts.can_manage_organization %}{% trans 'Add Reviewee' %}{% else %}{% trans 'Add Myself' %}{% endif %}</a>
 </div>
 
-{% if reviewees %}
-<div class="card">
-    <div class="card-body">
-        <div class="table-wrapper">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>{% trans 'Name' %}</th>
-                    <th>{% trans 'Email' %}</th>
-                    <th>{% trans 'Questionnaire' %}</th>
-                    <th>{% trans 'Review Cycles' %}</th>
-                    <th data-gap-column title="{% trans 'Self-assessment minus the average of other reviewers, latest completed report' %}">
-                        {% if sort == 'gap' %}
-                        <a href="?per_page={{ per_page }}" class="sort-link">{% trans "Self vs others" %} ▾</a>
-                        {% else %}
-                        <a href="?sort=gap&per_page={{ per_page }}" class="sort-link" title="{% trans 'Sort by largest gap' %}">{% trans "Self vs others" %}</a>
-                        {% endif %}
-                    </th>
-                    <th style="text-align: right;">{% trans 'Actions' %}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in reviewees_with_latest %}
-                <tr>
-                    <td>
-                        {% if item.active_cycle %}
-                            <a href="{% url 'review_cycle_detail' item.active_cycle.uuid %}" class="reviewee-name-link">{{ item.reviewee.name }}</a>
-                        {% elif item.latest_completed_report %}
-                            <a href="{% url 'reports:view_report' item.latest_completed_report.cycle.uuid %}" class="reviewee-name-link">{{ item.reviewee.name }}</a>
-                        {% else %}
-                            <span class="reviewee-name">{{ item.reviewee.name }}</span>
-                        {% endif %}
-                    </td>
-                    <td style="color: var(--text-secondary);">{{ item.reviewee.email }}</td>
-                    <td>
-                        {% if item.latest_questionnaire %}
-                        <div style="font-weight: 500;">{{ item.latest_questionnaire.name }}</div>
-                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.125rem;">{{ item.latest_questionnaire.report_type_label }}</div>
-                        {% else %}
-                        <span style="color: #cbd5e1;">—</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            {% if item.reviewee.cycle_count > 0 %}
-                            <span class="badge badge-info">{{ item.reviewee.cycle_count }}</span>
-                            {% else %}
-                            <span style="color: #cbd5e1;">—</span>
-                            {% endif %}
-
-                            {% if item.active_cycle %}
-                            <a href="{% url 'review_cycle_detail' item.active_cycle.uuid %}" class="badge badge-success" style="text-decoration: none; cursor: pointer;">{% trans 'Active' %}</a>
-                            {% endif %}
-
-                            {% if item.latest_completed_report %}
-                            <a href="{% url 'reports:view_report' item.latest_completed_report.cycle.uuid %}" class="btn btn-sm btn-secondary" style="text-decoration: none; cursor: pointer;">{% trans 'Report' %}</a>
-                            {% endif %}
-                        </div>
-                    </td>
-                    <td>
-                        {% if item.gap is None %}
-                        <span style="color: #cbd5e1;">—</span>
-                        {% else %}
-                        <div style="font-weight: 500;">{% if item.gap > 0 %}+{% endif %}{{ item.gap|floatformat:2 }}</div>
-                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.125rem;">
-                            {% if item.gap > 0 %}{% trans "Rates self higher than others" %}{% elif item.gap < 0 %}{% trans "Rates self lower than others" %}{% else %}{% trans "Same as others" %}{% endif %}
-                        </div>
-                        {% endif %}
-                    </td>
-                    <td style="text-align: right;">
-                        {% if perms.accounts.can_manage_organization %}
-                        <div style="display: inline-flex; gap: 0.5rem; align-items: center; justify-content: flex-end;">
-                            {% if item.active_cycle %}
-                            <a href="{% url 'review_cycle_detail' item.active_cycle.uuid %}" class="btn btn-sm btn-secondary">{% trans 'View Cycle' %}</a>
-                            {% endif %}
-
-                            <!-- Split button: New Cycle (main action) + dropdown for other questionnaires -->
-                            <div class="btn-group" style="position: relative; display: inline-flex;">
-                                <!-- Main action button: Create cycle with last-used or default questionnaire -->
-                                <form method="POST" action="{% url 'quick_cycle_create' item.reviewee.uuid %}" style="margin: 0; display: inline;">
-                                    {% csrf_token %}
-                                    {% if item.latest_questionnaire %}
-                                    <input type="hidden" name="questionnaire_id" value="{{ item.latest_questionnaire.id }}">
-                                    {% else %}
-                                    {% for q in questionnaires %}
-                                        {% if q.is_default %}
-                                        <input type="hidden" name="questionnaire_id" value="{{ q.id }}">
-                                        {% endif %}
-                                    {% endfor %}
-                                    {% endif %}
-                                    <button type="submit" class="btn btn-sm btn-primary" style="border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: 1px solid rgba(255,255,255,0.3);">
-                                        {% trans 'New Cycle' %}
-                                    </button>
-                                </form>
-
-                                <!-- Dropdown toggle button -->
-                                <button
-                                    class="btn btn-sm btn-primary"
-                                    type="button"
-                                    data-toggle="cycle-{{ item.reviewee.id }}"
-                                    style="border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 0.25rem 0.5rem; border-left: 1px solid rgba(255,255,255,0.3);"
-                                    title="{% trans 'Select different questionnaire' %}"
-                                >
-                                    ▾
-                                </button>
-
-                                <!-- Dropdown menu with fixed positioning -->
-                                <div class="dropdown-menu" id="cycle-{{ item.reviewee.id }}" style="display: none; position: fixed; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); min-width: 300px; z-index: 9999; margin-top: 0.25rem;">
-                                    <div style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); background: var(--bg-light);">
-                                        <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary); margin-bottom: 0.25rem;">
-                                            {% trans 'Select Questionnaire' %}
-                                        </div>
-                                        <div style="font-size: 0.75rem; color: var(--text-secondary);">
-                                            <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-                                                {% trans '✓ = Quick create (button action)' %}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    {% for q in questionnaires %}
-                                    {% if item.latest_questionnaire and item.latest_questionnaire.id == q.id or not item.latest_questionnaire and q.is_default %}
-                                        {# This is the questionnaire that will be used for quick create #}
-                                        <form method="POST" action="{% url 'quick_cycle_create' item.reviewee.uuid %}" style="margin: 0;">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="questionnaire_id" value="{{ q.id }}">
-                                            <button type="submit" class="dropdown-item" style="width: 100%; text-align: left; padding: 0.625rem 1rem; border: none; background: none; cursor: pointer; font-size: 0.875rem; display: flex; justify-content: space-between; align-items: center; transition: background 0.15s; color: var(--text-primary); border-left: 3px solid var(--primary);">
-                                                <span style="flex: 1; padding-right: 0.5rem; font-weight: 500;">{{ q.name }}</span>
-                                                <span class="badge badge-primary" style="font-size: 0.75rem; background: var(--primary); color: white; display: inline-flex; align-items: center; gap: 0.25rem;">
-                                                    <span>✓</span>
-                                                    <span>{% trans 'Quick create' %}</span>
-                                                </span>
-                                            </button>
-                                        </form>
-                                    {% else %}
-                                        <form method="POST" action="{% url 'quick_cycle_create' item.reviewee.uuid %}" style="margin: 0;">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="questionnaire_id" value="{{ q.id }}">
-                                            <button type="submit" class="dropdown-item" style="width: 100%; text-align: left; padding: 0.625rem 1rem; border: none; background: none; cursor: pointer; font-size: 0.875rem; display: flex; justify-content: space-between; align-items: center; transition: background 0.15s; color: var(--text-primary);">
-                                                <span style="flex: 1; padding-right: 0.5rem;">{{ q.name }}</span>
-                                                {% if q.is_default %}
-                                                <span class="badge badge-secondary" style="font-size: 0.75rem;">{% trans 'Default' %}</span>
-                                                {% endif %}
-                                            </button>
-                                        </form>
-                                    {% endif %}
-                                    {% endfor %}
-                                </div>
-                            </div>
-
-                            <a href="{% url 'reviewee_edit' item.reviewee.uuid %}" class="btn btn-sm btn-secondary">{% trans 'Edit' %}</a>
-                            <a href="{% url 'reviewee_delete' item.reviewee.uuid %}" class="btn btn-sm btn-danger">{% trans 'Delete' %}</a>
-                        </div>
-                        {% else %}
-                        <span style="color: #cbd5e1;">—</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+{% if has_reviewees or is_filtered %}
+<div class="card reviewees-overview" data-sort="{{ sort }}">
+    <form id="reviewee-filters" method="get" class="list-filters">
+        <nav class="stage-tabs" aria-label="{% trans 'Filter by review status' %}">
+            <a href="{% querystring stage=None page=None %}" class="stage-tab"{% if not stage %} aria-current="true"{% endif %}>{% trans 'All people' %} <span>{{ total_count }}</span></a>
+            {% for key, label, count in stages %}
+            <a href="{% querystring stage=key page=None %}" class="stage-tab"{% if stage == key %} aria-current="true"{% endif %}>{{ label }} <span>{{ count }}</span></a>
+            {% endfor %}
+        </nav>
+        {% if stage %}<input type="hidden" name="stage" value="{{ stage }}">{% endif %}
+        <div class="list-filter-fields">
+            <input id="reviewee-search" type="search" name="q" value="{{ q }}" class="form-control" placeholder="{% trans 'Name, email or department' %}" aria-label="{% trans 'Find a person' %}">
+            {% if departments %}
+            <select name="department" class="form-control" aria-label="{% trans 'Department' %}" data-submit-filter>
+                <option value="">{% trans 'All departments' %}</option>
+                {% for option in departments %}<option value="{{ option }}"{% if option == department %} selected{% endif %}>{{ option }}</option>{% endfor %}
+            </select>
+            {% endif %}
+            <select name="questionnaire" class="form-control" aria-label="{% trans 'Latest questionnaire' %}" data-submit-filter>
+                <option value="">{% trans 'All questionnaires' %}</option>
+                {% for option in used_questionnaires %}<option value="{{ option.uuid }}"{% if questionnaire_filter == option.uuid|stringformat:'s' %} selected{% endif %}>{{ option.name }}</option>{% endfor %}
+            </select>
+            <select name="sort" class="form-control" aria-label="{% trans 'Sort' %}" data-submit-filter>
+                {% for key, label in sorts %}<option value="{{ key }}"{% if key == sort %} selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+            <button type="button" class="btn btn-sm btn-secondary" popovertarget="reviewee-columns" data-reviewee-popover>{% trans 'Columns' %}</button>
+            {% if is_filtered %}<a href="{% querystring q=None department=None questionnaire=None stage=None page=None %}" class="btn btn-sm btn-secondary">{% trans 'Clear filters' %}</a>{% endif %}
         </div>
+    </form>
+
+    <div id="reviewee-columns" class="reviewee-popover" popover="auto" aria-labelledby="reviewee-columns-title">
+        <h2 class="card-title" id="reviewee-columns-title">{% trans 'Columns' %}</h2>
+        <p class="help-text">{% trans 'Choose the details you want to see.' %}</p>
+        <label class="reviewee-column-option"><input type="checkbox" data-column-toggle="questionnaire" checked> {% trans 'Latest questionnaire' %}</label>
+        <label class="reviewee-column-option"><input type="checkbox" data-column-toggle="department"> {% trans 'Department' %}</label>
+        <label class="reviewee-column-option"><input type="checkbox" data-column-toggle="gap"> {% trans 'Self vs others' %}</label>
+    </div>
+    <div id="reviewee-gap-help" class="reviewee-popover reviewee-gap-help" popover="auto" tabindex="0" role="region" aria-labelledby="reviewee-gap-title">
+        <h2 class="card-title" id="reviewee-gap-title">{% trans 'Self vs others' %}</h2>
+        <p class="help-text">{% trans 'Compares self-assessment with the average of other reviewers in the latest completed report.' %}</p>
+        <p class="help-text">{% trans 'Positive: rates themselves higher. Negative: rates themselves lower. Zero: the ratings agree.' %}</p>
+        <p class="help-text">{% trans 'A difference is shown only when there is enough feedback to protect anonymity. Use it as a conversation starter, not a performance score.' %}</p>
     </div>
 
-    {% if reviewees.has_other_pages %}
-    <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <span style="color: var(--text-secondary); font-size: 0.875rem;">{% trans 'Items per page:' %}</span>
-            <select onchange="window.location.href='?{% if sort %}sort={{ sort }}&{% endif %}per_page=' + this.value" style="padding: 0.25rem 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary);">
-                <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
-                <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
-                <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+    <div class="card-body">
+        {% if reviewees %}
+        <div class="table-wrapper" role="region" aria-label="{% trans 'Reviewees' %}" tabindex="0">
+            <table class="table reviewees-table">
+                <thead><tr>
+                    <th scope="col">{% trans 'Person' %}</th>
+                    <th scope="col">{% trans 'Review status' %}</th>
+                    <th scope="col" data-reviewee-column="questionnaire">{% trans 'Latest questionnaire' %}</th>
+                    <th scope="col" data-reviewee-column="department" hidden>{% trans 'Department' %}</th>
+                    <th scope="col" data-reviewee-column="gap" hidden><div class="reviewee-gap-heading">{% trans 'Self vs others' %}<button type="button" class="reviewee-info" popovertarget="reviewee-gap-help" data-reviewee-popover aria-label="{% trans 'About self vs others' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6M12 7h.01"></path></svg></button></div></th>
+                    <th scope="col" class="reviewee-actions-heading">{% trans 'Actions' %}</th>
+                </tr></thead>
+                <tbody>
+                {% for item in reviewees_with_latest %}
+                    <tr>
+                        <td class="reviewee-person">
+                            {% if item.active_cycle %}<a href="{% url 'review_cycle_detail' item.active_cycle.uuid %}" class="reviewee-name-link">{{ item.reviewee.name }}</a>
+                            {% elif item.latest_completed_report %}<a href="{% url 'reports:view_report' item.latest_completed_report.cycle.uuid %}" class="reviewee-name-link">{{ item.reviewee.name }}</a>
+                            {% else %}<span class="reviewee-name">{{ item.reviewee.name }}</span>{% endif %}
+                            <p class="help-text">{{ item.reviewee.email }}</p>
+                        </td>
+                        <td class="reviewee-status">
+                            {% if item.active_cycle %}<span class="badge badge-info">{% trans 'In progress' %}</span>
+                            {% elif item.reviewee.cycle_count %}<span class="badge badge-success">{% trans 'Completed' %}</span>
+                            {% else %}<span class="badge badge-secondary">{% trans 'Not started' %}</span>{% endif %}
+                            {% if item.reviewee.cycle_count %}<p class="help-text">{% blocktrans trimmed count counter=item.reviewee.cycle_count %}{{ counter }} review cycle{% plural %}{{ counter }} review cycles{% endblocktrans %}</p>{% endif %}
+                        </td>
+                        <td class="reviewee-questionnaire" data-reviewee-column="questionnaire">
+                            {% if item.latest_questionnaire %}{{ item.latest_questionnaire.name }}{% if not item.latest_questionnaire.is_active %}<span class="help-text">{% trans 'Archived' %}</span>{% endif %}
+                            {% else %}<span class="help-text">{% trans 'Not selected yet' %}</span>{% endif %}
+                        </td>
+                        <td class="reviewee-department" data-reviewee-column="department" hidden>{{ item.reviewee.department|default:'—' }}</td>
+                        <td class="reviewee-gap" data-reviewee-column="gap" hidden>
+                            {% if item.gap is None %}<span class="help-text">{% trans 'Not available yet' %}</span>
+                            {% else %}
+                            <strong>{% if item.gap > 0 %}+{% endif %}{{ item.gap|floatformat:2 }}</strong>
+                            <p class="help-text">{% if item.gap > 0 %}{% trans 'Rates self higher than others' %}{% elif item.gap < 0 %}{% trans 'Rates self lower than others' %}{% else %}{% trans 'Same as others' %}{% endif %}</p>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="reviewee-actions">
+                                {% if item.active_cycle %}
+                                <a href="{% url 'review_cycle_detail' item.active_cycle.uuid %}" class="btn btn-sm btn-secondary">{% trans 'View Cycle' %}</a>
+                                {% elif item.latest_completed_report %}
+                                <a href="{% url 'reports:view_report' item.latest_completed_report.cycle.uuid %}" class="btn btn-sm btn-primary">{% trans 'View Report' %}</a>
+                                {% elif perms.accounts.can_manage_organization and questionnaires %}
+                                <button type="button" class="btn btn-sm btn-primary" data-reviewee-dialog="start-review-{{ item.reviewee.uuid }}" aria-haspopup="dialog">{% trans 'Start review' %}</button>
+                                {% else %}<span class="help-text">{% trans 'No report available' %}</span>{% endif %}
+
+                                {% if perms.accounts.can_manage_organization or item.active_cycle and item.latest_completed_report %}
+                                <button type="button" class="btn btn-sm btn-secondary reviewee-more" popovertarget="reviewee-actions-{{ item.reviewee.uuid }}" data-reviewee-popover aria-label="{% trans 'Actions' %}: {{ item.reviewee.name }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg></button>
+                                <div id="reviewee-actions-{{ item.reviewee.uuid }}" class="reviewee-popover reviewee-menu" popover="auto" aria-label="{% trans 'Actions' %}: {{ item.reviewee.name }}">
+                                    {% if item.active_cycle and item.latest_completed_report %}<a href="{% url 'reports:view_report' item.latest_completed_report.cycle.uuid %}">{% trans 'View latest report' %}</a>{% endif %}
+                                    {% if perms.accounts.can_manage_organization %}
+                                        {% if questionnaires and item.active_cycle or questionnaires and item.latest_completed_report %}<button type="button" data-reviewee-dialog="start-review-{{ item.reviewee.uuid }}" aria-haspopup="dialog">{% trans 'Start a new review' %}</button>{% endif %}
+                                        <a href="{% url 'reviewee_edit' item.reviewee.uuid %}">{% trans 'Edit details' %}</a>
+                                        <a href="{% url 'reviewee_delete' item.reviewee.uuid %}" class="reviewee-delete">{% trans 'Delete' %}</a>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><h2 class="card-title">{% trans 'No people match these filters.' %}</h2><p class="help-text">{% trans 'Try another name or clear the filters to see everyone.' %}</p></div>
+        {% endif %}
+    </div>
+
+    {% if reviewees.has_other_pages or per_page != 25 %}
+    <div class="card-footer reviewee-pagination">
+        <div class="reviewee-page-size">
+            <label for="reviewee-per-page" class="help-text">{% trans 'Items per page:' %}</label>
+            <select id="reviewee-per-page" name="per_page" form="reviewee-filters" class="form-control" data-submit-filter>
+                <option value="25"{% if per_page == 25 %} selected{% endif %}>25</option>
+                <option value="50"{% if per_page == 50 %} selected{% endif %}>50</option>
+                <option value="100"{% if per_page == 100 %} selected{% endif %}>100</option>
             </select>
         </div>
-        <div class="pagination">
-            {% if reviewees.has_previous %}
-                <a href="?page=1&per_page={{ per_page }}{% if sort %}&sort={{ sort }}{% endif %}" class="pagination-link">{% trans 'First' %}</a>
-                <a href="?page={{ reviewees.previous_page_number }}&per_page={{ per_page }}{% if sort %}&sort={{ sort }}{% endif %}" class="pagination-link">{% trans 'Previous' %}</a>
-            {% endif %}
-
-            <span class="pagination-info">
-                {% blocktrans trimmed with num=reviewees.number total=reviewees.paginator.num_pages %}Page {{ num }} of {{ total }}{% endblocktrans %}
-            </span>
-
-            {% if reviewees.has_next %}
-                <a href="?page={{ reviewees.next_page_number }}&per_page={{ per_page }}{% if sort %}&sort={{ sort }}{% endif %}" class="pagination-link">{% trans 'Next' %}</a>
-                <a href="?page={{ reviewees.paginator.num_pages }}&per_page={{ per_page }}{% if sort %}&sort={{ sort }}{% endif %}" class="pagination-link">{% trans 'Last' %}</a>
-            {% endif %}
-        </div>
+        <span class="help-text">{% blocktrans trimmed with first=reviewees.start_index last=reviewees.end_index total=reviewees.paginator.count %}Showing {{ first }}–{{ last }} of {{ total }} people{% endblocktrans %}</span>
+        {% if reviewees.has_other_pages %}
+        <nav class="pagination" aria-label="{% trans 'Reviewee pages' %}">
+            {% if reviewees.has_previous %}<a href="{% querystring page=reviewees.previous_page_number %}" class="pagination-link">{% trans 'Previous' %}</a>{% endif %}
+            <span class="pagination-info">{% blocktrans trimmed with num=reviewees.number total=reviewees.paginator.num_pages %}Page {{ num }} of {{ total }}{% endblocktrans %}</span>
+            {% if reviewees.has_next %}<a href="{% querystring page=reviewees.next_page_number %}" class="pagination-link">{% trans 'Next' %}</a>{% endif %}
+        </nav>
+        {% endif %}
     </div>
     {% endif %}
 </div>
 {% else %}
-<div class="card">
-    <div class="card-body">
-        <div class="empty-state">
-            <h3 style="margin-bottom: 0.5rem;">{% trans 'No reviewees yet' %}</h3>
-            {% if perms.accounts.can_manage_organization %}
-            <p style="margin-bottom: 1.5rem;">{% trans 'Add your first reviewee to start creating review cycles' %}</p>
-            <a href="{% url 'reviewee_create' %}" class="btn btn-primary">{% trans 'Add Reviewee' %}</a>
-            {% else %}
-            <p style="margin-bottom: 1.5rem;">{% trans 'Add yourself as a reviewee to start receiving feedback' %}</p>
-            <a href="{% url 'reviewee_create' %}" class="btn btn-primary">{% trans 'Add Myself' %}</a>
-            {% endif %}
-        </div>
-    </div>
-</div>
+<div class="card"><div class="card-body"><div class="empty-state">
+    <h2 class="card-title">{% trans 'No reviewees yet' %}</h2>
+    <p class="help-text">{% if perms.accounts.can_manage_organization %}{% trans 'Add your first reviewee to start creating review cycles' %}{% else %}{% trans 'Add yourself as a reviewee to start receiving feedback' %}{% endif %}</p>
+</div></div></div>
 {% endif %}
 
-<style>
-.dropdown-item:hover {
-    background-color: var(--bg-light);
-}
-.btn-group {
-    position: relative;
-    display: inline-flex;
-}
-.sort-link {
-    color: inherit;
-    text-decoration: none;
-    border-bottom: 1px dashed currentColor;
-}
-.reviewee-name-link,
-.reviewee-name {
-    color: var(--text-primary);
-    font-weight: 500;
-}
-.reviewee-name-link {
-    text-decoration: none;
-    border-bottom: 1px dashed transparent;
-    transition: color 0.15s ease, border-bottom-color 0.15s ease;
-}
-.reviewee-name-link:hover,
-.reviewee-name-link:focus {
-    color: var(--primary);
-    border-bottom-color: var(--primary);
-    text-decoration: none;
-}
-</style>
-
-<script>
-// Handle dropdown toggle with proper positioning
-document.addEventListener('DOMContentLoaded', function() {
-    const dropdownToggles = document.querySelectorAll('[data-toggle^="cycle-"]');
-
-    dropdownToggles.forEach(toggle => {
-        toggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            const dropdownId = this.getAttribute('data-toggle');
-            const menu = document.getElementById(dropdownId);
-
-            // Close all other dropdowns
-            document.querySelectorAll('.dropdown-menu').forEach(m => {
-                if (m.id !== dropdownId) {
-                    m.style.display = 'none';
-                }
-            });
-
-            // Toggle this dropdown
-            const isVisible = menu.style.display === 'block';
-
-            if (!isVisible) {
-                // Position the dropdown relative to the button
-                const rect = this.getBoundingClientRect();
-                menu.style.top = (rect.bottom + window.scrollY + 4) + 'px';
-                menu.style.left = (rect.left + window.scrollX) + 'px';
-                menu.style.display = 'block';
-            } else {
-                menu.style.display = 'none';
-            }
-        });
-    });
-
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.btn-group')) {
-            document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                menu.style.display = 'none';
-            });
-        }
-    });
-
-    // Prevent dropdown from closing when clicking inside it
-    document.querySelectorAll('.dropdown-menu').forEach(menu => {
-        menu.addEventListener('click', function(e) {
-            // Let form submissions go through (they'll navigate away anyway)
-            if (e.target.closest('form')) {
-                return;
-            }
-            e.stopPropagation();
-        });
-    });
-});
-</script>
+{% if perms.accounts.can_manage_organization and questionnaires %}
+{% for item in reviewees_with_latest %}{% include 'admin_dashboard/partials/reviewee_start_dialog.html' %}{% endfor %}
+{% endif %}
+<script src="{% static 'js/reviewees.js' %}" defer></script>
 {% endblock %}
