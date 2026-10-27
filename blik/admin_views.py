@@ -13,7 +13,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.validators import validate_email
 from django.db import transaction
 from django.db.models import ProtectedError
-from django.db.models import Avg, Count, Max, OuterRef, Q, Subquery
+from django.db.models import Avg, Count, F, Max, OuterRef, Q, Subquery
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
@@ -1422,6 +1422,26 @@ def question_dreyfus_config_api(request, question_id):
         return JsonResponse({'error': _('Internal server error')}, status=500)
 
 
+# Where a cycle stands, from its status and response counts. Together the
+# stages cover every cycle exactly once. Conditions use the token_count and
+# completed_count annotations of review_cycle_list.
+CYCLE_STAGES = {
+    'waiting': (gettext_lazy('No responses yet'), Q(status='active', completed_count=0)),
+    'in_progress': (gettext_lazy('In progress'),
+                    Q(status='active', completed_count__gt=0, completed_count__lt=F('token_count'))),
+    'all_responded': (gettext_lazy('All responded'),
+                      Q(status='active', completed_count__gt=0, completed_count=F('token_count'))),
+    'completed': (gettext_lazy('Completed'), Q(status='completed')),
+}
+
+CYCLE_SORTS = {
+    'newest': (gettext_lazy('Newest first'), ['-created_at']),
+    'oldest': (gettext_lazy('Oldest first'), ['created_at']),
+    'reviewee': (gettext_lazy('Reviewee A–Z'), ['reviewee__name']),
+    'fewest_responses': (gettext_lazy('Fewest responses'), ['completed_count']),
+}
+
+
 @login_required
 def review_cycle_list(request):
     """List all review cycles"""
@@ -1438,13 +1458,44 @@ def review_cycle_list(request):
         )
 
     cycles_qs = visible_cycles(request.user, cycles_qs)
+    # Questionnaires that occur in this user's cycles, archived ones included.
+    used_questionnaires = Questionnaire.objects.filter(
+        review_cycles__in=cycles_qs).distinct().order_by('name')
 
+    q = request.GET.get('q', '').strip()
+    if q:
+        cycles_qs = cycles_qs.filter(Q(reviewee__name__icontains=q) | Q(reviewee__email__icontains=q))
+    questionnaire_filter = request.GET.get('questionnaire', '')
+    if questionnaire_filter:
+        try:
+            cycles_qs = cycles_qs.filter(questionnaire__uuid=questionnaire_filter)
+        except ValidationError:
+            questionnaire_filter = ''
+
+    latest_questionnaire_id = ReviewCycle.objects.filter(
+        reviewee=OuterRef('reviewee'),
+    ).order_by('-created_at').values('questionnaire_id')[:1]
     cycles_qs = cycles_qs.prefetch_related(
         'questionnaire__sections__questions'
     ).annotate(
         token_count=Count('tokens'),
-        completed_count=Count('tokens', filter=Q(tokens__completed_at__isnull=False))
-    ).order_by('-created_at')
+        completed_count=Count('tokens', filter=Q(tokens__completed_at__isnull=False)),
+        latest_questionnaire_id=Subquery(latest_questionnaire_id),
+    )
+
+    # Counts follow the search and questionnaire filters, so each stage
+    # button shows what clicking it would give.
+    stage_counts = {stage: cycles_qs.filter(cond).count() for stage, (_label, cond) in CYCLE_STAGES.items()}
+    stage = request.GET.get('stage', '')
+    if stage in CYCLE_STAGES:
+        cycles_qs = cycles_qs.filter(CYCLE_STAGES[stage][1])
+    else:
+        stage = ''
+
+    sort = request.GET.get('sort', '')
+    if sort not in CYCLE_SORTS:
+        sort = 'newest'
+    cycles_qs = cycles_qs.order_by(*CYCLE_SORTS[sort][1], '-created_at')
 
     # Get per_page from request, default to 25
     per_page = request.GET.get('per_page', '25')
@@ -1468,20 +1519,19 @@ def review_cycle_list(request):
     # Get available questionnaires for quick cycle creation
     questionnaires = Questionnaire.objects.for_organization(org).filter(is_active=True).order_by('-is_default', 'name')
 
-    # Enhance cycles with latest questionnaire info for each reviewee
-    cycles_with_latest = []
-    for cycle in cycles:
-        latest_cycle = cycle.reviewee.review_cycles.select_related('questionnaire').order_by('-created_at').first()
-        cycles_with_latest.append({
-            'cycle': cycle,
-            'latest_questionnaire': latest_cycle.questionnaire if latest_cycle else None,
-        })
-
     context = {
-        'cycles_with_latest': cycles_with_latest,
         'cycles': cycles,  # Paginated object
         'questionnaires': questionnaires,
         'per_page': per_page,
+        'q': q,
+        'questionnaire_filter': questionnaire_filter,
+        'used_questionnaires': used_questionnaires,
+        'stage': stage,
+        'stages': [(key, label, stage_counts[key]) for key, (label, _cond) in CYCLE_STAGES.items()],
+        'total_count': sum(stage_counts.values()),
+        'sort': sort,
+        'sorts': [(key, label) for key, (label, _fields) in CYCLE_SORTS.items()],
+        'is_filtered': bool(q or questionnaire_filter or stage),
     }
 
     return render(request, 'admin_dashboard/review_cycle_list.html', context)

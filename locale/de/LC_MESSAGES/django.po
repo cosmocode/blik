@@ -6748,3 +6748,48 @@ msgstr "Inaktiv"
 
 msgid "Did not observe"
 msgstr "Nicht beobachtet"
+
+msgid "No responses yet"
+msgstr "Noch keine Antworten"
+
+msgid "In progress"
+msgstr "In Bearbeitung"
+
+msgid "All responded"
+msgstr "Alle haben geantwortet"
+
+msgid "Newest first"
+msgstr "Neueste zuerst"
+
+msgid "Oldest first"
+msgstr "Älteste zuerst"
+
+msgid "Reviewee A–Z"
+msgstr "Beurteilte:r A–Z"
+
+msgid "Fewest responses"
+msgstr "Wenigste Antworten"
+
+msgid "Filter by stage"
+msgstr "Nach Stand filtern"
+
+msgid "Search reviewee name or email"
+msgstr "Name oder E-Mail der beurteilten Person suchen"
+
+msgid "Search reviewee"
+msgstr "Beurteilte Person suchen"
+
+msgid "Press / to search"
+msgstr "Taste / öffnet die Suche"
+
+msgid "All questionnaires"
+msgstr "Alle Fragebögen"
+
+msgid "Sort"
+msgstr "Sortierung"
+
+msgid "Clear filters"
+msgstr "Filter zurücksetzen"
+
+msgid "No review cycles match these filters."
+msgstr "Keine Feedbackrunden entsprechen diesen Filtern."
