@@ -84,7 +84,7 @@ Uses Playwright to capture screenshots of key pages.
 - Admin dashboard (desktop light/dark, mobile light/dark) - 4 screenshots
 - Review cycle detail (desktop light/dark) - 2 screenshots
 - Team management (desktop light/dark) - 2 screenshots
-- Manage invitations (desktop light) - 1 screenshot
+- Manage invitations (desktop light/dark) - 2 screenshots
 - Feedback form (desktop light/dark, mobile light/dark) - 4 screenshots
 
 **Total: 19 screenshots**

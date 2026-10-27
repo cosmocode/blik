@@ -473,6 +473,13 @@ class Command(BaseCommand):
                     'theme': 'light',
                     'wait_for': '#inviteForm',
                 },
+                {
+                    'name': 'invitations_desktop_dark',
+                    'url': f'{base_url}/dashboard/cycles/{config["partial_cycle_uuid"]}/invitations/',
+                    'viewport': {'width': 1920, 'height': 1080},
+                    'theme': 'dark',
+                    'wait_for': '#inviteForm',
+                },
             ])
 
             # "How Blik works" flow: sign up, configure, add reviewees, start a cycle
