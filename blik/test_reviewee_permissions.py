@@ -39,7 +39,7 @@ class RevieweeViewPermissionTestCase(TestCase):
 
 class RevieweeEditAccessTests(RevieweeViewPermissionTestCase):
     def _url(self):
-        return reverse('reviewee_edit', args=[self.reviewee.id])
+        return reverse('reviewee_edit', args=[self.reviewee.uuid])
 
     def test_member_is_redirected_to_the_reviewee_list(self):
         self.client.force_login(self.member)
@@ -63,7 +63,7 @@ class RevieweeEditAccessTests(RevieweeViewPermissionTestCase):
 
 class RevieweeDeleteAccessTests(RevieweeViewPermissionTestCase):
     def _url(self):
-        return reverse('reviewee_delete', args=[self.reviewee.id])
+        return reverse('reviewee_delete', args=[self.reviewee.uuid])
 
     def test_member_cannot_deactivate_a_reviewee(self):
         self.client.force_login(self.member)
@@ -87,7 +87,7 @@ class QuickCycleCreateAccessTests(RevieweeViewPermissionTestCase):
             name='Professional Skills', organization=self.org)
 
     def _url(self):
-        return reverse('quick_cycle_create', args=[self.reviewee.id])
+        return reverse('quick_cycle_create', args=[self.reviewee.uuid])
 
     def test_member_cannot_start_a_cycle_for_someone_else(self):
         self.client.force_login(self.member)

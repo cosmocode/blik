@@ -7,6 +7,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from . import views, admin_views, seo_views, superuser_views
 from productreviews import api_views as review_api
+from accounts.models import Reviewee
+from questionnaires.models import Questionnaire
 
 # Error handlers
 handler404 = 'blik.views.handler404'
@@ -35,19 +37,19 @@ urlpatterns = [
     path('dashboard/team/update-permissions/', admin_views.update_user_permissions, name='update_user_permissions'),
     path('dashboard/team/gdpr/', admin_views.gdpr_management, name='gdpr_management'),
     path('dashboard/team/gdpr/user/<int:user_id>/delete/', admin_views.gdpr_delete_user_view, name='gdpr_delete_user'),
-    path('dashboard/team/gdpr/reviewee/<int:reviewee_id>/delete/', admin_views.gdpr_delete_reviewee_view, name='gdpr_delete_reviewee'),
+    path('dashboard/team/gdpr/reviewee/<uuid:reviewee_uuid>/delete/', admin_views.gdpr_delete_reviewee_view, name='gdpr_delete_reviewee'),
     path('dashboard/reviewees/', admin_views.reviewee_list, name='reviewee_list'),
     path('dashboard/reviewees/create/', admin_views.reviewee_create, name='reviewee_create'),
-    path('dashboard/reviewees/<int:reviewee_id>/edit/', admin_views.reviewee_edit, name='reviewee_edit'),
-    path('dashboard/reviewees/<int:reviewee_id>/delete/', admin_views.reviewee_delete, name='reviewee_delete'),
-    path('dashboard/reviewees/<int:reviewee_id>/quick-cycle/', admin_views.quick_cycle_create, name='quick_cycle_create'),
+    path('dashboard/reviewees/<uuid:reviewee_uuid>/edit/', admin_views.reviewee_edit, name='reviewee_edit'),
+    path('dashboard/reviewees/<uuid:reviewee_uuid>/delete/', admin_views.reviewee_delete, name='reviewee_delete'),
+    path('dashboard/reviewees/<uuid:reviewee_uuid>/quick-cycle/', admin_views.quick_cycle_create, name='quick_cycle_create'),
     path('dashboard/questionnaires/', admin_views.questionnaire_list, name='questionnaire_list'),
     path('dashboard/questionnaires/create/', admin_views.questionnaire_create, name='questionnaire_create'),
-    path('dashboard/questionnaires/<int:questionnaire_id>/edit/', admin_views.questionnaire_edit, name='questionnaire_edit'),
-    path('dashboard/questionnaires/<int:questionnaire_id>/delete/', admin_views.questionnaire_delete, name='questionnaire_delete'),
-    path('dashboard/questionnaires/<int:questionnaire_id>/restore/', admin_views.questionnaire_restore, name='questionnaire_restore'),
-    path('dashboard/questionnaires/<int:questionnaire_id>/preview/', admin_views.questionnaire_preview, name='questionnaire_preview'),
-    path('dashboard/questionnaires/<int:questionnaire_id>/sample-report/', admin_views.questionnaire_sample_report, name='questionnaire_sample_report'),
+    path('dashboard/questionnaires/<uuid:questionnaire_uuid>/edit/', admin_views.questionnaire_edit, name='questionnaire_edit'),
+    path('dashboard/questionnaires/<uuid:questionnaire_uuid>/delete/', admin_views.questionnaire_delete, name='questionnaire_delete'),
+    path('dashboard/questionnaires/<uuid:questionnaire_uuid>/restore/', admin_views.questionnaire_restore, name='questionnaire_restore'),
+    path('dashboard/questionnaires/<uuid:questionnaire_uuid>/preview/', admin_views.questionnaire_preview, name='questionnaire_preview'),
+    path('dashboard/questionnaires/<uuid:questionnaire_uuid>/sample-report/', admin_views.questionnaire_sample_report, name='questionnaire_sample_report'),
     path('api/questions/<int:question_id>/dreyfus-config/', admin_views.question_dreyfus_config_api, name='question_dreyfus_config_api'),
     path('dashboard/cycles/', admin_views.review_cycle_list, name='review_cycle_list'),
     path('dashboard/cycles/create/', admin_views.review_cycle_create, name='review_cycle_create'),
@@ -86,6 +88,21 @@ urlpatterns = [
 
     # Public API for landing pages
     path('api/reviews/aggregate', review_api.aggregate_reviews_api, name='api_reviews_aggregate'),
+]
+
+# Old integer-id URLs (bookmarks) redirect to the UUID URLs. Only pages that
+# answer GET; the POST-only actions are reached from forms, never bookmarks.
+urlpatterns += [
+    path(f'dashboard/{prefix}/<int:pk>/{suffix}/', admin_views.legacy_id_redirect,
+         {'model': model, 'url_name': url_name})
+    for prefix, model, suffix, url_name in [
+        ('questionnaires', Questionnaire, 'edit', 'questionnaire_edit'),
+        ('questionnaires', Questionnaire, 'delete', 'questionnaire_delete'),
+        ('questionnaires', Questionnaire, 'preview', 'questionnaire_preview'),
+        ('questionnaires', Questionnaire, 'sample-report', 'questionnaire_sample_report'),
+        ('reviewees', Reviewee, 'edit', 'reviewee_edit'),
+        ('reviewees', Reviewee, 'delete', 'reviewee_delete'),
+    ]
 ]
 
 # Serve media files in development

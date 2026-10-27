@@ -33,11 +33,11 @@
                 {% endif %}
             </div>
             <div style="display: flex; gap: 0.5rem;">
-                <a href="{% url 'questionnaire_preview' questionnaire.id %}" class="btn btn-sm btn-secondary">Preview Questions</a>
-                <a href="{% url 'questionnaire_sample_report' questionnaire.id %}" class="btn btn-sm btn-primary">Sample Report</a>
+                <a href="{% url 'questionnaire_preview' questionnaire.uuid %}" class="btn btn-sm btn-secondary">Preview Questions</a>
+                <a href="{% url 'questionnaire_sample_report' questionnaire.uuid %}" class="btn btn-sm btn-primary">Sample Report</a>
                 {% if perms.accounts.can_manage_questionnaires %}
-                <a href="{% url 'questionnaire_edit' questionnaire.id %}" class="btn btn-sm btn-secondary">Edit</a>
-                <a href="{% url 'questionnaire_delete' questionnaire.id %}" class="btn btn-sm btn-danger">
+                <a href="{% url 'questionnaire_edit' questionnaire.uuid %}" class="btn btn-sm btn-secondary">Edit</a>
+                <a href="{% url 'questionnaire_delete' questionnaire.uuid %}" class="btn btn-sm btn-danger">
                     {% if questionnaire.cycle_count %}Archive{% else %}Delete{% endif %}
                 </a>
                 {% endif %}
@@ -87,9 +87,9 @@
                     </div>
                 </div>
                 <div style="display: flex; gap: 0.5rem;">
-                    <a href="{% url 'questionnaire_preview' questionnaire.id %}" class="btn btn-sm btn-secondary">Preview Questions</a>
+                    <a href="{% url 'questionnaire_preview' questionnaire.uuid %}" class="btn btn-sm btn-secondary">Preview Questions</a>
                     {% if perms.accounts.can_manage_questionnaires %}
-                    <form method="post" action="{% url 'questionnaire_restore' questionnaire.id %}" style="display: inline;">
+                    <form method="post" action="{% url 'questionnaire_restore' questionnaire.uuid %}" style="display: inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-sm btn-primary">Restore</button>
                     </form>

@@ -69,7 +69,7 @@
                     {% endif %}
                     <a href="{% url 'questionnaire_list' %}" class="btn btn-secondary">Cancel</a>
                     {% if questionnaire %}
-                    <a href="{% url 'questionnaire_preview' questionnaire.id %}" class="btn btn-secondary">Preview</a>
+                    <a href="{% url 'questionnaire_preview' questionnaire.uuid %}" class="btn btn-secondary">Preview</a>
                     {% endif %}
                 </div>
             </form>

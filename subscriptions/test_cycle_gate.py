@@ -86,7 +86,7 @@ class ModelGateTests(CycleGateBase):
 class DashboardEntryPointTests(CycleGateBase):
     def quick(self):
         return self.client.post(
-            reverse('quick_cycle_create', args=[self.reviewee.id]),
+            reverse('quick_cycle_create', args=[self.reviewee.uuid]),
             {'questionnaire_id': str(self.questionnaire.id)},
         )
 
