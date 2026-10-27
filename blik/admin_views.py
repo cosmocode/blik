@@ -82,6 +82,13 @@ def get_cycle_or_404(request, cycle_uuid):
 
 
 @login_required
+def legacy_id_redirect(request, pk, model, url_name):
+    """Send an old integer-id URL (bookmark) to its UUID URL, own organization only."""
+    obj = get_object_or_404(model, pk=pk, organization=request.organization)
+    return redirect(url_name, obj.uuid, permanent=True)
+
+
+@login_required
 def dashboard(request):
     """Admin dashboard homepage"""
     org = request.organization
@@ -430,9 +437,9 @@ def reviewee_create(request):
     message='You do not have permission to edit reviewees. '
             'Only organization administrators can access this feature.'
 )
-def reviewee_edit(request, reviewee_id):
+def reviewee_edit(request, reviewee_uuid):
     """Edit an existing reviewee - admin only"""
-    reviewee = get_object_or_404(Reviewee, id=reviewee_id)
+    reviewee = get_object_or_404(Reviewee, uuid=reviewee_uuid, organization=request.organization)
 
     if request.method == 'POST':
         reviewee.name = request.POST.get('name', reviewee.name)
@@ -460,9 +467,9 @@ def reviewee_edit(request, reviewee_id):
     message='You do not have permission to delete reviewees. '
             'Only organization administrators can access this feature.'
 )
-def reviewee_delete(request, reviewee_id):
+def reviewee_delete(request, reviewee_uuid):
     """Soft delete a reviewee - admin only"""
-    reviewee = get_object_or_404(Reviewee, id=reviewee_id)
+    reviewee = get_object_or_404(Reviewee, uuid=reviewee_uuid, organization=request.organization)
 
     if request.method == 'POST':
         reviewee.is_active = False
@@ -484,7 +491,7 @@ def reviewee_delete(request, reviewee_id):
     message='You do not have permission to create review cycles. '
             'Only organization administrators can access this feature.'
 )
-def quick_cycle_create(request, reviewee_id):
+def quick_cycle_create(request, reviewee_uuid):
     """
     Quick cycle creation from reviewee/cycle list.
     Creates a cycle based on a specified source cycle or the most recent cycle for this reviewee.
@@ -492,7 +499,7 @@ def quick_cycle_create(request, reviewee_id):
     If no previous cycle exists, creates default tokens (1 self, 3 peers, 1 manager, 0 direct reports).
     """
     org = request.organization
-    reviewee = get_object_or_404(Reviewee, id=reviewee_id, organization=org, is_active=True)
+    reviewee = get_object_or_404(Reviewee, uuid=reviewee_uuid, organization=org, is_active=True)
     questionnaire_id = request.POST.get('questionnaire_id')
     source_cycle_uuid = request.POST.get('source_cycle_uuid')  # Optional: specific cycle to copy from
 
@@ -628,9 +635,10 @@ def questionnaire_list(request):
 
 
 @login_required
-def questionnaire_preview(request, questionnaire_id):
+def questionnaire_preview(request, questionnaire_uuid):
     """Preview a questionnaire"""
-    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
+    questionnaire = get_object_or_404(
+        Questionnaire, uuid=questionnaire_uuid, organization=request.organization)
     sections = questionnaire.sections.prefetch_related('questions').all()
 
     context = {
@@ -642,7 +650,7 @@ def questionnaire_preview(request, questionnaire_id):
 
 
 @login_required
-def questionnaire_sample_report(request, questionnaire_id):
+def questionnaire_sample_report(request, questionnaire_uuid):
     """Render an illustrative sample report for a questionnaire.
 
     Builds a synthetic but shape-correct `insights` and `charts` data set so we
@@ -651,7 +659,8 @@ def questionnaire_sample_report(request, questionnaire_id):
     """
     questionnaire = get_object_or_404(
         Questionnaire.objects.prefetch_related('sections__questions'),
-        id=questionnaire_id,
+        uuid=questionnaire_uuid,
+        organization=request.organization,
     )
 
     rng = random.Random(questionnaire.id)
@@ -779,7 +788,7 @@ def questionnaire_create(request):
                 organization=org
             )
             messages.success(request, f'Questionnaire "{questionnaire.name}" created successfully.')
-            return redirect('questionnaire_edit', questionnaire_id=questionnaire.id)
+            return redirect('questionnaire_edit', questionnaire_uuid=questionnaire.uuid)
         except Exception as e:
             messages.error(request, f'Error creating questionnaire: {str(e)}')
 
@@ -792,7 +801,7 @@ def questionnaire_create(request):
 
 @login_required
 @can_manage_questionnaires_required
-def questionnaire_edit(request, questionnaire_id):
+def questionnaire_edit(request, questionnaire_uuid):
     """Edit an existing questionnaire"""
     # Get organization from request context
     org = getattr(request, 'organization', None)
@@ -800,7 +809,7 @@ def questionnaire_edit(request, questionnaire_id):
     # Filter by organization to prevent cross-org access
     questionnaire = get_object_or_404(
         Questionnaire,
-        id=questionnaire_id,
+        uuid=questionnaire_uuid,
         organization=org
     )
 
@@ -1177,7 +1186,7 @@ def questionnaire_edit(request, questionnaire_id):
                 except Exception as e:
                     messages.error(request, f'Error updating Dreyfus configuration: {str(e)}')
 
-        return redirect('questionnaire_edit', questionnaire_id=questionnaire.id)
+        return redirect('questionnaire_edit', questionnaire_uuid=questionnaire.uuid)
 
     sections = questionnaire.sections.prefetch_related('questions').all()
 
@@ -1192,7 +1201,7 @@ def questionnaire_edit(request, questionnaire_id):
 
 @login_required
 @can_manage_questionnaires_required
-def questionnaire_delete(request, questionnaire_id):
+def questionnaire_delete(request, questionnaire_uuid):
     """Delete a questionnaire, or archive it when review cycles depend on it.
 
     ReviewCycle.questionnaire is on_delete=PROTECT, so a questionnaire that
@@ -1201,7 +1210,7 @@ def questionnaire_delete(request, questionnaire_id):
     gone from every selection list, still there for the existing reports.
     """
     org = getattr(request, 'organization', None)
-    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id, organization=org)
+    questionnaire = get_object_or_404(Questionnaire, uuid=questionnaire_uuid, organization=org)
     cycle_count = questionnaire.review_cycles.count()
 
     if request.method == 'POST':
@@ -1243,10 +1252,10 @@ def questionnaire_delete(request, questionnaire_id):
 @login_required
 @can_manage_questionnaires_required
 @require_POST
-def questionnaire_restore(request, questionnaire_id):
+def questionnaire_restore(request, questionnaire_uuid):
     """Put an archived questionnaire back into circulation."""
     org = getattr(request, 'organization', None)
-    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id, organization=org)
+    questionnaire = get_object_or_404(Questionnaire, uuid=questionnaire_uuid, organization=org)
 
     questionnaire.is_active = True
     questionnaire.save(update_fields=['is_active'])
@@ -2305,7 +2314,7 @@ def gdpr_delete_user_view(request, user_id):
 
 @login_required
 @require_POST
-def gdpr_delete_reviewee_view(request, reviewee_id):
+def gdpr_delete_reviewee_view(request, reviewee_uuid):
     """Delete or anonymize a reviewee (GDPR)"""
     # Check permission
     if not request.user.has_perm('accounts.can_manage_organization'):
@@ -2319,7 +2328,7 @@ def gdpr_delete_reviewee_view(request, reviewee_id):
 
     try:
         # Get the reviewee to verify organization
-        reviewee = get_object_or_404(Reviewee, id=reviewee_id, organization=org)
+        reviewee = get_object_or_404(Reviewee, uuid=reviewee_uuid, organization=org)
 
         # Get deletion type from POST
         deletion_type = request.POST.get('deletion_type', 'soft')

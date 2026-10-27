@@ -83,7 +83,7 @@
                             <!-- Split button: New Cycle (main action) + dropdown for other questionnaires -->
                             <div class="btn-group" style="position: relative; display: inline-flex;">
                                 <!-- Main action button: Create cycle with last-used or default questionnaire -->
-                                <form method="POST" action="{% url 'quick_cycle_create' item.reviewee.id %}" style="margin: 0; display: inline;">
+                                <form method="POST" action="{% url 'quick_cycle_create' item.reviewee.uuid %}" style="margin: 0; display: inline;">
                                     {% csrf_token %}
                                     {% if item.latest_questionnaire %}
                                     <input type="hidden" name="questionnaire_id" value="{{ item.latest_questionnaire.id }}">
@@ -125,7 +125,7 @@
                                     {% for q in questionnaires %}
                                     {% if item.latest_questionnaire and item.latest_questionnaire.id == q.id or not item.latest_questionnaire and q.is_default %}
                                         {# This is the questionnaire that will be used for quick create #}
-                                        <form method="POST" action="{% url 'quick_cycle_create' item.reviewee.id %}" style="margin: 0;">
+                                        <form method="POST" action="{% url 'quick_cycle_create' item.reviewee.uuid %}" style="margin: 0;">
                                             {% csrf_token %}
                                             <input type="hidden" name="questionnaire_id" value="{{ q.id }}">
                                             <button type="submit" class="dropdown-item" style="width: 100%; text-align: left; padding: 0.625rem 1rem; border: none; background: none; cursor: pointer; font-size: 0.875rem; display: flex; justify-content: space-between; align-items: center; transition: background 0.15s; color: var(--text-primary); border-left: 3px solid var(--primary);">
@@ -137,7 +137,7 @@
                                             </button>
                                         </form>
                                     {% else %}
-                                        <form method="POST" action="{% url 'quick_cycle_create' item.reviewee.id %}" style="margin: 0;">
+                                        <form method="POST" action="{% url 'quick_cycle_create' item.reviewee.uuid %}" style="margin: 0;">
                                             {% csrf_token %}
                                             <input type="hidden" name="questionnaire_id" value="{{ q.id }}">
                                             <button type="submit" class="dropdown-item" style="width: 100%; text-align: left; padding: 0.625rem 1rem; border: none; background: none; cursor: pointer; font-size: 0.875rem; display: flex; justify-content: space-between; align-items: center; transition: background 0.15s; color: var(--text-primary);">
@@ -152,8 +152,8 @@
                                 </div>
                             </div>
 
-                            <a href="{% url 'reviewee_edit' item.reviewee.id %}" class="btn btn-sm btn-secondary">Edit</a>
-                            <a href="{% url 'reviewee_delete' item.reviewee.id %}" class="btn btn-sm btn-danger">Delete</a>
+                            <a href="{% url 'reviewee_edit' item.reviewee.uuid %}" class="btn btn-sm btn-secondary">Edit</a>
+                            <a href="{% url 'reviewee_delete' item.reviewee.uuid %}" class="btn btn-sm btn-danger">Delete</a>
                         </div>
                         {% else %}
                         <span style="color: #cbd5e1;">—</span>
