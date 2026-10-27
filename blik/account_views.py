@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 from django.contrib import messages
 from django.contrib.auth import logout
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from accounts.services import (
@@ -29,24 +29,8 @@ from subscriptions.models import Subscription
 
 @login_required
 def account_settings(request):
-    """Account and organization settings page."""
-    org = request.organization
-    user = request.user
-
-    # Get subscription if exists
-    subscription = None
-    if org:
-        try:
-            subscription = Subscription.objects.get(organization=org)
-        except Subscription.DoesNotExist:
-            pass
-
-    context = {
-        'organization': org,
-        'subscription': subscription,
-    }
-
-    return render(request, 'account/settings.html', context)
+    """The account settings live on the dashboard settings page."""
+    return redirect('settings')
 
 
 @login_required
@@ -56,7 +40,7 @@ def cancel_subscription_view(request):
     org = request.organization
     if not org:
         messages.error(request, 'Organization not found.')
-        return redirect('account_settings')
+        return redirect('settings')
 
     try:
         subscription = Subscription.objects.get(organization=org)
@@ -67,7 +51,7 @@ def cancel_subscription_view(request):
     except Exception as e:
         messages.error(request, f'Error canceling subscription: {str(e)}')
 
-    return redirect('account_settings')
+    return redirect('settings')
 
 
 @login_required
@@ -77,7 +61,7 @@ def reactivate_subscription_view(request):
     org = request.organization
     if not org:
         messages.error(request, 'Organization not found.')
-        return redirect('account_settings')
+        return redirect('settings')
 
     try:
         subscription = Subscription.objects.get(organization=org)
@@ -88,7 +72,7 @@ def reactivate_subscription_view(request):
     except Exception as e:
         messages.error(request, f'Error reactivating subscription: {str(e)}')
 
-    return redirect('account_settings')
+    return redirect('settings')
 
 
 @login_required
@@ -271,7 +255,7 @@ def delete_account(request):
     password = request.POST.get('password')
     if not user.check_password(password):
         messages.error(request, 'Invalid password. Account deletion canceled.')
-        return redirect('account_settings')
+        return redirect('settings')
 
     try:
         delete_user_account(user)
@@ -280,10 +264,10 @@ def delete_account(request):
         return redirect('landing:index')
     except ValueError as e:
         messages.error(request, str(e))
-        return redirect('account_settings')
+        return redirect('settings')
     except Exception as e:
         messages.error(request, f'Error deleting account: {str(e)}')
-        return redirect('account_settings')
+        return redirect('settings')
 
 
 @login_required
@@ -303,13 +287,13 @@ def delete_organization(request):
     password = request.POST.get('password')
     if not user.check_password(password):
         messages.error(request, 'Invalid password. Organization deletion canceled.')
-        return redirect('account_settings')
+        return redirect('settings')
 
     # Confirm with organization name
     org_name = request.POST.get('organization_name')
     if org_name != org.name:
         messages.error(request, 'Organization name does not match. Deletion canceled.')
-        return redirect('account_settings')
+        return redirect('settings')
 
     try:
         delete_organization_service(org)
@@ -318,7 +302,7 @@ def delete_organization(request):
         return redirect('landing:index')
     except Exception as e:
         messages.error(request, f'Error deleting organization: {str(e)}')
-        return redirect('account_settings')
+        return redirect('settings')
 
 
 @login_required(as_json=True)
