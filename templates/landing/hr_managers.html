@@ -48,7 +48,7 @@
                 <p class="hero-subtitle">Anonymous 360° feedback with trend, benchmark, and perception-gap reports. Built for teams of 30-{{ plan_ent_max }} employees, with self-hosting or managed EU hosting.</p>
                 <div class="hero-cta">
                     <a href="#pricing" class="btn btn-primary">See Pricing Options</a>
-                    <a href="{% landing_url 'how_it_works_hr' %}" class="btn btn-secondary">How It Works</a>
+                    <a href="{% landing_url 'how_it_works_hr' %}" class="btn btn-secondary">See every screen first</a>
                 </div>
             </div>
         </div>
@@ -62,6 +62,7 @@
                 <p class="audience-trust-copy">
                     360-degree feedback works best when employees understand how their responses are handled. Blik uses <strong>token-based access and category-aggregated reports</strong>. Explain the invitation method, access permissions, response thresholds, and limits of confidentiality before collecting feedback.
                 </p>
+                <p class="audience-trust-copy">Your people will ask: "Can my manager see what I wrote?" <a href="{% landing_url 'how_it_works_hr' %}#report">See the exact answer, step by step</a>.</p>
             </div>
         </div>
     </section>
@@ -97,7 +98,7 @@
                     <p>Rich, visual reports show aggregated feedback by category (peers, managers, reports). Built-in privacy thresholds protect anonymity.</p>
                 </div>
             </div>
-            <p class="section-intro"><a href="{% landing_url 'how_it_works_hr' %}">See every step with screenshots, and who sees what</a></p>
+            {% include 'landing/includes/hiw_teaser.html' with url_name='how_it_works_hr' %}
         </div>
     </section>
 
@@ -380,6 +381,7 @@
                     <a href="{% landing_url 'signup' %}" class="btn btn-primary">Start Free Trial</a>
                     <a href="{% landing_url 'open_source' %}" class="btn btn-secondary">View Self-Hosted Option</a>
                 </div>
+                <p class="mt-6">Not ready to decide? Good. <a href="{% landing_url 'how_it_works_hr' %}">Walk through one round first</a>.</p>
             </div>
         </div>
     </section>

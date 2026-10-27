@@ -7807,3 +7807,85 @@
     .landing-page .hiw-ledger td { transition: none; }
 }
 
+
+/* ==================== How-it-works teaser (HR page) ====================
+   A card that sends visitors to a how-it-works page. The screenshots are a
+   partial peek, faded at the bottom, so the page itself holds the full view. */
+.landing-page .hiw-teaser {
+    display: grid;
+    gap: var(--space-8);
+    margin-top: var(--space-12);
+    padding: var(--space-6);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    text-align: left;
+    overflow: hidden;
+}
+.landing-page .hiw-teaser-eyebrow {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--primary);
+    margin-bottom: var(--space-2);
+}
+.landing-page .hiw-teaser-title {
+    font-size: var(--text-2xl);
+    line-height: 1.2;
+    margin-bottom: var(--space-3);
+}
+.landing-page .hiw-teaser-copy { color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4); }
+.landing-page .hiw-teaser-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+}
+.landing-page .hiw-teaser-facts li {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-primary);
+}
+.landing-page .hiw-teaser-note { font-size: var(--text-sm); color: var(--text-tertiary); margin: var(--space-3) 0 0; }
+
+.landing-page .hiw-teaser-peek {
+    position: relative;
+    display: block;
+    height: 220px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 65%, transparent);
+    mask-image: linear-gradient(to bottom, #000 65%, transparent);
+}
+.landing-page .hiw-teaser-shot {
+    position: absolute;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    transition: transform 0.3s ease;
+}
+.landing-page .hiw-teaser-shot--back { width: 78%; top: 0; left: 0; transform: rotate(-3deg); }
+.landing-page .hiw-teaser-shot--front { width: 78%; top: 18%; right: 8%; }
+.landing-page .hiw-teaser-shot--phone { width: 26%; top: 8%; right: 0; border-radius: var(--radius-lg); }
+.landing-page .hiw-teaser-peek:hover .hiw-teaser-shot--back { transform: rotate(-5deg) translate(-4%, -2%); }
+.landing-page .hiw-teaser-peek:hover .hiw-teaser-shot--front { transform: translateY(-4%); }
+.landing-page .hiw-teaser-peek:hover .hiw-teaser-shot--phone { transform: rotate(3deg) translate(3%, -3%); }
+
+@media (min-width: 900px) {
+    .landing-page .hiw-teaser {
+        grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+        align-items: center;
+        padding: var(--space-10);
+    }
+    .landing-page .hiw-teaser-peek { height: 320px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .landing-page .hiw-teaser-shot { transition: none; }
+}

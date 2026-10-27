@@ -137,12 +137,14 @@ class Command(BaseCommand):
             ))
             return
 
-        # Create completed reviewees with different questionnaires
+        # Create completed reviewees with different questionnaires. The last value
+        # is how each person rates themselves, so the self-vs-others gap on the
+        # reviewees page shows a real spread (see SELF_RATING).
         reviewees_data = [
-            ('Alex Rivera', 'alex.rivera@acme.example.com', 'Engineering', 'Professional Skills 360 Review'),
-            ('Jordan Chen', 'jordan.chen@acme.example.com', 'Engineering', 'Software Engineering 360 Review'),
-            ('Morgan Taylor', 'morgan.taylor@acme.example.com', 'Engineering', 'Manager 360 Review'),
-            ('Casey Johnson', 'casey.johnson@acme.example.com', 'Product', '360 Degree Feedback'),
+            ('Alex Rivera', 'alex.rivera@acme.example.com', 'Engineering', 'Professional Skills 360 Review', 'low'),
+            ('Jordan Chen', 'jordan.chen@acme.example.com', 'Engineering', 'Software Engineering 360 Review', 'high'),
+            ('Morgan Taylor', 'morgan.taylor@acme.example.com', 'Engineering', 'Manager 360 Review', 'aligned'),
+            ('Casey Johnson', 'casey.johnson@acme.example.com', 'Product', '360 Degree Feedback', 'slightly_low'),
         ]
 
         # Create partial cycles for dashboard/invitation screenshots
@@ -157,7 +159,7 @@ class Command(BaseCommand):
         feedback_token_for_screenshots = None
 
         # Create completed cycles with different questionnaires
-        for name, email, dept, questionnaire_name in reviewees_data:
+        for name, email, dept, questionnaire_name, self_rating in reviewees_data:
             if questionnaire_name not in questionnaires:
                 self.stdout.write(self.style.WARNING(f'Skipping {name} - questionnaire not found'))
                 continue
@@ -170,7 +172,7 @@ class Command(BaseCommand):
             )
 
             questionnaire = questionnaires[questionnaire_name]
-            cycle = self._create_completed_cycle(reviewee, questionnaire, admin)
+            cycle = self._create_completed_cycle(reviewee, questionnaire, admin, self_rating)
 
             cycle_data = {
                 'reviewee': name,
@@ -281,7 +283,16 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS('\nConfiguration saved to: /tmp/blik_screenshot_config.json'))
 
-    def _create_completed_cycle(self, reviewee, questionnaire, admin_user):
+    # Self rating per pattern: (1-5 rating from the question seed, share of a scale range).
+    # Others average about 4.2, so these give gaps of about -1.5, -0.5, 0 and +0.8.
+    SELF_RATING = {
+        'low': (lambda seed: 2 if seed < 4 else 3, 0.4),  # imposter syndrome
+        'slightly_low': (lambda seed: 3 if seed < 3 else 4, 0.6),
+        'aligned': (lambda seed: 4 if seed < 8 else 5, 0.72),
+        'high': (lambda seed: 5, 0.92),  # overconfident
+    }
+
+    def _create_completed_cycle(self, reviewee, questionnaire, admin_user, self_rating='low'):
         """Create a completed cycle with visually interesting data"""
         cycle = ReviewCycle.objects.create(
             reviewee=reviewee,
@@ -324,8 +335,7 @@ class Command(BaseCommand):
                 if question.question_type in ['rating', 'likert']:
                     # Create realistic differentiation between categories
                     if token.category == 'self':
-                        # Self rates lower (imposter syndrome pattern: 2-3)
-                        rating = 2 if question_seed < 4 else 3
+                        rating = self.SELF_RATING[self_rating][0](question_seed)
                     elif token.category == 'manager':
                         # Managers rate slightly lower but fair (3-4, occasional 5)
                         if question_seed < 2:
@@ -353,8 +363,8 @@ class Command(BaseCommand):
                     scale_range = max_val - min_val
 
                     if token.category == 'self':
-                        # Self rates lower (40-60% of range)
-                        scale_value = min_val + int(scale_range * (0.4 + (question_seed / 50)))
+                        share = self.SELF_RATING[self_rating][1]
+                        scale_value = min_val + int(scale_range * min(share + question_seed / 50, 1))
                     elif token.category == 'manager':
                         # Managers rate 60-80% of range
                         scale_value = min_val + int(scale_range * (0.6 + (question_seed / 50)))
