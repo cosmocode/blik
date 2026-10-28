@@ -151,6 +151,66 @@ class QuickCycleTests(CycleCategoryTestCase):
         created = ReviewCycle.objects.exclude(pk=previous.pk).get()
         self.assertEqual(created.tokens.filter(category='peer').count(), 0)
 
+    def test_the_dialog_chooses_the_categories(self):
+        previous = ReviewCycle.objects.create(reviewee=self.reviewee, questionnaire=self.questionnaire)
+
+        self.client.post(
+            reverse('quick_cycle_create', args=[self.reviewee.uuid]),
+            {'questionnaire_id': self.questionnaire.id, 'categories_submitted': '1',
+             'include_self': 'on', 'include_manager': 'on'},
+        )
+
+        created = ReviewCycle.objects.exclude(pk=previous.pk).get()
+        self.assertEqual(created.active_categories, ['self', 'manager'])
+
+    def test_the_dialog_needs_a_category(self):
+        self.client.post(
+            reverse('quick_cycle_create', args=[self.reviewee.uuid]),
+            {'questionnaire_id': self.questionnaire.id, 'categories_submitted': '1'},
+        )
+
+        self.assertFalse(ReviewCycle.objects.exists())
+
+    def test_reviewers_of_a_category_cleared_in_the_dialog_are_not_copied(self):
+        previous = ReviewCycle.objects.create(reviewee=self.reviewee, questionnaire=self.questionnaire)
+        ReviewerToken.objects.create(cycle=previous, category='peer', reviewer_email='pat@acme.example')
+
+        with patch(SEND_MAIL) as send:
+            self.client.post(
+                reverse('quick_cycle_create', args=[self.reviewee.uuid]),
+                {'questionnaire_id': self.questionnaire.id, 'categories_submitted': '1',
+                 'include_manager': 'on'},
+            )
+
+        created = ReviewCycle.objects.exclude(pk=previous.pk).get()
+        self.assertFalse(created.tokens.filter(category='peer').exists())
+        send.assert_not_called()
+
+
+class StartDialogTests(CycleCategoryTestCase):
+    """"New Cycle" asks before it creates a cycle and sends its mails."""
+
+    def setUp(self):
+        super().setUp()
+        self.previous = ReviewCycle.objects.create(
+            reviewee=self.reviewee, questionnaire=self.questionnaire, include_peer=False)
+
+    def test_the_cycle_list_opens_a_dialog_per_row(self):
+        response = self.client.get(reverse('review_cycle_list'))
+
+        self.assertContains(response, f'data-reviewee-dialog="start-review-{self.previous.uuid}"')
+        self.assertContains(response, f'id="start-review-{self.previous.uuid}"')
+        self.assertContains(response, f'name="source_cycle_uuid" value="{self.previous.uuid}"')
+        self.assertNotContains(response, 'dropdown-menu')
+
+    def test_the_dialog_starts_from_the_categories_of_the_previous_cycle(self):
+        for url in (reverse('review_cycle_list'), reverse('reviewee_list')):
+            with self.subTest(url=url):
+                response = self.client.get(url)
+
+                self.assertContains(response, 'name="include_self" checked>')
+                self.assertContains(response, 'name="include_peer">')
+
 
 class InvitationMailTests(CycleCategoryTestCase):
     def _send(self, cycle):
@@ -191,6 +251,69 @@ class InvitationMailTests(CycleCategoryTestCase):
         self.assertIn(str(cycle.invitation_token_peer), body)
         self.assertIn(str(cycle.invitation_token_manager), body)
         self.assertNotIn(str(cycle.invitation_token_direct_report), body)
+
+
+class ResendLinksTests(CycleCategoryTestCase):
+    """The cycle page sends the reviewee the links to share once more."""
+
+    def resend(self, cycle):
+        with patch(SEND_MAIL) as send:
+            response = self.client.post(reverse('send_reviewee_links', args=[cycle.uuid]))
+        return response, send
+
+    def test_the_reviewee_gets_the_links_of_the_active_categories(self):
+        cycle = ReviewCycle.objects.create(
+            reviewee=self.reviewee, questionnaire=self.questionnaire, include_direct_report=False)
+
+        response, send = self.resend(cycle)
+
+        self.assertRedirects(response, reverse('review_cycle_detail', args=[cycle.uuid]),
+                             fetch_redirect_response=False)
+        kwargs = send.call_args.kwargs
+        self.assertEqual(kwargs['recipient_list'], ['dana@acme.example'])
+        self.assertIn('Share Your 360 Feedback Links', kwargs['subject'])
+        self.assertIn(str(cycle.invitation_token_peer), kwargs['html_message'])
+        self.assertNotIn(str(cycle.invitation_token_direct_report), kwargs['html_message'])
+        self.assertNotIn(str(cycle.invitation_token_self), kwargs['html_message'])
+
+    def test_it_takes_a_post(self):
+        cycle = ReviewCycle.objects.create(reviewee=self.reviewee, questionnaire=self.questionnaire)
+
+        response = self.client.get(reverse('send_reviewee_links', args=[cycle.uuid]))
+
+        self.assertEqual(response.status_code, 405)
+
+    def test_nothing_goes_out_without_links_that_work(self):
+        closed = ReviewCycle.objects.create(
+            reviewee=self.reviewee, questionnaire=self.questionnaire, status='completed')
+        self_only = ReviewCycle.objects.create(
+            reviewee=self.reviewee, questionnaire=self.questionnaire,
+            include_peer=False, include_manager=False, include_direct_report=False)
+
+        for cycle in (closed, self_only):
+            with self.subTest(status=cycle.status, categories=cycle.active_categories):
+                send = self.resend(cycle)[1]
+                send.assert_not_called()
+
+    def test_another_organization_cannot_send(self):
+        cycle = ReviewCycle.objects.create(reviewee=self.reviewee, questionnaire=self.questionnaire)
+        other_org = Organization.objects.create(name='Other', email='org@other.example')
+        outsider = User.objects.create_user(username='outsider', email='admin@other.example', password='pw')
+        UserProfile.objects.create(user=outsider, organization=other_org)
+        assign_organization_admin(outsider)
+        self.client.force_login(outsider)
+
+        response, send = self.resend(cycle)
+
+        self.assertEqual(response.status_code, 404)
+        send.assert_not_called()
+
+    def test_the_cycle_page_offers_the_button(self):
+        cycle = ReviewCycle.objects.create(reviewee=self.reviewee, questionnaire=self.questionnaire)
+
+        response = self.client.get(reverse('review_cycle_detail', args=[cycle.uuid]))
+
+        self.assertContains(response, reverse('send_reviewee_links', args=[cycle.uuid]))
 
 
 class InvitationLinkTests(CycleCategoryTestCase):

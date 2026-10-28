@@ -46,8 +46,10 @@
     window.addEventListener('resize', closePopovers);
     document.addEventListener('scroll', closePopovers, true);
 
-    document.querySelectorAll('[data-reviewee-dialog]').forEach(button => {
-        button.addEventListener('click', () => {
+    // Delegated, so the rows the cycle list's search swaps in keep working.
+    document.addEventListener('click', event => {
+        const button = event.target.closest('[data-reviewee-dialog]');
+        if (button) {
             const panel = button.closest('[popover]');
             if (panel?.matches(':popover-open')) panel.hidePopover();
             const dialog = document.getElementById(button.dataset.revieweeDialog);
@@ -58,17 +60,13 @@
             dialog.addEventListener('close', () => returnFocus.focus(), {once: true});
             dialog.showModal();
             dialog.querySelector('.card-body').scrollTop = 0;
-        });
-    });
-    document.querySelectorAll('[data-close-reviewee-dialog]').forEach(button => {
-        button.addEventListener('click', () => button.closest('dialog').close());
-    });
-    document.querySelectorAll('.reviewee-dialog').forEach(dialog => {
-        dialog.addEventListener('click', event => {
-            if (event.target !== dialog) return;
+        } else if (event.target.closest('[data-close-reviewee-dialog]')) {
+            event.target.closest('dialog').close();
+        } else if (event.target.matches('.reviewee-dialog')) {
+            const dialog = event.target;
             const bounds = dialog.getBoundingClientRect();
             if (event.clientX < bounds.left || event.clientX > bounds.right ||
                 event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
-        });
+        }
     });
 })();

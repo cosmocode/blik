@@ -1,6 +1,6 @@
 {% load i18n %}{% blocktrans trimmed with name=reviewee.name %}Hi {{ name }},{% endblocktrans %}
 
-{% trans 'A new 360-degree feedback cycle has been created for you!' %}
+{% if is_reminder %}{% trans 'This is a friendly reminder that your self-assessment is still open.' %}{% else %}{% trans 'A new 360-degree feedback cycle has been created for you!' %}{% endif %}
 
 {% trans 'Please complete your self-assessment by clicking the link below:' %}
 

@@ -97,10 +97,10 @@ def send_password_reset_email(user, token):
         Number of emails sent (0 or 1)
     """
     from django.template.loader import render_to_string
-    from django.urls import reverse
+    from .url import get_absolute_url
 
     # Build reset URL
-    reset_url = f'{settings.SITE_PROTOCOL}://{settings.SITE_DOMAIN}{reverse("reset_password", args=[token.token])}'
+    reset_url = get_absolute_url('reset_password', token.token)
 
     with translation.override(user_language(user)):
         subject = _('Reset your %(site_name)s password') % {'site_name': settings.SITE_NAME}
@@ -136,14 +136,14 @@ def send_welcome_email(user, organization, password=None):
     """
     import random
     from django.template.loader import render_to_string
-    from django.urls import reverse
     from .models import WelcomeEmailFact
+    from .url import get_absolute_url
 
     # Build login URL
-    login_url = f'{settings.SITE_PROTOCOL}://{settings.SITE_DOMAIN}{reverse("login")}'
+    login_url = get_absolute_url('login')
 
     # Build Dreyfus model URL
-    dreyfus_url = f'{settings.SITE_PROTOCOL}://{settings.SITE_DOMAIN}/landing/dreyfus-model/'
+    dreyfus_url = get_absolute_url('/landing/dreyfus-model/')
 
     with translation.override(user_language(user, organization)):
         # Get active facts from database

@@ -1,7 +1,8 @@
 {% extends "admin_dashboard/base.html" %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block title %}{% trans 'Review Cycles' %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/reviewees.css' %}">{% endblock %}
 
 {% block content %}
 <div class="page-header">
@@ -92,81 +93,7 @@
                     <td>
                         {% if perms.accounts.can_manage_organization %}
                         <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <!-- Split button: New Cycle (main action) + dropdown for other questionnaires -->
-                            <div class="btn-group" style="position: relative; display: inline-flex;">
-                                <!-- Main action button: Create cycle with last-used or default questionnaire -->
-                                <form method="POST" action="{% url 'quick_cycle_create' cycle.reviewee.uuid %}" style="margin: 0; display: inline;">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="source_cycle_uuid" value="{{ cycle.uuid }}">
-                                    {% if cycle.latest_questionnaire_id %}
-                                    <input type="hidden" name="questionnaire_id" value="{{ cycle.latest_questionnaire_id }}">
-                                    {% else %}
-                                    {% for q in questionnaires %}
-                                        {% if q.is_default %}
-                                        <input type="hidden" name="questionnaire_id" value="{{ q.id }}">
-                                        {% endif %}
-                                    {% endfor %}
-                                    {% endif %}
-                                    <button type="submit" class="btn btn-sm btn-primary" style="border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: 1px solid rgba(255,255,255,0.3);">
-                                        {% trans 'New Cycle' %}
-                                    </button>
-                                </form>
-
-                                <!-- Dropdown toggle button -->
-                                <button
-                                    class="btn btn-sm btn-primary"
-                                    type="button"
-                                    data-toggle="cycle-{{ cycle.id }}"
-                                    style="border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 0.25rem 0.5rem; border-left: 1px solid rgba(255,255,255,0.3);"
-                                    title="{% trans 'Select different questionnaire' %}"
-                                >
-                                    ▾
-                                </button>
-
-                                <!-- Dropdown menu with fixed positioning -->
-                                <div class="dropdown-menu" id="cycle-{{ cycle.id }}" style="display: none; position: fixed; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); min-width: 300px; z-index: 9999; margin-top: 0.25rem;">
-                                    <div style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); background: var(--bg-light);">
-                                        <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary); margin-bottom: 0.25rem;">
-                                            {% trans 'Select Questionnaire' %}
-                                        </div>
-                                        <div style="font-size: 0.75rem; color: var(--text-secondary);">
-                                            <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-                                                ✓ = {% trans 'Quick create (button action)' %}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    {% for q in questionnaires %}
-                                    {% if cycle.latest_questionnaire_id and cycle.latest_questionnaire_id == q.id or not cycle.latest_questionnaire_id and q.is_default %}
-                                        {# This is the questionnaire that will be used for quick create #}
-                                        <form method="POST" action="{% url 'quick_cycle_create' cycle.reviewee.uuid %}" style="margin: 0;">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="source_cycle_uuid" value="{{ cycle.uuid }}">
-                                            <input type="hidden" name="questionnaire_id" value="{{ q.id }}">
-                                            <button type="submit" class="dropdown-item" style="width: 100%; text-align: left; padding: 0.625rem 1rem; border: none; background: none; cursor: pointer; font-size: 0.875rem; display: flex; justify-content: space-between; align-items: center; transition: background 0.15s; color: var(--text-primary); border-left: 3px solid var(--primary);">
-                                                <span style="flex: 1; padding-right: 0.5rem; font-weight: 500;">{{ q.name }}</span>
-                                                <span class="badge badge-primary" style="font-size: 0.75rem; background: var(--primary); color: white; display: inline-flex; align-items: center; gap: 0.25rem;">
-                                                    <span>✓</span>
-                                                    <span>{% trans 'Quick create' %}</span>
-                                                </span>
-                                            </button>
-                                        </form>
-                                    {% else %}
-                                        <form method="POST" action="{% url 'quick_cycle_create' cycle.reviewee.uuid %}" style="margin: 0;">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="source_cycle_uuid" value="{{ cycle.uuid }}">
-                                            <input type="hidden" name="questionnaire_id" value="{{ q.id }}">
-                                            <button type="submit" class="dropdown-item" style="width: 100%; text-align: left; padding: 0.625rem 1rem; border: none; background: none; cursor: pointer; font-size: 0.875rem; display: flex; justify-content: space-between; align-items: center; transition: background 0.15s; color: var(--text-primary);">
-                                                <span style="flex: 1; padding-right: 0.5rem;">{{ q.name }}</span>
-                                                {% if q.is_default %}
-                                                <span class="badge badge-secondary" style="font-size: 0.75rem;">{% trans 'Default' %}</span>
-                                                {% endif %}
-                                            </button>
-                                        </form>
-                                    {% endif %}
-                                    {% endfor %}
-                                </div>
-                            </div>
-
+                            <button type="button" class="btn btn-sm btn-primary" data-reviewee-dialog="start-review-{{ cycle.uuid }}" aria-haspopup="dialog">{% trans 'New Cycle' %}</button>
                             <a href="{% url 'review_cycle_detail' cycle.uuid %}" class="btn btn-sm btn-secondary">{% trans 'View' %}</a>
                         </div>
                         {% else %}
@@ -185,6 +112,7 @@
             </tbody>
         </table>
         </div>
+        {% if perms.accounts.can_manage_organization %}{% for cycle in cycles %}{% include 'admin_dashboard/partials/reviewee_start_dialog.html' with item=cycle.start dialog_key=cycle.uuid %}{% endfor %}{% endif %}
         {% endif %}
     </div>
 
@@ -229,16 +157,6 @@
 </div>
 {% endif %}
 
-<style>
-.dropdown-item:hover {
-    background-color: var(--bg-light);
-}
-.btn-group {
-    position: relative;
-    display: inline-flex;
-}
-</style>
-
 <script>
 // "/" jumps to the search field, like most list views.
 document.addEventListener('keydown', function(e) {
@@ -276,29 +194,6 @@ document.addEventListener('keydown', function(e) {
         }, 30);
     });
 })();
-
-// Row dropdowns. Delegated, so rows swapped in by the search keep working.
-document.addEventListener('click', function(e) {
-    // Close every menu outside the clicked button group.
-    const group = e.target.closest('.btn-group');
-    document.querySelectorAll('.dropdown-menu').forEach(menu => {
-        if (!group || !group.contains(menu)) menu.style.display = 'none';
-    });
-
-    const toggle = e.target.closest('[data-toggle^="cycle-"]');
-    if (!toggle) return;
-    e.preventDefault();
-    const menu = document.getElementById(toggle.getAttribute('data-toggle'));
-    if (menu.style.display === 'block') {
-        menu.style.display = 'none';
-    } else {
-        // Position the dropdown relative to the button
-        const rect = toggle.getBoundingClientRect();
-        menu.style.top = (rect.bottom + window.scrollY + 4) + 'px';
-        menu.style.left = (rect.left + window.scrollX) + 'px';
-        menu.style.display = 'block';
-    }
-});
 
 // UUID Modal functions
 function showUuidModal(cycleUuid, revieweeUuid, revieweeName) {
@@ -511,4 +406,5 @@ function showCopyFeedback(message) {
     transform: translateY(0);
 }
 </style>
+<script src="{% static 'js/reviewees.js' %}" defer></script>
 {% endblock %}

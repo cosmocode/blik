@@ -1,12 +1,11 @@
 from django.db.models import Avg, Count
 from collections import Counter, defaultdict
 from django.template.loader import render_to_string
-from django.conf import settings
-from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import gettext as _
 from core.languages import recipient_language
 from core.email import send_email
+from core.url import get_absolute_url
 from .models import Report
 from reviews.models import CATEGORY_ORDER, Response, ReviewCycle
 from core.models import Organization
@@ -939,12 +938,7 @@ def send_report_ready_notification(report, request=None):
         stats['errors'].append(_('Report does not have an access token'))
         return stats
 
-    # Always use SITE_DOMAIN for consistent URLs across all email contexts.
-    # A request's host can be an internal proxy hostname, which produces links
-    # the recipient cannot reach.
-    base_url = f"{settings.SITE_PROTOCOL}://{settings.SITE_DOMAIN}"
-
-    report_url = f"{base_url}{reverse('reports:reviewee_report', kwargs={'access_token': report.access_token})}"
+    report_url = get_absolute_url('reports:reviewee_report', access_token=report.access_token)
 
     # Get response count
     summary = get_report_summary(report)

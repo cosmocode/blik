@@ -271,6 +271,13 @@
             </div>
             {% endif %}
         </div>
+
+        {% if cycle.include_peer or cycle.include_manager or cycle.include_direct_report %}
+        <form method="post" action="{% url 'send_reviewee_links' cycle.uuid %}" style="margin: 1.5rem 0 0;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-secondary">{% trans 'Resend the links to the reviewee' %}</button>
+        </form>
+        {% endif %}
     </div>
 </details>
 {% endif %}

@@ -15,12 +15,12 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 style="margin: 0; font-size: 1.75rem;">{% trans '360° Feedback Cycle Started' %}</h1>
+            <h1 style="margin: 0; font-size: 1.75rem;">{% if is_reminder %}{% trans 'Self-Assessment Reminder' %}{% else %}{% trans '360° Feedback Cycle Started' %}{% endif %}</h1>
         </div>
         <div class="content">
             <p>{% blocktrans trimmed with name=reviewee.name %}Hi <strong>{{ name }}</strong>,{% endblocktrans %}</p>
 
-            <p>{% trans 'A new 360-degree feedback cycle has been created for you!' %}</p>
+            <p>{% if is_reminder %}{% trans 'This is a friendly reminder that your self-assessment is still open.' %}{% else %}{% trans 'A new 360-degree feedback cycle has been created for you!' %}{% endif %}</p>
 
             <p>{% trans 'Please complete your <strong>self-assessment</strong> by clicking the button below:' %}</p>
 

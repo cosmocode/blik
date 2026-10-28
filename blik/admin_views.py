@@ -15,7 +15,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.validators import validate_email
 from django.db import transaction
 from django.db.models import ProtectedError
-from django.db.models import Avg, Count, F, Max, OuterRef, Q, Subquery
+from django.db.models import Avg, Count, Exists, F, Max, OuterRef, Q, Subquery
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
@@ -67,6 +67,7 @@ from reports.services import generate_report, self_vs_others_gap, send_report_re
 from reviews.models import CATEGORY_ORDER, ReviewCycle, ReviewerToken
 from reviews.services import (
     assign_tokens_to_emails,
+    send_invitation_links_email,
     send_reminder_emails,
     send_reviewee_notifications,
     send_reviewer_invitations,
@@ -449,6 +450,7 @@ def reviewee_list(request):
         report, gap = reports_by_id.get(person.latest_report_id, (None, None))
         reviewees_with_latest.append({
             'reviewee': person,
+            'source_cycle': latest_cycle,
             'latest_questionnaire': latest_questionnaire,
             'selected_questionnaire': questionnaire_by_id.get(
                 latest_questionnaire.id if latest_questionnaire else None, default_questionnaire),
@@ -624,8 +626,12 @@ def quick_cycle_create(request, reviewee_uuid):
         # Otherwise, get the most recent previous cycle for this reviewee
         previous_cycle = reviewee.review_cycles.order_by('-created_at').first()
 
-    category_flags = {}
-    if previous_cycle:
+    # The dialog's checkboxes; a client without them keeps the previous cycle's categories.
+    category_flags = selected_category_flags(request)
+    if category_flags and not any(category_flags.values()):
+        messages.error(request, _('Select at least one feedback category.'))
+        return redirect('reviewee_list')
+    if previous_cycle and not category_flags:
         category_flags = {
             f'include_{category}': previous_cycle.collects(category)
             for category in CATEGORY_ORDER
@@ -644,12 +650,15 @@ def quick_cycle_create(request, reviewee_uuid):
         messages.error(request, str(e))
         return redirect('reviewee_list')
 
+    transaction.on_commit(lambda c=cycle: send_reviewee_notifications(c, request))
+
     total_tokens = 0
     email_invited_count = 0
 
     if previous_cycle:
-        # Copy tokens from previous cycle, including email assignments
-        previous_tokens = previous_cycle.tokens.all()
+        # Copy tokens from previous cycle, including email assignments. The self-assessment
+        # token comes from send_reviewee_notifications above.
+        previous_tokens = previous_cycle.tokens.filter(category__in=cycle.active_categories).exclude(category='self')
 
         for prev_token in previous_tokens:
             new_token = ReviewerToken.objects.create(
@@ -683,7 +692,6 @@ def quick_cycle_create(request, reviewee_uuid):
     else:
         # No previous cycle - use default token distribution
         token_distribution = [
-            ('self', 1),
             ('peer', 3),
             ('manager', 1),
             ('direct_report', 0),
@@ -705,6 +713,8 @@ def quick_cycle_create(request, reviewee_uuid):
               'Go to the cycle details to assign reviewers and send invitations.')
             % {'name': reviewee.name, 'questionnaire': questionnaire.name, 'count': total_tokens}
         )
+
+    messages.info(request, _('Notification emails are being sent to the reviewee.'))
 
     # Redirect to cycle detail page
     return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
@@ -1551,15 +1561,13 @@ def review_cycle_list(request):
         except ValidationError:
             questionnaire_filter = ''
 
-    latest_questionnaire_id = ReviewCycle.objects.filter(
-        reviewee=OuterRef('reviewee'),
-    ).order_by('-created_at').values('questionnaire_id')[:1]
     cycles_qs = cycles_qs.prefetch_related(
         'questionnaire__sections__questions'
     ).annotate(
         token_count=Count('tokens'),
         completed_count=Count('tokens', filter=Q(tokens__completed_at__isnull=False)),
-        latest_questionnaire_id=Subquery(latest_questionnaire_id),
+        reviewee_has_active_cycle=Exists(
+            ReviewCycle.objects.filter(reviewee=OuterRef('reviewee'), status='active')),
     )
 
     # Counts follow the search and questionnaire filters, so each stage
@@ -1596,7 +1604,19 @@ def review_cycle_list(request):
         cycles = paginator.page(paginator.num_pages)
 
     # Get available questionnaires for quick cycle creation
-    questionnaires = Questionnaire.objects.for_organization(org).filter(is_active=True).order_by('-is_default', 'name')
+    questionnaires = list(
+        Questionnaire.objects.for_organization(org).filter(is_active=True).order_by('-is_default', 'name'))
+    default_questionnaire = questionnaires[0] if questionnaires else None
+
+    # "New Cycle" opens the start dialog of the reviewee list, set up as a copy of the row's cycle.
+    for cycle in cycles:
+        cycle.start = {
+            'reviewee': cycle.reviewee,
+            'source_cycle': cycle,
+            'latest_questionnaire': cycle.questionnaire,
+            'selected_questionnaire': cycle.questionnaire if cycle.questionnaire.is_active else default_questionnaire,
+            'active_cycle': cycle.reviewee_has_active_cycle,
+        }
 
     context = {
         'cycles': cycles,  # Paginated object
@@ -1718,13 +1738,6 @@ def review_cycle_create(request):
                     **category_flags
                 )
 
-                # Send notification emails to reviewee. Defer to after the
-                # transaction commits so a slow SMTP backend can't stall this
-                # request (matches the pattern in api/signals.py).
-                transaction.on_commit(
-                    lambda c=cycle: send_reviewee_notifications(c, request)
-                )
-
                 # Check if user provided reviewer emails
 
                 email_assignments = {}
@@ -1768,6 +1781,14 @@ def review_cycle_create(request):
                     # Assign tokens to emails with randomization
                     assign_stats = assign_tokens_to_emails(cycle, email_assignments)
 
+                # Send notification emails to reviewee. Defer to after the
+                # transaction commits so a slow SMTP backend can't stall this
+                # request (matches the pattern in api/signals.py). Without a
+                # transaction it runs right here, so it has to come after the
+                # tokens: the self-assessment goes to the one the form addressed.
+                transaction.on_commit(lambda c=cycle: send_reviewee_notifications(c, request))
+
+                if has_emails:
                     # Check if user wants to send invitations immediately.
                     # Defer the send to after-commit so SMTP latency never
                     # stalls the request.
@@ -2053,6 +2074,7 @@ def manage_invitations(request, cycle_uuid):
         'unsent_tokens': assigned_tokens - sent_tokens,
         'completed_tokens': completed_tokens,
         'default_language_name': language_name(cycle.organization.default_language),
+        'self_token': cycle.tokens.filter(category='self', reviewer_email__isnull=False).first(),
     }
 
     return render(request, 'admin_dashboard/manage_invitations.html', context)
@@ -2066,11 +2088,18 @@ def assign_invitations(request, cycle_uuid):
     if request.method == 'POST':
         # Parse email assignments by category
         email_assignments = {}
+        self_assigned = cycle.tokens.filter(category='self', reviewer_email__isnull=False).exists()
 
         for category_code, category_display in ReviewerToken.CATEGORY_CHOICES:
             if not cycle.collects(category_code):
                 # The form hides these; a stale page or hand-made POST must not
                 # assign reviewers to a category this cycle does not collect.
+                email_assignments[category_code] = []
+                continue
+
+            if category_code == 'self' and self_assigned:
+                # The reviewee already has their self-assessment token; another
+                # address would start a second one.
                 email_assignments[category_code] = []
                 continue
 
@@ -2161,6 +2190,29 @@ def send_invitations(request, cycle_uuid):
             messages.info(request, _('No pending invitations to send.'))
 
         return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
+
+    return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
+
+
+@login_required
+@require_POST
+def send_reviewee_links(request, cycle_uuid):
+    """Send the reviewee the links to share once more"""
+    cycle = get_cycle_or_404(request, cycle_uuid)
+    categories = [category for category in cycle.active_categories if category != 'self']
+
+    # The links only open feedback forms while the cycle is active
+    if cycle.status != 'active' or not categories:
+        messages.error(request, _('This cycle has no links to send.'))
+        return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
+
+    stats = {'sent': 0, 'errors': []}
+    send_invitation_links_email(cycle, categories, stats)
+
+    for error in stats['errors']:
+        messages.error(request, error)
+    if stats['sent']:
+        messages.success(request, _('The links have been sent to %(email)s.') % {'email': cycle.reviewee.email})
 
     return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
 

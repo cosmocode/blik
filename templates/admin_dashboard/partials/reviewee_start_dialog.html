@@ -1,25 +1,35 @@
-{% load i18n %}
-<dialog id="start-review-{{ item.reviewee.uuid }}" class="modal-content reviewee-dialog" aria-labelledby="start-review-title-{{ item.reviewee.uuid }}">
+{% load i18n %}{% firstof dialog_key item.reviewee.uuid as dialog_key %}
+<dialog id="start-review-{{ dialog_key }}" class="modal-content reviewee-dialog" aria-labelledby="start-review-title-{{ dialog_key }}">
     <div class="card-header">
-        <div><h2 class="card-title" id="start-review-title-{{ item.reviewee.uuid }}">{% trans 'Start a review' %}</h2><p class="help-text">{{ item.reviewee.name }}</p></div>
+        <div><h2 class="card-title" id="start-review-title-{{ dialog_key }}">{% trans 'Start a review' %}</h2><p class="help-text">{{ item.reviewee.name }}</p></div>
         <form method="dialog"><button class="btn btn-sm btn-secondary" aria-label="{% trans 'Close' %}" autofocus>&times;</button></form>
     </div>
     <form method="post" action="{% url 'quick_cycle_create' item.reviewee.uuid %}" class="reviewee-start-form">
         {% csrf_token %}
+        {% if item.source_cycle %}<input type="hidden" name="source_cycle_uuid" value="{{ item.source_cycle.uuid }}">{% endif %}
+        <input type="hidden" name="categories_submitted" value="1">
         <div class="card-body">
             {% if item.active_cycle %}<p class="help-text reviewee-start-note">{% trans 'This person already has an active cycle. This will start another review.' %}</p>{% endif %}
             <div class="form-group">
-                <label class="form-label" for="start-questionnaire-{{ item.reviewee.uuid }}">{% trans 'Questionnaire' %}</label>
-                <select class="form-control" name="questionnaire_id" id="start-questionnaire-{{ item.reviewee.uuid }}" required>
+                <label class="form-label" for="start-questionnaire-{{ dialog_key }}">{% trans 'Questionnaire' %}</label>
+                <select class="form-control" name="questionnaire_id" id="start-questionnaire-{{ dialog_key }}" required>
                     {% for questionnaire in questionnaires %}<option value="{{ questionnaire.id }}"{% if item.selected_questionnaire.id == questionnaire.id %} selected{% endif %}>{{ questionnaire.name }}{% if questionnaire.is_default %} ({% trans 'Default' %}){% endif %}</option>{% endfor %}
                 </select>
                 {% if item.latest_questionnaire and not item.latest_questionnaire.is_active %}<p class="help-text">{% trans 'The previous questionnaire is archived. An active questionnaire has been selected.' %}</p>{% endif %}
             </div>
-            {% if item.reviewee.cycle_count %}
-            <p class="help-text">{% trans 'Reviewers and feedback categories are copied from the latest cycle. Invitations are sent to reviewers who have an email address.' %}</p>
+            <fieldset class="form-group">
+                <legend class="form-label">{% trans 'Feedback Categories' %}</legend>
+                <label class="form-check"><input type="checkbox" class="form-check-input" name="include_self"{% if not item.source_cycle or item.source_cycle.include_self %} checked{% endif %}>{% trans 'Self assessment' %}</label>
+                <label class="form-check"><input type="checkbox" class="form-check-input" name="include_manager"{% if not item.source_cycle or item.source_cycle.include_manager %} checked{% endif %}>{% trans 'Manager review' %}</label>
+                <label class="form-check"><input type="checkbox" class="form-check-input" name="include_peer"{% if not item.source_cycle or item.source_cycle.include_peer %} checked{% endif %}>{% trans 'Peer review' %}</label>
+                <label class="form-check"><input type="checkbox" class="form-check-input" name="include_direct_report"{% if not item.source_cycle or item.source_cycle.include_direct_report %} checked{% endif %}>{% trans 'Direct report review' %}</label>
+            </fieldset>
+            {% if item.source_cycle %}
+            <p class="help-text">{% trans 'Reviewers are copied from the previous cycle. Invitations are sent to reviewers who have an email address.' %}</p>
             {% else %}
             <p class="help-text">{% trans 'The cycle starts with space for a self-assessment, three peers and one manager. You can assign reviewers in the next step.' %}</p>
             {% endif %}
+            <p class="help-text">{% trans 'The reviewee is notified by email right away.' %}</p>
         </div>
         <div class="card-footer"><button type="button" class="btn btn-secondary" data-close-reviewee-dialog>{% trans 'Cancel' %}</button><button type="submit" class="btn btn-primary">{% trans 'Create Review Cycle' %}</button></div>
     </form>

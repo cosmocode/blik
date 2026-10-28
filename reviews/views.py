@@ -8,6 +8,7 @@ from django.utils.translation import gettext as _
 from django_ratelimit.decorators import ratelimit
 from core.languages import is_language, request_language
 from .models import ReviewerToken, Response, ReviewCycle
+from .services import self_assessment_token
 from questionnaires.answer_options import OPTION_TYPES, resolve_answer
 from questionnaires.models import Question
 import secrets
@@ -71,6 +72,10 @@ def claim_token(request, invitation_token):
 
     # If coming from redirect page (has force_claim param), skip localStorage check
     if request.GET.get('force_claim'):
+        if category == 'self':
+            # A cycle has one self-assessment; the link opens it instead of starting another.
+            return redirect('reviews:feedback_form', token=self_assessment_token(cycle).token)
+
         # Get available tokens (not claimed, not completed, and NOT assigned to an email)
         # This prevents invite links from claiming tokens meant for specific email invitations
         available_tokens = list(

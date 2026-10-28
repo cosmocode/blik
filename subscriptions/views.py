@@ -17,6 +17,7 @@ from django_ratelimit.decorators import ratelimit
 from .models import Subscription, OneTimeLoginToken
 from .fulfilment import _period, _ts, fulfil_checkout
 from .utils import price_id_for
+from core.url import get_absolute_url
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -320,7 +321,7 @@ def billing_portal(request):
         # Create billing portal session
         session = stripe.billing_portal.Session.create(
             customer=subscription.stripe_customer_id,
-            return_url=f"{settings.SITE_URL}/dashboard/settings/",
+            return_url=get_absolute_url('settings'),
         )
 
         return redirect(session.url)

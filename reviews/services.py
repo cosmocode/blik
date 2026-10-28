@@ -4,14 +4,13 @@ Service functions for review cycles
 import random
 from django.utils import timezone
 from django.template.loader import render_to_string
-from django.conf import settings
-from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import gettext as _
 from core.email import send_email
 from core.languages import recipient_language
+from core.url import get_absolute_url
 from datetime import timedelta
-from django.db.models import Q
+from django.db.models import F, Q
 from .models import ReviewCycle, ReviewerToken
 
 
@@ -28,6 +27,33 @@ def token_language(token):
 def reviewee_language(reviewee):
     """The language of emails to a reviewee."""
     return recipient_language(reviewee.language, organization=reviewee.organization)
+
+
+def self_assessment_token(cycle):
+    """The cycle's self-assessment token, addressed to the reviewee; made if there is none.
+
+    A cycle has one self-assessment, so neither the invitation nor the self link may start a
+    second token. One already filled in or opened wins over one never used.
+    """
+
+    token = (
+        cycle.tokens.filter(category='self')
+        .order_by(F('completed_at').asc(nulls_last=True), F('claimed_at').asc(nulls_last=True), 'pk')
+        .first()
+    )
+
+    if token is None:
+        return ReviewerToken.objects.create(
+            cycle=cycle,
+            category='self',
+            reviewer_email=cycle.reviewee.email.lower(),
+        )
+
+    if not token.reviewer_email:
+        token.reviewer_email = cycle.reviewee.email.lower()
+        token.save(update_fields=['reviewer_email'])
+
+    return token
 
 
 def assign_tokens_to_emails(cycle, email_assignments, language=''):
@@ -86,6 +112,57 @@ def assign_tokens_to_emails(cycle, email_assignments, language=''):
     return stats
 
 
+def send_token_email(token, reminder=False):
+    """Send a reviewer the link to their feedback form, as an invitation or a reminder.
+
+    The reviewee's own self-assessment has mails of its own: the reviewer
+    mails speak of the reviewee in the third person.
+    """
+
+    cycle = token.cycle
+    language = token_language(token)
+
+    with translation.override(language):
+        feedback_url = get_absolute_url('reviews:feedback_form', token.token)
+        questionnaire = cycle.questionnaire.translated()
+        context = {
+            'reviewee_name': cycle.reviewee.name,
+            'category': token.get_category_display(),
+            'feedback_url': feedback_url,
+            'questionnaire_name': questionnaire.name,
+        }
+
+        if token.category == 'self':
+            context |= {
+                'reviewee': cycle.reviewee,
+                'cycle': cycle,
+                'self_assessment_url': feedback_url,
+                'is_reminder': reminder,
+            }
+
+            template = 'emails/reviewee_self_assessment'
+
+            if reminder:
+                subject = _('Reminder: Complete Your Self-Assessment: %(questionnaire)s')
+            else:
+                subject = _('Complete Your Self-Assessment: %(questionnaire)s')
+
+        elif reminder:
+            template = 'emails/reviewer_reminder'
+            subject = _('Reminder: 360 Feedback Request for %(name)s')
+
+        else:
+            template = 'emails/reviewer_invitation'
+            subject = _('360 Feedback Request: %(name)s')
+
+        send_email(
+            subject=subject % {'questionnaire': questionnaire.name, 'name': cycle.reviewee.name},
+            message=render_to_string(f'{template}.txt', context),
+            recipient_list=[token.reviewer_email],
+            html_message=render_to_string(f'{template}.html', context),
+        )
+
+
 def send_reviewer_invitations(cycle, token_ids=None):
     """
     Send email invitations to reviewers.
@@ -107,46 +184,12 @@ def send_reviewer_invitations(cycle, token_ids=None):
     if token_ids:
         tokens = tokens.filter(id__in=token_ids)
     else:
-        # Bulk send: skip 'self' (the reviewee already gets a dedicated
-        # self-assessment email from send_reviewee_notifications), and only
-        # tokens that haven't been sent yet and aren't completed.
-        tokens = tokens.exclude(category='self').filter(
-            invitation_sent_at__isnull=True, completed_at__isnull=True,
-        )
+        # Bulk send: only tokens that haven't been sent yet and aren't completed.
+        tokens = tokens.filter(invitation_sent_at__isnull=True, completed_at__isnull=True)
 
     for token in tokens:
         try:
-            with translation.override(token_language(token)):
-                # Generate feedback URL
-                feedback_url = f"{settings.SITE_PROTOCOL}://{settings.SITE_DOMAIN}/feedback/{token.token}/"
-                questionnaire = cycle.questionnaire.translated()
-
-                # Render email templates
-                context = {
-                    'reviewee_name': cycle.reviewee.name,
-                    'category': token.get_category_display(),
-                    'feedback_url': feedback_url,
-                    'questionnaire_name': questionnaire.name,
-                }
-
-                if token.category == 'self':
-                    context.update(reviewee=cycle.reviewee, cycle=cycle, self_assessment_url=feedback_url)
-                    subject = _('Complete Your Self-Assessment: %(questionnaire)s') % {'questionnaire': questionnaire.name}
-                    template = 'emails/reviewee_self_assessment'
-                else:
-                    subject = _('360 Feedback Request: %(name)s') % {'name': cycle.reviewee.name}
-                    template = 'emails/reviewer_invitation'
-
-                html_message = render_to_string(f'{template}.html', context)
-                text_message = render_to_string(f'{template}.txt', context)
-
-                # Send email
-                send_email(
-                    subject=subject,
-                    message=text_message,
-                    recipient_list=[token.reviewer_email],
-                    html_message=html_message,
-                )
+            send_token_email(token)
 
             # Mark as sent
             token.invitation_sent_at = timezone.now()
@@ -188,29 +231,7 @@ def send_reminder_emails(cycle, token_ids=None):
 
     for token in tokens:
         try:
-            with translation.override(token_language(token)):
-                # Generate feedback URL
-                feedback_url = f"{settings.SITE_PROTOCOL}://{settings.SITE_DOMAIN}/feedback/{token.token}/"
-                questionnaire = cycle.questionnaire.translated()
-
-                # Render email templates
-                context = {
-                    'reviewee_name': cycle.reviewee.name,
-                    'category': token.get_category_display(),
-                    'feedback_url': feedback_url,
-                    'questionnaire_name': questionnaire.name,
-                }
-
-                html_message = render_to_string('emails/reviewer_reminder.html', context)
-                text_message = render_to_string('emails/reviewer_reminder.txt', context)
-
-                # Send email
-                send_email(
-                    subject=_('Reminder: 360 Feedback Request for %(name)s') % {'name': cycle.reviewee.name},
-                    message=text_message,
-                    recipient_list=[token.reviewer_email],
-                    html_message=html_message,
-                )
+            send_token_email(token, reminder=True)
 
             # Update last reminder sent timestamp
             token.last_reminder_sent_at = timezone.now()
@@ -246,54 +267,28 @@ def send_reviewee_notifications(cycle, request=None):
         stats['errors'].append(_('No email address for reviewee %(name)s') % {'name': cycle.reviewee.name})
         return stats
 
-    # Always use SITE_DOMAIN for consistent URLs across all email contexts
-    base_url = f"{settings.SITE_PROTOCOL}://{settings.SITE_DOMAIN}"
-
     # 1. Send the self-assessment email, unless this cycle skips self review
     if cycle.collects('self'):
-        send_assessment_email(cycle, base_url, stats)
+        send_assessment_email(cycle, stats)
 
     # 2. Send the links the reviewee shares with everyone else. Self is not
     # among them: the reviewee got their own link above.
     link_categories = [c for c in cycle.active_categories if c != 'self']
 
     if link_categories:
-        send_invitation_links_email(cycle, base_url, link_categories, stats)
+        send_invitation_links_email(cycle, link_categories, stats)
 
     return stats
 
 
-def send_assessment_email(cycle, base_url, stats):
-    """Send the reviewee their own self-assessment link. Records into `stats`."""
-    try:
-        with translation.override(reviewee_language(cycle.reviewee)):
-            self_assessment_url = f"{base_url}{reverse('reviews:claim_token', kwargs={'invitation_token': cycle.invitation_token_self})}"
-            questionnaire = cycle.questionnaire.translated()
-
-            context = {
-                'reviewee': cycle.reviewee,
-                'cycle': cycle,
-                'questionnaire_name': questionnaire.name,
-                'self_assessment_url': self_assessment_url,
-            }
-
-            html_message = render_to_string('emails/reviewee_self_assessment.html', context)
-            text_message = render_to_string('emails/reviewee_self_assessment.txt', context)
-
-            send_email(
-                subject=_('Complete Your Self-Assessment: %(questionnaire)s') % {'questionnaire': questionnaire.name},
-                message=text_message,
-                recipient_list=[cycle.reviewee.email],
-                html_message=html_message,
-            )
-
-        stats['sent'] += 1
-
-    except Exception as e:
-        stats['errors'].append(_('Failed to send self-assessment email: %(error)s') % {'error': str(e)})
+def send_assessment_email(cycle, stats):
+    """Send the reviewee their self-assessment token. Records into `stats`."""
+    sent = send_reviewer_invitations(cycle, token_ids=[self_assessment_token(cycle).id])
+    stats['sent'] += sent['sent']
+    stats['errors'] += sent['errors']
 
 
-def send_invitation_links_email(cycle, base_url, categories, stats):
+def send_invitation_links_email(cycle, categories, stats):
     """Send the reviewee the links to share, one per category. Records into `stats`."""
     try:
         with translation.override(reviewee_language(cycle.reviewee)):
@@ -305,10 +300,7 @@ def send_invitation_links_email(cycle, base_url, categories, stats):
             }
             for category in categories:
                 token = cycle.get_invitation_token(category)
-                context[f'{category}_url'] = (
-                    f"{base_url}"
-                    f"{reverse('reviews:claim_token', kwargs={'invitation_token': token})}"
-                )
+                context[f'{category}_url'] = get_absolute_url('reviews:claim_token', invitation_token=token)
 
             html_message = render_to_string('emails/reviewee_invitation_links.html', context)
             text_message = render_to_string('emails/reviewee_invitation_links.txt', context)
@@ -358,8 +350,6 @@ def send_close_check_emails(dry_run=False):
     if dry_run:
         return stats
 
-    base_url = f"{settings.SITE_PROTOCOL}://{settings.SITE_DOMAIN}"
-
     for cycle in cycles:
         try:
             if not cycle.reviewee.email:
@@ -370,7 +360,7 @@ def send_close_check_emails(dry_run=False):
 
             completed_count = cycle.tokens.filter(completed_at__isnull=False).count()
             total_count = cycle.tokens.count()
-            dashboard_url = f"{base_url}/dashboard/cycles/{cycle.uuid}/"
+            dashboard_url = get_absolute_url('review_cycle_detail', cycle_uuid=cycle.uuid)
 
             with translation.override(reviewee_language(cycle.reviewee)):
                 questionnaire = cycle.questionnaire.translated()

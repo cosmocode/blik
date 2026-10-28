@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-28 12:30+0000\n"
+"POT-Creation-Date: 2026-10-28 12:35+0000\n"
 "Language: de_Informal\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -880,12 +880,18 @@ msgstr ""
 msgid "Invalid questionnaire selected."
 msgstr ""
 
+msgid "Select at least one feedback category."
+msgstr ""
+
 #, python-format
 msgid "Review cycle created for \"%(name)s\" using \"%(questionnaire)s\". Copied %(count)s reviewer(s) from previous cycle. %(sent)s email invitation(s) sent."
 msgstr ""
 
 #, python-format
 msgid "Review cycle created for \"%(name)s\" using \"%(questionnaire)s\" with %(count)s reviewer token(s). Go to the cycle details to assign reviewers and send invitations."
+msgstr ""
+
+msgid "Notification emails are being sent to the reviewee."
 msgstr ""
 
 msgid "Pair with a more senior teammate on a challenging problem this sprint"
@@ -1028,9 +1034,6 @@ msgstr ""
 msgid "Fewest responses"
 msgstr ""
 
-msgid "Select at least one feedback category."
-msgstr ""
-
 #, python-format
 msgid "Created %(count)s review cycles. No invitations have been sent yet."
 msgstr ""
@@ -1111,6 +1114,13 @@ msgid "Successfully sent %(sent)s invitation email(s)."
 msgstr ""
 
 msgid "No pending invitations to send."
+msgstr ""
+
+msgid "This cycle has no links to send."
+msgstr ""
+
+#, python-format
+msgid "The links have been sent to %(email)s."
 msgstr ""
 
 #, python-format
@@ -2647,7 +2657,15 @@ msgid "Not enough tokens for %(category)s: need %(needed)s, have %(available)s"
 msgstr ""
 
 #, python-format
+msgid "Reminder: Complete Your Self-Assessment: %(questionnaire)s"
+msgstr ""
+
+#, python-format
 msgid "Complete Your Self-Assessment: %(questionnaire)s"
+msgstr ""
+
+#, python-format
+msgid "Reminder: 360 Feedback Request for %(name)s"
 msgstr ""
 
 #, python-format
@@ -2659,15 +2677,7 @@ msgid "Failed to send to %(email)s: %(error)s"
 msgstr ""
 
 #, python-format
-msgid "Reminder: 360 Feedback Request for %(name)s"
-msgstr ""
-
-#, python-format
 msgid "Failed to send reminder to %(email)s: %(error)s"
-msgstr ""
-
-#, python-format
-msgid "Failed to send self-assessment email: %(error)s"
 msgstr ""
 
 #, python-format
@@ -3540,6 +3550,9 @@ msgstr ""
 msgid "Enter email addresses for each reviewer category. The system will generate anonymous tokens and send invitations. Separate multiple emails with commas or newlines."
 msgstr ""
 
+msgid "The self-assessment goes to this address. Send the invitation or a reminder from the cycle page."
+msgstr ""
+
 msgid "Your email is automatically assigned for self-assessment"
 msgstr "Deine E-Mail-Adresse wird automatisch für die Selbsteinschätzung verwendet"
 
@@ -3824,11 +3837,17 @@ msgstr ""
 msgid "The previous questionnaire is archived. An active questionnaire has been selected."
 msgstr ""
 
-msgid "Reviewers and feedback categories are copied from the latest cycle. Invitations are sent to reviewers who have an email address."
+msgid "Feedback Categories"
+msgstr ""
+
+msgid "Reviewers are copied from the previous cycle. Invitations are sent to reviewers who have an email address."
 msgstr ""
 
 msgid "The cycle starts with space for a self-assessment, three peers and one manager. You can assign reviewers in the next step."
 msgstr "Die Runde beginnt mit Plätzen für eine Selbsteinschätzung, drei Kolleg:innen und eine Führungskraft. Im nächsten Schritt kannst du Beurteilende zuweisen."
+
+msgid "The reviewee is notified by email right away."
+msgstr ""
 
 #, python-format
 msgid "%(counter)s text missing"
@@ -4831,6 +4850,9 @@ msgstr ""
 msgid "Copy Link"
 msgstr ""
 
+msgid "Resend the links to the reviewee"
+msgstr ""
+
 #, python-format
 msgid "%(counter)s reviewer"
 msgid_plural "%(counter)s reviewers"
@@ -4964,9 +4986,6 @@ msgstr ""
 msgid "Preview sample report"
 msgstr ""
 
-msgid "Feedback Categories"
-msgstr ""
-
 msgid "Who gives feedback in this cycle. Categories you clear are left out of the invitation email and the report."
 msgstr ""
 
@@ -5025,18 +5044,6 @@ msgid "Show API Identifiers"
 msgstr ""
 
 msgid "New Cycle"
-msgstr ""
-
-msgid "Select different questionnaire"
-msgstr ""
-
-msgid "Select Questionnaire"
-msgstr ""
-
-msgid "Quick create (button action)"
-msgstr ""
-
-msgid "Quick create"
 msgstr ""
 
 #, python-format
@@ -6266,8 +6273,14 @@ msgstr ""
 msgid "DIRECT REPORT REVIEWS:"
 msgstr ""
 
+msgid "Self-Assessment Reminder"
+msgstr ""
+
 msgid "360° Feedback Cycle Started"
 msgstr ""
+
+msgid "This is a friendly reminder that your self-assessment is still open."
+msgstr "Eine freundliche Erinnerung: Deine Selbsteinschätzung ist noch offen."
 
 msgid "A new 360-degree feedback cycle has been created for you!"
 msgstr "Für dich wurde eine neue 360°-Feedbackrunde angelegt!"
