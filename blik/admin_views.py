@@ -645,12 +645,15 @@ def quick_cycle_create(request, reviewee_uuid):
         messages.error(request, str(e))
         return redirect('reviewee_list')
 
+    transaction.on_commit(lambda c=cycle: send_reviewee_notifications(c, request))
+
     total_tokens = 0
     email_invited_count = 0
 
     if previous_cycle:
-        # Copy tokens from previous cycle, including email assignments
-        previous_tokens = previous_cycle.tokens.all()
+        # Copy tokens from previous cycle, including email assignments. The self-assessment
+        # token comes from send_reviewee_notifications above.
+        previous_tokens = previous_cycle.tokens.exclude(category='self')
 
         for prev_token in previous_tokens:
             new_token = ReviewerToken.objects.create(
@@ -684,7 +687,6 @@ def quick_cycle_create(request, reviewee_uuid):
     else:
         # No previous cycle - use default token distribution
         token_distribution = [
-            ('self', 1),
             ('peer', 3),
             ('manager', 1),
             ('direct_report', 0),
@@ -706,6 +708,8 @@ def quick_cycle_create(request, reviewee_uuid):
               'Go to the cycle details to assign reviewers and send invitations.')
             % {'name': reviewee.name, 'questionnaire': questionnaire.name, 'count': total_tokens}
         )
+
+    messages.info(request, _('Notification emails are being sent to the reviewee.'))
 
     # Redirect to cycle detail page
     return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)

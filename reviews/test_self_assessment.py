@@ -181,6 +181,38 @@ class ManageInvitationsTests(SelfAssessmentTestCase):
         self.assertEqual(send.call_args.kwargs['recipient_list'], ['dana@acme.example'])
 
 
+class NewCycleTests(SelfAssessmentTestCase):
+    def setUp(self):
+        super().setUp()
+        self.client.force_login(self.admin)
+
+    def new_cycle(self):
+        with patch(SEND_MAIL) as send, self.captureOnCommitCallbacks(execute=True):
+            self.client.post(reverse('quick_cycle_create', args=[self.reviewee.uuid]),
+                             {'questionnaire_id': self.cycle.questionnaire.id})
+        return ReviewCycle.objects.exclude(pk=self.cycle.pk).get(), send
+
+    def test_the_reviewee_gets_the_self_assessment_and_the_links(self):
+        created, send = self.new_cycle()
+
+        subjects = {c.kwargs['subject'].split(':')[0] for c in send.call_args_list}
+        self.assertEqual(subjects, {'Complete Your Self-Assessment', 'Share Your 360 Feedback Links'})
+        [token] = created.tokens.filter(category='self')
+        self.assertIsNotNone(token.invitation_sent_at)
+
+    def test_the_copy_keeps_one_self_token(self):
+        ReviewerToken.objects.create(cycle=self.cycle, category='self', reviewer_email='dana@acme.example')
+        ReviewerToken.objects.create(cycle=self.cycle, category='self', claimed_at=timezone.now())
+        ReviewerToken.objects.create(cycle=self.cycle, category='peer', reviewer_email='pat@acme.example')
+
+        created, send = self.new_cycle()
+
+        self.assertEqual(created.tokens.filter(category='self').count(), 1)
+        recipients = [address.lower() for c in send.call_args_list for address in c.kwargs['recipient_list']]
+        self.assertEqual(recipients.count('dana@acme.example'), 2)
+        self.assertIn('pat@acme.example', recipients)
+
+
 class DropOrphanSelfTokensTests(SelfAssessmentTestCase):
     def addressed(self, **fields):
         return ReviewerToken.objects.create(
