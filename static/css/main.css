@@ -1360,6 +1360,34 @@ body.setup-page {
     }
 }
 
+/* A moved section or question, once its new place is saved */
+.just-saved {
+    position: relative;
+    animation: just-saved-outline 1.6s ease-out;
+}
+
+.just-saved::after {
+    content: attr(data-saved-label);
+    position: absolute;
+    bottom: 0.375rem;
+    right: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--success);
+    pointer-events: none;
+    animation: just-saved-label 1.6s ease-out forwards;
+}
+
+@keyframes just-saved-outline {
+    from { box-shadow: 0 0 0 2px var(--success); }
+    to { box-shadow: 0 0 0 2px transparent; }
+}
+
+@keyframes just-saved-label {
+    0%, 60% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
 /* An empty section still takes a dragged question */
 .question-list:not(:has(.editor-question)) {
     min-height: 3rem;

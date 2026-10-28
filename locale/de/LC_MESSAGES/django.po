@@ -7128,3 +7128,6 @@ msgstr "Frage nach unten verschieben"
 
 msgid "The new order could not be saved. Reload the page and try again."
 msgstr "Die neue Reihenfolge konnte nicht gespeichert werden. Laden Sie die Seite neu und versuchen Sie es erneut."
+
+msgid "Saved"
+msgstr "Gespeichert"

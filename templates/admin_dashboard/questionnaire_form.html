@@ -1535,7 +1535,7 @@ function getLayout() {
     });
 }
 
-async function saveLayout() {
+async function saveLayout(item) {
     document.querySelectorAll('#sections-list .question-list').forEach(function(list) {
         const emptyState = document.getElementById(`section-empty-${list.closest('.editor-section').dataset.sectionId}`);
 
@@ -1551,7 +1551,14 @@ async function saveLayout() {
         await postFormAsJson(form);
     } catch (error) {
         showFloatingAlert(document.getElementById('sections-list'), error.message, 'error');
+        return;
     }
+
+    // Flash the moved item once the server has the new order
+    item.dataset.savedLabel = '✓ {{ _('Saved')|escapejs }}';
+    item.classList.remove('just-saved');
+    void item.offsetWidth;
+    item.classList.add('just-saved');
 }
 
 function moveItem(button) {
@@ -1578,7 +1585,7 @@ function moveItem(button) {
 
     button.focus();
     item.scrollIntoView({ block: 'nearest' });
-    saveLayout();
+    saveLayout(item);
 }
 
 const sectionsList = document.getElementById('sections-list');
@@ -1597,7 +1604,7 @@ if (sectionsList) {
         animation: 150,
         onEnd: function(event) {
             if (event.oldIndex !== event.newIndex) {
-                saveLayout();
+                saveLayout(event.item);
             }
         },
     });
@@ -1609,7 +1616,7 @@ if (sectionsList) {
             animation: 150,
             onEnd: function(event) {
                 if (event.from !== event.to || event.oldIndex !== event.newIndex) {
-                    saveLayout();
+                    saveLayout(event.item);
                 }
             },
         });
