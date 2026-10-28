@@ -3,6 +3,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils import translation
 from django.utils.translation import gettext as _
+from core.url import get_absolute_url
 from reviews.models import ReviewerToken
 from reviews.services import token_language
 
@@ -10,7 +11,7 @@ from reviews.services import token_language
 def send_feedback_invitation(token, reviewer_email=None):
     """Send feedback invitation email for a reviewer token"""
 
-    full_url = f"{settings.SITE_URL}/feedback/{token.token}/"
+    full_url = get_absolute_url('reviews:feedback_form', token.token)
 
     with translation.override(token_language(token)):
         context = {

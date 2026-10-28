@@ -2,19 +2,18 @@
 Views for organization invitations
 """
 from datetime import timedelta
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.utils import timezone
-from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import gettext as _
 from accounts.models import OrganizationInvitation
 from accounts.permissions import organization_admin_required
 from core.languages import recipient_language
 from core.email import send_email
+from core.url import get_absolute_url
 from subscriptions.utils import check_user_limit
 
 
@@ -68,7 +67,7 @@ def send_invitation(request):
         )
 
         # Build invitation URL
-        invite_url = settings.SITE_URL + reverse('accept_invitation', kwargs={'token': invitation.token})
+        invite_url = get_absolute_url('accept_invitation', token=invitation.token)
 
         # Send invitation email
         try:
