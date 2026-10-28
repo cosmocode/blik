@@ -1,6 +1,6 @@
 import uuid
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _, gettext
 from core.models import TimeStampedModel, Organization
@@ -52,6 +52,15 @@ class Questionnaire(Translatable, TimeStampedModel):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        # An organization has one default questionnaire. Templates (no organization) are all marked default,
+        # so they are left alone.
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            if self.is_default and self.organization_id:
+                Questionnaire.objects.filter(organization_id=self.organization_id, is_default=True) \
+                    .exclude(pk=self.pk).update(is_default=False)
 
     @property
     def dreyfus_dimensions(self):
