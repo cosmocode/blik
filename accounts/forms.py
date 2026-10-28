@@ -1,5 +1,6 @@
 from django import forms
 from django.conf import settings
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -80,6 +81,22 @@ class ProfileEditForm(forms.ModelForm):
             profile.save(update_fields=['language'])
 
         return user
+
+
+class ProfilePasswordForm(PasswordChangeForm):
+    """Django's password change form, styled for the profile page"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['old_password'].label = _('Current password')
+        self.fields['new_password2'].label = _('Confirm new password')
+        self.fields['new_password2'].help_text = ''
+        # A short hint instead of the list of all validator rules; the validators still explain what fails
+        self.fields['new_password1'].help_text = _('Use at least 8 characters.')
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs.pop('autofocus', None)
+        self.fields['old_password'].widget.attrs['autofocus'] = True
 
 
 class ForgotPasswordForm(forms.Form):

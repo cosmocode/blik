@@ -237,7 +237,8 @@ def reset_password_view(request, token):
 def profile_view(request):
     """User profile view with editing capabilities and cycle reports."""
     from django.db.models import Count, Exists, OuterRef, Q
-    from accounts.forms import ProfileEditForm
+    from django.contrib.auth import update_session_auth_hash
+    from accounts.forms import ProfileEditForm, ProfilePasswordForm
     from reviews.models import ReviewCycle, ReviewerToken
     from reports.models import Report
     from reports.services import get_report_summary
@@ -248,15 +249,23 @@ def profile_view(request):
         messages.error(request, _('Profile not found. Please contact support.'))
         return redirect('admin_dashboard')
 
-    # Handle profile edit form
-    if request.method == 'POST':
+    # Both forms post here; the submit button name tells them apart
+    form = ProfileEditForm(instance=request.user)
+    password_form = ProfilePasswordForm(request.user)
+    if request.method == 'POST' and 'change_password' in request.POST:
+        password_form = ProfilePasswordForm(request.user, request.POST)
+        if password_form.is_valid():
+            user = password_form.save()
+            # Keep this session logged in; other sessions are logged out
+            update_session_auth_hash(request, user)
+            messages.success(request, _('Your password has been changed.'))
+            return redirect('profile')
+    elif request.method == 'POST':
         form = ProfileEditForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, _('Your profile has been updated successfully.'))
             return redirect('profile')
-    else:
-        form = ProfileEditForm(instance=request.user)
 
     # Get user's review cycles - both as reviewee and as creator
     organization = profile.organization
@@ -300,6 +309,7 @@ def profile_view(request):
         'profile': profile,
         'organization': organization,
         'form': form,
+        'password_form': password_form,
         'cycles_with_reports': cycles_with_reports,
     }
     return render(request, 'accounts/profile.html', context)

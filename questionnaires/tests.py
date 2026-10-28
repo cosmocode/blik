@@ -57,6 +57,17 @@ class QuestionnaireTestCase(TestCase):
         self.assertTrue(self.questionnaire.is_default)
         self.assertTrue(self.questionnaire.is_active)
 
+    def test_new_default_unsets_previous_default(self):
+        """Test that an organization keeps one default questionnaire"""
+        other_org_default = QuestionnaireFactory(organization=OrganizationFactory(), is_default=True)
+        new_default = QuestionnaireFactory(organization=self.org, is_default=True)
+
+        self.questionnaire.refresh_from_db()
+        other_org_default.refresh_from_db()
+        self.assertFalse(self.questionnaire.is_default)
+        self.assertTrue(new_default.is_default)
+        self.assertTrue(other_org_default.is_default)
+
     def test_questionnaire_has_sections(self):
         """Test that questionnaire has sections"""
         sections = self.questionnaire.sections.all()
