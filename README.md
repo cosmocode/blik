@@ -161,6 +161,12 @@ docker compose logs -f web
 
 Then visit `http://localhost:8000/setup/` to complete setup.
 
+### Translations
+
+After changing texts, update the catalogues with
+`docker compose exec web python manage.py update_translations` instead of editing them by hand.
+See the [Translation Guide](docs/TRANSLATIONS.md) for the workflow and the German terms.
+
 ### Contributing
 
 See the [Issues](https://github.com/thijsdezoete/blik/issues) page for current development tasks. Contributors welcome for:
@@ -178,6 +184,7 @@ See the [Issues](https://github.com/thijsdezoete/blik/issues) page for current d
 - **[User Guide](docs/USER_GUIDE.md)** - For reviewees and reviewers
 - **[Report Guide](docs/REPORT_GUIDE.md)** - Understanding feedback reports
 - **[Requirements](docs/REQUIREMENTS.md)** - MVP requirements and roadmap
+- **[Translation Guide](docs/TRANSLATIONS.md)** - Updating the catalogues, marking texts, German terms
 
 ## Technology Stack
 

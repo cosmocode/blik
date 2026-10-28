@@ -6,7 +6,8 @@ only ask for base languages, so a browser language with the same base as the org
 default (de for de-informal) takes the organization's variant.
 
 A variant such as de-informal only holds the texts that differ from its base language de, and
-falls back to it for the rest.
+falls back to it for the rest. Texts that Django translates as well are the exception: Django's
+own catalogue for de comes before ours, so the variant repeats them.
 """
 from django.conf import settings
 from django.utils.translation import get_supported_language_variant
