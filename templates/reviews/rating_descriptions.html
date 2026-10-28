@@ -1,0 +1,17 @@
+{# What each value of a rating question means, collapsed below the question; name puts in the reviewee's first name #}
+{% load i18n feedback_tags %}
+{% if question.descriptions %}
+<details class="rating-descriptions">
+    <summary>{% trans 'What does each score mean?' %}</summary>
+    <dl>
+        {% for value in "12345" %}
+        {% with text=question.descriptions|get_item:value %}
+        {% if text %}
+        <dt>{{ value }}{% if question.labels|get_item:value %} – {{ question.labels|get_item:value }}{% endif %}</dt>
+        <dd>{{ text|personalize:name|linebreaksbr }}</dd>
+        {% endif %}
+        {% endwith %}
+        {% endfor %}
+    </dl>
+</details>
+{% endif %}

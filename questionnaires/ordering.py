@@ -1,0 +1,36 @@
+"""The order of the sections of a questionnaire and of the questions in them, as the editor drags them around."""
+
+from django.db import transaction
+from django.db.models import F
+
+from .models import Question, QuestionSection
+
+
+def save_layout(questionnaire, layout):
+    """
+    Put the sections and questions of questionnaire in the order of layout: [{"section": id, "questions": [id, ...]}].
+    A question can move to another section. Raises ValueError unless layout holds every section and question once.
+    """
+
+    sections = {section.id: section for section in questionnaire.sections.all()}
+    questions = {question.id: question for question in Question.objects.filter(section__questionnaire=questionnaire)}
+    section_ids = [entry['section'] for entry in layout]
+    question_ids = [question_id for entry in layout for question_id in entry['questions']]
+
+    if sorted(section_ids) != sorted(sections) or sorted(question_ids) != sorted(questions):
+        raise ValueError('The layout must hold every section and question of the questionnaire once')
+
+    for order, entry in enumerate(layout):
+        sections[entry['section']].order = order
+
+        for question_order, question_id in enumerate(entry['questions']):
+            question = questions[question_id]
+            question.section_id = entry['section']
+            question.order = question_order
+
+    with transaction.atomic():
+        # Out of the way first: the orders are unique per questionnaire and per section, and ids never repeat
+        QuestionSection.objects.filter(id__in=sections).update(order=F('id') * -1)
+        Question.objects.filter(id__in=questions).update(order=F('id') * -1)
+        QuestionSection.objects.bulk_update(sections.values(), ['order'])
+        Question.objects.bulk_update(questions.values(), ['section', 'order'])

@@ -1,6 +1,7 @@
 """
 Admin dashboard views for Blik
 """
+import json
 import logging
 import random
 import re
@@ -43,8 +44,9 @@ from core.gdpr import GDPRDeletionService
 from core.models import Organization
 from productreviews.models import ProductReview, anonymous_name
 from questionnaires.action_items import add_action_item_keys
-from questionnaires.answer_options import DEFAULT_LIKERT_SCALE, save_options
+from questionnaires.answer_options import DEFAULT_LIKERT_SCALE, DEFAULT_RATING_LABELS, save_options
 from questionnaires.models import Question, QuestionSection, Questionnaire
+from questionnaires.ordering import save_layout
 from questionnaires.presentation import questionnaire_report_features
 from questionnaires.translations import (
     LanguageState,
@@ -79,9 +81,6 @@ from subscriptions.utils import (
 )
 
 logger = logging.getLogger(__name__)
-
-# A new rating question reads its five values like the default likert scale
-DEFAULT_RATING_LABELS = {f'{value}': label for value, label in enumerate(DEFAULT_LIKERT_SCALE, 1)}
 
 
 def get_default_labels(questionnaire):
@@ -940,6 +939,17 @@ def posted_labels(post, question_type):
     return {key: label for key, label in labels.items() if label}
 
 
+def posted_descriptions(post, question_type):
+    """The descriptions of the rating values the question editor posted, without the empty ones."""
+
+    if question_type != 'rating' or post.get('rating_descriptions') != 'on':
+        return {}
+
+    descriptions = {key: post.get(f'rating_description_{key}', '').strip() for key in DEFAULT_RATING_LABELS}
+
+    return {key: text for key, text in descriptions.items() if text}
+
+
 def posted_option_rows(post, prefix, with_weights=False):
     """The answer options the question editor posted, as [(id or None, label, weight), ...].
 
@@ -1004,6 +1014,17 @@ def questionnaire_edit(request, questionnaire_uuid):
                 messages.success(request, _('Questionnaire "%(name)s" updated successfully.') % {'name': questionnaire.name})
             except Exception as e:
                 messages.error(request, _('Error updating questionnaire: %(error)s') % {'error': str(e)})
+
+        elif action == 'reorder':
+            try:
+                save_layout(questionnaire, json.loads(request.POST.get('layout', '')))
+            except (ValueError, TypeError, KeyError):
+                return JsonResponse({
+                    'success': False,
+                    'message': _('The new order could not be saved. Reload the page and try again.'),
+                }, status=400)
+
+            return JsonResponse({'success': True})
 
         elif action == 'add_section':
             section_title = request.POST.get('section_title')
@@ -1133,6 +1154,7 @@ def questionnaire_edit(request, questionnaire_uuid):
                         question_type=question_type,
                         config=config,
                         labels=labels,
+                        descriptions=posted_descriptions(request.POST, question_type),
                         required=required,
                         order=next_order,
                         action_items=add_action_item_keys(action_items)
@@ -1244,6 +1266,7 @@ def questionnaire_edit(request, questionnaire_uuid):
 
                     question.config = config
                     question.labels = labels
+                    question.descriptions = posted_descriptions(request.POST, question_type)
                     question.save()
                     save_options(question, option_rows)
 
@@ -1260,6 +1283,7 @@ def questionnaire_edit(request, questionnaire_uuid):
                                 'config': question.config,
                                 'options': question.options_data,
                                 'labels': question.labels,
+                                'descriptions': question.descriptions,
                             },
                         })
 

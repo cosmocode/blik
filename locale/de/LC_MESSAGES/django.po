@@ -1849,6 +1849,25 @@ msgid "Label of rating %(value)s"
 msgstr "Beschriftung der Bewertung %(value)s"
 
 #, python-format
+msgid "Description of rating %(value)s"
+msgstr "Beschreibung der Bewertung %(value)s"
+
+msgid "descriptions"
+msgstr "Beschreibungen"
+
+msgid "Describe what each score means"
+msgstr "Beschreiben, was jede Bewertung bedeutet"
+
+msgid "What this score means (optional)"
+msgstr "Was diese Bewertung bedeutet (optional)"
+
+msgid "Reviewers can open the descriptions below the question."
+msgstr "Beurteilende können die Beschreibungen unter der Frage öffnen."
+
+msgid "What does each score mean?"
+msgstr "Was bedeutet jede Bewertung?"
+
+#, python-format
 msgid "The translation of \"%(text)s\" is longer than %(max_length)s characters."
 msgstr "Die Übersetzung von „%(text)s“ ist länger als %(max_length)s Zeichen."
 
@@ -7091,3 +7110,37 @@ msgstr "Gleiche Einschätzung wie andere"
 
 msgid "You do not have permission to create organizations."
 msgstr "Keine Berechtigung, Organisationen zu erstellen."
+
+msgid "Drag to move"
+msgstr "Zum Verschieben ziehen"
+
+msgid "Move section up"
+msgstr "Abschnitt nach oben verschieben"
+
+msgid "Move section down"
+msgstr "Abschnitt nach unten verschieben"
+
+msgid "Move question up"
+msgstr "Frage nach oben verschieben"
+
+msgid "Move question down"
+msgstr "Frage nach unten verschieben"
+
+msgid "The new order could not be saved. Reload the page and try again."
+msgstr "Die neue Reihenfolge konnte nicht gespeichert werden. Bitte die Seite neu laden und erneut versuchen."
+
+msgid "Saved"
+msgstr "Gespeichert"
+
+msgid "Only rating questions have descriptions."
+msgstr "Nur Bewertungsfragen haben Beschreibungen."
+
+msgid "Give the descriptions as texts by rating value."
+msgstr "Die Beschreibungen als Texte je Bewertungswert angeben."
+
+#, python-format
+msgid "Unknown rating values: %(values)s"
+msgstr "Unbekannte Bewertungswerte: %(values)s"
+
+msgid "List every section and question of the questionnaire once, by UUID."
+msgstr "Jeden Abschnitt und jede Frage des Fragebogens genau einmal per UUID aufführen."

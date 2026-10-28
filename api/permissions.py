@@ -86,6 +86,19 @@ class CanManageOrganization(BasePermission):
         return request.user.has_perm("accounts.can_manage_organization")
 
 
+class CanManageQuestionnaires(BasePermission):
+    """
+    Requires 'can_manage_questionnaires' permission.
+    Used for the endpoints that change questionnaires.
+    """
+
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+
+        return request.user.has_perm("accounts.can_manage_questionnaires")
+
+
 class CanCreateCycles(BasePermission):
     """
     Checks if user can create cycles for others.

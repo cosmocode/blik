@@ -6,11 +6,14 @@ organization scoping and permission checks.
 """
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from django.db.models import Count, Q
 from django.utils import timezone, translation
+from django.utils.translation import gettext as _
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
 
 from accounts.models import Reviewee
@@ -18,7 +21,8 @@ from accounts.permissions import visible_cycles
 from core.languages import request_language
 from reviews.models import ReviewCycle, ReviewerToken
 from questionnaires.answer_options import OPTION_TYPES, resolve_answer
-from questionnaires.models import Questionnaire
+from questionnaires.models import Question, QuestionSection, Questionnaire
+from questionnaires.ordering import save_layout
 from reports.models import Report
 
 from .serializers import (
@@ -27,6 +31,8 @@ from .serializers import (
     ReviewCycleSerializer,
     ReviewCycleCreateSerializer,
     ReviewCycleListSerializer,
+    QuestionDescriptionsSerializer,
+    QuestionSerializer,
     QuestionnaireSerializer,
     QuestionnaireListSerializer,
     ReportSerializer,
@@ -38,6 +44,7 @@ from .models import WebhookEndpoint, WebhookDelivery, APIToken
 from .permissions import (
     IsOrganizationMember,
     CanManageOrganization,
+    CanManageQuestionnaires,
     CanCreateCycles,
     CanViewAllReports,
 )
@@ -668,9 +675,13 @@ class QuestionnaireViewSet(RequestLanguageMixin, viewsets.ReadOnlyModelViewSet):
     """
     API endpoints for questionnaires.
 
-    Read-only for now - questionnaire creation/editing via admin UI.
-    Returns org-specific questionnaires + shared templates.
+    Returns org-specific questionnaires + shared templates. Only the order of sections and questions and the
+    descriptions of rating values can be changed here, and only in the organization's own questionnaires; everything
+    else is edited in the admin UI.
     """
+
+    # The actions that change a questionnaire
+    edit_actions = ["reorder", "update_question"]
 
     permission_classes = [IsOrganizationMember]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
@@ -684,18 +695,102 @@ class QuestionnaireViewSet(RequestLanguageMixin, viewsets.ReadOnlyModelViewSet):
             return QuestionnaireListSerializer
         return QuestionnaireSerializer
 
+    def get_permissions(self):
+        """Changing a questionnaire takes the permission to manage questionnaires."""
+
+        if self.action in self.edit_actions:
+            return [*super().get_permissions(), CanManageQuestionnaires()]
+
+        return super().get_permissions()
+
     def get_queryset(self):
         """
-        Return org questionnaires + shared templates.
+        Return org questionnaires + shared templates; shared templates cannot be changed.
         """
         org = self.request.organization
+        owners = Q(organization=org)
+
+        if self.action not in self.edit_actions:
+            owners |= Q(organization__isnull=True)
+
         return (
-            Questionnaire.objects.filter(
-                Q(organization=org) | Q(organization__isnull=True), is_active=True
-            )
+            Questionnaire.objects.filter(owners, is_active=True)
             .prefetch_related(*Questionnaire.translation_lookups())
             .order_by("name")
         )
+
+    @extend_schema(
+        tags=["questionnaires"],
+        description="Put the sections, and the questions in them, in a new order. Every section and question of the "
+        "questionnaire must be listed once; a question listed under another section moves there.",
+        request={
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "sections": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "uuid": {"type": "string", "format": "uuid"},
+                                "questions": {"type": "array", "items": {"type": "string", "format": "uuid"}},
+                            },
+                        },
+                    }
+                },
+            }
+        },
+    )
+    @action(detail=True, methods=["post"])
+    def reorder(self, request, uuid=None):
+        """
+        POST /api/v1/questionnaires/{uuid}/reorder/
+        Body: {"sections": [{"uuid": "...", "questions": ["...", "..."]}, ...]}
+        """
+        questionnaire = self.get_object()
+        section_ids = {f"{key}": id for key, id in questionnaire.sections.values_list("uuid", "id")}
+        question_ids = {
+            f"{key}": id for key, id in Question.objects.filter(section__questionnaire=questionnaire).values_list("uuid", "id")
+        }
+
+        try:
+            save_layout(questionnaire, [
+                {
+                    "section": section_ids[f"{entry['uuid']}"],
+                    "questions": [question_ids[f"{question}"] for question in entry["questions"]],
+                }
+                for entry in request.data["sections"]
+            ])
+        except (KeyError, TypeError, ValueError):
+            raise ValidationError(
+                {"sections": [_("List every section and question of the questionnaire once, by UUID.")]}
+            )
+
+        return Response({
+            "sections": [
+                {"uuid": section.uuid, "questions": [question.uuid for question in section.questions.all()]}
+                # Not the sections prefetched with the questionnaire: those still have the old order
+                for section in QuestionSection.objects.filter(questionnaire=questionnaire).prefetch_related("questions")
+            ]
+        })
+
+    @extend_schema(
+        tags=["questionnaires"],
+        description="Change a question. For now only the descriptions of the values of a rating question can be "
+        'changed, as texts by value: {"descriptions": {"1": "Almost never on time"}}. Empty texts are left out.',
+        request=QuestionDescriptionsSerializer,
+        responses=QuestionSerializer,
+        parameters=[OpenApiParameter("question_uuid", OpenApiTypes.UUID, OpenApiParameter.PATH)],
+    )
+    @action(detail=True, methods=["patch"], url_path=r"questions/(?P<question_uuid>[^/.]+)")
+    def update_question(self, request, uuid=None, question_uuid=None):
+        """PATCH /api/v1/questionnaires/{uuid}/questions/{question_uuid}/"""
+        question = get_object_or_404(Question, uuid=question_uuid, section__questionnaire=self.get_object())
+        serializer = QuestionDescriptionsSerializer(question, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(QuestionSerializer(question).data)
 
 
 # =============================================================================

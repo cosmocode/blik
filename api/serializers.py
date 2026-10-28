@@ -4,10 +4,12 @@ DRF Serializers for Blik API.
 These serializers handle conversion between model instances and JSON,
 with organization scoping and anonymity preservation.
 """
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 from django.db.models import Count, Q
 from accounts.models import Reviewee
 from reviews.models import CATEGORY_ORDER, ReviewCycle, ReviewerToken, Response
+from questionnaires.answer_options import DEFAULT_RATING_LABELS
 from questionnaires.legacy_config import config_with_texts
 from questionnaires.models import AnswerOption, Questionnaire, QuestionSection, Question
 from questionnaires.placeholders import personalize
@@ -115,6 +117,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             "config",
             "options",
             "labels",
+            "descriptions",
             "required",
             "order",
             "section",
@@ -128,6 +131,30 @@ class QuestionSerializer(serializers.ModelSerializer):
         return data
 
 
+class QuestionDescriptionsSerializer(serializers.ModelSerializer):
+    """The descriptions of the values of a rating question, by value: {"1": "Almost never on time", ...}."""
+
+    class Meta:
+        model = Question
+        fields = ["descriptions"]
+
+    def validate_descriptions(self, descriptions):
+        """Only rating questions have them, only for their values; empty ones are left out."""
+
+        if self.instance.question_type != "rating":
+            raise serializers.ValidationError(_("Only rating questions have descriptions."))
+
+        if not isinstance(descriptions, dict) or not all(isinstance(text, str) for text in descriptions.values()):
+            raise serializers.ValidationError(_("Give the descriptions as texts by rating value."))
+
+        if unknown := set(descriptions) - set(DEFAULT_RATING_LABELS):
+            raise serializers.ValidationError(
+                _("Unknown rating values: %(values)s") % {"values": ", ".join(sorted(unknown))}
+            )
+
+        return {value: text.strip() for value, text in descriptions.items() if text.strip()}
+
+
 class QuestionSectionSerializer(serializers.ModelSerializer):
     """Serializer for question sections with nested questions."""
 
@@ -135,8 +162,8 @@ class QuestionSectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = QuestionSection
-        fields = ["title", "description", "order", "questions"]
-        read_only_fields = []
+        fields = ["uuid", "title", "description", "order", "questions"]
+        read_only_fields = ["uuid"]
 
 
 class QuestionnaireSerializer(TranslatedSerializerMixin, serializers.ModelSerializer):

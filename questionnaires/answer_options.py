@@ -18,6 +18,9 @@ OPTION_TYPES = ['likert', 'single_choice', 'multiple_choice']
 # Offered in the source language of the questionnaire a new question belongs to
 DEFAULT_LIKERT_SCALE = [_('Strongly Disagree'), _('Disagree'), _('Neutral'), _('Agree'), _('Strongly Agree')]
 
+# A new rating question reads its five values like the default likert scale
+DEFAULT_RATING_LABELS = {f'{value}': label for value, label in enumerate(DEFAULT_LIKERT_SCALE, 1)}
+
 
 def save_options(question, rows):
     """Store the option rows the editor posted, [(id or None, label, weight), ...], in their order.

@@ -105,6 +105,7 @@
                             </label>
                         </div>
                     </div>
+                    {% include 'reviews/rating_descriptions.html' with name=reviewee.name %}
 
                     {% elif question.question_type == 'likert' %}
                     <div class="likert-group">

@@ -100,6 +100,7 @@ class QuestionSection(Translatable, TimeStampedModel):
     translated_fields = ['title', 'description']
     translated_children = 'questions'
 
+    uuid = models.UUIDField(_('UUID'), default=uuid.uuid4, unique=True, editable=False)
     questionnaire = models.ForeignKey(
         Questionnaire,
         on_delete=models.CASCADE,
@@ -124,7 +125,7 @@ class QuestionSection(Translatable, TimeStampedModel):
 class Question(Translatable, TimeStampedModel):
     """Individual question within a section"""
 
-    translated_fields = ['question_text', 'labels', 'action_items']
+    translated_fields = ['question_text', 'labels', 'descriptions', 'action_items']
     translated_children = 'options'
 
     QUESTION_TYPES = [
@@ -171,6 +172,9 @@ class Question(Translatable, TimeStampedModel):
     # For rating: labels by value, {"1": "Poor", "5": "Excellent"}
     # For scale: labels of its ends, {"min": "Not at all", "max": "Extremely"}
     labels = models.JSONField(_('labels'), default=dict, blank=True)
+
+    # For rating: what each value means, shown below the question on request, {"1": "Creates time pressure …"}
+    descriptions = models.JSONField(_('descriptions'), default=dict, blank=True)
 
     # Personalized action items for development plans
     # Format: [
@@ -219,12 +223,14 @@ class Question(Translatable, TimeStampedModel):
         return super().get_source_value(field)
 
     def set_texts(self, texts):
-        """Labels and action items are translated by key; keys the source no longer has are left out."""
+        """Labels, descriptions and action items are translated by key; keys the source no longer has are left out."""
 
         labels = texts.get('labels', {})
+        descriptions = texts.get('descriptions', {})
         action_items = texts.get('action_items', {})
         self.question_text = texts.get('question_text', self.question_text)
         self.labels = {key: labels.get(key, label) for key, label in self.labels.items()}
+        self.descriptions = {key: descriptions.get(key, text) for key, text in self.descriptions.items()}
         self.action_items = [
             {**item, 'text': action_items.get(item.get('key'), item.get('text'))} if isinstance(item, dict) else item
             for item in self.action_items
@@ -313,6 +319,8 @@ class QuestionTranslation(Translation):
     question_text = models.TextField(_('question text'), blank=True)
     # By the keys of Question.labels: {"1": "…", "5": "…"}
     labels = models.JSONField(_('labels'), default=dict, blank=True)
+    # By the keys of Question.descriptions: {"1": "…", "5": "…"}
+    descriptions = models.JSONField(_('descriptions'), default=dict, blank=True)
     # By the keys of Question.action_items: {"k3x9a2bq": "…"}
     action_items = models.JSONField(_('action items'), default=dict, blank=True)
 

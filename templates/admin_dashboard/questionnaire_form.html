@@ -1,5 +1,5 @@
 {% extends "admin_dashboard/base.html" %}
-{% load i18n %}
+{% load i18n static %}
 {% load json_filters %}
 
 {% block title %}{% if action == 'Edit' %}{% trans 'Edit Questionnaire' %}{% else %}{% trans 'Create Questionnaire' %}{% endif %}{% endblock %}
@@ -377,10 +377,12 @@
         </div>
         <div class="card-body">
             {% if sections %}
+            <div id="sections-list">
             {% for section in sections %}
-            <div class="card mb-2" style="background: var(--bg-light);">
-                <div class="card-header" style="background: var(--bg-light); display: flex; justify-content: space-between; align-items: center;">
-                    <div>
+            <div class="card mb-2 editor-section" data-section-id="{{ section.id }}" style="background: var(--bg-light);">
+                <div class="card-header" style="background: var(--bg-light); display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                    {% include 'admin_dashboard/partials/move_controls.html' with kind='section' %}
+                    <div style="flex: 1;">
                         <h3 style="font-size: 1.125rem; font-weight: 600; margin: 0; color: var(--text-primary);">{{ section.title }}</h3>
                         {% if section.description %}
                         <p style="margin: 0.25rem 0 0; color: var(--text-secondary); font-size: 0.875rem;">{{ section.description }}</p>
@@ -402,14 +404,14 @@
                 </div>
                 <div class="card-body">
                     {% if section.questions.all %}
-                    <div id="section-questions-{{ section.id }}" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div id="section-questions-{{ section.id }}" class="question-list" style="display: flex; flex-direction: column; gap: 1rem;">
                         {% for question in section.questions.all %}
                         {% include "admin_dashboard/partials/question_card.html" with question=question %}
                         {% endfor %}
                     </div>
                     {% else %}
                     <p id="section-empty-{{ section.id }}" style="color: var(--text-secondary); margin: 0;">{% trans 'No questions in this section yet.' %}</p>
-                    <div id="section-questions-{{ section.id }}" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+                    <div id="section-questions-{{ section.id }}" class="question-list" style="display: flex; flex-direction: column; gap: 1rem;"></div>
                     {% endif %}
 
                     <!-- Add Question Form -->
@@ -807,6 +809,12 @@
                 </div>
             </div>
             {% endfor %}
+            </div>
+            <form id="reorder-form" method="post" hidden>
+                {% csrf_token %}
+                <input type="hidden" name="action" value="reorder">
+                <input type="hidden" name="layout">
+            </form>
             {% else %}
             <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">{% trans 'No sections yet. Add a section to start building your questionnaire.' %}</p>
             {% endif %}
@@ -864,6 +872,7 @@
     </div>
 </template>
 
+<script src="{% static 'js/sortable.min.js' %}"></script>
 <script>
 // Attach event listeners to edit buttons
 document.addEventListener('DOMContentLoaded', function() {
@@ -937,7 +946,7 @@ function toggleOptionWeights(checkbox) {
 }
 
 // Edit Question Modal Functions
-function openEditQuestionModal(questionId, questionText, questionType, required, config, options, labels) {
+function openEditQuestionModal(questionId, questionText, questionType, required, config, options, labels, descriptions) {
     // Set basic fields
     document.getElementById('edit_question_id').value = questionId;
     document.getElementById('edit_question_text').value = questionText;
@@ -965,6 +974,10 @@ function openEditQuestionModal(questionId, questionText, questionType, required,
     ratingContainer.querySelectorAll('[data-rating-value]').forEach(function(input) {
         input.value = labels[input.dataset.ratingValue] || '';
     });
+    ratingContainer.querySelectorAll('[data-rating-description]').forEach(function(textarea) {
+        textarea.value = descriptions[textarea.dataset.ratingDescription] || '';
+    });
+    ratingContainer.querySelector('[data-rating-descriptions-toggle]').checked = Object.keys(descriptions).length > 0;
 
     // Populate based on question type
     if (questionType === 'rating') {
@@ -1059,6 +1072,7 @@ function updateQuestionCard(question) {
         editButton.dataset.config = JSON.stringify(question.config || {});
         editButton.dataset.options = JSON.stringify(question.options || []);
         editButton.dataset.labels = JSON.stringify(question.labels || {});
+        editButton.dataset.descriptions = JSON.stringify(question.descriptions || {});
     }
 }
 
@@ -1130,8 +1144,9 @@ function bindEditQuestionButtons(rootElement) {
             const config = JSON.parse(this.dataset.config || '{}');
             const options = JSON.parse(this.dataset.options || '[]');
             const labels = JSON.parse(this.dataset.labels || '{}');
+            const descriptions = JSON.parse(this.dataset.descriptions || '{}');
 
-            openEditQuestionModal(questionId, questionText, questionType, required, config, options, labels);
+            openEditQuestionModal(questionId, questionText, questionType, required, config, options, labels, descriptions);
         });
     });
 }
@@ -1506,6 +1521,106 @@ function removeActionItem(itemId) {
     if (container.children.length === 0) {
         container.innerHTML = '<p style="color: var(--text-secondary); font-style: italic; text-align: center; padding: 2rem;">{{ _('No action items configured. Click "+ Add Action Item" to create one.')|escapejs }}</p>';
     }
+}
+
+// Reordering: drag a handle or use the arrows; each change saves the order of all sections and questions
+function getLayout() {
+    return Array.from(document.querySelectorAll('#sections-list > .editor-section')).map(function(section) {
+        return {
+            section: Number(section.dataset.sectionId),
+            questions: Array.from(section.querySelectorAll('.question-list > .editor-question')).map(function(question) {
+                return Number(question.dataset.questionId);
+            }),
+        };
+    });
+}
+
+async function saveLayout(item) {
+    document.querySelectorAll('#sections-list .question-list').forEach(function(list) {
+        const emptyState = document.getElementById(`section-empty-${list.closest('.editor-section').dataset.sectionId}`);
+
+        if (emptyState) {
+            emptyState.hidden = list.children.length > 0;
+        }
+    });
+
+    const form = document.getElementById('reorder-form');
+    form.elements.layout.value = JSON.stringify(getLayout());
+
+    try {
+        await postFormAsJson(form);
+    } catch (error) {
+        showFloatingAlert(document.getElementById('sections-list'), error.message, 'error');
+        return;
+    }
+
+    // Flash the moved item once the server has the new order
+    item.dataset.savedLabel = '✓ {{ _('Saved')|escapejs }}';
+    item.classList.remove('just-saved');
+    void item.offsetWidth;
+    item.classList.add('just-saved');
+}
+
+function moveItem(button) {
+    const item = button.closest('.editor-question') || button.closest('.editor-section');
+    const up = button.dataset.move === 'up';
+    const sibling = up ? item.previousElementSibling : item.nextElementSibling;
+
+    if (sibling) {
+        up ? sibling.before(item) : sibling.after(item);
+    } else if (item.classList.contains('editor-question')) {
+        // At the edge of its section a question moves on into the neighbouring section
+        const section = item.closest('.editor-section');
+        const neighbour = up ? section.previousElementSibling : section.nextElementSibling;
+
+        if (!neighbour) {
+            return;
+        }
+
+        const list = neighbour.querySelector('.question-list');
+        up ? list.append(item) : list.prepend(item);
+    } else {
+        return;
+    }
+
+    button.focus();
+    item.scrollIntoView({ block: 'nearest' });
+    saveLayout(item);
+}
+
+const sectionsList = document.getElementById('sections-list');
+
+if (sectionsList) {
+    sectionsList.addEventListener('click', function(event) {
+        const button = event.target.closest('[data-move]');
+
+        if (button) {
+            moveItem(button);
+        }
+    });
+
+    Sortable.create(sectionsList, {
+        handle: '.section-handle',
+        animation: 150,
+        onEnd: function(event) {
+            if (event.oldIndex !== event.newIndex) {
+                saveLayout(event.item);
+            }
+        },
+    });
+
+    sectionsList.querySelectorAll('.question-list').forEach(function(list) {
+        Sortable.create(list, {
+            group: 'questions',
+            handle: '.question-handle',
+            animation: 150,
+            onEnd: function(event) {
+                if (event.from !== event.to || event.oldIndex !== event.newIndex) {
+                    saveLayout(event.item);
+                }
+            },
+        });
+    });
 }
 </script>
 

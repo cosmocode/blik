@@ -24,7 +24,7 @@ from core.languages import get_base_language, is_language, language_name, transl
 CHECKSUM_LENGTH = 16
 
 # Source texts that the translation page edits in a text area instead of a single line
-MULTILINE_FIELDS = ['description', 'question_text', 'action_items']
+MULTILINE_FIELDS = ['description', 'question_text', 'descriptions', 'action_items']
 
 # What a text is, by the model name of its part and its field
 TEXT_LABELS = {
@@ -218,6 +218,9 @@ class TextTranslation:
     @property
     def label(self):
         """What the text is, for the translation page."""
+
+        if self.field == 'descriptions':
+            return gettext('Description of rating %(value)s') % {'value': self.item}
 
         if self.field != 'labels':
             return TEXT_LABELS[self.part._meta.model_name, self.field]
