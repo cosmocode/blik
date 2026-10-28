@@ -1298,6 +1298,34 @@ body.setup-page {
     outline-offset: 2px;
 }
 
+/* The question editor shows the description of each rating value once they are switched on */
+.rating-labels:not(:has([data-rating-descriptions-toggle]:checked)) .rating-description-input {
+    display: none;
+}
+
+.rating-descriptions {
+    margin-top: 12px;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.rating-descriptions summary {
+    cursor: pointer;
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.rating-descriptions dt {
+    margin-top: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.rating-descriptions dd {
+    margin: 2px 0 0;
+    line-height: 1.4;
+}
+
 .rating-label:hover {
     border-color: var(--primary);
     background: var(--bg-light);

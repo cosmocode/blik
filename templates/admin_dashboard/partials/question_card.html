@@ -36,6 +36,7 @@
                 data-config="{{ question.config|to_json }}"
                 data-options="{{ question.options_data|to_json }}"
                 data-labels="{{ question.labels|to_json }}"
+                data-descriptions="{{ question.descriptions|to_json }}"
             >{% trans 'Edit' %}</button>
             <form method="post" style="margin: 0;" onsubmit="return confirm('{{ _('Delete this question?')|escapejs }}');">
                 {% csrf_token %}

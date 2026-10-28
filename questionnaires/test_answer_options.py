@@ -201,6 +201,53 @@ class EditorTest(AnswerOptionTestCase):
         self.assertEqual(Question.objects.get(question_text='Rating').labels, {'1': 'Rarely', '5': 'Always'})
         self.assertEqual(Question.objects.get(question_text='Scale').labels, {'min': 'Drained'})
 
+    def test_rating_descriptions_are_stored_without_the_empty_ones(self):
+        self.edit(
+            action='add_question',
+            section_id=self.section.id,
+            question_type='rating',
+            question_text='Timeliness',
+            rating_descriptions='on',
+            rating_description_1='Almost never on time',
+            rating_description_2='  ',
+        )
+
+        self.assertEqual(Question.objects.get(question_text='Timeliness').descriptions, {'1': 'Almost never on time'})
+
+    def test_switching_the_rating_descriptions_off_drops_them(self):
+        question = Question.objects.create(
+            section=self.section,
+            question_text='Timeliness',
+            question_type='rating',
+            descriptions={'1': 'Almost never on time'},
+            order=self.section.questions.count(),
+        )
+
+        self.edit(
+            action='edit_question',
+            question_id=question.id,
+            question_type='rating',
+            question_text='Timeliness',
+            rating_description_1='Almost never on time',
+        )
+
+        question.refresh_from_db()
+        self.assertEqual(question.descriptions, {})
+
+    def test_another_type_drops_the_rating_descriptions(self):
+        question = Question.objects.create(
+            section=self.section,
+            question_text='Timeliness',
+            question_type='rating',
+            descriptions={'1': 'Almost never on time'},
+            order=self.section.questions.count(),
+        )
+
+        self.edit(action='edit_question', question_id=question.id, question_type='text', question_text='Timeliness')
+
+        question.refresh_from_db()
+        self.assertEqual(question.descriptions, {})
+
 
 class ConfigTextsTest(AnswerOptionTestCase):
 

@@ -86,6 +86,7 @@ def export_organization_data(organization):
                     'config': question.config,
                     'options': [{**data, 'translations': get_translations_data(option)} for data, option in options],
                     'labels': question.labels,
+                    'descriptions': question.descriptions,
                     'action_items': question.action_items,
                     'required': question.required,
                     'order': question.order,

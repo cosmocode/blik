@@ -93,6 +93,16 @@ class TranslatedCopyTest(TranslatedQuestionnaireTestCase):
         self.assertEqual([option.label for option in likert.options.all()], ['Stimme zu', 'Disagree'])
         self.assertEqual(likert.options.count(), 2)
 
+    def test_rating_descriptions_are_translated_by_value(self):
+        self.rating.descriptions = {'1': 'Often late', '5': 'Always on time'}
+        self.rating.save()
+        self.rating.translations.filter(language='de').update(descriptions={'1': 'Oft zu spät', '9': 'Verwaist'})
+
+        [section] = self.questionnaire.translated('de').sections.all()
+        rating, likert = section.questions.all()
+
+        self.assertEqual(rating.descriptions, {'1': 'Oft zu spät', '5': 'Always on time'})
+
     def test_a_variant_takes_its_own_texts_and_those_of_its_base_language(self):
         [section] = self.questionnaire.translated('de-informal').sections.all()
         rating, likert = section.questions.all()

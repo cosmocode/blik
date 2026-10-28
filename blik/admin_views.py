@@ -940,6 +940,17 @@ def posted_labels(post, question_type):
     return {key: label for key, label in labels.items() if label}
 
 
+def posted_descriptions(post, question_type):
+    """The descriptions of the rating values the question editor posted, without the empty ones."""
+
+    if question_type != 'rating' or post.get('rating_descriptions') != 'on':
+        return {}
+
+    descriptions = {key: post.get(f'rating_description_{key}', '').strip() for key in DEFAULT_RATING_LABELS}
+
+    return {key: text for key, text in descriptions.items() if text}
+
+
 def posted_option_rows(post, prefix, with_weights=False):
     """The answer options the question editor posted, as [(id or None, label, weight), ...].
 
@@ -1133,6 +1144,7 @@ def questionnaire_edit(request, questionnaire_uuid):
                         question_type=question_type,
                         config=config,
                         labels=labels,
+                        descriptions=posted_descriptions(request.POST, question_type),
                         required=required,
                         order=next_order,
                         action_items=add_action_item_keys(action_items)
@@ -1244,6 +1256,7 @@ def questionnaire_edit(request, questionnaire_uuid):
 
                     question.config = config
                     question.labels = labels
+                    question.descriptions = posted_descriptions(request.POST, question_type)
                     question.save()
                     save_options(question, option_rows)
 
@@ -1260,6 +1273,7 @@ def questionnaire_edit(request, questionnaire_uuid):
                                 'config': question.config,
                                 'options': question.options_data,
                                 'labels': question.labels,
+                                'descriptions': question.descriptions,
                             },
                         })
 

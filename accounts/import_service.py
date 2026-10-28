@@ -398,6 +398,7 @@ def import_questionnaires(organization, questionnaires_data, conflict_resolution
                         question_type=question_data.get('question_type', 'text'),
                         config=question_data.get('config', {}),
                         labels=question_data.get('labels', {}),
+                        descriptions=question_data.get('descriptions', {}),
                         action_items=add_action_item_keys(question_data.get('action_items') or []),
                         required=question_data.get('required', False),
                         order=question_data.get('order', 0),

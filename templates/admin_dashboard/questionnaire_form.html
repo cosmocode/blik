@@ -937,7 +937,7 @@ function toggleOptionWeights(checkbox) {
 }
 
 // Edit Question Modal Functions
-function openEditQuestionModal(questionId, questionText, questionType, required, config, options, labels) {
+function openEditQuestionModal(questionId, questionText, questionType, required, config, options, labels, descriptions) {
     // Set basic fields
     document.getElementById('edit_question_id').value = questionId;
     document.getElementById('edit_question_text').value = questionText;
@@ -965,6 +965,10 @@ function openEditQuestionModal(questionId, questionText, questionType, required,
     ratingContainer.querySelectorAll('[data-rating-value]').forEach(function(input) {
         input.value = labels[input.dataset.ratingValue] || '';
     });
+    ratingContainer.querySelectorAll('[data-rating-description]').forEach(function(textarea) {
+        textarea.value = descriptions[textarea.dataset.ratingDescription] || '';
+    });
+    ratingContainer.querySelector('[data-rating-descriptions-toggle]').checked = Object.keys(descriptions).length > 0;
 
     // Populate based on question type
     if (questionType === 'rating') {
@@ -1059,6 +1063,7 @@ function updateQuestionCard(question) {
         editButton.dataset.config = JSON.stringify(question.config || {});
         editButton.dataset.options = JSON.stringify(question.options || []);
         editButton.dataset.labels = JSON.stringify(question.labels || {});
+        editButton.dataset.descriptions = JSON.stringify(question.descriptions || {});
     }
 }
 
@@ -1130,8 +1135,9 @@ function bindEditQuestionButtons(rootElement) {
             const config = JSON.parse(this.dataset.config || '{}');
             const options = JSON.parse(this.dataset.options || '[]');
             const labels = JSON.parse(this.dataset.labels || '{}');
+            const descriptions = JSON.parse(this.dataset.descriptions || '{}');
 
-            openEditQuestionModal(questionId, questionText, questionType, required, config, options, labels);
+            openEditQuestionModal(questionId, questionText, questionType, required, config, options, labels, descriptions);
         });
     });
 }

@@ -115,6 +115,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             "config",
             "options",
             "labels",
+            "descriptions",
             "required",
             "order",
             "section",

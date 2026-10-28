@@ -1849,6 +1849,25 @@ msgid "Label of rating %(value)s"
 msgstr "Beschriftung der Bewertung %(value)s"
 
 #, python-format
+msgid "Description of rating %(value)s"
+msgstr "Beschreibung der Bewertung %(value)s"
+
+msgid "descriptions"
+msgstr "Beschreibungen"
+
+msgid "Describe what each score means"
+msgstr "Beschreiben, was jede Bewertung bedeutet"
+
+msgid "What this score means (optional)"
+msgstr "Was diese Bewertung bedeutet (optional)"
+
+msgid "Reviewers can open the descriptions below the question."
+msgstr "Bewertende können die Beschreibungen unter der Frage öffnen."
+
+msgid "What does each score mean?"
+msgstr "Was bedeutet jede Bewertung?"
+
+#, python-format
 msgid "The translation of \"%(text)s\" is longer than %(max_length)s characters."
 msgstr "Die Übersetzung von „%(text)s“ ist länger als %(max_length)s Zeichen."
 

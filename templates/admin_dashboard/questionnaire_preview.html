@@ -66,6 +66,7 @@
                         {% blocktrans trimmed with max=question.config.max_value|default:5 %}1 to {{ max }}{% endblocktrans %}
                         {% endif %}
                     </div>
+                    {% include 'reviews/rating_descriptions.html' with name='' %}
                     {% elif question.question_type == 'likert' %}
                     <div style="margin-top: 0.5rem;">
                         <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">{% trans 'Likert scale options:' %}</div>
