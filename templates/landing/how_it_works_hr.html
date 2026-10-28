@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="hiw hiw-a">
+<div class="hiw hiw-a" data-device="desktop">
     <section class="hiw-hero">
         <div class="container">
             <h1 class="hiw-title">How Blik works, start to finish</h1>
@@ -48,6 +48,12 @@
                 {% if step.note %}<p class="hiw-note">{{ step.note }}</p>{% endif %}
             </div>
             <div class="hiw-a-media">
+                {% if step.has_devices %}
+                <div class="hiw-device" role="group" aria-label="Show the screens on">
+                    <button type="button" class="hiw-lens-btn" data-device="desktop" aria-pressed="true">Computer</button>
+                    <button type="button" class="hiw-lens-btn" data-device="phone" aria-pressed="false">Phone</button>
+                </div>
+                {% endif %}
                 {% for m in step.media %}{% include 'landing/includes/hiw_media.html' %}{% endfor %}
             </div>
         </li>
@@ -56,4 +62,20 @@
 
     {% include 'landing/includes/hiw_footer.html' %}
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Computer or phone: one choice for the whole page, so every switch stays in step.
+    (function () {
+        var root = document.querySelector('.hiw-a');
+        var buttons = root.querySelectorAll('.hiw-device button');
+        buttons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                root.setAttribute('data-device', btn.dataset.device);
+                buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.device === btn.dataset.device ? 'true' : 'false'); });
+            });
+        });
+    })();
+</script>
 {% endblock %}
