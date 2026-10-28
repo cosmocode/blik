@@ -19,6 +19,8 @@ Visibility rules come from the code, not from marketing:
 
 Media with "placeholder": True are screenshots not captured yet;
 the template shows a labelled box with the expected filename.
+Media with "device": "phone" or "desktop" are two versions of one screen;
+the HR page shows one set at a time, with a switch.
 """
 
 ROLES = [
@@ -39,8 +41,9 @@ STEPS = [
         "title": "Sign up",
         "lead": "Pick a plan and pay with Stripe. You get an admin account and a welcome email.",
         "points": [
-            "One round costs €19. It covers up to 10 people.",
-            "A subscription starts with a 14-day free trial.",
+            "€19 buys 10 credits. One credit is one round for one reviewee.",
+            "Reviewers are free. There is no limit on reviewers.",
+            "A subscription covers up to 50 reviewees and starts with a 14-day free trial. For more people, ask Thijs.",
             "Or self-host the open source version for free.",
         ],
         "media": [
@@ -138,10 +141,14 @@ STEPS = [
             "button": "Complete Self-Assessment",
         },
         "media": [
-            {"kind": "phone", "shot": "email_reviewee_self_assessment_mobile",
+            {"kind": "phone", "device": "phone", "shot": "email_reviewee_self_assessment_mobile",
              "alt": "The self-assessment email on a phone"},
-            {"kind": "browser", "shot": "self_assessment_desktop",
-             "alt": "The self-assessment questionnaire in the browser"},
+            {"kind": "phone", "device": "phone", "shot": "self_assessment_mobile",
+             "alt": "The self-assessment questionnaire on a phone"},
+            {"kind": "browser", "device": "desktop", "shot": "email_reviewee_self_assessment_desktop",
+             "alt": "The self-assessment email on a computer"},
+            {"kind": "browser", "device": "desktop", "shot": "self_assessment_desktop",
+             "alt": "The self-assessment questionnaire on a computer"},
         ],
         "visibility": {
             "admin": _see("If the self-assessment is done.", "The self-assessment answers, until the report."),
@@ -153,8 +160,8 @@ STEPS = [
     {
         "slug": "reviewers",
         "act": "round",
-        "title": "Reviewers answer on their phone",
-        "lead": "Each reviewer gets an email with a private link. The questionnaire works on any phone.",
+        "title": "Reviewers answer on a computer or a phone",
+        "lead": "Each reviewer gets an email with a private link. The questionnaire works on any computer or phone.",
         "points": [
             "No app to install and no account to make.",
             "One section per screen. The answer buttons are large.",
@@ -171,10 +178,14 @@ STEPS = [
             "button": "Start Your Review",
         },
         "media": [
-            {"kind": "phone", "shot": "email_reviewer_invitation_mobile",
+            {"kind": "phone", "device": "phone", "shot": "email_reviewer_invitation_mobile",
              "alt": "The reviewer invitation email on a phone"},
-            {"kind": "phone", "shot": "feedback_mobile",
+            {"kind": "phone", "device": "phone", "shot": "feedback_mobile",
              "alt": "A reviewer answering questions on a phone"},
+            {"kind": "browser", "device": "desktop", "shot": "email_reviewer_invitation_desktop",
+             "alt": "The reviewer invitation email on a computer"},
+            {"kind": "browser", "device": "desktop", "shot": "feedback_desktop",
+             "alt": "A reviewer answering questions on a computer"},
         ],
         "visibility": {
             "admin": _see("That an invited email has finished.", "What that person answered."),
@@ -195,7 +206,9 @@ STEPS = [
             "A text without a translation shows in the original language.",
         ],
         "media": [
-            {"kind": "phone", "shot": "feedback_translated_mobile",
+            {"kind": "phone", "device": "phone", "shot": "feedback_translated_mobile",
+             "alt": "A reviewer with a German browser sees the questionnaire in German"},
+            {"kind": "browser", "device": "desktop", "shot": "feedback_translated_desktop",
              "alt": "A reviewer with a German browser sees the questionnaire in German"},
             {"kind": "browser", "shot": "questionnaire_translate_desktop",
              "alt": "Translating a questionnaire into German, next to the English original"},
@@ -261,6 +274,7 @@ ACTS = [
 
 
 def context():
-    steps = [dict(step, number=i) for i, step in enumerate(STEPS, start=1)]
+    steps = [dict(step, number=i, has_devices=any("device" in m for m in step["media"]))
+             for i, step in enumerate(STEPS, start=1)]
     acts = [dict(act, steps=[s for s in steps if s["act"] == act["key"]]) for act in ACTS]
     return {"roles": ROLES, "steps": steps, "acts": acts}

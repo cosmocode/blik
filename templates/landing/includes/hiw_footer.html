@@ -1,5 +1,5 @@
 {% load landing_tags %}
-{# Ending of both how-it-works pages: founder card and the three ways to start. #}
+{# Ending of both how-it-works pages: founder card, the three ways to start, and the screenshot lightbox. #}
     {% include 'landing/includes/hiw_founder.html' %}
 
     <section class="section hiw-next" aria-labelledby="next-title">
@@ -9,22 +9,118 @@
                 <div class="hiw-next-card hiw-next-card--main">
                     <h3>Run one round</h3>
                     <p class="hiw-next-price">€{{ plan_single_price }}, once</p>
-                    <p>One hosted round for up to {{ plan_single_max }} people. No subscription. Reviewers are free.</p>
+                    <p>{{ plan_single_max }} credits: one hosted round each for {{ plan_single_max }} reviewees. No subscription. Reviewers are free.</p>
                     <a href="{% landing_url 'signup' %}?plan=single" class="btn btn-primary">Run a round for €{{ plan_single_price }}</a>
                 </div>
                 <div class="hiw-next-card">
                     <h3>Start a free trial</h3>
                     <p class="hiw-next-price">{{ trial_days }} days free</p>
-                    <p>Then €{{ plan_saas_price }} a month for up to {{ plan_saas_max }} people. A credit card is required.</p>
+                    <p>Then €{{ plan_saas_price }} a month for up to {{ plan_saas_max }} reviewees. More people? Ask Thijs. A credit card is required.</p>
                     <a href="{% landing_url 'signup' %}" class="btn btn-secondary">Start the trial</a>
                 </div>
                 <div class="hiw-next-card">
                     <h3>Talk to Thijs</h3>
                     <p class="hiw-next-price">No sales team</p>
                     <p>Ask how Blik fits your company. You talk to the person who built it.</p>
-                    {# TODO: contact mechanism not decided (email, calendar link or form). #}
-                    <a href="#contact-thijs" class="btn btn-secondary">Contact Thijs</a>
+                    <a href="https://www.linkedin.com/in/thijsdez/" class="btn btn-secondary" target="_blank" rel="noopener">Contact Thijs on LinkedIn</a>
                 </div>
             </div>
         </div>
     </section>
+
+    <dialog class="hiw-lightbox" aria-label="Enlarged screenshot">
+        <figure class="hiw-lightbox-frame">
+            <div class="hiw-lightbox-bar">
+                <span class="hiw-lightbox-tag">Screenshot</span>
+                <figcaption class="hiw-lightbox-caption"></figcaption>
+                <span class="hiw-lightbox-count" aria-live="polite"></span>
+                <div class="hiw-lightbox-theme hiw-lightbox-device" role="group" aria-label="Screenshot device">
+                    <button type="button" data-device-pick="desktop" aria-pressed="true">Computer</button>
+                    <button type="button" data-device-pick="phone" aria-pressed="false">Phone</button>
+                </div>
+                <div class="hiw-lightbox-theme" role="group" aria-label="Screenshot theme">
+                    <button type="button" data-theme-pick="light" aria-pressed="true">Light</button>
+                    <button type="button" data-theme-pick="dark" aria-pressed="false">Dark</button>
+                </div>
+                <button type="button" class="hiw-lightbox-close" aria-label="Close" autofocus>&times;</button>
+            </div>
+            <div class="hiw-lightbox-stage">
+                <img alt="">
+                <button type="button" class="hiw-lightbox-nav" data-step="-1" aria-label="Previous screenshot">&lsaquo;</button>
+                <button type="button" class="hiw-lightbox-nav" data-step="1" aria-label="Next screenshot">&rsaquo;</button>
+            </div>
+        </figure>
+    </dialog>
+    <script>
+        // Lightbox: opens the screenshot the visitor sees (hover swaps the theme), with a light/dark switch.
+        // A phone or computer screenshot with a twin in the same step also gets a device switch;
+        // twins pair up by their order in the step. The arrow keys and buttons loop through the
+        // screenshots the page shows, in page order. Without JS the link opens the image file.
+        (function () {
+            var box = document.querySelector('.hiw-lightbox');
+            var img = box.querySelector('img');
+            var themes = box.querySelectorAll('[data-theme-pick]');
+            var devices = box.querySelectorAll('[data-device-pick]');
+            var deviceGroup = box.querySelector('.hiw-lightbox-device');
+            var links = {}, theme = 'light', seq = [], pos = 0;
+            function press(buttons, key, value) {
+                buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.dataset[key] === value ? 'true' : 'false'); });
+            }
+            function show(device) {
+                var a = links[device];
+                var pick = a.querySelector(theme === 'dark' ? '.img-dark' : '.img-light');
+                img.src = pick.currentSrc || pick.src;
+                img.alt = a.querySelector('.img-light').alt;
+                box.querySelector('.hiw-lightbox-caption').textContent = img.alt;
+                press(themes, 'themePick', theme);
+                press(devices, 'devicePick', device);
+                box.dataset.device = device;
+            }
+            function twins(a) {
+                var fig = a.closest('figure');
+                var device = fig.classList.contains('hiw-dev-phone') ? 'phone' : fig.classList.contains('hiw-dev-desktop') ? 'desktop' : null;
+                var result = { current: device || 'single' };
+                result[result.current] = a;
+                if (device) {
+                    var other = device === 'phone' ? 'desktop' : 'phone';
+                    var index = Array.prototype.indexOf.call(fig.parentElement.querySelectorAll('.hiw-dev-' + device), fig);
+                    var twin = fig.parentElement.querySelectorAll('.hiw-dev-' + other)[index];
+                    if (twin) result[other] = twin.querySelector('.hiw-zoom');
+                }
+                return result;
+            }
+            function load(a) {
+                links = twins(a);
+                deviceGroup.hidden = !(links.phone && links.desktop);
+                box.querySelector('.hiw-lightbox-count').textContent = (pos + 1) + ' / ' + seq.length;
+                show(links.current);
+            }
+            function go(step) {
+                pos = (pos + step + seq.length) % seq.length;
+                load(seq[pos]);
+            }
+            document.querySelectorAll('.hiw-zoom').forEach(function (a) {
+                a.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    // Hidden screenshots (the other device on the page switch) have no offsetParent.
+                    seq = Array.prototype.filter.call(document.querySelectorAll('.hiw-zoom'), function (z) { return z.offsetParent !== null; });
+                    pos = seq.indexOf(a);
+                    theme = getComputedStyle(a.querySelector('.img-dark')).display === 'none' ? 'light' : 'dark';
+                    load(a);
+                    box.showModal();
+                });
+            });
+            box.querySelectorAll('.hiw-lightbox-nav').forEach(function (b) {
+                b.addEventListener('click', function () { go(+b.dataset.step); });
+            });
+            box.addEventListener('keydown', function (e) {
+                if (e.key === 'ArrowLeft') go(-1);
+                else if (e.key === 'ArrowRight') go(1);
+            });
+            themes.forEach(function (b) { b.addEventListener('click', function () { theme = b.dataset.themePick; show(box.dataset.device); }); });
+            devices.forEach(function (b) { b.addEventListener('click', function () { show(b.dataset.devicePick); }); });
+            box.querySelector('.hiw-lightbox-close').addEventListener('click', function () { box.close(); });
+            // A click on the backdrop or the image closes it; the bar stays usable.
+            box.addEventListener('click', function (e) { if (e.target === box || e.target === img) box.close(); });
+        })();
+    </script>
