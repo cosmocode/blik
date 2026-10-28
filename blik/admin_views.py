@@ -44,7 +44,7 @@ from core.gdpr import GDPRDeletionService
 from core.models import Organization
 from productreviews.models import ProductReview, anonymous_name
 from questionnaires.action_items import add_action_item_keys
-from questionnaires.answer_options import DEFAULT_LIKERT_SCALE, save_options
+from questionnaires.answer_options import DEFAULT_LIKERT_SCALE, DEFAULT_RATING_LABELS, save_options
 from questionnaires.models import Question, QuestionSection, Questionnaire
 from questionnaires.ordering import save_layout
 from questionnaires.presentation import questionnaire_report_features
@@ -81,9 +81,6 @@ from subscriptions.utils import (
 )
 
 logger = logging.getLogger(__name__)
-
-# A new rating question reads its five values like the default likert scale
-DEFAULT_RATING_LABELS = {f'{value}': label for value, label in enumerate(DEFAULT_LIKERT_SCALE, 1)}
 
 
 def get_default_labels(questionnaire):

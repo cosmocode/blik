@@ -100,6 +100,7 @@ class QuestionSection(Translatable, TimeStampedModel):
     translated_fields = ['title', 'description']
     translated_children = 'questions'
 
+    uuid = models.UUIDField(_('UUID'), default=uuid.uuid4, unique=True, editable=False)
     questionnaire = models.ForeignKey(
         Questionnaire,
         on_delete=models.CASCADE,

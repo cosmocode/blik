@@ -7131,3 +7131,16 @@ msgstr "Die neue Reihenfolge konnte nicht gespeichert werden. Laden Sie die Seit
 
 msgid "Saved"
 msgstr "Gespeichert"
+
+msgid "Only rating questions have descriptions."
+msgstr "Nur Bewertungsfragen haben Beschreibungen."
+
+msgid "Give the descriptions as texts by rating value."
+msgstr "Geben Sie die Beschreibungen als Texte je Bewertungswert an."
+
+#, python-format
+msgid "Unknown rating values: %(values)s"
+msgstr "Unbekannte Bewertungswerte: %(values)s"
+
+msgid "List every section and question of the questionnaire once, by UUID."
+msgstr "Führen Sie jeden Abschnitt und jede Frage des Fragebogens genau einmal auf, per UUID."

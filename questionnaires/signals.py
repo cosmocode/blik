@@ -47,6 +47,7 @@ def clone_questionnaire_for_organization(questionnaire, organization):
         translations = list(section.translations.all())
         section.pk = None
         section.id = None
+        section.uuid = uuid.uuid4()
         section.questionnaire = cloned_questionnaire
         section.save()
         copy_translations(translations, section)
