@@ -253,6 +253,69 @@ class InvitationMailTests(CycleCategoryTestCase):
         self.assertNotIn(str(cycle.invitation_token_direct_report), body)
 
 
+class ResendLinksTests(CycleCategoryTestCase):
+    """The cycle page sends the reviewee the links to share once more."""
+
+    def resend(self, cycle):
+        with patch(SEND_MAIL) as send:
+            response = self.client.post(reverse('send_reviewee_links', args=[cycle.uuid]))
+        return response, send
+
+    def test_the_reviewee_gets_the_links_of_the_active_categories(self):
+        cycle = ReviewCycle.objects.create(
+            reviewee=self.reviewee, questionnaire=self.questionnaire, include_direct_report=False)
+
+        response, send = self.resend(cycle)
+
+        self.assertRedirects(response, reverse('review_cycle_detail', args=[cycle.uuid]),
+                             fetch_redirect_response=False)
+        kwargs = send.call_args.kwargs
+        self.assertEqual(kwargs['recipient_list'], ['dana@acme.example'])
+        self.assertIn('Share Your 360 Feedback Links', kwargs['subject'])
+        self.assertIn(str(cycle.invitation_token_peer), kwargs['html_message'])
+        self.assertNotIn(str(cycle.invitation_token_direct_report), kwargs['html_message'])
+        self.assertNotIn(str(cycle.invitation_token_self), kwargs['html_message'])
+
+    def test_it_takes_a_post(self):
+        cycle = ReviewCycle.objects.create(reviewee=self.reviewee, questionnaire=self.questionnaire)
+
+        response = self.client.get(reverse('send_reviewee_links', args=[cycle.uuid]))
+
+        self.assertEqual(response.status_code, 405)
+
+    def test_nothing_goes_out_without_links_that_work(self):
+        closed = ReviewCycle.objects.create(
+            reviewee=self.reviewee, questionnaire=self.questionnaire, status='completed')
+        self_only = ReviewCycle.objects.create(
+            reviewee=self.reviewee, questionnaire=self.questionnaire,
+            include_peer=False, include_manager=False, include_direct_report=False)
+
+        for cycle in (closed, self_only):
+            with self.subTest(status=cycle.status, categories=cycle.active_categories):
+                send = self.resend(cycle)[1]
+                send.assert_not_called()
+
+    def test_another_organization_cannot_send(self):
+        cycle = ReviewCycle.objects.create(reviewee=self.reviewee, questionnaire=self.questionnaire)
+        other_org = Organization.objects.create(name='Other', email='org@other.example')
+        outsider = User.objects.create_user(username='outsider', email='admin@other.example', password='pw')
+        UserProfile.objects.create(user=outsider, organization=other_org)
+        assign_organization_admin(outsider)
+        self.client.force_login(outsider)
+
+        response, send = self.resend(cycle)
+
+        self.assertEqual(response.status_code, 404)
+        send.assert_not_called()
+
+    def test_the_cycle_page_offers_the_button(self):
+        cycle = ReviewCycle.objects.create(reviewee=self.reviewee, questionnaire=self.questionnaire)
+
+        response = self.client.get(reverse('review_cycle_detail', args=[cycle.uuid]))
+
+        self.assertContains(response, reverse('send_reviewee_links', args=[cycle.uuid]))
+
+
 class InvitationLinkTests(CycleCategoryTestCase):
     def test_a_link_for_a_dropped_category_is_refused(self):
         """Links live in old mails; dropping a category must close them."""

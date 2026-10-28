@@ -65,6 +65,7 @@ from reports.services import generate_report, self_vs_others_gap, send_report_re
 from reviews.models import CATEGORY_ORDER, ReviewCycle, ReviewerToken
 from reviews.services import (
     assign_tokens_to_emails,
+    send_invitation_links_email,
     send_reminder_emails,
     send_reviewee_notifications,
     send_reviewer_invitations,
@@ -2165,6 +2166,29 @@ def send_invitations(request, cycle_uuid):
             messages.info(request, _('No pending invitations to send.'))
 
         return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
+
+    return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
+
+
+@login_required
+@require_POST
+def send_reviewee_links(request, cycle_uuid):
+    """Send the reviewee the links to share once more"""
+    cycle = get_cycle_or_404(request, cycle_uuid)
+    categories = [category for category in cycle.active_categories if category != 'self']
+
+    # The links only open feedback forms while the cycle is active
+    if cycle.status != 'active' or not categories:
+        messages.error(request, _('This cycle has no links to send.'))
+        return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
+
+    stats = {'sent': 0, 'errors': []}
+    send_invitation_links_email(cycle, categories, stats)
+
+    for error in stats['errors']:
+        messages.error(request, error)
+    if stats['sent']:
+        messages.success(request, _('The links have been sent to %(email)s.') % {'email': cycle.reviewee.email})
 
     return redirect('review_cycle_detail', cycle_uuid=cycle.uuid)
 
