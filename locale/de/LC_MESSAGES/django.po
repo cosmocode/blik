@@ -1862,7 +1862,7 @@ msgid "What this score means (optional)"
 msgstr "Was diese Bewertung bedeutet (optional)"
 
 msgid "Reviewers can open the descriptions below the question."
-msgstr "Bewertende können die Beschreibungen unter der Frage öffnen."
+msgstr "Beurteilende können die Beschreibungen unter der Frage öffnen."
 
 msgid "What does each score mean?"
 msgstr "Was bedeutet jede Bewertung?"
@@ -7127,7 +7127,7 @@ msgid "Move question down"
 msgstr "Frage nach unten verschieben"
 
 msgid "The new order could not be saved. Reload the page and try again."
-msgstr "Die neue Reihenfolge konnte nicht gespeichert werden. Laden Sie die Seite neu und versuchen Sie es erneut."
+msgstr "Die neue Reihenfolge konnte nicht gespeichert werden. Bitte die Seite neu laden und erneut versuchen."
 
 msgid "Saved"
 msgstr "Gespeichert"
@@ -7136,11 +7136,11 @@ msgid "Only rating questions have descriptions."
 msgstr "Nur Bewertungsfragen haben Beschreibungen."
 
 msgid "Give the descriptions as texts by rating value."
-msgstr "Geben Sie die Beschreibungen als Texte je Bewertungswert an."
+msgstr "Die Beschreibungen als Texte je Bewertungswert angeben."
 
 #, python-format
 msgid "Unknown rating values: %(values)s"
 msgstr "Unbekannte Bewertungswerte: %(values)s"
 
 msgid "List every section and question of the questionnaire once, by UUID."
-msgstr "Führen Sie jeden Abschnitt und jede Frage des Fragebogens genau einmal auf, per UUID."
+msgstr "Jeden Abschnitt und jede Frage des Fragebogens genau einmal per UUID aufführen."
