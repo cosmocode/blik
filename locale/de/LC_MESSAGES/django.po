@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-28 09:05+0000\n"
+"POT-Creation-Date: 2026-10-28 11:07+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -867,6 +867,9 @@ msgstr "Ein Fragebogen ist erforderlich."
 msgid "Invalid questionnaire selected."
 msgstr "Ungültiger Fragebogen ausgewählt."
 
+msgid "Select at least one feedback category."
+msgstr "Bitte mindestens eine Feedbackkategorie auswählen."
+
 #, python-format
 msgid "Review cycle created for \"%(name)s\" using \"%(questionnaire)s\". Copied %(count)s reviewer(s) from previous cycle. %(sent)s email invitation(s) sent."
 msgstr "Feedbackrunde für „%(name)s“ mit „%(questionnaire)s“ angelegt. %(count)s Beurteilende aus der vorherigen Feedbackrunde übernommen. %(sent)s Einladung(en) per E-Mail gesendet."
@@ -874,6 +877,9 @@ msgstr "Feedbackrunde für „%(name)s“ mit „%(questionnaire)s“ angelegt. 
 #, python-format
 msgid "Review cycle created for \"%(name)s\" using \"%(questionnaire)s\" with %(count)s reviewer token(s). Go to the cycle details to assign reviewers and send invitations."
 msgstr "Feedbackrunde für „%(name)s“ mit „%(questionnaire)s“ und %(count)s Token(s) für Beurteilende angelegt. In den Details der Feedbackrunde lassen sich Beurteilende zuweisen und Einladungen versenden."
+
+msgid "Notification emails are being sent to the reviewee."
+msgstr "Die beurteilte Person wird per E-Mail benachrichtigt."
 
 msgid "Pair with a more senior teammate on a challenging problem this sprint"
 msgstr "In diesem Sprint gemeinsam mit einem erfahreneren Teammitglied ein anspruchsvolles Problem lösen"
@@ -1012,9 +1018,6 @@ msgstr "Beurteilte:r A–Z"
 msgid "Fewest responses"
 msgstr "Wenigste Antworten"
 
-msgid "Select at least one feedback category."
-msgstr "Bitte mindestens eine Feedbackkategorie auswählen."
-
 #, python-format
 msgid "Created %(count)s review cycles. No invitations have been sent yet."
 msgstr "%(count)s Feedbackrunden angelegt. Es wurden noch keine Einladungen gesendet."
@@ -1096,6 +1099,13 @@ msgstr "%(sent)s Einladung(en) per E-Mail gesendet."
 
 msgid "No pending invitations to send."
 msgstr "Keine offenen Einladungen zum Senden."
+
+msgid "This cycle has no links to send."
+msgstr "Für diese Feedbackrunde gibt es keine Links zum Senden."
+
+#, python-format
+msgid "The links have been sent to %(email)s."
+msgstr "Die Links wurden an %(email)s gesendet."
 
 #, python-format
 msgid "Successfully sent %(sent)s reminder(s)."
@@ -2624,8 +2634,16 @@ msgid "Not enough tokens for %(category)s: need %(needed)s, have %(available)s"
 msgstr "Nicht genug Tokens für %(category)s: benötigt %(needed)s, vorhanden %(available)s"
 
 #, python-format
+msgid "Reminder: Complete Your Self-Assessment: %(questionnaire)s"
+msgstr "Erinnerung an die Selbsteinschätzung: %(questionnaire)s"
+
+#, python-format
 msgid "Complete Your Self-Assessment: %(questionnaire)s"
 msgstr "Selbsteinschätzung ausfüllen: %(questionnaire)s"
+
+#, python-format
+msgid "Reminder: 360 Feedback Request for %(name)s"
+msgstr "Erinnerung: 360°-Feedbackanfrage für %(name)s"
 
 #, python-format
 msgid "360 Feedback Request: %(name)s"
@@ -2636,16 +2654,8 @@ msgid "Failed to send to %(email)s: %(error)s"
 msgstr "Senden an %(email)s fehlgeschlagen: %(error)s"
 
 #, python-format
-msgid "Reminder: 360 Feedback Request for %(name)s"
-msgstr "Erinnerung: 360°-Feedbackanfrage für %(name)s"
-
-#, python-format
 msgid "Failed to send reminder to %(email)s: %(error)s"
 msgstr "Die Erinnerung an %(email)s konnte nicht gesendet werden: %(error)s"
-
-#, python-format
-msgid "Failed to send self-assessment email: %(error)s"
-msgstr "Die E-Mail zur Selbsteinschätzung konnte nicht gesendet werden: %(error)s"
 
 #, python-format
 msgid "Share Your 360 Feedback Links: %(questionnaire)s"
@@ -3517,6 +3527,9 @@ msgstr "Beurteilende per E-Mail einladen"
 msgid "Enter email addresses for each reviewer category. The system will generate anonymous tokens and send invitations. Separate multiple emails with commas or newlines."
 msgstr "E-Mail-Adressen für jede Kategorie von Beurteilenden eingeben. Das System erzeugt anonyme Tokens und versendet die Einladungen. Mehrere Adressen durch Kommas oder Zeilenumbrüche trennen."
 
+msgid "The self-assessment goes to this address. Send the invitation or a reminder from the cycle page."
+msgstr "Die Selbsteinschätzung geht an diese Adresse. Einladung und Erinnerung lassen sich auf der Seite der Feedbackrunde versenden."
+
 msgid "Your email is automatically assigned for self-assessment"
 msgstr "Ihre E-Mail-Adresse wird automatisch für die Selbsteinschätzung verwendet"
 
@@ -3777,11 +3790,17 @@ msgstr "Für diese Person läuft bereits eine Feedbackrunde. Es wird eine weiter
 msgid "The previous questionnaire is archived. An active questionnaire has been selected."
 msgstr "Der vorherige Fragebogen ist archiviert. Ein aktiver Fragebogen wurde ausgewählt."
 
-msgid "Reviewers and feedback categories are copied from the latest cycle. Invitations are sent to reviewers who have an email address."
-msgstr "Beurteilende und Kategorien werden aus der letzten Runde übernommen. Beurteilende mit E-Mail-Adresse erhalten eine Einladung."
+msgid "Feedback Categories"
+msgstr "Feedbackkategorien"
+
+msgid "Reviewers are copied from the previous cycle. Invitations are sent to reviewers who have an email address."
+msgstr "Beurteilende werden aus der vorherigen Runde übernommen. Beurteilende mit E-Mail-Adresse erhalten eine Einladung."
 
 msgid "The cycle starts with space for a self-assessment, three peers and one manager. You can assign reviewers in the next step."
 msgstr "Die Runde beginnt mit Plätzen für eine Selbsteinschätzung, drei Kolleg:innen und eine Führungskraft. Im nächsten Schritt können Sie Beurteilende zuweisen."
+
+msgid "The reviewee is notified by email right away."
+msgstr "Die beurteilte Person wird sofort per E-Mail benachrichtigt."
 
 #, python-format
 msgid "%(counter)s text missing"
@@ -4781,6 +4800,9 @@ msgstr "Diese Links an die Beurteilenden weitergeben. Jeder Link vergibt zufäll
 msgid "Copy Link"
 msgstr "Link kopieren"
 
+msgid "Resend the links to the reviewee"
+msgstr "Links erneut an die beurteilte Person senden"
+
 #, python-format
 msgid "%(counter)s reviewer"
 msgid_plural "%(counter)s reviewers"
@@ -4914,9 +4936,6 @@ msgstr "Berichtsart:"
 msgid "Preview sample report"
 msgstr "Beispielbericht ansehen"
 
-msgid "Feedback Categories"
-msgstr "Feedbackkategorien"
-
 msgid "Who gives feedback in this cycle. Categories you clear are left out of the invitation email and the report."
 msgstr "Wer in dieser Feedbackrunde Feedback gibt. Abgewählte Kategorien fehlen in der Einladungs-E-Mail und im Bericht."
 
@@ -4976,18 +4995,6 @@ msgstr "API-Kennungen anzeigen"
 
 msgid "New Cycle"
 msgstr "Neue Feedbackrunde"
-
-msgid "Select different questionnaire"
-msgstr "Anderen Fragebogen auswählen"
-
-msgid "Select Questionnaire"
-msgstr "Fragebogen auswählen"
-
-msgid "Quick create (button action)"
-msgstr "Schnell anlegen (per Schaltfläche)"
-
-msgid "Quick create"
-msgstr "Schnell anlegen"
 
 #, python-format
 msgid "Page %(number)s of %(num_pages)s"
@@ -6216,8 +6223,14 @@ msgstr "FEEDBACK DER FÜHRUNGSKRAFT:"
 msgid "DIRECT REPORT REVIEWS:"
 msgstr "FEEDBACK VON UNTERSTELLTEN:"
 
+msgid "Self-Assessment Reminder"
+msgstr "Erinnerung an die Selbsteinschätzung"
+
 msgid "360° Feedback Cycle Started"
 msgstr "360°-Feedbackrunde gestartet"
+
+msgid "This is a friendly reminder that your self-assessment is still open."
+msgstr "Eine freundliche Erinnerung: Ihre Selbsteinschätzung ist noch offen."
 
 msgid "A new 360-degree feedback cycle has been created for you!"
 msgstr "Für Sie wurde eine neue 360°-Feedbackrunde angelegt!"
