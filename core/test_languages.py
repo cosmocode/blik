@@ -1,4 +1,5 @@
 """Which language a request, a reviewer's form and an email get (core/languages.py)."""
+import gettext
 from unittest.mock import patch
 
 from django.conf import settings
@@ -6,6 +7,7 @@ from django.contrib.auth.models import User
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.urls import reverse
 from django.utils import timezone, translation
+from django.utils.translation.trans_real import DjangoTranslation
 
 from accounts.models import UserProfile
 from accounts.permissions import assign_organization_admin, ensure_permission_groups
@@ -23,6 +25,23 @@ class VariantTests(SimpleTestCase):
     def test_a_language_without_variant_is_its_own_base(self):
         self.assertEqual(get_base_language('de-informal'), 'de')
         self.assertEqual(get_base_language('de'), 'de')
+
+    def test_a_variant_shows_its_base_text_where_it_has_none(self):
+        # Django's own catalogue for de comes before ours, so a text Django translates as well
+        # needs an entry in de_Informal, or de-informal shows Django's wording
+        for domain in ('django', 'djangojs'):
+            catalogues = {}
+            for locale in ('de', 'de_Informal'):
+                with open(settings.LOCALE_PATHS[0] / locale / 'LC_MESSAGES' / f'{domain}.mo', 'rb') as file:
+                    catalogues[locale] = gettext.GNUTranslations(file)._catalog
+            variant = DjangoTranslation('de-informal', domain=domain)
+
+            differing = [
+                msgid for msgid, text in catalogues['de'].items()
+                if isinstance(msgid, str) and msgid not in catalogues['de_Informal'] and variant.gettext(msgid) != text
+            ]
+
+            self.assertEqual(differing, [], domain)
 
 
 class RequestLanguageTests(TestCase):
