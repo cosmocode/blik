@@ -14,7 +14,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.validators import validate_email
 from django.db import transaction
 from django.db.models import ProtectedError
-from django.db.models import Avg, Count, F, Max, OuterRef, Q, Subquery
+from django.db.models import Avg, Count, Exists, F, Max, OuterRef, Q, Subquery
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
@@ -450,6 +450,7 @@ def reviewee_list(request):
         report, gap = reports_by_id.get(person.latest_report_id, (None, None))
         reviewees_with_latest.append({
             'reviewee': person,
+            'source_cycle': latest_cycle,
             'latest_questionnaire': latest_questionnaire,
             'selected_questionnaire': questionnaire_by_id.get(
                 latest_questionnaire.id if latest_questionnaire else None, default_questionnaire),
@@ -625,8 +626,12 @@ def quick_cycle_create(request, reviewee_uuid):
         # Otherwise, get the most recent previous cycle for this reviewee
         previous_cycle = reviewee.review_cycles.order_by('-created_at').first()
 
-    category_flags = {}
-    if previous_cycle:
+    # The dialog's checkboxes; a client without them keeps the previous cycle's categories.
+    category_flags = selected_category_flags(request)
+    if category_flags and not any(category_flags.values()):
+        messages.error(request, _('Select at least one feedback category.'))
+        return redirect('reviewee_list')
+    if previous_cycle and not category_flags:
         category_flags = {
             f'include_{category}': previous_cycle.collects(category)
             for category in CATEGORY_ORDER
@@ -653,7 +658,7 @@ def quick_cycle_create(request, reviewee_uuid):
     if previous_cycle:
         # Copy tokens from previous cycle, including email assignments. The self-assessment
         # token comes from send_reviewee_notifications above.
-        previous_tokens = previous_cycle.tokens.exclude(category='self')
+        previous_tokens = previous_cycle.tokens.filter(category__in=cycle.active_categories).exclude(category='self')
 
         for prev_token in previous_tokens:
             new_token = ReviewerToken.objects.create(
@@ -1531,15 +1536,13 @@ def review_cycle_list(request):
         except ValidationError:
             questionnaire_filter = ''
 
-    latest_questionnaire_id = ReviewCycle.objects.filter(
-        reviewee=OuterRef('reviewee'),
-    ).order_by('-created_at').values('questionnaire_id')[:1]
     cycles_qs = cycles_qs.prefetch_related(
         'questionnaire__sections__questions'
     ).annotate(
         token_count=Count('tokens'),
         completed_count=Count('tokens', filter=Q(tokens__completed_at__isnull=False)),
-        latest_questionnaire_id=Subquery(latest_questionnaire_id),
+        reviewee_has_active_cycle=Exists(
+            ReviewCycle.objects.filter(reviewee=OuterRef('reviewee'), status='active')),
     )
 
     # Counts follow the search and questionnaire filters, so each stage
@@ -1576,7 +1579,19 @@ def review_cycle_list(request):
         cycles = paginator.page(paginator.num_pages)
 
     # Get available questionnaires for quick cycle creation
-    questionnaires = Questionnaire.objects.for_organization(org).filter(is_active=True).order_by('-is_default', 'name')
+    questionnaires = list(
+        Questionnaire.objects.for_organization(org).filter(is_active=True).order_by('-is_default', 'name'))
+    default_questionnaire = questionnaires[0] if questionnaires else None
+
+    # "New Cycle" opens the start dialog of the reviewee list, set up as a copy of the row's cycle.
+    for cycle in cycles:
+        cycle.start = {
+            'reviewee': cycle.reviewee,
+            'source_cycle': cycle,
+            'latest_questionnaire': cycle.questionnaire,
+            'selected_questionnaire': cycle.questionnaire if cycle.questionnaire.is_active else default_questionnaire,
+            'active_cycle': cycle.reviewee_has_active_cycle,
+        }
 
     context = {
         'cycles': cycles,  # Paginated object

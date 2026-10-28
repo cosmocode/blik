@@ -151,6 +151,66 @@ class QuickCycleTests(CycleCategoryTestCase):
         created = ReviewCycle.objects.exclude(pk=previous.pk).get()
         self.assertEqual(created.tokens.filter(category='peer').count(), 0)
 
+    def test_the_dialog_chooses_the_categories(self):
+        previous = ReviewCycle.objects.create(reviewee=self.reviewee, questionnaire=self.questionnaire)
+
+        self.client.post(
+            reverse('quick_cycle_create', args=[self.reviewee.uuid]),
+            {'questionnaire_id': self.questionnaire.id, 'categories_submitted': '1',
+             'include_self': 'on', 'include_manager': 'on'},
+        )
+
+        created = ReviewCycle.objects.exclude(pk=previous.pk).get()
+        self.assertEqual(created.active_categories, ['self', 'manager'])
+
+    def test_the_dialog_needs_a_category(self):
+        self.client.post(
+            reverse('quick_cycle_create', args=[self.reviewee.uuid]),
+            {'questionnaire_id': self.questionnaire.id, 'categories_submitted': '1'},
+        )
+
+        self.assertFalse(ReviewCycle.objects.exists())
+
+    def test_reviewers_of_a_category_cleared_in_the_dialog_are_not_copied(self):
+        previous = ReviewCycle.objects.create(reviewee=self.reviewee, questionnaire=self.questionnaire)
+        ReviewerToken.objects.create(cycle=previous, category='peer', reviewer_email='pat@acme.example')
+
+        with patch(SEND_MAIL) as send:
+            self.client.post(
+                reverse('quick_cycle_create', args=[self.reviewee.uuid]),
+                {'questionnaire_id': self.questionnaire.id, 'categories_submitted': '1',
+                 'include_manager': 'on'},
+            )
+
+        created = ReviewCycle.objects.exclude(pk=previous.pk).get()
+        self.assertFalse(created.tokens.filter(category='peer').exists())
+        send.assert_not_called()
+
+
+class StartDialogTests(CycleCategoryTestCase):
+    """"New Cycle" asks before it creates a cycle and sends its mails."""
+
+    def setUp(self):
+        super().setUp()
+        self.previous = ReviewCycle.objects.create(
+            reviewee=self.reviewee, questionnaire=self.questionnaire, include_peer=False)
+
+    def test_the_cycle_list_opens_a_dialog_per_row(self):
+        response = self.client.get(reverse('review_cycle_list'))
+
+        self.assertContains(response, f'data-reviewee-dialog="start-review-{self.previous.uuid}"')
+        self.assertContains(response, f'id="start-review-{self.previous.uuid}"')
+        self.assertContains(response, f'name="source_cycle_uuid" value="{self.previous.uuid}"')
+        self.assertNotContains(response, 'dropdown-menu')
+
+    def test_the_dialog_starts_from_the_categories_of_the_previous_cycle(self):
+        for url in (reverse('review_cycle_list'), reverse('reviewee_list')):
+            with self.subTest(url=url):
+                response = self.client.get(url)
+
+                self.assertContains(response, 'name="include_self" checked>')
+                self.assertContains(response, 'name="include_peer">')
+
 
 class InvitationMailTests(CycleCategoryTestCase):
     def _send(self, cycle):
