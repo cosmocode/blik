@@ -1,4 +1,4 @@
-🎯 Your Developer Skills Assessment Results
+Your Developer Skills Assessment Results
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Hi {{ name }},

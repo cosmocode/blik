@@ -27,7 +27,7 @@
 
             {% if peer_url %}
             <div class="link-box">
-                <h3>🤝 {% trans 'Peer Reviews' %}</h3>
+                <h3>{% trans 'Peer Reviews' %}</h3>
                 <code>{{ peer_url }}</code>
                 <p style="margin: 10px 0 0 0; font-size: 0.875rem; color: #6b7280;">
                     {% trans 'Share this link with your colleagues/peers. Each person who clicks will get their own unique review link.' %}
@@ -37,7 +37,7 @@
 
             {% if manager_url %}
             <div class="link-box">
-                <h3>👔 {% trans 'Manager Review' %}</h3>
+                <h3>{% trans 'Manager Review' %}</h3>
                 <code>{{ manager_url }}</code>
                 <p style="margin: 10px 0 0 0; font-size: 0.875rem; color: #6b7280;">
                     {% trans 'Share this link with your manager.' %}
@@ -47,7 +47,7 @@
 
             {% if direct_report_url %}
             <div class="link-box">
-                <h3>👥 {% trans 'Direct Report Reviews' %}</h3>
+                <h3>{% trans 'Direct Report Reviews' %}</h3>
                 <code>{{ direct_report_url }}</code>
                 <p style="margin: 10px 0 0 0; font-size: 0.875rem; color: #6b7280;">
                     {% trans 'Share this link with your direct reports. Each person who clicks will get their own unique review link.' %}
