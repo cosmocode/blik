@@ -7,6 +7,7 @@ the Organization row and bypasses the test mail outbox.
 from unittest.mock import patch
 
 from django.test import RequestFactory, TestCase, override_settings
+from django.utils import timezone
 
 from accounts.factories import RevieweeFactory
 from core.factories import OrganizationFactory, UserFactory
@@ -31,15 +32,14 @@ class SendReviewerInvitationsTests(TestCase):
         )
 
     @patch('reviews.services.send_email')
-    def test_does_not_send_to_self_category_tokens(self, mock_send_email):
-        """Self-category tokens already receive a dedicated self-assessment
-        email from send_reviewee_notifications. Sending the generic
-        reviewer invitation in addition delivers two emails to the same
-        person with different subjects and bodies.
+    def test_does_not_resend_a_sent_self_assessment(self, mock_send_email):
+        """send_reviewee_notifications sends the self-assessment and marks it
+        sent; sending the pending invitations afterwards must not mail the
+        reviewee a second time.
         """
         ReviewerTokenFactory(
             cycle=self.cycle, category='self',
-            reviewer_email=self.reviewee.email,
+            reviewer_email=self.reviewee.email, invitation_sent_at=timezone.now(),
         )
         ReviewerTokenFactory(
             cycle=self.cycle, category='manager',
@@ -55,6 +55,18 @@ class SendReviewerInvitationsTests(TestCase):
         }
         self.assertEqual(recipients, {'manager@example.com'})
         self.assertEqual(stats['sent'], 1)
+
+    @patch('reviews.services.send_email')
+    def test_sends_a_pending_self_assessment(self, mock_send_email):
+        """A self-assessment added under Manage Invitations is pending like any other invitation."""
+        ReviewerTokenFactory(cycle=self.cycle, category='self', reviewer_email=self.reviewee.email)
+
+        stats = send_reviewer_invitations(self.cycle)
+
+        self.assertEqual(stats['sent'], 1)
+        kwargs = mock_send_email.call_args.kwargs
+        self.assertEqual(kwargs['recipient_list'], [self.reviewee.email])
+        self.assertIn('Self-Assessment', kwargs['subject'])
 
 
 @override_settings(SITE_DOMAIN='public.example.com', SITE_PROTOCOL='https')

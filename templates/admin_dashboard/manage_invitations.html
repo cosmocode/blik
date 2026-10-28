@@ -49,7 +49,18 @@
             {% if cycle.include_self %}
             <div class="form-group" style="margin-bottom: 1.5rem;">
                 <label class="form-label">{% trans 'Self Assessment' %}</label>
-                {% if not user.profile.can_create_cycles_for_others %}
+                {% if self_token %}
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ self_token.reviewer_email }}"
+                    readonly
+                    style="background: var(--bg-light); cursor: not-allowed;"
+                >
+                <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                    {% trans 'The self-assessment goes to this address. Send the invitation or a reminder from the cycle page.' %}
+                </div>
+                {% elif not user.profile.can_create_cycles_for_others %}
                 <input
                     type="text"
                     name="self_emails"

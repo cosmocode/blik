@@ -13,6 +13,7 @@ from pathlib import Path
 
 from django.apps import apps
 from django.db import transaction
+from django.db.models import Exists, OuterRef, Q
 
 from questionnaires.action_items import add_action_item_keys
 from questionnaires.answer_options import migrate_responses
@@ -20,6 +21,7 @@ from questionnaires.legacy_config import move_all_texts_out_of_config
 from questionnaires.management.commands.apply_dreyfus_mappings import Command as DreyfusCommand
 from questionnaires.models import Question
 from questionnaires.shipped import add_shipped_translations
+from reviews.models import ReviewerToken
 
 
 def _apply_dreyfus_mappings(stdout):
@@ -169,6 +171,39 @@ def translate_shipped_questionnaires(stdout):
     stdout.write(f'Translated {count} questionnaire(s) made from a shipped template.')
 
 
+def drop_orphan_self_tokens(stdout):
+    """Delete the self-assessment tokens that were addressed to the reviewee but never used.
+
+    The self link used to start a token of its own next to the addressed one, which then stayed open. Sending pending
+    invitations now includes the self-assessment and would reach reviewees who are long done. A token goes when another
+    one was sent, opened or filled in, or when an older one already has an address.
+    """
+
+    used_or_older = (
+        ReviewerToken.objects.filter(cycle=OuterRef('cycle'), category='self')
+        .exclude(pk=OuterRef('pk'))
+        .filter(
+            Q(invitation_sent_at__isnull=False)
+            | Q(claimed_at__isnull=False)
+            | Q(completed_at__isnull=False)
+            | Q(pk__lt=OuterRef('pk'), reviewer_email__isnull=False)
+        )
+    )
+    orphans = ReviewerToken.objects.filter(
+        Exists(used_or_older),
+        category='self',
+        reviewer_email__isnull=False,
+        invitation_sent_at__isnull=True,
+        claimed_at__isnull=True,
+        completed_at__isnull=True,
+        responses__isnull=True,
+    )
+
+    count = orphans.count()
+    orphans.delete()
+    stdout.write(f'Deleted {count} unused self-assessment token(s) next to the one the reviewee uses.')
+
+
 STEPS = [
     ('0001_apply_dreyfus_mappings', _apply_dreyfus_mappings),
     ('0002_reapply_dreyfus_mappings', _reapply_dreyfus_mappings),
@@ -178,4 +213,5 @@ STEPS = [
     ('0005_move_question_texts', move_question_texts),
     ('0006_key_action_items', key_action_items),
     ('0007_translate_shipped_questionnaires', translate_shipped_questionnaires),
+    ('0008_drop_orphan_self_tokens', drop_orphan_self_tokens),
 ]

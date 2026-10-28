@@ -1694,13 +1694,6 @@ def review_cycle_create(request):
                     **category_flags
                 )
 
-                # Send notification emails to reviewee. Defer to after the
-                # transaction commits so a slow SMTP backend can't stall this
-                # request (matches the pattern in api/signals.py).
-                transaction.on_commit(
-                    lambda c=cycle: send_reviewee_notifications(c, request)
-                )
-
                 # Check if user provided reviewer emails
 
                 email_assignments = {}
@@ -1744,6 +1737,14 @@ def review_cycle_create(request):
                     # Assign tokens to emails with randomization
                     assign_stats = assign_tokens_to_emails(cycle, email_assignments)
 
+                # Send notification emails to reviewee. Defer to after the
+                # transaction commits so a slow SMTP backend can't stall this
+                # request (matches the pattern in api/signals.py). Without a
+                # transaction it runs right here, so it has to come after the
+                # tokens: the self-assessment goes to the one the form addressed.
+                transaction.on_commit(lambda c=cycle: send_reviewee_notifications(c, request))
+
+                if has_emails:
                     # Check if user wants to send invitations immediately.
                     # Defer the send to after-commit so SMTP latency never
                     # stalls the request.
@@ -2029,6 +2030,7 @@ def manage_invitations(request, cycle_uuid):
         'unsent_tokens': assigned_tokens - sent_tokens,
         'completed_tokens': completed_tokens,
         'default_language_name': language_name(cycle.organization.default_language),
+        'self_token': cycle.tokens.filter(category='self', reviewer_email__isnull=False).first(),
     }
 
     return render(request, 'admin_dashboard/manage_invitations.html', context)
@@ -2042,11 +2044,18 @@ def assign_invitations(request, cycle_uuid):
     if request.method == 'POST':
         # Parse email assignments by category
         email_assignments = {}
+        self_assigned = cycle.tokens.filter(category='self', reviewer_email__isnull=False).exists()
 
         for category_code, category_display in ReviewerToken.CATEGORY_CHOICES:
             if not cycle.collects(category_code):
                 # The form hides these; a stale page or hand-made POST must not
                 # assign reviewers to a category this cycle does not collect.
+                email_assignments[category_code] = []
+                continue
+
+            if category_code == 'self' and self_assigned:
+                # The reviewee already has their self-assessment token; another
+                # address would start a second one.
                 email_assignments[category_code] = []
                 continue
 
