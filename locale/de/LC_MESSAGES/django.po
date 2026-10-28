@@ -7110,3 +7110,21 @@ msgstr "Gleiche Einschätzung wie andere"
 
 msgid "You do not have permission to create organizations."
 msgstr "Keine Berechtigung, Organisationen zu erstellen."
+
+msgid "Drag to move"
+msgstr "Zum Verschieben ziehen"
+
+msgid "Move section up"
+msgstr "Abschnitt nach oben verschieben"
+
+msgid "Move section down"
+msgstr "Abschnitt nach unten verschieben"
+
+msgid "Move question up"
+msgstr "Frage nach oben verschieben"
+
+msgid "Move question down"
+msgstr "Frage nach unten verschieben"
+
+msgid "The new order could not be saved. Reload the page and try again."
+msgstr "Die neue Reihenfolge konnte nicht gespeichert werden. Laden Sie die Seite neu und versuchen Sie es erneut."

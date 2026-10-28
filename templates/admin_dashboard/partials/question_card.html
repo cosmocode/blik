@@ -1,7 +1,8 @@
 {% load i18n %}
 {% load json_filters %}
-<div id="question-card-{{ question.id }}" style="position: relative; padding: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 0.5rem;">
+<div id="question-card-{{ question.id }}" class="editor-question" data-question-id="{{ question.id }}" style="position: relative; padding: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 0.5rem;">
     <div style="display: flex; justify-content: space-between; align-items: start; gap: 1rem;">
+        {% include 'admin_dashboard/partials/move_controls.html' with kind='question' %}
         <div style="flex: 1;">
             <div id="question-text-{{ question.id }}" style="font-weight: 500; margin-bottom: 0.25rem; color: var(--text-primary);">
                 <span class="question-text-value">{{ question.question_text }}</span>

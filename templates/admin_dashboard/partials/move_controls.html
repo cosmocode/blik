@@ -1,0 +1,12 @@
+{# Drag handle and arrows that move a section or a question; the reordering code in questionnaire_form.html handles them #}
+{% load i18n %}
+<div class="move-controls">
+    <span class="drag-handle {{ kind }}-handle" title="{% trans 'Drag to move' %}" aria-hidden="true">⠿</span>
+    {% if kind == 'section' %}
+    <button type="button" class="btn btn-sm btn-secondary" data-move="up" aria-label="{% trans 'Move section up' %}" title="{% trans 'Move section up' %}">↑</button>
+    <button type="button" class="btn btn-sm btn-secondary" data-move="down" aria-label="{% trans 'Move section down' %}" title="{% trans 'Move section down' %}">↓</button>
+    {% else %}
+    <button type="button" class="btn btn-sm btn-secondary" data-move="up" aria-label="{% trans 'Move question up' %}" title="{% trans 'Move question up' %}">↑</button>
+    <button type="button" class="btn btn-sm btn-secondary" data-move="down" aria-label="{% trans 'Move question down' %}" title="{% trans 'Move question down' %}">↓</button>
+    {% endif %}
+</div>

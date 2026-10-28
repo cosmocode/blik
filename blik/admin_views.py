@@ -1,6 +1,7 @@
 """
 Admin dashboard views for Blik
 """
+import json
 import logging
 import random
 import re
@@ -45,6 +46,7 @@ from productreviews.models import ProductReview, anonymous_name
 from questionnaires.action_items import add_action_item_keys
 from questionnaires.answer_options import DEFAULT_LIKERT_SCALE, save_options
 from questionnaires.models import Question, QuestionSection, Questionnaire
+from questionnaires.ordering import save_layout
 from questionnaires.presentation import questionnaire_report_features
 from questionnaires.translations import (
     LanguageState,
@@ -1015,6 +1017,17 @@ def questionnaire_edit(request, questionnaire_uuid):
                 messages.success(request, _('Questionnaire "%(name)s" updated successfully.') % {'name': questionnaire.name})
             except Exception as e:
                 messages.error(request, _('Error updating questionnaire: %(error)s') % {'error': str(e)})
+
+        elif action == 'reorder':
+            try:
+                save_layout(questionnaire, json.loads(request.POST.get('layout', '')))
+            except (ValueError, TypeError, KeyError):
+                return JsonResponse({
+                    'success': False,
+                    'message': _('The new order could not be saved. Reload the page and try again.'),
+                }, status=400)
+
+            return JsonResponse({'success': True})
 
         elif action == 'add_section':
             section_title = request.POST.get('section_title')
