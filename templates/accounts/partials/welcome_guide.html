@@ -1,12 +1,12 @@
 {% load i18n %}
-<dialog id="profile-welcome-guide" class="modal-content profile-guide" aria-labelledby="profile-guide-title">
+<dialog id="profile-welcome-guide" class="modal-content profile-dialog profile-guide" aria-labelledby="profile-guide-title">
     <div class="card-header">
         <div>
             <h2 class="card-title" id="profile-guide-title">{% trans 'Welcome to Blik' %}</h2>
             <p class="help-text">{% trans 'Your 360-degree feedback platform' %}</p>
         </div>
         <form method="dialog">
-            <button class="btn btn-secondary profile-guide-close" aria-label="{% trans 'Close' context 'dismiss dialog' %}" autofocus>
+            <button class="btn btn-secondary profile-dialog-close" aria-label="{% trans 'Close' context 'dismiss dialog' %}" autofocus>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"></path></svg>
             </button>
         </form>

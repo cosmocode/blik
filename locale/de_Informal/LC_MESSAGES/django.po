@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-28 12:35+0000\n"
+"POT-Creation-Date: 2026-10-28 22:21+0000\n"
 "Language: de_Informal\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -142,6 +142,15 @@ msgstr ""
 msgid "This email address is already in use."
 msgstr ""
 
+msgid "Current password"
+msgstr ""
+
+msgid "Confirm new password"
+msgstr ""
+
+msgid "Use at least 8 characters."
+msgstr ""
+
 msgid "Enter your email address"
 msgstr ""
 
@@ -152,9 +161,6 @@ msgid "New password"
 msgstr ""
 
 msgid "Confirm Password"
-msgstr ""
-
-msgid "Confirm new password"
 msgstr ""
 
 msgid "Passwords do not match."
@@ -548,6 +554,9 @@ msgstr "Dein Passwort wurde zurückgesetzt. Bitte melde dich an."
 
 msgid "Profile not found. Please contact support."
 msgstr "Profil nicht gefunden. Bitte wende dich an den Support."
+
+msgid "Your password has been changed."
+msgstr ""
 
 msgid "Your profile has been updated successfully."
 msgstr "Dein Profil wurde aktualisiert."
@@ -3048,6 +3057,9 @@ msgstr ""
 msgid "Username cannot be changed"
 msgstr ""
 
+msgid "Change password"
+msgstr ""
+
 msgid "Review cycle access"
 msgstr ""
 
@@ -3121,6 +3133,12 @@ msgstr "Für dein Konto wurden keine Feedbackrunden gefunden."
 
 msgid "Review cycles will appear here when they're created for your email address."
 msgstr "Feedbackrunden erscheinen hier, sobald sie für deine E-Mail-Adresse angelegt werden."
+
+msgid "You stay signed in here. Other devices are signed out."
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
 
 msgid "Register - Blik 360 Feedback"
 msgstr ""
@@ -3382,9 +3400,6 @@ msgid "Note:"
 msgstr ""
 
 msgid "Your review will be submitted for approval before being published."
-msgstr ""
-
-msgid "Cancel"
 msgstr ""
 
 msgid "Submit Review"

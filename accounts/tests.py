@@ -234,3 +234,36 @@ class RevieweeManagementTestCase(TestCase):
 
         for reviewee in reviewees:
             self.assertEqual(reviewee.organization, self.org)
+
+
+class ProfilePasswordChangeTestCase(TestCase):
+    """Test changing the password from the profile page"""
+
+    def setUp(self):
+        self.user = UserFactory(username='member')
+        self.user.set_password('old-pass-123')
+        self.user.save()
+        UserProfileFactory(user=self.user, organization=OrganizationFactory())
+        self.client.force_login(self.user)
+
+    def change(self, old_password):
+        return self.client.post(reverse('profile'), {
+            'change_password': '',
+            'old_password': old_password,
+            'new_password1': 'N3w-strong-passphrase',
+            'new_password2': 'N3w-strong-passphrase',
+        })
+
+    def test_change_password_keeps_session(self):
+        response = self.change('old-pass-123')
+        self.assertRedirects(response, reverse('profile'))
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password('N3w-strong-passphrase'))
+        self.assertEqual(self.client.get(reverse('profile')).status_code, 200)
+
+    def test_wrong_old_password_is_rejected(self):
+        response = self.change('wrong')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['password_form'].errors)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password('old-pass-123'))

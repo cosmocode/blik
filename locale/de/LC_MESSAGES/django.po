@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-28 12:35+0000\n"
+"POT-Creation-Date: 2026-10-28 22:21+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -142,6 +142,15 @@ msgstr "Sprache des Browsers"
 msgid "This email address is already in use."
 msgstr "Diese E-Mail-Adresse wird bereits verwendet."
 
+msgid "Current password"
+msgstr "Aktuelles Passwort"
+
+msgid "Confirm new password"
+msgstr "Neues Passwort bestätigen"
+
+msgid "Use at least 8 characters."
+msgstr "Mindestens 8 Zeichen."
+
 msgid "Enter your email address"
 msgstr "E-Mail-Adresse eingeben"
 
@@ -153,9 +162,6 @@ msgstr "Neues Passwort"
 
 msgid "Confirm Password"
 msgstr "Passwort bestätigen"
-
-msgid "Confirm new password"
-msgstr "Neues Passwort bestätigen"
 
 msgid "Passwords do not match."
 msgstr "Die Passwörter stimmen nicht überein."
@@ -548,6 +554,9 @@ msgstr "Ihr Passwort wurde zurückgesetzt. Bitte melden Sie sich an."
 
 msgid "Profile not found. Please contact support."
 msgstr "Profil nicht gefunden. Bitte wenden Sie sich an den Support."
+
+msgid "Your password has been changed."
+msgstr "Das Passwort wurde geändert."
 
 msgid "Your profile has been updated successfully."
 msgstr "Ihr Profil wurde aktualisiert."
@@ -3048,6 +3057,9 @@ msgstr "Benutzername"
 msgid "Username cannot be changed"
 msgstr "Der Benutzername kann nicht geändert werden"
 
+msgid "Change password"
+msgstr "Passwort ändern"
+
 msgid "Review cycle access"
 msgstr "Berechtigung für Feedbackrunden"
 
@@ -3121,6 +3133,12 @@ msgstr "Für Ihr Konto wurden keine Feedbackrunden gefunden."
 
 msgid "Review cycles will appear here when they're created for your email address."
 msgstr "Feedbackrunden erscheinen hier, sobald sie für Ihre E-Mail-Adresse angelegt werden."
+
+msgid "You stay signed in here. Other devices are signed out."
+msgstr "Hier bleibt die Anmeldung bestehen. Andere Geräte werden abgemeldet."
+
+msgid "Cancel"
+msgstr "Abbrechen"
 
 msgid "Register - Blik 360 Feedback"
 msgstr "Registrieren - Blik 360 Feedback"
@@ -3383,9 +3401,6 @@ msgstr "Hinweis:"
 
 msgid "Your review will be submitted for approval before being published."
 msgstr "Bewertungen werden vor der Veröffentlichung geprüft."
-
-msgid "Cancel"
-msgstr "Abbrechen"
 
 msgid "Submit Review"
 msgstr "Bewertung absenden"
