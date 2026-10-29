@@ -17,6 +17,7 @@ from core.email import send_email
 from core.languages import recipient_language, user_language
 from core.url import get_absolute_url
 from reviews.models import ReviewCycle, ReviewerToken
+from .utils import billing_enabled
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +46,9 @@ def _send(subscription, template, subject, context, dates):
     subject is a function of the context. dates maps context names to datetimes, which are formatted
     in each recipient's language.
     """
+    if not billing_enabled():
+        return 0
+
     organization = subscription.organization
     sent = 0
 
@@ -280,6 +284,8 @@ def send_trial_reminders(dry_run=False, now=None):
 
     now = now or timezone.now()
     stats = {'eligible': 0, 'sent': 0, 'errors': []}
+    if not billing_enabled():
+        return stats  # nothing is recorded as sent, so reminders start once billing works
 
     trials = Subscription.objects.filter(
         status='trialing', cancel_at_period_end=False,

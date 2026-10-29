@@ -13,16 +13,22 @@ from subscriptions import services, views
 from reports.models import Report
 from reviews.factories import ReviewCycleFactory, ReviewerTokenFactory
 from subscriptions.emails import (
-    _usage, billing_recipients, change_email, next_step, send_trial_reminders, snapshot,
+    _usage, billing_recipients, change_email, next_step, send_cancellation_email, send_trial_reminders, snapshot,
     trial_ending_subject, trial_ending_template,
 )
 from subscriptions.fulfilment import fulfil_checkout
 from subscriptions.models import Plan, Subscription
+from subscriptions.utils import billing_enabled
 from subscriptions.testing import STRIPE_SUBSCRIPTION, subscribe, subscription_session
 
 import stripe
 
+# A working SaaS setup. Billing emails are only sent with one, so tests must not depend on the local .env.
+BILLING = dict(STRIPE_SECRET_KEY='sk_test_x', STRIPE_WEBHOOK_SECRET='whsec_x', STRIPE_PRICE_ID_SAAS='price_saas')
+NO_BILLING = dict(STRIPE_SECRET_KEY='', STRIPE_WEBHOOK_SECRET='', STRIPE_PRICE_ID_SAAS='', STRIPE_PRICE_ID_ENTERPRISE='')
 
+
+@override_settings(**BILLING)
 class SubscriptionEmailTestCase(TestCase):
     def setUp(self):
         self.org = OrganizationFactory()
@@ -57,6 +63,35 @@ class BillingRecipientsTests(SubscriptionEmailTestCase):
     def test_organization_email_when_there_is_no_administrator(self):
         org = OrganizationFactory(email='billing@example.com')
         self.assertEqual(billing_recipients(org), [(None, 'billing@example.com')])
+
+
+class BillingEnabledTests(TestCase):
+    def test_needs_a_secret_key_a_webhook_secret_and_a_subscription_price(self):
+        with override_settings(**BILLING):
+            self.assertTrue(billing_enabled())
+        for missing in ('STRIPE_WEBHOOK_SECRET', 'STRIPE_PRICE_ID_SAAS'):
+            with override_settings(**{**NO_BILLING, **BILLING, missing: ''}):
+                self.assertFalse(billing_enabled(), missing)
+
+    def test_a_placeholder_secret_key_does_not_count(self):
+        with override_settings(**{**BILLING, 'STRIPE_SECRET_KEY': 'changeme'}):
+            self.assertFalse(billing_enabled())
+
+
+@override_settings(**NO_BILLING)
+class WithoutBillingTests(SubscriptionEmailTestCase):
+    def test_no_trial_reminder_and_nothing_recorded(self):
+        self.subscription.trial_end = timezone.now() + timedelta(days=2)
+        self.subscription.save()
+
+        self.assertEqual(send_trial_reminders()['sent'], 0)
+        self.assertEqual(mail.outbox, [])
+        self.subscription.refresh_from_db()
+        self.assertIsNone(self.subscription.trial_reminder_3_days_sent_at)
+
+    def test_no_cancellation_email(self):
+        self.assertEqual(send_cancellation_email(self.subscription), 0)
+        self.assertEqual(mail.outbox, [])
 
 
 class TrialReminderTests(SubscriptionEmailTestCase):
@@ -325,6 +360,7 @@ class InAppCancellationTests(SubscriptionEmailTestCase):
         self.assertEqual(len(mail.outbox), 1)
 
 
+@override_settings(**BILLING)
 class CheckoutConfirmationTests(TestCase):
     def setUp(self):
         Plan.objects.create(name='EU SaaS', plan_type='saas', price_monthly=49, max_employees=50)
