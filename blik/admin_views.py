@@ -1144,7 +1144,7 @@ def questionnaire_edit(request, questionnaire_uuid):
                             action_item_indices.add(idx_str)
 
                     # Build action items list
-                    for idx in sorted(action_item_indices):
+                    for idx in sorted(action_item_indices, key=int):
                         text = request.POST.get(f'add_action_items[{idx}][text]', '').strip()
                         threshold = request.POST.get(f'add_action_items[{idx}][threshold]', 3.0)
                         stages_raw = request.POST.getlist(f'add_action_items[{idx}][stages][]')
@@ -1335,7 +1335,7 @@ def questionnaire_edit(request, questionnaire_uuid):
                             action_item_indices.add(idx_str)
 
                     # Build action items list
-                    for idx in sorted(action_item_indices):
+                    for idx in sorted(action_item_indices, key=int):
                         text = request.POST.get(f'action_items[{idx}][text]', '').strip()
                         threshold = request.POST.get(f'action_items[{idx}][threshold]', 3.0)
                         stages_raw = request.POST.getlist(f'action_items[{idx}][stages][]')
