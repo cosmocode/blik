@@ -10,7 +10,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils import timezone, translation
 from django.utils.formats import date_format
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, ngettext
 
 from accounts.models import Reviewee, UserProfile
 from core.email import send_email
@@ -75,34 +75,81 @@ def _send(subscription, template, subject, context, dates):
 
 
 def _usage(organization):
-    """What the organization set up so far. Counts only, so nothing tells who reviewed whom."""
+    """What the organization set up so far, and what is still open. Counts only, so nothing tells who reviewed whom."""
     cycles = ReviewCycle.objects.filter(reviewee__organization=organization)
+    open_cycles = cycles.filter(status='active')
+    completed = ReviewerToken.objects.filter(cycle__in=cycles, completed_at__isnull=False)
 
     return {
         'cycle_count': cycles.count(),
+        'open_cycle_count': open_cycles.count(),
+        'pending_report_count': open_cycles.filter(report__isnull=True).count(),
         'reviewee_count': Reviewee.objects.filter(organization=organization, is_active=True).count(),
-        'completed_review_count': ReviewerToken.objects.filter(
-            cycle__in=cycles, completed_at__isnull=False).count(),
+        'reviewed_people_count': completed.values('cycle__reviewee').distinct().count(),
+        'completed_review_count': completed.count(),
         'member_count': UserProfile.objects.filter(organization=organization).count(),
     }
 
 
+def trial_ending_template(days, usage):
+    """Which trial reminder to send: for an account without a cycle, the last one (1 day), or the first one (3 days)."""
+    if not usage['cycle_count']:
+        return 'trial_ending_empty'
+    if days == 1:
+        return 'trial_ending_last'
+    return 'trial_ending'
+
+
+def trial_ending_subject(days, c):
+    """The subject names the work done and the work still open, when there is any."""
+    reviews, reports, cycles = c['completed_review_count'], c['pending_report_count'], c['open_cycle_count']
+    values = {'site_name': c['site_name'], 'date': c['trial_end_date']}
+
+    if not c['cycle_count']:
+        if days == 1:
+            return _('Your %(site_name)s trial ends on %(date)s') % values
+        return _('Before your trial ends: try one test cycle')
+
+    if days == 1:
+        if cycles:
+            return ngettext(
+                'Your trial ends on %(date)s. Your open cycle keeps running',
+                'Your trial ends on %(date)s. Your %(count)s open cycles keep running',
+                cycles) % {**values, 'count': cycles}
+        return _('Your trial ends on %(date)s. Your reports stay as they are') % values
+
+    if reviews and reports:
+        # Translators: the two parts below, e.g. "41 reviews in, 2 reports on the way"
+        return _('%(reviews)s, %(reports)s') % {
+            'reviews': ngettext('%(count)s review in', '%(count)s reviews in', reviews) % {'count': reviews},
+            'reports': ngettext('%(count)s report on the way', '%(count)s reports on the way', reports) % {
+                'count': reports},
+        }
+    if reviews:
+        return ngettext('%(count)s review in so far. Your trial ends on %(date)s',
+                        '%(count)s reviews in so far. Your trial ends on %(date)s',
+                        reviews) % {**values, 'count': reviews}
+    if cycles:
+        return ngettext('%(count)s review cycle is collecting feedback',
+                        '%(count)s review cycles are collecting feedback',
+                        cycles) % {'count': cycles}
+    return _('Your %(site_name)s trial ends on %(date)s') % values
+
+
 def send_trial_ending_email(subscription, days):
     """The reminder that the trial ends soon. days is 3 or 1: which reminder this is."""
+    usage = _usage(subscription.organization)
     context = {
         'days': days,
         'choose_plan_url': get_absolute_url('subscriptions:billing_portal'),
         'create_cycle_url': get_absolute_url('review_cycle_create'),
-        **_usage(subscription.organization),
+        'cycles_url': get_absolute_url('review_cycle_list'),
+        'dashboard_url': get_absolute_url('admin_dashboard'),
+        **usage,
     }
 
-    def subject(c):
-        values = {'site_name': c['site_name'], 'date': c['trial_end_date']}
-        if days == 1:
-            return _('Last reminder: your %(site_name)s trial ends on %(date)s') % values
-        return _('Your %(site_name)s trial ends on %(date)s') % values
-
-    return _send(subscription, 'trial_ending', subject, context, {'trial_end_date': subscription.trial_end})
+    return _send(subscription, trial_ending_template(days, usage), lambda c: trial_ending_subject(days, c),
+                 context, {'trial_end_date': subscription.trial_end})
 
 
 def send_trial_ended_email(subscription):
@@ -113,18 +160,31 @@ def send_trial_ended_email(subscription):
     }
 
     def subject(c):
-        return _('Your %(site_name)s trial has ended') % {'site_name': c['site_name']}
+        return _('Your first %(site_name)s payment did not go through') % {'site_name': c['site_name']}
 
     return _send(subscription, 'trial_ended', subject, context, {})
+
+
+def next_step(usage):
+    """The one next step a confirmed subscription points to: the first cycle, the open cycles, or the next cycle."""
+    if not usage['cycle_count']:
+        return 'first_cycle'
+    if usage['open_cycle_count']:
+        return 'follow_up'
+    return 'next_cycle'
 
 
 def send_subscription_confirmed_email(subscription, kind):
     """kind: 'started' (trial started), 'active' (paid plan runs), 'plan_changed' or 'resumed' (cancellation undone)."""
     if kind == 'started' and subscription.status != 'trialing':
         kind = 'active'  # A subscription that started without a trial
+    usage = _usage(subscription.organization)
     context = {
         'kind': kind,
-        'dashboard_url': get_absolute_url('admin_dashboard'),
+        'next_step': next_step(usage),
+        'create_cycle_url': get_absolute_url('review_cycle_create'),
+        'cycles_url': get_absolute_url('review_cycle_list'),
+        **usage,
     }
 
     def subject(c):
@@ -152,6 +212,7 @@ def send_cancellation_email(subscription):
         'retention_days': DATA_RETENTION_DAYS,
         'settings_url': get_absolute_url('settings'),
         'export_url': get_absolute_url('account:export_data'),
+        'open_cycle_count': _usage(subscription.organization)['open_cycle_count'],
     }
 
     def subject(c):

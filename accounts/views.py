@@ -136,7 +136,7 @@ def signup_view(request):
         # Send welcome email
         try:
             from core.email import send_welcome_email
-            send_welcome_email(user, invitation.organization)
+            send_welcome_email(user, invitation.organization, invited_by=invitation.invited_by)
         except Exception as e:
             logger.exception("Failed to send welcome email to %s", user.email)
 

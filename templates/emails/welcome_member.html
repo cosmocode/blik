@@ -1,26 +1,17 @@
 {% extends 'emails/_base.html' %}
 {% load i18n %}
-{% block title %}{% blocktrans trimmed with org_name=organization.name %}Welcome to {{ org_name }}!{% endblocktrans %}{% endblock %}
-{% block preheader %}{% trans "Your account has been successfully created. You're all set to start your feedback journey." %}{% endblock %}
-{% block heading %}{% blocktrans trimmed with org_name=organization.name %}Welcome to {{ org_name }}!{% endblocktrans %}{% endblock %}
+{% block title %}{% blocktrans trimmed with org_name=organization.name %}Welcome to {{ org_name }} on {{ site_name }}{% endblocktrans %}{% endblock %}
+{% block preheader %}{% if inviter_name %}{% blocktrans trimmed with inviter=inviter_name %}{{ inviter }} added you. Your account is ready.{% endblocktrans %}{% else %}{% trans 'Your account is ready.' %}{% endif %}{% endblock %}
+{% block heading %}{% blocktrans trimmed with org_name=organization.name %}Welcome to {{ org_name }} on {{ site_name }}{% endblocktrans %}{% endblock %}
 {% block content %}
-<p>{% trans 'Hi there,' %}</p>
-<p>{% trans "Your account has been successfully created. You're all set to start your feedback journey." %}</p>
-{% trans 'Log In to Dashboard' as cta %}{% include 'emails/_button.html' with url=login_url label=cta %}
-<h2 style="margin:28px 0 8px; font-size:16px; color:#0f172a;">{% trans 'Getting Started' %}</h2>
-<ol style="margin:0 0 16px; padding-left:20px;">
-  <li>{% trans 'Complete your profile' %}</li>
-  <li>{% trans "Participate in feedback cycles as they're created" %}</li>
-  <li>{% trans 'Track your development over time' %}</li>
-</ol>
-<p>{% trans 'If you have any questions, your team admin is here to help.' %}</p>
-<hr style="border:none; border-top:1px solid #e2e8f0; margin:28px 0;">
-<p style="font-size:14px; color:#64748b;">{% trans "While you're here, here's something interesting about feedback and growth:" %}</p>
-<div style="margin:16px 0; padding:16px 20px; background:#f8fafc; border-left:3px solid #4f46e5; border-radius:4px;">
-  <div style="font-weight:600; color:#0f172a; margin-bottom:4px;">{{ fact_title }}</div>
-  <div style="font-size:14px;">{{ fact_content|safe }}</div>
-</div>
-<p style="font-size:14px; color:#64748b;">{% blocktrans trimmed %}Blik uses the Dreyfus Model as a framework for understanding skill development—from Novice to Expert. We believe it's a powerful tool for tracking your growth journey.{% endblocktrans %} <a href="{{ dreyfus_url }}" style="color:#4f46e5;">{% trans 'Learn more' %}</a></p>
-<p>{% trans 'Best regards,' %}<br>{% blocktrans trimmed with org_name=organization.name %}The {{ org_name }} Team{% endblocktrans %}</p>
+<p style="margin:0 0 16px;">{% if user.first_name %}{% blocktrans trimmed with name=user.first_name %}Hello {{ name }},{% endblocktrans %}{% else %}{% trans 'Hello,' %}{% endif %}</p>
+
+<p style="margin:0 0 16px;">{% if inviter_name %}{% blocktrans trimmed with inviter=inviter_name org_name=organization.name %}{{ inviter }} invited you to {{ org_name }}, and your account is ready.{% endblocktrans %}{% else %}{% blocktrans trimmed with org_name=organization.name %}Your account for {{ org_name }} is ready.{% endblocktrans %}{% endif %}</p>
+
+<p style="margin:0 0 16px;">{% trans 'In a review cycle, colleagues give feedback on your work. All feedback is anonymous. Nobody can see who gave which answer. When a cycle asks for your feedback, you get an email with a link.' %}</p>
+
+{% trans 'Log in to your dashboard' as cta %}{% include 'emails/_button.html' with url=login_url label=cta %}
+
+<p style="margin:0; font-size:13px; color:#64748b;">{% if inviter_name %}{% blocktrans trimmed with inviter=inviter_name %}Questions? Ask {{ inviter }} or an administrator in your team.{% endblocktrans %}{% else %}{% trans 'Questions? Ask an administrator in your team.' %}{% endif %}</p>
 {% endblock %}
 {% block footer %}{% blocktrans trimmed with email=user.email org_name=organization.name %}This email was sent to {{ email }} because you were invited to join {{ org_name }}.{% endblocktrans %}{% endblock %}

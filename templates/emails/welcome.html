@@ -1,26 +1,27 @@
 {% extends 'emails/_base.html' %}
 {% load i18n %}
 {% block title %}{% blocktrans trimmed %}Welcome to {{ site_name }}{% endblocktrans %}{% endblock %}
-{% block preheader %}{% trans 'Your Login Credentials' %}{% endblock %}
+{% block preheader %}{% trans 'Your account is ready. Start with one test cycle on yourself.' %}{% endblock %}
 {% block heading %}{% blocktrans trimmed %}Welcome to {{ site_name }}{% endblocktrans %}{% endblock %}
 {% block content %}
-<p>{% blocktrans trimmed with username=user.username %}Hello {{ username }},{% endblocktrans %}</p>
-<p>{% blocktrans trimmed %}Your {{ site_name }} account has been created and is ready to use. You can now start creating 360-degree feedback cycles for your organization.{% endblocktrans %}</p>
-<div style="margin:24px 0; padding:16px 20px; background:#f8fafc; border-left:3px solid #4f46e5; border-radius:4px;">
-  <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; margin-bottom:6px;">{% trans 'Your Login Credentials' %}</div>
-  <strong>{% trans 'Email:' %}</strong> {{ user.email }}{% if password %}<br>
-  <strong>{% trans 'Password:' %}</strong> {{ password }}{% endif %}
-</div>
-{% trans 'Login to Dashboard' as cta %}{% include 'emails/_button.html' with url=login_url label=cta %}
-{% if password %}<p><strong>{% trans 'Important:' %}</strong> {% trans 'Please change your password after your first login for security.' %}</p>{% endif %}
-<h2 style="margin:28px 0 8px; font-size:16px; color:#0f172a;">{% trans 'Getting Started' %}</h2>
-<ol style="margin:0 0 16px; padding-left:20px;">
-  <li>{% trans 'Login to your dashboard using the credentials above' %}</li>
-  <li>{% trans 'Add reviewees (employees) to your organization' %}</li>
-  <li>{% trans 'Create a review cycle and invite reviewers' %}</li>
-  <li>{% trans 'Monitor progress and generate reports' %}</li>
-</ol>
-<p>{% trans "If you have any questions, please don't hesitate to reach out to our support team." %}</p>
-<p>{% trans 'Best regards,' %}<br>{% blocktrans trimmed %}The {{ site_name }} Team{% endblocktrans %}</p>
+<p style="margin:0 0 16px;">{% if user.first_name %}{% blocktrans trimmed with name=user.first_name %}Hello {{ name }},{% endblocktrans %}{% else %}{% trans 'Hello,' %}{% endif %}</p>
+
+<p style="margin:0 0 16px;">{% blocktrans trimmed with organization=organization.name %}The {{ site_name }} account for {{ organization }} is ready.{% endblocktrans %}</p>
+
+{% if password %}
+{% blocktrans trimmed asvar credentials with email=user.email password=password %}
+Email: <strong>{{ email }}</strong><br>
+Password: <strong>{{ password }}</strong>
+{% endblocktrans %}
+{% trans 'Your login details' as credentials_title %}
+{% include 'emails/_panel.html' with title=credentials_title body=credentials %}
+<p style="margin:0 0 16px; font-size:13px; color:#64748b;">{% trans 'Change this password after you log in for the first time.' %}</p>
+{% endif %}
+
+<p style="margin:0 0 16px;">{% trans 'Start with one test cycle on yourself. Choose a few colleagues you trust and ask them for feedback on you. It takes 5 minutes, and you see the report your team would get.' %}</p>
+
+{% trans 'Start a test cycle' as cta %}{% include 'emails/_button.html' with url=create_cycle_url label=cta %}
+
+<p style="margin:0; font-size:13px; color:#64748b;">{% blocktrans trimmed with email=support_email %}Questions? Write to <a href="mailto:{{ email }}">{{ email }}</a>.{% endblocktrans %}</p>
 {% endblock %}
 {% block footer %}{% blocktrans trimmed with email=user.email %}This email was sent to {{ email }} because an account was created for your organization.{% endblocktrans %}{% endblock %}
