@@ -207,7 +207,7 @@ def send_no_reviewers_nudge(organization):
     cycle = ReviewCycle.objects.filter(reviewee__organization=organization).select_related('reviewee').first()
 
     def build():
-        return _('Invite reviewers to your review cycle'), {
+        return _("%(name)s's cycle is set up. Invite the reviewers.") % {'name': cycle.reviewee.name}, {
             'reviewee_name': cycle.reviewee.name,
             'cycle_url': get_absolute_url('review_cycle_detail', cycle_uuid=cycle.uuid),
             'threshold': organization.min_responses_for_anonymity,

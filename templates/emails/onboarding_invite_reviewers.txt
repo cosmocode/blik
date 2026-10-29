@@ -1,9 +1,12 @@
 {% load i18n %}{% if name %}{% blocktrans trimmed %}Hi {{ name }},{% endblocktrans %}{% else %}{% trans 'Hello,' %}{% endif %}
 
-{% blocktrans trimmed %}The review cycle for {{ reviewee_name }} has no reviewers yet. Feedback starts when you invite them. There are two ways:{% endblocktrans %}
+{% blocktrans trimmed %}{{ reviewee_name }}'s cycle is set up.{% endblocktrans %} {% trans 'Nothing happens until the reviewers get the link.' %}
 
-- {% trans 'By email. Enter the email address of each reviewer. Blik sends each one a personal link.' %}
-- {% trans 'With invite links. Copy the link for a group, such as peers, and share it yourself.' %}
+{% trans 'Reviewers who get the link early have more time to answer. More answers make the report more complete.' %}
+
+{% trans 'There are two ways:' %}
+- {% trans 'By email. Blik sends each reviewer a personal link.' %}
+- {% trans 'With invite links. Share one link per group yourself.' %}
 
 {% trans 'Invite reviewers:' %}
 {{ cycle_url }}
