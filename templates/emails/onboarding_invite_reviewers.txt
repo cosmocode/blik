@@ -1,0 +1,11 @@
+{% load i18n %}{% if name %}{% blocktrans trimmed %}Hi {{ name }},{% endblocktrans %}{% else %}{% trans 'Hello,' %}{% endif %}
+
+{% blocktrans trimmed %}The review cycle for {{ reviewee_name }} has no reviewers yet. Feedback starts when you invite them. There are two ways:{% endblocktrans %}
+
+- {% trans 'By email. Enter the email address of each reviewer. Blik sends each one a personal link.' %}
+- {% trans 'With invite links. Copy the link for a group, such as peers, and share it yourself.' %}
+
+{% trans 'Invite reviewers:' %}
+{{ cycle_url }}
+
+{% blocktrans trimmed count counter=threshold %}The report shows the results of a group when at least {{ counter }} reviewer in that group responds.{% plural %}The report shows the results of a group when at least {{ counter }} reviewers in that group respond.{% endblocktrans %}

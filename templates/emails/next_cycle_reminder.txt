@@ -1,0 +1,12 @@
+{% load i18n %}{% if name %}{% blocktrans trimmed %}Hi {{ name }},{% endblocktrans %}{% else %}{% trans 'Hello,' %}{% endif %}
+
+{% blocktrans trimmed with organization=organization.name %}The last review cycle of {{ organization }} closed about six months ago. A new round shows how people have grown since then.{% endblocktrans %}
+
+{% trans 'Each report places a person on the Dreyfus model, from novice to expert. It does this for two dimensions: skill, how well someone does the work, and agency, how much they take the initiative.' %}
+
+{% trans 'Use the same questionnaire as last time. The new report then compares the results with the earlier round.' %}
+
+{% blocktrans trimmed with date=last_closed_at|date:'DATE_FORMAT' %}The last review cycle closed on {{ date }}.{% endblocktrans %}
+
+{% trans 'Start the next round:' %}
+{{ create_url }}
