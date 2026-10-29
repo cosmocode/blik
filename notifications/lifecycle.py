@@ -216,10 +216,23 @@ def send_no_reviewers_nudge(organization):
                  lambda: _send_to_admins(organization, 'onboarding_invite_reviewers', build))
 
 
+def people_with_baseline(organization):
+    """How many active people of the organization have a report from a closed cycle. An aggregate count."""
+    return (
+        Report.objects
+        .filter(cycle__reviewee__organization=organization, cycle__reviewee__is_active=True,
+                cycle__status='completed', available=True)
+        .values('cycle__reviewee').distinct().count()
+    )
+
+
 def send_next_cycle_reminder(organization, cycle):
     """About six months after the organization's last cycle closed."""
+    baseline = people_with_baseline(organization)
+
     def build():
         return _('Time for the next round of 360 feedback'), {
+            'baseline': baseline,
             'last_closed_at': cycle.updated_at,
             'create_url': get_absolute_url('review_cycle_create'),
         }

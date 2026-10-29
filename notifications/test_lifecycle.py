@@ -144,6 +144,22 @@ class NextCycleReminderTests(LifecycleTestCase):
 
         self.assertEqual(lifecycle.organizations_due_next_cycle(), [])
 
+    def test_counts_people_with_a_report_from_a_closed_cycle_once(self):
+        first = self.closed_cycle(self.org, closed_days_ago=300)
+        self.report(first)
+        second = self.cycle(self.org, status='completed')
+        second.reviewee = first.reviewee
+        second.save()
+        self.report(second)
+        self.report(self.closed_cycle(self.org, closed_days_ago=190))
+        self.report(self.cycle(self.org))  # an open cycle
+        hidden = self.report(self.closed_cycle(self.org, closed_days_ago=190))
+        hidden.available = False
+        hidden.save()
+        self.report(self.closed_cycle(self.organization(created_days_ago=3), closed_days_ago=190))
+
+        self.assertEqual(lifecycle.people_with_baseline(self.org), 2)
+
     def test_goes_out_once_per_last_cycle(self):
         last = self.closed_cycle(self.org, closed_days_ago=190)
 
