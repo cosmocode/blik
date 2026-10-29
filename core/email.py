@@ -7,7 +7,7 @@ from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.backends.smtp import EmailBackend
 from django.conf import settings
 from django.utils import translation
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, gettext_lazy
 from .languages import user_language
 from .models import Organization
 
@@ -196,4 +196,54 @@ def send_welcome_email(user, organization, password=None):
         recipient_list=[user.email],
         html_message=html_message,
         from_email=organization.from_email if organization.from_email else None
+    )
+
+
+def _send_account_notice(email, language, subject, template, context):
+    """Render emails/<template>.html and .txt in the recipient's language and send them to one address.
+
+    subject is a lazy text with a %(site_name)s placeholder.
+    """
+    from django.template.loader import render_to_string
+    from django.utils import timezone
+    from django.utils.formats import date_format
+
+    with translation.override(language):
+        now = timezone.localtime()
+        context = {
+            'site_name': settings.SITE_NAME,
+            'date': date_format(now, 'DATE_FORMAT'),
+            'time': date_format(now, 'H:i'),
+            **context,
+        }
+        subject = str(subject) % {'site_name': settings.SITE_NAME}
+        html_message = render_to_string(f'emails/{template}.html', context)
+        text_message = render_to_string(f'emails/{template}.txt', context)
+
+    return send_email(subject=subject, message=text_message, recipient_list=[email], html_message=html_message)
+
+
+def send_password_changed_email(user):
+    """Security notice after the user's password changed, with a way out if it was not them."""
+    from .url import get_absolute_url
+
+    return _send_account_notice(
+        user.email, user_language(user), gettext_lazy('Your %(site_name)s password was changed'),
+        'password_changed', {'user': user, 'reset_url': get_absolute_url('forgot_password')},
+    )
+
+
+def send_email_changed_email(user, old_email):
+    """Security notice to the old address after the user's email address changed."""
+    profile = getattr(user, 'profile', None)
+
+    return _send_account_notice(
+        old_email, user_language(user),
+        gettext_lazy('The email address of your %(site_name)s account was changed'),
+        'email_changed', {
+            'user': user,
+            'old_email': old_email,
+            'new_email': user.email,
+            'organization': getattr(profile, 'organization', None),
+        },
     )
