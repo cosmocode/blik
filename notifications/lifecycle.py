@@ -339,7 +339,7 @@ def send_feedback_conversation_guide(report):
         return False
 
     def build():
-        return _('How to run the feedback conversation'), {
+        return _('The first 360 report of %(organization)s is ready') % {'organization': organization.name}, {
             'report_url': get_absolute_url('reports:view_report', cycle_uuid=report.cycle.uuid),
         }
     return _once(SentEmail.FEEDBACK_CONVERSATION, organization,
