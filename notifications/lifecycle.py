@@ -23,6 +23,7 @@ from core.languages import user_language
 from core.models import Organization
 from core.url import get_absolute_url
 from reports.models import Report
+from reports.services import self_vs_others_gap
 from reviews.models import ReviewCycle, ReviewerToken
 from reviews.services import reviewee_language
 from subscriptions.utils import entitlement
@@ -194,7 +195,7 @@ def _send_to_admins(organization, template, build):
 def send_no_cycle_nudge(organization):
     """Onboarding: signed up, but no review cycle yet."""
     def build():
-        return _('Start your first 360 in 5 minutes'), {
+        return _('Your account is ready. One step left.'), {
             'create_url': get_absolute_url('review_cycle_create'),
         }
     return _once(SentEmail.NO_CYCLE, organization,
@@ -206,7 +207,7 @@ def send_no_reviewers_nudge(organization):
     cycle = ReviewCycle.objects.filter(reviewee__organization=organization).select_related('reviewee').first()
 
     def build():
-        return _('Invite reviewers to your review cycle'), {
+        return _("%(name)s's cycle is set up. Invite the reviewers.") % {'name': cycle.reviewee.name}, {
             'reviewee_name': cycle.reviewee.name,
             'cycle_url': get_absolute_url('review_cycle_detail', cycle_uuid=cycle.uuid),
             'threshold': organization.min_responses_for_anonymity,
@@ -215,15 +216,41 @@ def send_no_reviewers_nudge(organization):
                  lambda: _send_to_admins(organization, 'onboarding_invite_reviewers', build))
 
 
+def people_with_baseline(organization):
+    """How many active people of the organization have a report from a closed cycle. An aggregate count."""
+    return (
+        Report.objects
+        .filter(cycle__reviewee__organization=organization, cycle__reviewee__is_active=True,
+                cycle__status='completed', available=True)
+        .values('cycle__reviewee').distinct().count()
+    )
+
+
 def send_next_cycle_reminder(organization, cycle):
     """About six months after the organization's last cycle closed."""
+    baseline = people_with_baseline(organization)
+
     def build():
         return _('Time for the next round of 360 feedback'), {
+            'baseline': baseline,
             'last_closed_at': cycle.updated_at,
             'create_url': get_absolute_url('review_cycle_create'),
         }
     return _once(SentEmail.NEXT_CYCLE, cycle,
                  lambda: _send_to_admins(organization, 'next_cycle_reminder', build))
+
+
+def has_perception_gap(report):
+    """True when the report shows a notable gap between the self-assessment and the others' scores.
+
+    Only a yes or no for the email, never the area or the scores. No when fewer other reviewers
+    responded than the anonymity threshold.
+    """
+    data = report.report_data or {}
+    threshold = report.cycle.reviewee.organization.min_responses_for_anonymity
+    return bool((data.get('insights') or {}).get('perception_gaps')) and (
+        self_vs_others_gap(data, threshold) is not None
+    )
 
 
 def send_report_follow_up(report):
@@ -235,12 +262,12 @@ def send_report_follow_up(report):
         with translation.override(reviewee_language(reviewee)):
             context = {
                 'name': reviewee.name,
-                'questionnaire_name': report.cycle.questionnaire.translated().name,
-                'delivered_at': SentEmail.objects.get(kind=SentEmail.REPORT_READY, object_id=report.pk).sent_at,
+                'organization': organization,
                 'report_url': get_absolute_url('reports:reviewee_report', access_token=report.access_token),
                 'has_development_path': bool(report.report_data.get('insights', {}).get('development_plan')),
+                'has_gap': has_perception_gap(report),
             }
-            _send('report_follow_up', _('Revisit your 360 feedback report'), reviewee.email, context, organization)
+            _send('report_follow_up', _('What should your next report say?'), reviewee.email, context, organization)
         return 1
     return _once(SentEmail.REPORT_FOLLOW_UP, report, send)
 
@@ -312,7 +339,7 @@ def send_feedback_conversation_guide(report):
         return False
 
     def build():
-        return _('How to run the feedback conversation'), {
+        return _('The first 360 report of %(organization)s is ready') % {'organization': organization.name}, {
             'report_url': get_absolute_url('reports:view_report', cycle_uuid=report.cycle.uuid),
         }
     return _once(SentEmail.FEEDBACK_CONVERSATION, organization,
