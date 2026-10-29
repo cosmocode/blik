@@ -4,14 +4,17 @@
 
 {% include 'emails/partials/subscription_confirmed_intro.txt' %}
 
-{% blocktrans trimmed with plan=plan.name %}Plan: {{ plan }}{% endblocktrans %}
-{% blocktrans trimmed with price=plan.price_monthly|floatformat:"-2" %}Price: €{{ price }} per month{% endblocktrans %}
-{% blocktrans trimmed with max=plan.max_employees %}People to review: up to {{ max }}{% endblocktrans %}
-{% if trial_end_date %}{% blocktrans trimmed with date=trial_end_date %}Free trial until: {{ date }}{% endblocktrans %}{% else %}{% blocktrans trimmed with date=period_end_date %}Next payment: {{ date }}{% endblocktrans %}{% endif %}
+{% headline '-' %}{% include 'emails/partials/subscription_confirmed_next_step.txt' with part='title' %}{% endheadline %}
 
-{% trans 'Team members are free on every plan. Stripe sends a receipt for each payment.' %}
+{% include 'emails/partials/subscription_confirmed_next_step.txt' with part='text' %}
 
-{% trans 'Go to your dashboard:' %}
-{{ dashboard_url }}
+{% if next_step == 'follow_up' %}{% trans 'Go to your open cycles:' %}
+{{ cycles_url }}{% elif next_step == 'first_cycle' %}{% trans 'Start a test cycle:' %}
+{{ create_cycle_url }}{% else %}{% trans 'Start a new review cycle:' %}
+{{ create_cycle_url }}{% endif %}
 
-{% blocktrans trimmed with email=support_email %}Questions about your plan? Write to {{ email }}.{% endblocktrans %}{% endautoescape %}
+{% headline '-' %}{% trans 'Your plan' %}{% endheadline %}
+{% blocktrans trimmed with plan=plan.name price=plan.price_monthly|floatformat:"-2" max=plan.max_employees %}{{ plan }}, €{{ price }} per month, for up to {{ max }} people.{% endblocktrans %}
+{% if trial_end_date %}{% blocktrans trimmed with date=trial_end_date %}Free trial until {{ date }}.{% endblocktrans %}{% else %}{% blocktrans trimmed with date=period_end_date %}Next payment on {{ date }}.{% endblocktrans %}{% endif %}
+
+{% blocktrans trimmed with email=support_email %}Team members are free on every plan. Stripe sends a receipt for each payment. Questions about your plan? Write to {{ email }}.{% endblocktrans %}{% endautoescape %}
