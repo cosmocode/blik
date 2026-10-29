@@ -6,11 +6,16 @@ from django.core import mail
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from accounts.factories import UserProfileFactory
+from accounts.factories import RevieweeFactory, UserProfileFactory
 from accounts.permissions import assign_organization_admin
 from core.factories import OrganizationFactory, UserFactory
 from subscriptions import services, views
-from subscriptions.emails import billing_recipients, change_email, send_trial_reminders, snapshot
+from reports.models import Report
+from reviews.factories import ReviewCycleFactory, ReviewerTokenFactory
+from subscriptions.emails import (
+    _usage, billing_recipients, change_email, next_step, send_trial_reminders, snapshot,
+    trial_ending_subject, trial_ending_template,
+)
 from subscriptions.fulfilment import fulfil_checkout
 from subscriptions.models import Plan, Subscription
 from subscriptions.testing import STRIPE_SUBSCRIPTION, subscribe, subscription_session
@@ -123,6 +128,61 @@ class TrialReminderTests(SubscriptionEmailTestCase):
         self.assertEqual((stats['sent'], len(stats['errors'])), (0, 1))
         self.subscription.refresh_from_db()
         self.assertIsNone(self.subscription.trial_reminder_3_days_sent_at)
+
+
+class UsageTests(SubscriptionEmailTestCase):
+    def test_counts_open_work_and_people_with_feedback(self):
+        anna, ben = RevieweeFactory(organization=self.org), RevieweeFactory(organization=self.org)
+        open_cycle = ReviewCycleFactory(reviewee=anna)
+        reported = ReviewCycleFactory(reviewee=anna)
+        Report.objects.create(cycle=reported, report_data={})
+        done = ReviewCycleFactory(reviewee=ben, status='completed')
+        ReviewCycleFactory()  # Another organization
+        for cycle in (open_cycle, open_cycle, done):
+            ReviewerTokenFactory(cycle=cycle, completed_at=timezone.now())
+        ReviewerTokenFactory(cycle=open_cycle)  # Not completed
+
+        usage = _usage(self.org)
+
+        self.assertEqual(usage['cycle_count'], 3)
+        self.assertEqual(usage['open_cycle_count'], 2)
+        self.assertEqual(usage['pending_report_count'], 1)
+        self.assertEqual(usage['completed_review_count'], 3)
+        self.assertEqual(usage['reviewed_people_count'], 2)
+
+
+class TrialEndingVariantTests(TestCase):
+    def usage(self, cycles=2, open_cycles=1, reports=1, reviews=41):
+        return {'cycle_count': cycles, 'open_cycle_count': open_cycles, 'pending_report_count': reports,
+                'completed_review_count': reviews, 'site_name': 'Blik', 'trial_end_date': '2 November 2026'}
+
+    def test_template(self):
+        self.assertEqual(trial_ending_template(3, self.usage()), 'trial_ending')
+        self.assertEqual(trial_ending_template(1, self.usage()), 'trial_ending_last')
+        self.assertEqual(trial_ending_template(3, self.usage(cycles=0)), 'trial_ending_empty')
+        self.assertEqual(trial_ending_template(1, self.usage(cycles=0)), 'trial_ending_empty')
+
+    def test_subject_carries_the_numbers(self):
+        subject = trial_ending_subject(3, self.usage(reviews=41, reports=2))
+        self.assertIn('41', subject)
+        self.assertIn('2', subject)
+
+    def test_one_day_subject_differs(self):
+        for usage in (self.usage(), self.usage(cycles=0), self.usage(open_cycles=0, reports=0)):
+            self.assertNotEqual(trial_ending_subject(1, usage), trial_ending_subject(3, usage))
+
+    def test_subject_without_numbers_names_no_zeros(self):
+        for usage in (self.usage(open_cycles=0, reports=0, reviews=0), self.usage(cycles=0, open_cycles=0,
+                                                                                  reports=0, reviews=0)):
+            for days in (1, 3):
+                self.assertNotIn('0', trial_ending_subject(days, usage).replace('2026', ''))
+
+
+class NextStepTests(TestCase):
+    def test_next_step_follows_the_organization_state(self):
+        self.assertEqual(next_step({'cycle_count': 0, 'open_cycle_count': 0}), 'first_cycle')
+        self.assertEqual(next_step({'cycle_count': 3, 'open_cycle_count': 1}), 'follow_up')
+        self.assertEqual(next_step({'cycle_count': 3, 'open_cycle_count': 0}), 'next_cycle')
 
 
 class ChangeEmailTests(SubscriptionEmailTestCase):
