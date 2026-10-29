@@ -4,7 +4,7 @@
 
 {% trans 'Reviewers who get the link early have more time to answer. More answers make the report more complete.' %}
 
-{% trans 'There are two ways:' %}
+{% trans 'Invite them in one of two ways:' %}
 - {% trans 'By email. Blik sends each reviewer a personal link.' %}
 - {% trans 'With invite links. Share one link per group yourself.' %}
 

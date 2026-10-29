@@ -10,7 +10,8 @@
 <p style="margin:0 0 8px;">{% trans 'Make it concrete. Pick one behaviour and one situation. Then finish this sentence:' %}</p>
 <p style="margin:0 0 8px; padding-left:16px; font-style:italic;">{% trans 'When [situation] happens, I will [behaviour].' %}</p>
 <p style="margin:0 0 16px; padding-left:16px; color:#64748b;">{% trans 'For example: When a meeting has no agenda, I will ask for the goal first.' %}</p>
-<p style="margin:0 0 16px;">{% if has_development_path %}{% trans 'Your report has a development path. It can help you choose the behaviour.' %} {% endif %}<a href="{{ report_url }}">{% trans 'Open your report' %}</a></p>
+{% if has_development_path %}<p style="margin:0 0 16px;">{% trans 'Your report has a development path. It can help you choose the behaviour.' %}</p>{% endif %}
+<p style="margin:0 0 24px;"><a href="{{ report_url }}" style="font-weight:600;">{% trans 'Open your report' %}</a></p>
 <p style="margin:0;">{% blocktrans trimmed with organization=organization.name %}{{ organization }} uses Blik for 360 feedback. Blik sends this reminder once, about a month after your report.{% endblocktrans %}</p>
 {% endblock %}
 {% block footer %}{% trans 'This link is personal. Do not forward this email.' %}{% endblock %}

@@ -1,8 +1,8 @@
 {% load i18n %}{% if name %}{% blocktrans trimmed %}Hi {{ name }},{% endblocktrans %}{% else %}{% trans 'Hello,' %}{% endif %}
 
-{% blocktrans trimmed %}The review cycle for {{ reviewee_name }} is closed. The report is ready. These are the numbers.{% endblocktrans %}
-
 {% if completed_cycles == 1 %}{% blocktrans trimmed with organization=organization.name %}This is the first closed review cycle of {{ organization }}.{% endblocktrans %}{% else %}{% blocktrans trimmed count counter=completed_cycles with organization=organization.name %}With this one, {{ organization }} has closed {{ counter }} review cycle.{% plural %}With this one, {{ organization }} has closed {{ counter }} review cycles.{% endblocktrans %}{% endif %}
+
+{% blocktrans trimmed %}The review cycle for {{ reviewee_name }} is closed. The report is ready. These are the numbers.{% endblocktrans %}
 
 {% trans 'Responses' %}
 {% if enough_responses %}{% blocktrans trimmed %}{{ responded }} of {{ invited }} invited reviewers responded ({{ response_rate }}%).{% endblocktrans %}{% else %}{% blocktrans trimmed count counter=threshold %}Fewer than {{ counter }} reviewer responded. To keep the answers anonymous, the report does not show them.{% plural %}Fewer than {{ counter }} reviewers responded. To keep the answers anonymous, the report does not show them.{% endblocktrans %}{% endif %}
