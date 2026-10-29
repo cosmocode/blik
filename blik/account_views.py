@@ -26,6 +26,18 @@ from accounts.permissions import (
 )
 from subscriptions.services import cancel_subscription, reactivate_subscription
 from subscriptions.models import Subscription
+from core.email import send_account_deleted_email
+from core.languages import user_language
+
+
+def _send_deletion_confirmation(email, language, **kwargs):
+    """Confirm a deletion. The data is gone already, so a mail failure is only logged."""
+    if not email:
+        return
+    try:
+        send_account_deleted_email(email, language, **kwargs)
+    except Exception:
+        logger.exception('Deletion confirmation email failed')
 
 
 @login_required
@@ -259,7 +271,9 @@ def delete_account(request):
         return redirect('settings')
 
     try:
+        email, language = user.email, user_language(user)
         delete_user_account(user)
+        _send_deletion_confirmation(email, language)
         logout(request)
         messages.success(request, _('Your account has been deleted.'))
         return redirect('landing:index')
@@ -297,7 +311,12 @@ def delete_organization(request):
         return redirect('settings')
 
     try:
+        # Read what the confirmation needs while the organization still exists
+        email, language = user.email, user_language(user)
+        had_subscription = Subscription.objects.filter(organization=org).exists()
         delete_organization_service(org)
+        _send_deletion_confirmation(email, language, organization_name=org_name,
+                                    had_subscription=had_subscription)
         logout(request)
         messages.success(request, _('Organization and all data have been deleted.'))
         return redirect('landing:index')

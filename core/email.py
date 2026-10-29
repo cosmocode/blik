@@ -247,3 +247,18 @@ def send_email_changed_email(user, old_email):
             'organization': getattr(profile, 'organization', None),
         },
     )
+
+
+def send_account_deleted_email(email, language, organization_name=None, had_subscription=False):
+    """Confirmation that a deletion the user asked for is done: their account, or with organization_name, their
+    whole organization. Sent after the data is gone, so it takes plain values."""
+    if organization_name:
+        subject = gettext_lazy('Your organization was deleted from %(site_name)s')
+    else:
+        subject = gettext_lazy('Your %(site_name)s account was deleted')
+
+    return _send_account_notice(email, language, subject, 'account_deleted', {
+        'email': email,
+        'organization_name': organization_name,
+        'had_subscription': had_subscription,
+    })
