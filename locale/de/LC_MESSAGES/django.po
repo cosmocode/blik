@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 09:23+0000\n"
+"POT-Creation-Date: 2026-10-29 19:50+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -6308,6 +6308,10 @@ msgstr "Am %(date)s haben wir das %(site_name)s-Konto <strong>%(email)s</strong>
 
 msgid "Feedback you gave as a reviewer is anonymous. It is not linked to your account, so it stays part of the reports it belongs to."
 msgstr "Als Beurteilende:r abgegebenes Feedback ist anonym. Es ist nicht mit dem Konto verknüpft und bleibt daher Teil der zugehörigen Berichte."
+
+#, python-format
+msgid "Thank you for using %(site_name)s."
+msgstr "Vielen Dank für die Nutzung von %(site_name)s."
 
 msgid "We cannot undo this deletion. This is the last email we send you about it."
 msgstr "Wir können das Löschen nicht rückgängig machen. Dies ist unsere letzte E-Mail dazu."

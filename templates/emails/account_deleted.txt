@@ -12,4 +12,6 @@
 
 {% trans 'Feedback you gave as a reviewer is anonymous. It is not linked to your account, so it stays part of the reports it belongs to.' %}
 {% endif %}
+{% blocktrans trimmed %}Thank you for using {{ site_name }}.{% endblocktrans %}
+
 {% trans 'We cannot undo this deletion. This is the last email we send you about it.' %}{% endautoescape %}

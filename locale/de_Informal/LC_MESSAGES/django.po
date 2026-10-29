@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 09:23+0000\n"
+"POT-Creation-Date: 2026-10-29 19:50+0000\n"
 "Language: de_Informal\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -6307,6 +6307,10 @@ msgid "On %(date)s, we deleted your %(site_name)s account <strong>%(email)s</str
 msgstr ""
 
 msgid "Feedback you gave as a reviewer is anonymous. It is not linked to your account, so it stays part of the reports it belongs to."
+msgstr ""
+
+#, python-format
+msgid "Thank you for using %(site_name)s."
 msgstr ""
 
 msgid "We cannot undo this deletion. This is the last email we send you about it."
