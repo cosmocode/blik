@@ -189,6 +189,35 @@ class ReportFollowUpTests(LifecycleTestCase):
         self.assertEqual(lifecycle.reports_due_follow_up(), [])
 
 
+class PerceptionGapTests(LifecycleTestCase):
+    def report_with(self, perception_gaps, peer_count):
+        self.org.min_responses_for_anonymity = 3
+        self.org.save()
+        report = self.report(self.cycle(self.org, status='completed'))
+        report.report_data = {
+            'insights': {
+                'perception_gaps': perception_gaps,
+                'overall_sentiment': {'score': 3.0, 'self_avg': 4.0},
+            },
+            'by_section': {'1': {'questions': {'10': {'by_category': {
+                'self': {'count': 1}, 'peer': {'count': peer_count},
+            }}}}},
+        }
+        return report
+
+    def test_a_gap_the_report_shows(self):
+        self.assertTrue(lifecycle.has_perception_gap(self.report_with([{'type': 'overconfidence'}], peer_count=3)))
+
+    def test_no_gap_in_the_report(self):
+        self.assertFalse(lifecycle.has_perception_gap(self.report_with([], peer_count=3)))
+
+    def test_a_gap_below_the_anonymity_threshold_does_not_count(self):
+        self.assertFalse(lifecycle.has_perception_gap(self.report_with([{'type': 'overconfidence'}], peer_count=2)))
+
+    def test_empty_report_data(self):
+        self.assertFalse(lifecycle.has_perception_gap(self.report(self.cycle(self.org, status='completed'))))
+
+
 class FeedbackConversationGuideTests(LifecycleTestCase):
     def test_the_first_report_sends_the_guide_to_the_admins_once(self):
         first = self.report(self.cycle(self.org, status='completed'))

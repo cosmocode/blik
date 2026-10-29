@@ -23,6 +23,7 @@ from core.languages import user_language
 from core.models import Organization
 from core.url import get_absolute_url
 from reports.models import Report
+from reports.services import self_vs_others_gap
 from reviews.models import ReviewCycle, ReviewerToken
 from reviews.services import reviewee_language
 from subscriptions.utils import entitlement
@@ -226,6 +227,19 @@ def send_next_cycle_reminder(organization, cycle):
                  lambda: _send_to_admins(organization, 'next_cycle_reminder', build))
 
 
+def has_perception_gap(report):
+    """True when the report shows a notable gap between the self-assessment and the others' scores.
+
+    Only a yes or no for the email, never the area or the scores. No when fewer other reviewers
+    responded than the anonymity threshold.
+    """
+    data = report.report_data or {}
+    threshold = report.cycle.reviewee.organization.min_responses_for_anonymity
+    return bool((data.get('insights') or {}).get('perception_gaps')) and (
+        self_vs_others_gap(data, threshold) is not None
+    )
+
+
 def send_report_follow_up(report):
     """About a month after the reviewee got their report."""
     reviewee = report.cycle.reviewee
@@ -235,12 +249,12 @@ def send_report_follow_up(report):
         with translation.override(reviewee_language(reviewee)):
             context = {
                 'name': reviewee.name,
-                'questionnaire_name': report.cycle.questionnaire.translated().name,
-                'delivered_at': SentEmail.objects.get(kind=SentEmail.REPORT_READY, object_id=report.pk).sent_at,
+                'organization': organization,
                 'report_url': get_absolute_url('reports:reviewee_report', access_token=report.access_token),
                 'has_development_path': bool(report.report_data.get('insights', {}).get('development_plan')),
+                'has_gap': has_perception_gap(report),
             }
-            _send('report_follow_up', _('Revisit your 360 feedback report'), reviewee.email, context, organization)
+            _send('report_follow_up', _('What should your next report say?'), reviewee.email, context, organization)
         return 1
     return _once(SentEmail.REPORT_FOLLOW_UP, report, send)
 
