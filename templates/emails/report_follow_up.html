@@ -1,0 +1,20 @@
+{% extends 'emails/_base.html' %}
+{% load i18n %}
+{% block title %}{% trans 'Revisit your 360 feedback report' %}{% endblock %}
+{% block preheader %}{% trans 'One month later: a good moment to look at your goals again.' %}{% endblock %}
+{% block heading %}{% trans 'Revisit your feedback' %}{% endblock %}
+{% block content %}
+<p style="margin:0 0 16px;">{% blocktrans trimmed %}Hi {{ name }},{% endblocktrans %}</p>
+<p style="margin:0 0 16px;">{% trans 'Your 360 feedback report has been ready for about a month. This is a good moment to read it again and to look at your progress.' %}</p>
+<p style="margin:0 0 8px;">{% trans 'Ask yourself three questions:' %}</p>
+<ul style="margin:0 0 16px; padding-left:22px;">
+  <li style="margin-bottom:6px;">{% trans 'Which goals did you choose after you read the report?' %}</li>
+  <li style="margin-bottom:6px;">{% trans 'What do you do differently now?' %}</li>
+  <li style="margin-bottom:6px;">{% trans 'What is your next small step?' %}</li>
+</ul>
+{% if has_development_path %}<p style="margin:0 0 16px;">{% trans 'Your report also has a development path. It shows what helps you reach the next stage.' %}</p>{% endif %}
+{% blocktrans trimmed with date=delivered_at|date:'DATE_FORMAT' asvar facts %}{{ questionnaire_name }}, ready since {{ date }}{% endblocktrans %}
+{% include 'emails/_panel.html' with title=_('Your report') body=facts %}
+{% include 'emails/_button.html' with url=report_url label=_('Open your report') %}
+{% endblock %}
+{% block footer %}{% trans 'This link is personal. Do not forward this email.' %}{% endblock %}

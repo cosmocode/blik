@@ -1,0 +1,12 @@
+{% load i18n %}{% if name %}{% blocktrans trimmed %}Hi {{ name }},{% endblocktrans %}{% else %}{% trans 'Hello,' %}{% endif %}
+
+{% blocktrans trimmed with organization=organization.name %}The Blik account of {{ organization }} is ready, but there is no review cycle yet. A review cycle collects feedback for one person. It has three steps:{% endblocktrans %}
+
+1. {% trans 'Choose the person who gets the feedback.' %}
+2. {% trans 'Choose a questionnaire. The default questionnaire is a good start.' %}
+3. {% trans 'Invite the reviewers by email, or share the invite links.' %}
+
+{% trans 'Create a review cycle:' %}
+{{ create_url }}
+
+{% trans 'All feedback is anonymous. Nobody can see who gave which answer.' %}

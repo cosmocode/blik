@@ -1,0 +1,17 @@
+{% load i18n %}{% blocktrans trimmed %}Hi {{ name }},{% endblocktrans %}
+
+{% trans 'Your 360 feedback report has been ready for about a month. This is a good moment to read it again and to look at your progress.' %}
+
+{% trans 'Ask yourself three questions:' %}
+- {% trans 'Which goals did you choose after you read the report?' %}
+- {% trans 'What do you do differently now?' %}
+- {% trans 'What is your next small step?' %}
+{% if has_development_path %}
+{% trans 'Your report also has a development path. It shows what helps you reach the next stage.' %}
+{% endif %}
+{% trans 'Your report:' %} {% blocktrans trimmed with date=delivered_at|date:'DATE_FORMAT' %}{{ questionnaire_name }}, ready since {{ date }}{% endblocktrans %}
+
+{% trans 'Open your report:' %}
+{{ report_url }}
+
+{% trans 'This link is personal. Do not forward this email.' %}
