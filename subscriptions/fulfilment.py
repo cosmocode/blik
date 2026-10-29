@@ -175,8 +175,12 @@ def _fulfil(session, plan_type, stripe_subscription):
     return fulfilment, True, account
 
 
-def _send_emails(fulfilment, account):
-    """After commit, once. A failure is logged and never undoes the grant."""
+def _send_emails(fulfilment, account, stripe_subscription_id):
+    """After commit, once. A failure is logged and never undoes the grant.
+
+    A new user gets the welcome email. An existing organization that starts a
+    subscription gets the trial confirmation instead.
+    """
     try:
         if account.user_created:
             from core.email import send_welcome_email
@@ -192,6 +196,10 @@ def _send_emails(fulfilment, account):
                     }),
                     recipient_list=[account.user.email],
                 )
+        elif fulfilment.outcome == 'fulfilled' and stripe_subscription_id:
+            from .emails import send_subscription_confirmed_email
+            subscription = Subscription.objects.get(stripe_subscription_id=stripe_subscription_id)
+            send_subscription_confirmed_email(subscription, 'started')
     except Exception:
         logger.exception("Checkout %s was fulfilled but its email failed",
                          fulfilment.stripe_session_id)
@@ -229,5 +237,5 @@ def fulfil_checkout(session):
         fulfilment, created, account = _fulfil(session, plan_type, stripe_subscription)
 
     if created:
-        _send_emails(fulfilment, account)
+        _send_emails(fulfilment, account, session['subscription'] if is_subscription else None)
     return fulfilment

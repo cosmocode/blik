@@ -1,0 +1,17 @@
+{% load i18n email_tags %}{% autoescape off %}{% headline '=' %}{% if ended %}{% trans 'Your subscription has ended' %}{% else %}{% trans 'Your subscription is canceled' %}{% endif %}{% endheadline %}
+
+{% if user.first_name %}{% blocktrans trimmed with name=user.first_name %}Hello {{ name }},{% endblocktrans %}{% else %}{% trans 'Hello,' %}{% endif %}
+
+{% if ended %}{% blocktrans trimmed with organization=organization.name plan=plan.name %}We have canceled the {{ plan }} plan for {{ organization }}, as you asked. It has ended now. You pay nothing more.{% endblocktrans %}{% else %}{% blocktrans trimmed with organization=organization.name plan=plan.name date=end_date %}We have canceled the {{ plan }} plan for {{ organization }}, as you asked. You keep full access until {{ date }}. After that, you pay nothing more.{% endblocktrans %}{% endif %}
+
+{% headline '-' %}{% trans 'What happens to your data' %}{% endheadline %}
+{% if not ended %}
+- {% blocktrans trimmed with end=end_date %}Until {{ end }}, everything works as it does now.{% endblocktrans %}{% endif %}
+- {% blocktrans trimmed with end=end_date %}From {{ end }}, your account is paused. You can still sign in and export your data.{% endblocktrans %}
+- {% blocktrans trimmed with deletion=deletion_date %}On {{ deletion }}, we delete your organization's data.{% endblocktrans %}
+
+{% if ended %}{% trans 'Do you want to keep your reports? Download an export before your data is deleted:' %}
+{{ export_url }}{% else %}{% blocktrans trimmed with date=end_date %}Did you change your mind? Keep your subscription before {{ date }}, and nothing changes for your team:{% endblocktrans %}
+{{ settings_url }}{% endif %}
+
+{% blocktrans trimmed with email=support_email %}Why did you leave? One sentence helps us improve. Write to {{ email }}.{% endblocktrans %}{% endautoescape %}

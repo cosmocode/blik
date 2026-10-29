@@ -1,0 +1,26 @@
+{% load i18n email_tags %}{% autoescape off %}{% headline '=' %}{% blocktrans trimmed with date=trial_end_date %}Your trial ends on {{ date }}{% endblocktrans %}{% endheadline %}
+
+{% if user.first_name %}{% blocktrans trimmed with name=user.first_name %}Hello {{ name }},{% endblocktrans %}{% else %}{% trans 'Hello,' %}{% endif %}
+
+{% blocktrans trimmed with organization=organization.name date=trial_end_date %}The free trial for {{ organization }} ends on {{ date }}. This is what your team has set up so far.{% endblocktrans %}
+
+{% blocktrans trimmed with cycles=cycle_count %}Review cycles: {{ cycles }}{% endblocktrans %}
+{% blocktrans trimmed with people=reviewee_count %}People to review: {{ people }}{% endblocktrans %}
+{% blocktrans trimmed with reviews=completed_review_count %}Completed reviews: {{ reviews }}{% endblocktrans %}
+{% blocktrans trimmed with members=member_count %}Team members: {{ members }}{% endblocktrans %}{% if not cycle_count %}
+
+{% trans 'You have not started a review cycle yet. There is still time. Start your first cycle here. It takes a few minutes:' %}
+{{ create_cycle_url }}{% endif %}
+
+{% headline '-' %}{% blocktrans trimmed with date=trial_end_date %}What happens on {{ date }}{% endblocktrans %}{% endheadline %}
+
+{% blocktrans trimmed with plan=plan.name price=plan.price_monthly|floatformat:"-2" max=plan.max_employees %}Your {{ plan }} plan starts, for up to {{ max }} people. We charge €{{ price }} per month to the card you gave at checkout.{% endblocktrans %}
+
+{% trans 'Your review cycles, reports and settings stay as they are. You do not need to do anything.' %}
+
+{% blocktrans trimmed with date=trial_end_date %}Do you want a different plan, or do you want to stop? Choose before {{ date }}. If you cancel before then, we do not charge you.{% endblocktrans %}
+
+{% trans 'Choose your plan:' %}
+{{ choose_plan_url }}
+
+{% blocktrans trimmed with email=support_email %}Questions about your plan? Write to {{ email }}.{% endblocktrans %}{% endautoescape %}

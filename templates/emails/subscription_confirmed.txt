@@ -1,0 +1,17 @@
+{% load i18n email_tags %}{% autoescape off %}{% headline '=' %}{% include 'emails/partials/subscription_confirmed_heading.txt' %}{% endheadline %}
+
+{% if user.first_name %}{% blocktrans trimmed with name=user.first_name %}Hello {{ name }},{% endblocktrans %}{% else %}{% trans 'Hello,' %}{% endif %}
+
+{% include 'emails/partials/subscription_confirmed_intro.txt' %}
+
+{% blocktrans trimmed with plan=plan.name %}Plan: {{ plan }}{% endblocktrans %}
+{% blocktrans trimmed with price=plan.price_monthly|floatformat:"-2" %}Price: €{{ price }} per month{% endblocktrans %}
+{% blocktrans trimmed with max=plan.max_employees %}People to review: up to {{ max }}{% endblocktrans %}
+{% if trial_end_date %}{% blocktrans trimmed with date=trial_end_date %}Free trial until: {{ date }}{% endblocktrans %}{% else %}{% blocktrans trimmed with date=period_end_date %}Next payment: {{ date }}{% endblocktrans %}{% endif %}
+
+{% trans 'Team members are free on every plan. Stripe sends a receipt for each payment.' %}
+
+{% trans 'Go to your dashboard:' %}
+{{ dashboard_url }}
+
+{% blocktrans trimmed with email=support_email %}Questions about your plan? Write to {{ email }}.{% endblocktrans %}{% endautoescape %}

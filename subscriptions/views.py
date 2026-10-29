@@ -14,7 +14,8 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import gettext as _
 from django_ratelimit.decorators import ratelimit
-from .models import Subscription, OneTimeLoginToken
+from . import emails
+from .models import OneTimeLoginToken, Plan, Subscription
 from .fulfilment import _period, _ts, fulfil_checkout
 from .utils import price_id_for
 from core.url import get_absolute_url
@@ -191,33 +192,63 @@ def stripe_webhook(request):
     return HttpResponse(status=200)
 
 
+def _plan_for(stripe_subscription):
+    """The Plan of the subscription's price, or None for a price we do not sell."""
+    item = ((stripe_subscription.get('items') or {}).get('data') or [{}])[0]
+    price_id = (item.get('price') or {}).get('id')
+    for plan_type in ('saas', 'enterprise'):
+        try:
+            if price_id and price_id == price_id_for(plan_type):
+                return Plan.objects.filter(plan_type=plan_type).first()
+        except ValueError:
+            continue
+    return None
+
+
 def handle_subscription_updated(stripe_subscription):
-    """Update subscription status"""
+    """Update subscription status and plan, and email the customer about the change."""
     try:
         subscription = Subscription.objects.get(
             stripe_subscription_id=stripe_subscription['id']
         )
+        before = emails.snapshot(subscription)
         start, end = _period(stripe_subscription)
         subscription.status = stripe_subscription['status']
         subscription.current_period_start = _ts(start)
         subscription.current_period_end = _ts(end)
         subscription.cancel_at_period_end = stripe_subscription.get('cancel_at_period_end', False)
+        subscription.plan = _plan_for(stripe_subscription) or subscription.plan
         subscription.save()
+        emails.notify_change(before, subscription)
     except Subscription.DoesNotExist:
         pass
 
 
 def handle_subscription_deleted(stripe_subscription):
-    """Mark subscription as canceled"""
+    """Mark subscription as canceled. Confirm it when the customer asked for it and was not told yet."""
     try:
         subscription = Subscription.objects.get(
             stripe_subscription_id=stripe_subscription['id']
         )
-        subscription.status = 'canceled'
-        subscription.canceled_at = timezone.now()
-        subscription.save()
     except Subscription.DoesNotExist:
-        pass
+        return
+    if subscription.canceled_at:
+        return  # A retried event, or canceled here already
+
+    # A scheduled cancellation was confirmed when it was scheduled. An ended subscription after
+    # failed payments is Stripe's to report.
+    reason = (stripe_subscription.get('cancellation_details') or {}).get('reason')
+    confirm = reason == 'cancellation_requested' and not subscription.cancel_at_period_end
+
+    subscription.status = 'canceled'
+    subscription.canceled_at = timezone.now()
+    subscription.save()
+
+    if confirm:
+        try:
+            emails.send_cancellation_email(subscription)
+        except Exception:
+            logger.exception('Subscription %s ended but its email failed', subscription.pk)
 
 
 def handle_payment_failed(invoice):
@@ -225,9 +256,12 @@ def handle_payment_failed(invoice):
     stripe_customer_id = invoice['customer']
     try:
         subscription = Subscription.objects.get(stripe_customer_id=stripe_customer_id)
+        before = emails.snapshot(subscription)
         subscription.status = 'past_due'
         subscription.save()
-        # TODO: Send payment failed email
+        # Stripe emails the failed payment itself. This only covers the end of a trial, which can
+        # arrive here before customer.subscription.updated does.
+        emails.notify_change(before, subscription)
     except Subscription.DoesNotExist:
         pass
 
