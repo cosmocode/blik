@@ -122,7 +122,14 @@ def send_password_reset_email(user, token):
     )
 
 
-def send_welcome_email(user, organization, password=None):
+def inviter_name(user):
+    """How an email names the person who invited someone: their full name, else their email. None without a user."""
+    if user is None:
+        return None
+    return user.get_full_name() or user.email or None
+
+
+def send_welcome_email(user, organization, password=None, invited_by=None):
     """
     Send welcome email to newly registered user.
 
@@ -130,65 +137,40 @@ def send_welcome_email(user, organization, password=None):
         user: User object
         organization: Organization object
         password: Optional password to include in email (for admin-created accounts)
+        invited_by: Optional user who invited them (for invited members)
 
     Returns:
         Number of emails sent (0 or 1)
     """
-    import random
     from django.template.loader import render_to_string
-    from .models import WelcomeEmailFact
+    from subscriptions.emails import SUPPORT_EMAIL
     from .url import get_absolute_url
 
-    # Build login URL
-    login_url = get_absolute_url('login')
-
-    # Build Dreyfus model URL
-    dreyfus_url = get_absolute_url('/landing/dreyfus-model/')
-
     with translation.override(user_language(user, organization)):
-        # Get active facts from database
-        active_facts = list(WelcomeEmailFact.objects.filter(is_active=True))
-
-        if active_facts:
-            # Select a random fact from the database
-            selected_fact_obj = random.choice(active_facts)
-            selected_fact = {
-                'title': selected_fact_obj.title,
-                'content': selected_fact_obj.content
-            }
-        else:
-            # Fallback if no facts in database
-            selected_fact = {
-                'title': _('The Power of 360 Feedback'),
-                'content': _('Research shows that <strong>360-degree feedback increases self-awareness by up to 30%</strong> and significantly improves leadership effectiveness.')
-            }
-
         # Use different templates based on whether password is provided
         if password:
             # Admin-created account with credentials
-            subject = _('Welcome to %(site_name)s - Your Account is Ready') % {'site_name': settings.SITE_NAME}
-            html_template = 'emails/welcome.html'
-            text_template = 'emails/welcome.txt'
+            subject = _('Welcome to %(site_name)s. Your account is ready') % {'site_name': settings.SITE_NAME}
+            template = 'emails/welcome'
         else:
             # Invited member (already set their own password)
-            subject = _('Welcome to %(organization)s!') % {'organization': organization.name}
-            html_template = 'emails/welcome_member.html'
-            text_template = 'emails/welcome_member.txt'
+            subject = _('Welcome to %(organization)s on %(site_name)s') % {
+                'organization': organization.name, 'site_name': settings.SITE_NAME}
+            template = 'emails/welcome_member'
 
-        # Render email templates
         context = {
             'organization': organization,
             'user': user,
             'password': password,
-            'login_url': login_url,
-            'dreyfus_url': dreyfus_url,
+            'login_url': get_absolute_url('login'),
+            'create_cycle_url': get_absolute_url('review_cycle_create'),
+            'inviter_name': inviter_name(invited_by),
             'site_name': settings.SITE_NAME,
-            'fact_title': selected_fact['title'],
-            'fact_content': selected_fact['content'],
+            'support_email': SUPPORT_EMAIL,
         }
 
-        html_message = render_to_string(html_template, context)
-        text_message = render_to_string(text_template, context)
+        html_message = render_to_string(f'{template}.html', context)
+        text_message = render_to_string(f'{template}.txt', context)
 
     return send_email(
         subject=subject,
