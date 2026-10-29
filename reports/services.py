@@ -969,5 +969,9 @@ def send_report_ready_notification(report, request=None):
 
     except Exception as e:
         stats['errors'].append(_('Failed to send report ready email: %(error)s') % {'error': str(e)})
+        return stats
+
+    from notifications.lifecycle import report_delivered
+    report_delivered(report)
 
     return stats
