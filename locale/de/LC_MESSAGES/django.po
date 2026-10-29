@@ -16,7 +16,7 @@ msgstr "Fehler beim Anonymisieren von %(name)s: %(error)s"
 
 #, python-format
 msgid "Successfully anonymized %(count)s reviewee(s). Personal data removed, review cycles preserved."
-msgstr "%(count)s Beurteilte anonymisiert. Personenbezogene Daten entfernt, Feedbackrunden bleiben erhalten."
+msgstr "%(count)s Feedbacknehmende anonymisiert. Personenbezogene Daten entfernt, Feedbackrunden bleiben erhalten."
 
 msgid "GDPR: Hard delete (complete removal with all data)"
 msgstr "DSGVO: Endgültig löschen (vollständige Entfernung mit allen Daten)"
@@ -27,10 +27,10 @@ msgstr "Fehler beim Löschen von %(name)s: %(error)s"
 
 #, python-format
 msgid "Successfully deleted %(count)s reviewee(s) and %(cycles)s review cycle(s) with all related data."
-msgstr "%(count)s Beurteilte und %(cycles)s Feedbackrunde(n) mit allen zugehörigen Daten gelöscht."
+msgstr "%(count)s Feedbacknehmende und %(cycles)s Feedbackrunde(n) mit allen zugehörigen Daten gelöscht."
 
 msgid "GDPR: Full anonymization (reviewee + reviewer emails)"
-msgstr "DSGVO: Vollständig anonymisieren (Beurteilte und E-Mail-Adressen der Beurteilenden)"
+msgstr "DSGVO: Vollständig anonymisieren (Feedbacknehmende und E-Mail-Adressen der Feedbackgebenden)"
 
 #, python-format
 msgid "Error in full anonymization for %(name)s: %(error)s"
@@ -38,14 +38,14 @@ msgstr "Fehler beim vollständigen Anonymisieren von %(name)s: %(error)s"
 
 #, python-format
 msgid "Successfully fully anonymized %(count)s reviewee(s) including reviewer emails."
-msgstr "%(count)s Beurteilte vollständig anonymisiert, einschließlich der E-Mail-Adressen der Beurteilenden."
+msgstr "%(count)s Feedbacknehmende vollständig anonymisiert, einschließlich der E-Mail-Adressen der Feedbackgebenden."
 
 msgid "Show GDPR data summary"
 msgstr "DSGVO-Datenübersicht anzeigen"
 
 #, python-format
 msgid "Reviewee %(name)s: %(cycles)s cycles, %(tokens)s tokens, %(responses)s responses, %(reports)s reports"
-msgstr "Beurteilte:r %(name)s: %(cycles)s Feedbackrunden, %(tokens)s Tokens, %(responses)s Antworten, %(reports)s Berichte"
+msgstr "Feedbacknehmende Person %(name)s: %(cycles)s Feedbackrunden, %(tokens)s Tokens, %(responses)s Antworten, %(reports)s Berichte"
 
 #, python-format
 msgid "Error getting summary for %(name)s: %(error)s"
@@ -199,11 +199,11 @@ msgstr "Benutzer:in an Index %(index)s: Pflichtfeld '%(field)s' fehlt"
 
 #, python-format
 msgid "Reviewee at index %(index)s must be an object"
-msgstr "Beurteilte:r an Index %(index)s muss ein Objekt sein"
+msgstr "Feedbacknehmende Person an Index %(index)s muss ein Objekt sein"
 
 #, python-format
 msgid "Reviewee at index %(index)s missing required field: '%(field)s'"
-msgstr "Beurteilte:r an Index %(index)s: Pflichtfeld '%(field)s' fehlt"
+msgstr "Feedbacknehmende Person an Index %(index)s: Pflichtfeld '%(field)s' fehlt"
 
 #, python-format
 msgid "Questionnaire at index %(index)s must be an object"
@@ -260,11 +260,11 @@ msgstr "Unbenannt"
 
 #, python-format
 msgid "Created duplicate reviewee: %(name)s with email %(email)s (original: %(original)s)"
-msgstr "Beurteilte:r als Duplikat angelegt: %(name)s mit E-Mail-Adresse %(email)s (Original: %(original)s)"
+msgstr "Feedbacknehmende Person als Duplikat angelegt: %(name)s mit E-Mail-Adresse %(email)s (Original: %(original)s)"
 
 #, python-format
 msgid "Failed to import reviewee %(reviewee)s: %(error)s"
-msgstr "Beurteilte:r %(reviewee)s konnte nicht importiert werden: %(error)s"
+msgstr "Feedbacknehmende Person %(reviewee)s konnte nicht importiert werden: %(error)s"
 
 msgid "unknown"
 msgstr "unbekannt"
@@ -283,7 +283,7 @@ msgstr "Fragebogen %(questionnaire)s konnte nicht importiert werden: %(error)s"
 
 #, python-format
 msgid "Reviewee '%(name)s' not found - skipping cycle"
-msgstr "Beurteilte:r '%(name)s' nicht gefunden – Feedbackrunde übersprungen"
+msgstr "Feedbacknehmende Person '%(name)s' nicht gefunden – Feedbackrunde übersprungen"
 
 #, python-format
 msgid "Questionnaire '%(name)s' not found - skipping cycle"
@@ -319,21 +319,21 @@ msgstr "Benutzer:in %(username)s konnte nicht importiert werden: %(error)s"
 
 #, python-format
 msgid "Reviewee '%(name)s' not found for report - skipping"
-msgstr "Beurteilte:r '%(name)s' für den Bericht nicht gefunden – übersprungen"
+msgstr "Feedbacknehmende Person '%(name)s' für den Bericht nicht gefunden – übersprungen"
 
 #, python-format
 msgid "No questionnaire found for report (reviewee: %(name)s) - skipping"
-msgstr "Kein Fragebogen für den Bericht gefunden (Beurteilte:r: %(name)s) – übersprungen"
+msgstr "Kein Fragebogen für den Bericht gefunden (feedbacknehmende Person: %(name)s) – übersprungen"
 
 #, python-format
 msgid "Failed to import report: %(error)s"
 msgstr "Bericht konnte nicht importiert werden: %(error)s"
 
 msgid "Skipped cycle import: requires both reviewees and questionnaires to be imported"
-msgstr "Import der Feedbackrunden übersprungen: Dafür müssen Beurteilte und Fragebögen mitimportiert werden"
+msgstr "Import der Feedbackrunden übersprungen: Dafür müssen Feedbacknehmende und Fragebögen mitimportiert werden"
 
 msgid "Reviewees"
-msgstr "Beurteilte"
+msgstr "Feedbacknehmende"
 
 msgid "Questionnaires"
 msgstr "Fragebögen"
@@ -481,7 +481,7 @@ msgid "name"
 msgstr "Name"
 
 msgid "department"
-msgstr "Abteilung"
+msgstr "Bereich"
 
 msgid "Language of emails to this person. Empty: the organization's default language."
 msgstr "Sprache der E-Mails an diese Person. Leer: die Standardsprache der Organisation."
@@ -490,10 +490,10 @@ msgid "active"
 msgstr "aktiv"
 
 msgid "reviewee"
-msgstr "Beurteilte:r"
+msgstr "Feedbacknehmende Person"
 
 msgid "reviewees"
-msgstr "Beurteilte"
+msgstr "Feedbacknehmende"
 
 msgid "Authentication required"
 msgstr "Anmeldung erforderlich"
@@ -849,36 +849,36 @@ msgid "No organization found. Please run setup first."
 msgstr "Keine Organisation gefunden. Bitte zuerst die Einrichtung durchführen."
 
 msgid "You can only create a reviewee profile for yourself."
-msgstr "Sie können nur für sich selbst ein Profil als Beurteilte:r anlegen."
+msgstr "Sie können nur für sich selbst ein Profil als feedbacknehmende Person anlegen."
 
 #, python-format
 msgid "Reviewee \"%(name)s\" created successfully."
-msgstr "Beurteilte:r „%(name)s“ angelegt."
+msgstr "Feedbacknehmende Person „%(name)s“ angelegt."
 
 #, python-format
 msgid "Error creating reviewee: %(error)s"
-msgstr "Fehler beim Anlegen der beurteilten Person: %(error)s"
+msgstr "Fehler beim Anlegen der feedbacknehmenden Person: %(error)s"
 
 msgid "Name and email are required."
 msgstr "Name und E-Mail-Adresse sind erforderlich."
 
 msgid "You do not have permission to edit reviewees. Only organization administrators can access this feature."
-msgstr "Keine Berechtigung, Beurteilte zu bearbeiten. Nur Organisations-Admins können diese Funktion nutzen."
+msgstr "Keine Berechtigung, Feedbacknehmende zu bearbeiten. Nur Organisations-Admins können diese Funktion nutzen."
 
 #, python-format
 msgid "Reviewee \"%(name)s\" updated successfully."
-msgstr "Beurteilte:r „%(name)s“ aktualisiert."
+msgstr "Feedbacknehmende Person „%(name)s“ aktualisiert."
 
 #, python-format
 msgid "Error updating reviewee: %(error)s"
-msgstr "Fehler beim Aktualisieren der beurteilten Person: %(error)s"
+msgstr "Fehler beim Aktualisieren der feedbacknehmenden Person: %(error)s"
 
 msgid "You do not have permission to delete reviewees. Only organization administrators can access this feature."
-msgstr "Keine Berechtigung, Beurteilte zu löschen. Nur Organisations-Admins können diese Funktion nutzen."
+msgstr "Keine Berechtigung, Feedbacknehmende zu löschen. Nur Organisations-Admins können diese Funktion nutzen."
 
 #, python-format
 msgid "Reviewee \"%(name)s\" deactivated."
-msgstr "Beurteilte:r „%(name)s“ deaktiviert."
+msgstr "Feedbacknehmende Person „%(name)s“ deaktiviert."
 
 msgid "You do not have permission to create review cycles. Only organization administrators can access this feature."
 msgstr "Keine Berechtigung, Feedbackrunden anzulegen. Nur Organisations-Admins können diese Funktion nutzen."
@@ -894,14 +894,14 @@ msgstr "Bitte mindestens eine Feedbackkategorie auswählen."
 
 #, python-format
 msgid "Review cycle created for \"%(name)s\" using \"%(questionnaire)s\". Copied %(count)s reviewer(s) from previous cycle. %(sent)s email invitation(s) sent."
-msgstr "Feedbackrunde für „%(name)s“ mit „%(questionnaire)s“ angelegt. %(count)s Beurteilende aus der vorherigen Feedbackrunde übernommen. %(sent)s Einladung(en) per E-Mail gesendet."
+msgstr "Feedbackrunde für „%(name)s“ mit „%(questionnaire)s“ angelegt. %(count)s Feedbackgebende aus der vorherigen Feedbackrunde übernommen. %(sent)s Einladung(en) per E-Mail gesendet."
 
 #, python-format
 msgid "Review cycle created for \"%(name)s\" using \"%(questionnaire)s\" with %(count)s reviewer token(s). Go to the cycle details to assign reviewers and send invitations."
-msgstr "Feedbackrunde für „%(name)s“ mit „%(questionnaire)s“ und %(count)s Token(s) für Beurteilende angelegt. In den Details der Feedbackrunde lassen sich Beurteilende zuweisen und Einladungen versenden."
+msgstr "Feedbackrunde für „%(name)s“ mit „%(questionnaire)s“ und %(count)s Token(s) für Feedbackgebende angelegt. In den Details der Feedbackrunde lassen sich Feedbackgebende zuweisen und Einladungen versenden."
 
 msgid "Notification emails are being sent to the reviewee."
-msgstr "Die beurteilte Person wird per E-Mail benachrichtigt."
+msgstr "Die feedbacknehmende Person wird per E-Mail benachrichtigt."
 
 msgid "Pair with a more senior teammate on a challenging problem this sprint"
 msgstr "In diesem Sprint gemeinsam mit einem erfahreneren Teammitglied ein anspruchsvolles Problem lösen"
@@ -1038,7 +1038,7 @@ msgid "Oldest first"
 msgstr "Älteste zuerst"
 
 msgid "Reviewee A–Z"
-msgstr "Beurteilte:r A–Z"
+msgstr "Feedbacknehmende A–Z"
 
 msgid "Fewest responses"
 msgstr "Wenigste Antworten"
@@ -1048,7 +1048,7 @@ msgid "Created %(count)s review cycles. No invitations have been sent yet."
 msgstr "%(count)s Feedbackrunden angelegt. Es wurden noch keine Einladungen gesendet."
 
 msgid "Reviewee is required for single cycle creation."
-msgstr "Für eine einzelne Feedbackrunde muss eine beurteilte Person ausgewählt werden."
+msgstr "Für eine einzelne Feedbackrunde muss eine feedbacknehmende Person ausgewählt werden."
 
 #, python-format
 msgid "Invalid email skipped in %(category)s: %(email)s"
@@ -1056,15 +1056,15 @@ msgstr "Ungültige E-Mail-Adresse übersprungen (%(category)s): %(email)s"
 
 #, python-format
 msgid "Review cycle created for \"%(name)s\" with %(assigned)s reviewer(s) invited. Invitation emails are being sent."
-msgstr "Feedbackrunde für „%(name)s“ mit %(assigned)s eingeladenen Beurteilenden angelegt. Die Einladungen werden per E-Mail gesendet."
+msgstr "Feedbackrunde für „%(name)s“ mit %(assigned)s eingeladenen Feedbackgebenden angelegt. Die Einladungen werden per E-Mail gesendet."
 
 #, python-format
 msgid "Review cycle created for \"%(name)s\" with %(assigned)s reviewer(s) assigned. Visit the invitations page to send emails."
-msgstr "Feedbackrunde für „%(name)s“ mit %(assigned)s zugewiesenen Beurteilenden angelegt. Die E-Mails lassen sich auf der Seite „Einladungen“ versenden."
+msgstr "Feedbackrunde für „%(name)s“ mit %(assigned)s zugewiesenen Feedbackgebenden angelegt. Die E-Mails lassen sich auf der Seite „Einladungen“ versenden."
 
 #, python-format
 msgid "Review cycle created for \"%(name)s\". Notification emails are being sent to the reviewee."
-msgstr "Feedbackrunde für „%(name)s“ angelegt. Die beurteilte Person wird per E-Mail benachrichtigt."
+msgstr "Feedbackrunde für „%(name)s“ angelegt. Die feedbacknehmende Person wird per E-Mail benachrichtigt."
 
 #, python-format
 msgid "Error creating review cycle: %(error)s"
@@ -1108,7 +1108,7 @@ msgstr "Feedbackrunde abgeschlossen, aber der Bericht konnte nicht erstellt werd
 
 #, python-format
 msgid "Successfully invited %(assigned)s reviewer(s) and sent %(sent)s email(s)."
-msgstr "%(assigned)s Beurteilende eingeladen und %(sent)s E-Mail(s) gesendet."
+msgstr "%(assigned)s Feedbackgebende eingeladen und %(sent)s E-Mail(s) gesendet."
 
 #, python-format
 msgid "Successfully assigned %(assigned)s email(s). Invitations will be sent separately."
@@ -1140,43 +1140,43 @@ msgid "No pending reminders to send."
 msgstr "Keine offenen Erinnerungen zum Senden."
 
 msgid "Cannot send reminder: no email assigned to this reviewer."
-msgstr "Erinnerung nicht möglich: Für diese beurteilende Person ist keine E-Mail-Adresse hinterlegt."
+msgstr "Erinnerung nicht möglich: Für diese feedbackgebende Person ist keine E-Mail-Adresse hinterlegt."
 
 msgid "Cannot send reminder: invitation not sent yet."
 msgstr "Erinnerung nicht möglich: Die Einladung wurde noch nicht gesendet."
 
 msgid "This reviewer has already completed their feedback."
-msgstr "Diese beurteilende Person hat ihr Feedback bereits abgegeben."
+msgstr "Diese feedbackgebende Person hat ihr Feedback bereits abgegeben."
 
 msgid "Reminder sent to reviewer."
-msgstr "Erinnerung an die beurteilende Person gesendet."
+msgstr "Erinnerung an die feedbackgebende Person gesendet."
 
 msgid "Reviewer token not found."
-msgstr "Token der beurteilenden Person nicht gefunden."
+msgstr "Token der feedbackgebenden Person nicht gefunden."
 
 #, python-format
 msgid "Error sending reminder: %(error)s"
 msgstr "Fehler beim Senden der Erinnerung: %(error)s"
 
 msgid "You do not have permission to remove reviewers."
-msgstr "Keine Berechtigung, Beurteilende zu entfernen."
+msgstr "Keine Berechtigung, Feedbackgebende zu entfernen."
 
 msgid "Cannot remove: reviewer has already started or completed their feedback."
-msgstr "Entfernen nicht möglich: Die beurteilende Person hat ihr Feedback bereits begonnen oder abgegeben."
+msgstr "Entfernen nicht möglich: Die feedbackgebende Person hat ihr Feedback bereits begonnen oder abgegeben."
 
 msgid "unclaimed token"
 msgstr "nicht eingelöster Token"
 
 #, python-format
 msgid "Removed %(category)s reviewer (%(email)s) from cycle."
-msgstr "Beurteilende Person (%(email)s, %(category)s) aus der Feedbackrunde entfernt."
+msgstr "Feedbackgebende Person (%(email)s, %(category)s) aus der Feedbackrunde entfernt."
 
 msgid "Cycle automatically closed and report generated (all remaining reviewers completed)."
-msgstr "Feedbackrunde automatisch abgeschlossen und Bericht erstellt (alle übrigen Beurteilenden sind fertig)."
+msgstr "Feedbackrunde automatisch abgeschlossen und Bericht erstellt (alle übrigen Feedbackgebenden sind fertig)."
 
 #, python-format
 msgid "Error removing reviewer: %(error)s"
-msgstr "Fehler beim Entfernen der beurteilenden Person: %(error)s"
+msgstr "Fehler beim Entfernen der feedbackgebenden Person: %(error)s"
 
 msgid "No report found for this cycle. Please generate the report first."
 msgstr "Für diese Feedbackrunde gibt es keinen Bericht. Bitte zuerst den Bericht erstellen."
@@ -1240,23 +1240,23 @@ msgid "Error deleting user: %(error)s"
 msgstr "Fehler beim Löschen des Benutzerkontos: %(error)s"
 
 msgid "You do not have permission to delete reviewees."
-msgstr "Keine Berechtigung zum Löschen von Beurteilten."
+msgstr "Keine Berechtigung zum Löschen von Feedbacknehmenden."
 
 #, python-format
 msgid "Reviewee %(name)s and all associated reviewer emails have been anonymized. %(count)s reviewer email(s) anonymized."
-msgstr "Beurteilte:r %(name)s und alle zugehörigen E-Mail-Adressen von Beurteilenden wurden anonymisiert. Anonymisierte E-Mail-Adressen: %(count)s."
+msgstr "Feedbacknehmende Person %(name)s und alle zugehörigen E-Mail-Adressen von Feedbackgebenden wurden anonymisiert. Anonymisierte E-Mail-Adressen: %(count)s."
 
 #, python-format
 msgid "Reviewee %(name)s has been permanently deleted along with %(count)s review cycle(s) and all associated data."
-msgstr "Beurteilte:r %(name)s wurde samt aller zugehörigen Daten endgültig gelöscht. Gelöschte Feedbackrunden: %(count)s."
+msgstr "Feedbacknehmende Person %(name)s wurde samt aller zugehörigen Daten endgültig gelöscht. Gelöschte Feedbackrunden: %(count)s."
 
 #, python-format
 msgid "Reviewee %(name)s has been anonymized. %(count)s review cycle(s) preserved."
-msgstr "Beurteilte:r %(name)s wurde anonymisiert. Erhaltene Feedbackrunden: %(count)s."
+msgstr "Feedbacknehmende Person %(name)s wurde anonymisiert. Erhaltene Feedbackrunden: %(count)s."
 
 #, python-format
 msgid "Error deleting reviewee: %(error)s"
-msgstr "Fehler beim Löschen der beurteilten Person: %(error)s"
+msgstr "Fehler beim Löschen der feedbacknehmenden Person: %(error)s"
 
 msgid "You do not have permission to create product reviews."
 msgstr "Keine Berechtigung zum Anlegen von Produktbewertungen."
@@ -1518,7 +1518,7 @@ msgid "minimum responses for anonymity"
 msgstr "Mindestanzahl für Anonymität"
 
 msgid "Automatically send email to reviewee when their report is generated"
-msgstr "Der beurteilten Person automatisch eine E-Mail senden, sobald ihr Bericht erstellt ist"
+msgstr "Der feedbacknehmenden Person automatisch eine E-Mail senden, sobald ihr Bericht erstellt ist"
 
 msgid "automatically send report email"
 msgstr "Berichts-E-Mail automatisch senden"
@@ -1620,7 +1620,7 @@ msgid "Could not load default questionnaires: %(error)s"
 msgstr "Die Standard-Fragebögen konnten nicht geladen werden: %(error)s"
 
 msgid "Demo data generated successfully! Created 15 reviewees with diverse review cycles in various states. Check the dashboard to explore."
-msgstr "Demodaten wurden erzeugt! Angelegt wurden 15 Beurteilte mit verschiedenen Feedbackrunden in unterschiedlichen Zuständen. Im Dashboard lassen sie sich erkunden."
+msgstr "Demodaten wurden erzeugt! Angelegt wurden 15 Feedbacknehmende mit verschiedenen Feedbackrunden in unterschiedlichen Zuständen. Im Dashboard lassen sie sich erkunden."
 
 #, python-format
 msgid "Failed to generate demo data: %(error)s"
@@ -1941,7 +1941,7 @@ msgid "Written feedback"
 msgstr "Schriftliches Feedback"
 
 msgid "Read comments and examples from reviewers."
-msgstr "Lesen Sie Kommentare und Beispiele der Beurteilenden."
+msgstr "Lesen Sie Kommentare und Beispiele der Feedbackgebenden."
 
 msgid "Name"
 msgstr "Name"
@@ -2424,7 +2424,7 @@ msgid "review cycle"
 msgstr "Feedbackrunde"
 
 msgid "Secure token for reviewee access to their report"
-msgstr "Sicheres Token, mit dem Beurteilte auf ihren Bericht zugreifen"
+msgstr "Sicheres Token, mit dem Feedbacknehmende auf ihren Bericht zugreifen"
 
 msgid "access token"
 msgstr "Zugangstoken"
@@ -2531,7 +2531,7 @@ msgstr "Zu wenige Antworten (mindestens %(count)s erforderlich)"
 
 #, python-format
 msgid "No email address for reviewee %(name)s"
-msgstr "Keine E-Mail-Adresse für die beurteilte Person %(name)s"
+msgstr "Keine E-Mail-Adresse für die feedbacknehmende Person %(name)s"
 
 msgid "Report does not have an access token"
 msgstr "Der Bericht hat kein Zugangstoken"
@@ -2548,7 +2548,7 @@ msgstr "Dieser Berichtslink ist abgelaufen. Für einen neuen Link bitte an die A
 
 #, python-format
 msgid "Token %(token)s generated. Copy feedback URL and send to reviewer manually: %(url)s"
-msgstr "Token %(token)s erstellt. Feedback-URL kopieren und manuell an die beurteilende Person senden: %(url)s"
+msgstr "Token %(token)s erstellt. Feedback-URL kopieren und manuell an die feedbackgebende Person senden: %(url)s"
 
 #, python-format
 msgid "Error with token %(token)s: %(error)s"
@@ -2569,13 +2569,13 @@ msgstr "Bericht"
 
 #. Translators: admin app holding review cycles, reviewer tokens and responses (not product reviews)
 msgid "Reviews"
-msgstr "Beurteilungen"
+msgstr "Feedbacks"
 
 msgid "Active"
 msgstr "Aktiv"
 
 msgid "When the close check-in email was sent to the reviewee"
-msgstr "Zeitpunkt, zu dem die Abschluss-Rückfrage an die beurteilte Person gesendet wurde"
+msgstr "Zeitpunkt, zu dem die Abschluss-Rückfrage an die feedbacknehmende Person gesendet wurde"
 
 msgid "close check sent at"
 msgstr "Abschluss-Rückfrage gesendet am"
@@ -2590,7 +2590,7 @@ msgid "Manager review"
 msgstr "Feedback der Führungskraft"
 
 msgid "Direct report review"
-msgstr "Feedback von Unterstellten"
+msgstr "Feedback von direkten Mitarbeitenden"
 
 msgid "self assessment invitation token"
 msgstr "Einladungstoken Selbsteinschätzung"
@@ -2602,7 +2602,7 @@ msgid "manager review invitation token"
 msgstr "Einladungstoken Führungskraft"
 
 msgid "direct report review invitation token"
-msgstr "Einladungstoken Unterstellte"
+msgstr "Einladungstoken direkte Mitarbeitende"
 
 msgid "review cycles"
 msgstr "Feedbackrunden"
@@ -2617,7 +2617,7 @@ msgid "Manager Review"
 msgstr "Feedback der Führungskraft"
 
 msgid "Direct Report Review"
-msgstr "Feedback von Unterstellten"
+msgstr "Feedback von direkten Mitarbeitenden"
 
 msgid "feedback category"
 msgstr "Feedbackkategorie"
@@ -2629,7 +2629,7 @@ msgid "invitation sent at"
 msgstr "Einladung gesendet am"
 
 msgid "When the last reminder email was sent to this reviewer"
-msgstr "Zeitpunkt der letzten Erinnerungs-E-Mail an diese beurteilende Person"
+msgstr "Zeitpunkt der letzten Erinnerungs-E-Mail an diese feedbackgebende Person"
 
 msgid "last reminder sent at"
 msgstr "letzte Erinnerung gesendet am"
@@ -2644,13 +2644,13 @@ msgid "completed at"
 msgstr "abgeschlossen am"
 
 msgid "Language of the form and of emails to this reviewer. Empty until the form is first opened."
-msgstr "Sprache des Formulars und der E-Mails an diese beurteilende Person. Leer, bis das Formular zum ersten Mal geöffnet wird."
+msgstr "Sprache des Formulars und der E-Mails an diese feedbackgebende Person. Leer, bis das Formular zum ersten Mal geöffnet wird."
 
 msgid "reviewer token"
-msgstr "Token für Beurteilende"
+msgstr "Token für Feedbackgebende"
 
 msgid "reviewer tokens"
-msgstr "Tokens für Beurteilende"
+msgstr "Tokens für Feedbackgebende"
 
 msgid "answer data"
 msgstr "Antwortdaten"
@@ -2711,7 +2711,7 @@ msgid "Manager"
 msgstr "Führungskraft"
 
 msgid "Direct Report"
-msgstr "Unterstellte:r"
+msgstr "Direkte Mitarbeitende"
 
 msgid "Invalid or expired invitation link."
 msgstr "Ungültiger oder abgelaufener Einladungslink."
@@ -2793,7 +2793,7 @@ msgid "maximum employees"
 msgstr "maximale Anzahl an Beschäftigten"
 
 msgid "Maximum total: reviewees + team members combined"
-msgstr "Maximum insgesamt: Beurteilte und Teammitglieder zusammen"
+msgstr "Maximum insgesamt: Feedbacknehmende und Teammitglieder zusammen"
 
 msgid "Stripe price ID"
 msgstr "Stripe-Preis-ID"
@@ -2912,7 +2912,7 @@ msgstr "Ihr Abonnement ist nicht aktiv. Bitte aktualisieren Sie Ihre Zahlungsdat
 
 #, python-format
 msgid "You've reached your plan limit of %(max_employees)s reviewees. Please upgrade your plan."
-msgstr "Sie haben die Grenze Ihres Tarifs von %(max_employees)s Beurteilten erreicht. Bitte wechseln Sie in einen größeren Tarif."
+msgstr "Sie haben die Grenze Ihres Tarifs von %(max_employees)s Feedbacknehmenden erreicht. Bitte wechseln Sie in einen größeren Tarif."
 
 msgid "Unknown plan"
 msgstr "Unbekannter Tarif"
@@ -2991,7 +2991,7 @@ msgid "How Blik helps you:"
 msgstr "Das bietet Blik:"
 
 msgid "Gather comprehensive feedback from peers, managers, and direct reports"
-msgstr "Umfassendes Feedback von Kolleg:innen, Führungskräften und Unterstellten einholen"
+msgstr "Umfassendes Feedback von Kolleg:innen, Führungskräften und direkten Mitarbeitenden einholen"
 
 msgid "Maintain complete anonymity for honest, constructive input"
 msgstr "Vollständige Anonymität für ehrliche, konstruktive Rückmeldungen wahren"
@@ -3003,7 +3003,7 @@ msgid "Getting started is simple:"
 msgstr "Der Einstieg ist einfach:"
 
 msgid "Add reviewees"
-msgstr "Beurteilte hinzufügen"
+msgstr "Feedbacknehmende hinzufügen"
 
 msgid "People who will receive 360° feedback"
 msgstr "Personen, die 360°-Feedback erhalten"
@@ -3012,7 +3012,7 @@ msgid "Create a review cycle"
 msgstr "Feedbackrunde anlegen"
 
 msgid "Choose a questionnaire and invite reviewers"
-msgstr "Fragebogen wählen und Beurteilende einladen"
+msgstr "Fragebogen wählen und Feedbackgebende einladen"
 
 msgid "Share anonymous invite links"
 msgstr "Anonyme Einladungslinks teilen"
@@ -3024,7 +3024,7 @@ msgid "Review the report"
 msgstr "Bericht ansehen"
 
 msgid "View aggregated insights and share with reviewees"
-msgstr "Zusammengefasste Erkenntnisse ansehen und mit den Beurteilten teilen"
+msgstr "Zusammengefasste Erkenntnisse ansehen und mit den Feedbacknehmenden teilen"
 
 msgid "Get Started"
 msgstr "Loslegen"
@@ -3234,13 +3234,13 @@ msgid "No emails have been sent yet."
 msgstr "Es wurden noch keine E-Mails versendet."
 
 msgid "Review the list below and click <em>Send invitations now</em> to notify every reviewee."
-msgstr "Prüfen Sie die Liste unten und klicken Sie auf <em>Einladungen jetzt senden</em>, um alle Beurteilten zu benachrichtigen."
+msgstr "Prüfen Sie die Liste unten und klicken Sie auf <em>Einladungen jetzt senden</em>, um alle Feedbacknehmenden zu benachrichtigen."
 
 msgid "You can also skip for now and send individual invitations later from the cycles list."
 msgstr "Sie können diesen Schritt auch überspringen und Einladungen später einzeln aus der Liste der Feedbackrunden senden."
 
 msgid "Reviewee"
-msgstr "Beurteilte:r"
+msgstr "Feedbacknehmende Person"
 
 msgid "Created"
 msgstr "Angelegt"
@@ -3248,8 +3248,8 @@ msgstr "Angelegt"
 #, python-format
 msgid "Send invitations for all %(counter)s reviewee"
 msgid_plural "Send invitations for all %(counter)s reviewees"
-msgstr[0] "Einladung an %(counter)s Beurteilte:n senden"
-msgstr[1] "Einladungen an alle %(counter)s Beurteilten senden"
+msgstr[0] "Einladung an %(counter)s feedbacknehmende Person senden"
+msgstr[1] "Einladungen an alle %(counter)s Feedbacknehmenden senden"
 
 msgid "Skip — I'll send later"
 msgstr "Überspringen – ich sende später"
@@ -3265,7 +3265,7 @@ msgid "Manage 360-degree feedback and review cycles"
 msgstr "360°-Feedback und Feedbackrunden verwalten"
 
 msgid "Active Reviewees"
-msgstr "Aktive Beurteilte"
+msgstr "Aktive Feedbacknehmende"
 
 msgid "Active Cycles"
 msgstr "Aktive Feedbackrunden"
@@ -3274,7 +3274,7 @@ msgid "Completed Cycles"
 msgstr "Abgeschlossene Feedbackrunden"
 
 msgid "Pending Reviews"
-msgstr "Ausstehende Beurteilungen"
+msgstr "Ausstehende Feedbacks"
 
 msgid "Share Your Experience with Blik"
 msgstr "Erfahrungen mit Blik teilen"
@@ -3310,7 +3310,7 @@ msgstr "Limit fast erreicht:"
 
 #, python-format
 msgid "You're nearing your plan limit of %(max_employees)s reviewees. Contact us to upgrade your plan."
-msgstr "Sie nähern sich der Grenze Ihres Tarifs von %(max_employees)s Beurteilten. Kontaktieren Sie uns für einen größeren Tarif."
+msgstr "Sie nähern sich der Grenze Ihres Tarifs von %(max_employees)s Feedbacknehmenden. Kontaktieren Sie uns für einen größeren Tarif."
 
 msgid "Quick Actions"
 msgstr "Schnellzugriff"
@@ -3319,7 +3319,7 @@ msgid "New Review Cycle"
 msgstr "Neue Feedbackrunde"
 
 msgid "Add Reviewee"
-msgstr "Beurteilte:n hinzufügen"
+msgstr "Feedbacknehmende Person hinzufügen"
 
 msgid "All Cycles"
 msgstr "Alle Feedbackrunden"
@@ -3422,10 +3422,10 @@ msgstr "<strong>Endgültig löschen (vollständige Entfernung):</strong> Entfern
 
 #, python-format
 msgid "Reviewees (%(count)s)"
-msgstr "Beurteilte (%(count)s)"
+msgstr "Feedbacknehmende (%(count)s)"
 
 msgid "Department"
-msgstr "Abteilung"
+msgstr "Bereich"
 
 msgid "Inactive"
 msgstr "Inaktiv"
@@ -3441,7 +3441,7 @@ msgid "%(cycles)s cycles, %(responses)s responses"
 msgstr "%(cycles)s Feedbackrunden, %(responses)s Antworten"
 
 msgid "No reviewees found"
-msgstr "Keine Beurteilten gefunden"
+msgstr "Keine Feedbacknehmenden gefunden"
 
 msgid "Items per page:"
 msgstr "Einträge pro Seite:"
@@ -3463,7 +3463,7 @@ msgid "Last"
 msgstr "Letzte"
 
 msgid "Delete Reviewee Data"
-msgstr "Daten der beurteilten Person löschen"
+msgstr "Daten der feedbacknehmenden Person löschen"
 
 #, python-format
 msgid "Delete or anonymize data for <strong id=\"%(name_id)s\"></strong>"
@@ -3490,13 +3490,13 @@ msgid "Soft Delete (Anonymization) - Recommended"
 msgstr "Anonymisieren – empfohlen"
 
 msgid "Anonymizes name, email, and department. Preserves review cycles, responses, and reports for analytics."
-msgstr "Anonymisiert Name, E-Mail-Adresse und Abteilung. Feedbackrunden, Antworten und Berichte bleiben für Auswertungen erhalten."
+msgstr "Anonymisiert Name, E-Mail-Adresse und Bereich. Feedbackrunden, Antworten und Berichte bleiben für Auswertungen erhalten."
 
 msgid "Full Anonymization"
 msgstr "Vollständige Anonymisierung"
 
 msgid "Anonymizes reviewee AND all reviewer emails in their cycles. Maximum privacy protection."
-msgstr "Anonymisiert die beurteilte Person UND alle E-Mail-Adressen der Beurteilenden in ihren Feedbackrunden. Größtmöglicher Datenschutz."
+msgstr "Anonymisiert die feedbacknehmende Person UND alle E-Mail-Adressen der Feedbackgebenden in ihren Feedbackrunden. Größtmöglicher Datenschutz."
 
 msgid "Hard Delete (Complete Removal)"
 msgstr "Endgültig löschen (vollständige Entfernung)"
@@ -3545,10 +3545,10 @@ msgstr "Löscht Benutzerkonto und Profil endgültig. Angelegte Feedbackrunden bl
 
 #, python-format
 msgid "Invite Reviewers - %(name)s"
-msgstr "Beurteilende einladen - %(name)s"
+msgstr "Feedbackgebende einladen - %(name)s"
 
 msgid "Invite Reviewers"
-msgstr "Beurteilende einladen"
+msgstr "Feedbackgebende einladen"
 
 msgid "Invitation Status"
 msgstr "Status der Einladungen"
@@ -3560,10 +3560,10 @@ msgid "Emails Sent"
 msgstr "Versendete E-Mails"
 
 msgid "Invite Reviewers by Email"
-msgstr "Beurteilende per E-Mail einladen"
+msgstr "Feedbackgebende per E-Mail einladen"
 
 msgid "Enter email addresses for each reviewer category. The system will generate anonymous tokens and send invitations. Separate multiple emails with commas or newlines."
-msgstr "E-Mail-Adressen für jede Kategorie von Beurteilenden eingeben. Das System erzeugt anonyme Tokens und versendet die Einladungen. Mehrere Adressen durch Kommas oder Zeilenumbrüche trennen."
+msgstr "E-Mail-Adressen für jede Kategorie von Feedbackgebenden eingeben. Das System erzeugt anonyme Tokens und versendet die Einladungen. Mehrere Adressen durch Kommas oder Zeilenumbrüche trennen."
 
 msgid "The self-assessment goes to this address. Send the invitation or a reminder from the cycle page."
 msgstr "Die Selbsteinschätzung geht an diese Adresse. Einladung und Erinnerung lassen sich auf der Seite der Feedbackrunde versenden."
@@ -3572,7 +3572,7 @@ msgid "Your email is automatically assigned for self-assessment"
 msgstr "Ihre E-Mail-Adresse wird automatisch für die Selbsteinschätzung verwendet"
 
 msgid "Usually the reviewee's own email"
-msgstr "Meist die eigene E-Mail-Adresse der beurteilten Person"
+msgstr "Meist die eigene E-Mail-Adresse der feedbacknehmenden Person"
 
 msgid "Manager/Supervisor"
 msgstr "Führungskraft"
@@ -3587,17 +3587,17 @@ msgid "Colleagues at the same level"
 msgstr "Kolleg:innen auf gleicher Ebene"
 
 msgid "Direct Reports"
-msgstr "Unterstellte"
+msgstr "Direkte Mitarbeitende"
 
 msgid "People who report to this reviewee"
-msgstr "Personen, die der beurteilten Person unterstellt sind"
+msgstr "Personen, die direkt an die feedbacknehmende Person berichten"
 
 #, python-format
 msgid "Organization default (%(language)s)"
 msgstr "Standard der Organisation (%(language)s)"
 
 msgid "Language of the invitations and reminders to the reviewers above, and of their form"
-msgstr "Sprache der Einladungen und Erinnerungen an die oben eingetragenen Beurteilenden und ihres Formulars"
+msgstr "Sprache der Einladungen und Erinnerungen an die oben eingetragenen Feedbackgebenden und ihres Formulars"
 
 msgid "Save & Send Invitations"
 msgstr "Speichern & Einladungen senden"
@@ -3606,16 +3606,16 @@ msgid "Save Without Sending"
 msgstr "Speichern ohne Senden"
 
 msgid "Reviewer Response Status"
-msgstr "Antwortstatus der Beurteilenden"
+msgstr "Antwortstatus der Feedbackgebenden"
 
 msgid "Privacy Notice"
 msgstr "Datenschutzhinweis"
 
 msgid "Email addresses are never displayed to protect reviewer anonymity. Only response status is shown."
-msgstr "E-Mail-Adressen werden zum Schutz der Anonymität der Beurteilenden nie angezeigt. Nur der Antwortstatus ist sichtbar."
+msgstr "E-Mail-Adressen werden zum Schutz der Anonymität der Feedbackgebenden nie angezeigt. Nur der Antwortstatus ist sichtbar."
 
 msgid "Reviewer"
-msgstr "Beurteilende:r"
+msgstr "Feedbackgebende Person"
 
 msgid "Response Status"
 msgstr "Antwortstatus"
@@ -3657,7 +3657,7 @@ msgstr[0] "%(counter)s ausstehende Einladung"
 msgstr[1] "%(counter)s ausstehende Einladungen"
 
 msgid "Send email invitations to reviewers who haven't received one yet"
-msgstr "E-Mail-Einladungen an Beurteilende senden, die noch keine erhalten haben"
+msgstr "E-Mail-Einladungen an Feedbackgebende senden, die noch keine erhalten haben"
 
 msgid "Send Pending Invitations"
 msgstr "Ausstehende Einladungen senden"
@@ -3697,7 +3697,7 @@ msgstr "Frage nach unten verschieben"
 
 #, python-brace-format
 msgid "{name} stands for the first name of the person reviewed."
-msgstr "{name} steht für den Vornamen der beurteilten Person."
+msgstr "{name} steht für den Vornamen der feedbacknehmenden Person."
 
 msgid "Add option"
 msgstr "Option hinzufügen"
@@ -3841,7 +3841,7 @@ msgid "Describe what each score means"
 msgstr "Beschreiben, was jede Bewertung bedeutet"
 
 msgid "Reviewers can open the descriptions below the question."
-msgstr "Beurteilende können die Beschreibungen unter der Frage öffnen."
+msgstr "Feedbackgebende können die Beschreibungen unter der Frage öffnen."
 
 msgid "Start a review"
 msgstr "Feedbackrunde starten"
@@ -3856,13 +3856,13 @@ msgid "Feedback Categories"
 msgstr "Feedbackkategorien"
 
 msgid "Reviewers are copied from the previous cycle. Invitations are sent to reviewers who have an email address."
-msgstr "Beurteilende werden aus der vorherigen Runde übernommen. Beurteilende mit E-Mail-Adresse erhalten eine Einladung."
+msgstr "Feedbackgebende werden aus der vorherigen Runde übernommen. Feedbackgebende mit E-Mail-Adresse erhalten eine Einladung."
 
 msgid "The cycle starts with space for a self-assessment, three peers and one manager. You can assign reviewers in the next step."
-msgstr "Die Runde beginnt mit Plätzen für eine Selbsteinschätzung, drei Kolleg:innen und eine Führungskraft. Im nächsten Schritt können Sie Beurteilende zuweisen."
+msgstr "Die Runde beginnt mit Plätzen für eine Selbsteinschätzung, drei Kolleg:innen und eine Führungskraft. Im nächsten Schritt können Sie Feedbackgebende zuweisen."
 
 msgid "The reviewee is notified by email right away."
-msgstr "Die beurteilte Person wird sofort per E-Mail benachrichtigt."
+msgstr "Die feedbacknehmende Person wird sofort per E-Mail benachrichtigt."
 
 #, python-format
 msgid "%(counter)s text missing"
@@ -4520,7 +4520,7 @@ msgid "Skip scoring when:"
 msgstr "Auf Wertung verzichten, wenn:"
 
 msgid "Choices are purely categorical (e.g., department names, roles)"
-msgstr "die Optionen reine Kategorien sind (z. B. Abteilungen, Rollen)"
+msgstr "die Optionen reine Kategorien sind (z. B. Bereiche, Rollen)"
 
 msgid "Tip:"
 msgstr "Tipp:"
@@ -4663,7 +4663,7 @@ msgid "Overall Performance"
 msgstr "Gesamtleistung"
 
 msgid "Aggregated across peer, manager, and direct-report feedback."
-msgstr "Zusammengefasst aus dem Feedback von Kolleg:innen, Führungskraft und Unterstellten."
+msgstr "Zusammengefasst aus dem Feedback von Kolleg:innen, Führungskraft und direkten Mitarbeitenden."
 
 msgid "Performance Overview"
 msgstr "Leistungsübersicht"
@@ -4675,7 +4675,7 @@ msgid "Self vs Others Comparison"
 msgstr "Selbst im Vergleich zu anderen"
 
 msgid "How the reviewee's self-assessment would compare to others' feedback (sorted by gap size)"
-msgstr "Wie die Selbsteinschätzung der beurteilten Person im Vergleich zum Feedback der anderen ausfallen würde (sortiert nach Größe der Abweichung)"
+msgstr "Wie die Selbsteinschätzung der feedbacknehmenden Person im Vergleich zum Feedback der anderen ausfallen würde (sortiert nach Größe der Abweichung)"
 
 msgid "Section-Level Performance"
 msgstr "Leistung nach Abschnitten"
@@ -4789,7 +4789,7 @@ msgid "Copy"
 msgstr "Kopieren"
 
 msgid "Reviewee UUID:"
-msgstr "UUID der beurteilten Person:"
+msgstr "UUID der feedbacknehmenden Person:"
 
 msgid "Report Available"
 msgstr "Bericht verfügbar"
@@ -4823,7 +4823,7 @@ msgid "View Report (Admin)"
 msgstr "Bericht ansehen (Admin)"
 
 msgid "View Report (Reviewee View)"
-msgstr "Bericht ansehen (Sicht der beurteilten Person)"
+msgstr "Bericht ansehen (Sicht der feedbacknehmenden Person)"
 
 #, python-format
 msgid "Send Report to %(name)s"
@@ -4833,14 +4833,14 @@ msgid "Regenerate Report"
 msgstr "Bericht neu erstellen"
 
 msgid "Review Completion Details"
-msgstr "Details zum Abschluss der Beurteilungen"
+msgstr "Details zum Abschluss der Feedbacks"
 
 #, python-format
 msgid "%(completed_tokens)s of %(total_tokens)s completed (%(rate)s%%)"
 msgstr "%(completed_tokens)s von %(total_tokens)s abgeschlossen (%(rate)s%%)"
 
 msgid "Total Reviewers"
-msgstr "Beurteilende gesamt"
+msgstr "Feedbackgebende gesamt"
 
 msgid "Completion Rate"
 msgstr "Abschlussquote"
@@ -4860,19 +4860,19 @@ msgid "Alternative to email invites"
 msgstr "Alternative zu E-Mail-Einladungen"
 
 msgid "Share these links with reviewers. Each link will randomly assign an available token from the category. Reviewers can bookmark their feedback link or return later - progress is saved automatically."
-msgstr "Diese Links an die Beurteilenden weitergeben. Jeder Link vergibt zufällig ein freies Token der Kategorie. Beurteilende können ihren Feedbacklink als Lesezeichen speichern oder später zurückkehren – der Fortschritt wird automatisch gespeichert."
+msgstr "Diese Links an die Feedbackgebenden weitergeben. Jeder Link vergibt zufällig ein freies Token der Kategorie. Feedbackgebende können ihren Feedbacklink als Lesezeichen speichern oder später zurückkehren – der Fortschritt wird automatisch gespeichert."
 
 msgid "Copy Link"
 msgstr "Link kopieren"
 
 msgid "Resend the links to the reviewee"
-msgstr "Links erneut an die beurteilte Person senden"
+msgstr "Links erneut an die feedbacknehmende Person senden"
 
 #, python-format
 msgid "%(counter)s reviewer"
 msgid_plural "%(counter)s reviewers"
-msgstr[0] "%(counter)s Beurteilende:r"
-msgstr[1] "%(counter)s Beurteilende"
+msgstr[0] "%(counter)s feedbackgebende Person"
+msgstr[1] "%(counter)s Feedbackgebende"
 
 msgid "Send Invite"
 msgstr "Einladung senden"
@@ -4884,7 +4884,7 @@ msgid "Send Reminder"
 msgstr "Erinnerung senden"
 
 msgid "Send invitation emails to all reviewers who have been assigned but not sent invites yet"
-msgstr "Einladungs-E-Mails an alle zugewiesenen Beurteilenden senden, die noch keine Einladung erhalten haben"
+msgstr "Einladungs-E-Mails an alle zugewiesenen Feedbackgebenden senden, die noch keine Einladung erhalten haben"
 
 msgid "Send All Pending Invites"
 msgstr "Alle ausstehenden Einladungen senden"
@@ -4892,20 +4892,20 @@ msgstr "Alle ausstehenden Einladungen senden"
 #, python-format
 msgid "%(counter)s unfinished review"
 msgid_plural "%(counter)s unfinished reviews"
-msgstr[0] "%(counter)s unvollständige Beurteilung"
-msgstr[1] "%(counter)s unvollständige Beurteilungen"
+msgstr[0] "%(counter)s unvollständiges Feedback"
+msgstr[1] "%(counter)s unvollständige Feedbacks"
 
 msgid "Send reminder emails to all reviewers who have been sent invitations but haven't completed their feedback yet"
-msgstr "Erinnerungs-E-Mails an alle Beurteilenden senden, die eingeladen wurden, ihr Feedback aber noch nicht abgeschlossen haben"
+msgstr "Erinnerungs-E-Mails an alle Feedbackgebenden senden, die eingeladen wurden, ihr Feedback aber noch nicht abgeschlossen haben"
 
 msgid "Remind All Pending Reviewers"
-msgstr "Alle ausstehenden Beurteilenden erinnern"
+msgstr "Alle ausstehenden Feedbackgebenden erinnern"
 
 msgid "No reviewers invited yet."
-msgstr "Noch keine Beurteilenden eingeladen."
+msgstr "Noch keine Feedbackgebenden eingeladen."
 
 msgid "Invite reviewers"
-msgstr "Beurteilende einladen"
+msgstr "Feedbackgebende einladen"
 
 msgid "Manage Invitations"
 msgstr "Einladungen verwalten"
@@ -4947,7 +4947,7 @@ msgid "UUID copied to clipboard"
 msgstr "UUID in die Zwischenablage kopiert"
 
 msgid "Are you sure you want to remove this reviewer from the cycle?"
-msgstr "Diese beurteilende Person wirklich aus der Feedbackrunde entfernen?"
+msgstr "Diese feedbackgebende Person wirklich aus der Feedbackrunde entfernen?"
 
 msgid "Set up a new 360-degree feedback review cycle"
 msgstr "Neue Feedbackrunde für 360°-Feedback einrichten"
@@ -4966,7 +4966,7 @@ msgid "Creation Mode"
 msgstr "Modus"
 
 msgid "Single Reviewee"
-msgstr "Einzelne beurteilte Person"
+msgstr "Einzelne feedbacknehmende Person"
 
 msgid "Create cycle for one person"
 msgstr "Feedbackrunde für eine Person anlegen"
@@ -4975,7 +4975,7 @@ msgid "Bulk Create"
 msgstr "Mehrere anlegen"
 
 msgid "Create for all active reviewees"
-msgstr "Für alle aktiven Beurteilten anlegen"
+msgstr "Für alle aktiven Feedbacknehmenden anlegen"
 
 msgid "Bulk creation does not send any emails. You'll review the new cycles and send invitations in the next step."
 msgstr "Beim Anlegen mehrerer Feedbackrunden werden keine E-Mails versendet. Die neuen Feedbackrunden werden im nächsten Schritt geprüft und die Einladungen versendet."
@@ -4984,7 +4984,7 @@ msgid "You can only create review cycles for yourself. Contact an administrator 
 msgstr "Sie können Feedbackrunden nur für sich selbst anlegen. Für andere Teammitglieder legt ein Admin die Feedbackrunden an."
 
 msgid "Select a reviewee..."
-msgstr "Beurteilte Person auswählen..."
+msgstr "Feedbacknehmende Person auswählen..."
 
 msgid "Person who will receive 360-degree feedback"
 msgstr "Person, die 360°-Feedback erhält"
@@ -4993,7 +4993,7 @@ msgid "Select a questionnaire..."
 msgstr "Fragebogen auswählen..."
 
 msgid "Questions that reviewers will answer"
-msgstr "Fragen, die die Beurteilenden beantworten"
+msgstr "Fragen, die die Feedbackgebenden beantworten"
 
 msgid "Report type:"
 msgstr "Berichtsart:"
@@ -5005,19 +5005,19 @@ msgid "Who gives feedback in this cycle. Categories you clear are left out of th
 msgstr "Wer in dieser Feedbackrunde Feedback gibt. Abgewählte Kategorien fehlen in der Einladungs-E-Mail und im Bericht."
 
 msgid "The reviewee rates themselves"
-msgstr "Die beurteilte Person bewertet sich selbst"
+msgstr "Die feedbacknehmende Person bewertet sich selbst"
 
 msgid "Select at least one category."
 msgstr "Mindestens eine Kategorie auswählen."
 
 msgid "Invite Reviewers (Optional)"
-msgstr "Beurteilende einladen (optional)"
+msgstr "Feedbackgebende einladen (optional)"
 
 msgid "Enter email addresses for reviewers now, or skip and add them later. Separate multiple emails with commas or newlines."
-msgstr "E-Mail-Adressen der Beurteilenden jetzt eintragen oder später hinzufügen. Mehrere Adressen durch Kommas oder Zeilenumbrüche trennen."
+msgstr "E-Mail-Adressen der Feedbackgebenden jetzt eintragen oder später hinzufügen. Mehrere Adressen durch Kommas oder Zeilenumbrüche trennen."
 
 msgid "Usually the reviewee's own email (auto-filled when reviewee selected)"
-msgstr "Meist die eigene E-Mail-Adresse der beurteilten Person (wird bei der Auswahl automatisch ausgefüllt)"
+msgstr "Meist die eigene E-Mail-Adresse der feedbacknehmenden Person (wird bei der Auswahl automatisch ausgefüllt)"
 
 msgid "Send invitation emails immediately after creating cycle"
 msgstr "Einladungs-E-Mails direkt nach dem Anlegen versenden"
@@ -5035,10 +5035,10 @@ msgid "Filter by stage"
 msgstr "Nach Status filtern"
 
 msgid "Search reviewee name or email"
-msgstr "Name oder E-Mail der beurteilten Person suchen"
+msgstr "Name oder E-Mail der feedbacknehmenden Person suchen"
 
 msgid "Search reviewee"
-msgstr "Beurteilte Person suchen"
+msgstr "Feedbacknehmende Person suchen"
 
 msgid "Press / to search"
 msgstr "Taste / öffnet die Suche"
@@ -5083,7 +5083,7 @@ msgid "Cycle UUID"
 msgstr "UUID der Feedbackrunde"
 
 msgid "Reviewee UUID"
-msgstr "UUID der:des Beurteilten"
+msgstr "UUID der feedbacknehmenden Person"
 
 msgid "Example calls"
 msgstr "Beispielaufrufe"
@@ -5098,13 +5098,13 @@ msgid "Response progress per group"
 msgstr "Antwortfortschritt pro Gruppe"
 
 msgid "Remind all pending reviewers"
-msgstr "Alle ausstehenden Beurteilenden erinnern"
+msgstr "Alle ausstehenden Feedbackgebenden erinnern"
 
 msgid "Close the cycle and generate the report"
 msgstr "Feedbackrunde abschließen und Bericht erstellen"
 
 msgid "Reviewee details"
-msgstr "Details der beurteilten Person"
+msgstr "Details der feedbacknehmenden Person"
 
 msgid "All cycles of this reviewee"
 msgstr "Alle Feedbackrunden dieser Person"
@@ -5116,28 +5116,28 @@ msgid "Command copied to clipboard"
 msgstr "Befehl in die Zwischenablage kopiert"
 
 msgid "Delete Reviewee"
-msgstr "Beurteilte:n löschen"
+msgstr "Feedbacknehmende Person löschen"
 
 msgid "Are you sure you want to deactivate this reviewee?"
 msgstr "Diese Person wirklich deaktivieren?"
 
 msgid "<strong>Warning:</strong> This will deactivate the reviewee. Their past review cycles will remain accessible, but they will not appear in active lists."
-msgstr "<strong>Warnung:</strong> Dadurch wird der:die Beurteilte deaktiviert. Frühere Feedbackrunden bleiben zugänglich, die Person erscheint aber nicht mehr in aktiven Listen."
+msgstr "<strong>Warnung:</strong> Dadurch wird die feedbacknehmende Person deaktiviert. Frühere Feedbackrunden bleiben zugänglich, die Person erscheint aber nicht mehr in aktiven Listen."
 
 msgid "Email:"
 msgstr "E-Mail:"
 
 msgid "Department:"
-msgstr "Abteilung:"
+msgstr "Bereich:"
 
 msgid "Deactivate Reviewee"
-msgstr "Beurteilte:n deaktivieren"
+msgstr "Feedbacknehmende Person deaktivieren"
 
 msgid "Edit Reviewee"
-msgstr "Beurteilte:n bearbeiten"
+msgstr "Feedbacknehmende Person bearbeiten"
 
 msgid "Create Reviewee"
-msgstr "Beurteilte:n anlegen"
+msgstr "Feedbacknehmende Person anlegen"
 
 #, python-format
 msgid "Update information for %(name)s"
@@ -5153,7 +5153,7 @@ msgid "john.doe@company.com"
 msgstr "alex.mustermann@firma.de"
 
 msgid "Department (Optional)"
-msgstr "Abteilung (optional)"
+msgstr "Bereich (optional)"
 
 msgid "Engineering, Marketing, etc."
 msgstr "Entwicklung, Marketing usw."
@@ -5162,7 +5162,7 @@ msgid "Language of the emails to this person and of their self-assessment."
 msgstr "Sprache der E-Mails an diese Person und ihrer Selbsteinschätzung."
 
 msgid "Update Reviewee"
-msgstr "Beurteilte:n aktualisieren"
+msgstr "Feedbacknehmende Person aktualisieren"
 
 # Reviewee overview filters and actions
 msgid "Find people, follow their feedback, and plan the next review."
@@ -5170,7 +5170,7 @@ msgstr "Finden Sie Personen, verfolgen Sie ihr Feedback und planen Sie die näch
 
 #, python-format
 msgid "%(current)s / %(max)s reviewees (%(remaining)s remaining)"
-msgstr "%(current)s / %(max)s Beurteilte (noch %(remaining)s frei)"
+msgstr "%(current)s / %(max)s Feedbacknehmende (noch %(remaining)s frei)"
 
 msgid "Add Myself"
 msgstr "Mich hinzufügen"
@@ -5182,13 +5182,13 @@ msgid "All people"
 msgstr "Alle Personen"
 
 msgid "Name, email or department"
-msgstr "Name, E-Mail oder Abteilung"
+msgstr "Name, E-Mail oder Bereich"
 
 msgid "Find a person"
 msgstr "Person suchen"
 
 msgid "All departments"
-msgstr "Alle Abteilungen"
+msgstr "Alle Bereiche"
 
 msgid "Latest questionnaire"
 msgstr "Letzter Fragebogen"
@@ -5203,7 +5203,7 @@ msgid "Self vs others"
 msgstr "Selbst- vs. Fremdeinschätzung"
 
 msgid "Compares self-assessment with the average of other reviewers in the latest completed report."
-msgstr "Vergleicht die Selbsteinschätzung mit dem Durchschnitt der anderen Beurteilenden im letzten abgeschlossenen Bericht."
+msgstr "Vergleicht die Selbsteinschätzung mit dem Durchschnitt der anderen Feedbackgebenden im letzten abgeschlossenen Bericht."
 
 msgid "Positive: rates themselves higher. Negative: rates themselves lower. Zero: the ratings agree."
 msgstr "Positiv: höhere Selbsteinschätzung. Negativ: niedrigere Selbsteinschätzung. Null: Die Einschätzungen stimmen überein."
@@ -5261,16 +5261,16 @@ msgid "Showing %(first)s–%(last)s of %(total)s people"
 msgstr "Personen %(first)s–%(last)s von %(total)s"
 
 msgid "Reviewee pages"
-msgstr "Seiten der Beurteilten"
+msgstr "Seiten der Feedbacknehmenden"
 
 msgid "No reviewees yet"
-msgstr "Noch keine Beurteilten"
+msgstr "Noch keine Feedbacknehmenden"
 
 msgid "Add your first reviewee to start creating review cycles"
-msgstr "Erste beurteilte Person hinzufügen, um Feedbackrunden anzulegen"
+msgstr "Erste feedbacknehmende Person hinzufügen, um Feedbackrunden anzulegen"
 
 msgid "Add yourself as a reviewee to start receiving feedback"
-msgstr "Sich selbst als Beurteilte:n hinzufügen, um Feedback zu erhalten"
+msgstr "Sich selbst als feedbacknehmende Person hinzufügen, um Feedback zu erhalten"
 
 #, python-format
 msgid "Send Reminders - %(name)s"
@@ -5280,19 +5280,19 @@ msgid "Send Reminders"
 msgstr "Erinnerungen senden"
 
 msgid "Send reminder emails for pending reviews in this cycle"
-msgstr "Erinnerungs-E-Mails für ausstehende Beurteilungen in dieser Feedbackrunde senden"
+msgstr "Erinnerungs-E-Mails für ausstehende Feedbacks in dieser Feedbackrunde senden"
 
 msgid "Review Cycle Details"
 msgstr "Details der Feedbackrunde"
 
 msgid "Reviewee:"
-msgstr "Beurteilte Person:"
+msgstr "Feedbacknehmende Person:"
 
 msgid "Pending Reviews:"
-msgstr "Ausstehende Beurteilungen:"
+msgstr "Ausstehende Feedbacks:"
 
 msgid "Pending Reviewer Tokens"
-msgstr "Ausstehende Tokens der Beurteilenden"
+msgstr "Ausstehende Tokens der Feedbackgebenden"
 
 msgid "Category"
 msgstr "Kategorie"
@@ -5321,7 +5321,7 @@ msgstr "Jede E-Mail enthält einen eigenen anonymen Feedbacklink"
 
 #, python-format
 msgid "Reviewer Email Addresses (%(count)s required)"
-msgstr "E-Mail-Adressen der Beurteilenden (%(count)s erforderlich)"
+msgstr "E-Mail-Adressen der Feedbackgebenden (%(count)s erforderlich)"
 
 #, python-format
 msgid "Enter %(count)s email address(es), one per line"
@@ -5332,10 +5332,10 @@ msgid "Send %(count)s Reminder(s)"
 msgstr "%(count)s Erinnerung(en) senden"
 
 msgid "All reviews completed"
-msgstr "Alle Beurteilungen abgeschlossen"
+msgstr "Alle Feedbacks abgegeben"
 
 msgid "There are no pending reviews for this cycle."
-msgstr "In dieser Feedbackrunde stehen keine Beurteilungen mehr aus."
+msgstr "In dieser Feedbackrunde stehen keine Feedbacks mehr aus."
 
 msgid "Back to Cycle"
 msgstr "Zurück zur Feedbackrunde"
@@ -5375,7 +5375,7 @@ msgid "Automatically send report email when generated"
 msgstr "Bericht nach dem Erstellen automatisch per E-Mail senden"
 
 msgid "When enabled, reviewees automatically receive an email with a link to their report when all feedback is collected."
-msgstr "Wenn aktiviert, erhalten Beurteilte automatisch eine E-Mail mit einem Link zu ihrem Bericht, sobald alles Feedback vorliegt."
+msgstr "Wenn aktiviert, erhalten Feedbacknehmende automatisch eine E-Mail mit einem Link zu ihrem Bericht, sobald alles Feedback vorliegt."
 
 msgid "User Registration"
 msgstr "Registrierung"
@@ -5571,7 +5571,7 @@ msgstr "Passwort bestätigen:"
 
 #, python-format
 msgid "This will permanently delete <strong>%(name)s</strong> and all data including users, reviewees, cycles, and reports. This action cannot be undone."
-msgstr "Damit werden <strong>%(name)s</strong> und alle Daten endgültig gelöscht, einschließlich Benutzer:innen, Beurteilten, Feedbackrunden und Berichten. Diese Aktion lässt sich nicht rückgängig machen."
+msgstr "Damit werden <strong>%(name)s</strong> und alle Daten endgültig gelöscht, einschließlich Benutzer:innen, Feedbacknehmenden, Feedbackrunden und Berichten. Diese Aktion lässt sich nicht rückgängig machen."
 
 msgid "Type the organization name to confirm:"
 msgstr "Zur Bestätigung den Namen der Organisation eingeben:"
@@ -5634,7 +5634,7 @@ msgid "All import operations are atomic - if any error occurs, no changes will b
 msgstr "Der Import läuft atomar - bei einem Fehler wird nichts geändert"
 
 msgid "Reviewer anonymity is preserved - no reviewer email addresses are restored"
-msgstr "Die Anonymität der Beurteilenden bleibt gewahrt - ihre E-Mail-Adressen werden nicht wiederhergestellt"
+msgstr "Die Anonymität der Feedbackgebenden bleibt gewahrt - ihre E-Mail-Adressen werden nicht wiederhergestellt"
 
 msgid "Response data may be skipped if question matching fails"
 msgstr "Antworten werden unter Umständen übersprungen, wenn sich Fragen nicht zuordnen lassen"
@@ -5893,7 +5893,7 @@ msgid "Can view all reports and cycles"
 msgstr "Darf alle Berichte und Feedbackrunden sehen"
 
 msgid "Without this, user only sees the reports and cycles they are the subject of."
-msgstr "Ohne diese Berechtigung sieht die Person nur die Berichte und Feedbackrunden, in denen sie selbst beurteilt wird."
+msgstr "Ohne diese Berechtigung sieht die Person nur die Berichte und Feedbackrunden, in denen sie selbst Feedback erhält."
 
 msgid "Organization Admins always have this."
 msgstr "Organisations-Admins haben diese Berechtigung immer."
@@ -6129,14 +6129,14 @@ msgstr "Hallo <strong>%(name)s</strong>,"
 #, python-format
 msgid "<strong>%(counter)s</strong> review has been completed for your <strong>%(questionnaire_name)s</strong> cycle."
 msgid_plural "<strong>%(counter)s</strong> reviews have been completed for your <strong>%(questionnaire_name)s</strong> cycle."
-msgstr[0] "In der Feedbackrunde <strong>%(questionnaire_name)s</strong> wurde <strong>%(counter)s</strong> Beurteilung abgeschlossen."
-msgstr[1] "In der Feedbackrunde <strong>%(questionnaire_name)s</strong> wurden <strong>%(counter)s</strong> Beurteilungen abgeschlossen."
+msgstr[0] "In der Feedbackrunde <strong>%(questionnaire_name)s</strong> wurde <strong>%(counter)s</strong> Feedback abgegeben."
+msgstr[1] "In der Feedbackrunde <strong>%(questionnaire_name)s</strong> wurden <strong>%(counter)s</strong> Feedbacks abgegeben."
 
 msgid "If everyone has submitted their feedback, you can close the cycle and generate your report from your dashboard."
 msgstr "Wenn alle ihr Feedback abgegeben haben, können Sie die Feedbackrunde im Dashboard abschließen und Ihren Bericht erstellen."
 
 msgid "Your cycle will stay open until you manually close it, so additional reviewers can still submit feedback via the invite link."
-msgstr "Ihre Feedbackrunde bleibt offen, bis Sie sie selbst abschließen. Weitere Beurteilende können also noch über den Einladungslink Feedback abgeben."
+msgstr "Ihre Feedbackrunde bleibt offen, bis Sie sie selbst abschließen. Weitere Feedbackgebende können also noch über den Einladungslink Feedback abgeben."
 
 msgid "This is an automated email from your feedback system."
 msgstr "Dies ist eine automatisch versendete E-Mail des Feedbacksystems."
@@ -6148,8 +6148,8 @@ msgstr "Hallo %(name)s,"
 #, python-format
 msgid "%(counter)s review has been completed for your %(questionnaire_name)s cycle."
 msgid_plural "%(counter)s reviews have been completed for your %(questionnaire_name)s cycle."
-msgstr[0] "In der Feedbackrunde %(questionnaire_name)s wurde %(counter)s Beurteilung abgeschlossen."
-msgstr[1] "In der Feedbackrunde %(questionnaire_name)s wurden %(counter)s Beurteilungen abgeschlossen."
+msgstr[0] "In der Feedbackrunde %(questionnaire_name)s wurde %(counter)s Feedback abgegeben."
+msgstr[1] "In der Feedbackrunde %(questionnaire_name)s wurden %(counter)s Feedbacks abgegeben."
 
 msgid "If everyone has submitted their feedback, you can close the cycle and generate your report from your dashboard:"
 msgstr "Wenn alle ihr Feedback abgegeben haben, können Sie die Feedbackrunde im Dashboard abschließen und Ihren Bericht erstellen:"
@@ -6216,7 +6216,7 @@ msgstr "Zusammenfassung des Berichts"
 
 #, python-format
 msgid "This report contains feedback from <strong>%(response_count)s reviewer(s)</strong> across different categories."
-msgstr "Dieser Bericht enthält Feedback von <strong>%(response_count)s Beurteilenden</strong> aus verschiedenen Kategorien."
+msgstr "Dieser Bericht enthält Feedback von <strong>%(response_count)s Feedbackgebenden</strong> aus verschiedenen Kategorien."
 
 msgid "The report includes:"
 msgstr "Der Bericht enthält:"
@@ -6244,28 +6244,28 @@ msgstr "Hier geht es zu Ihrem Bericht:"
 
 #, python-format
 msgid "This report contains feedback from %(response_count)s reviewer(s) across different categories."
-msgstr "Dieser Bericht enthält Feedback von %(response_count)s Beurteilenden aus verschiedenen Kategorien."
+msgstr "Dieser Bericht enthält Feedback von %(response_count)s Feedbackgebenden aus verschiedenen Kategorien."
 
 msgid "Share Your Review Links"
 msgstr "Ihre Links für das Feedback teilen"
 
 msgid "Your 360-degree feedback cycle has been created. Please share the following invitation links with your reviewers:"
-msgstr "Ihre 360°-Feedbackrunde wurde angelegt. Bitte teilen Sie die folgenden Einladungslinks mit Ihren Beurteilenden:"
+msgstr "Ihre 360°-Feedbackrunde wurde angelegt. Bitte teilen Sie die folgenden Einladungslinks mit Ihren Feedbackgebenden:"
 
 msgid "Peer Reviews"
 msgstr "Feedback von Kolleg:innen"
 
 msgid "Share this link with your colleagues/peers. Each person who clicks will get their own unique review link."
-msgstr "Teilen Sie diesen Link mit Ihren Kolleg:innen. Jede Person, die darauf klickt, erhält einen eigenen Link zur Beurteilung."
+msgstr "Teilen Sie diesen Link mit Ihren Kolleg:innen. Jede Person, die darauf klickt, erhält einen eigenen Feedbacklink."
 
 msgid "Share this link with your manager."
 msgstr "Teilen Sie diesen Link mit Ihrer Führungskraft."
 
 msgid "Direct Report Reviews"
-msgstr "Feedback von Unterstellten"
+msgstr "Feedback von direkten Mitarbeitenden"
 
 msgid "Share this link with your direct reports. Each person who clicks will get their own unique review link."
-msgstr "Teilen Sie diesen Link mit Ihren Unterstellten. Jede Person, die darauf klickt, erhält einen eigenen Link zur Beurteilung."
+msgstr "Teilen Sie diesen Link mit Ihren direkten Mitarbeitenden. Jede Person, die darauf klickt, erhält einen eigenen Feedbacklink."
 
 msgid "Important:"
 msgstr "Wichtig:"
@@ -6274,7 +6274,7 @@ msgid "Each link can be shared with multiple people"
 msgstr "Jeder Link kann mit mehreren Personen geteilt werden"
 
 msgid "Reviewers remain anonymous"
-msgstr "Beurteilende bleiben anonym"
+msgstr "Feedbackgebende bleiben anonym"
 
 msgid "They can save their progress and return later"
 msgstr "Der Fortschritt lässt sich speichern und später fortsetzen"
@@ -6327,10 +6327,10 @@ msgid "Your feedback is anonymous and will help %(reviewee_name)s grow professio
 msgstr "Ihr Feedback ist anonym und hilft %(reviewee_name)s, sich beruflich weiterzuentwickeln."
 
 msgid "Start Your Review"
-msgstr "Beurteilung starten"
+msgstr "Feedback starten"
 
 msgid "You can save your progress and return to complete it later - just bookmark the link above."
-msgstr "Sie können Ihren Fortschritt speichern und die Beurteilung später abschließen – setzen Sie einfach ein Lesezeichen auf den Link oben."
+msgstr "Sie können Ihren Fortschritt speichern und das Feedback später abschließen – setzen Sie einfach ein Lesezeichen auf den Link oben."
 
 msgid "Thank you for your participation."
 msgstr "Vielen Dank für Ihre Teilnahme."
@@ -6347,7 +6347,7 @@ msgid "You have been invited to provide %(category)s feedback for %(reviewee_nam
 msgstr "Sie wurden um Feedback für %(reviewee_name)s gebeten (%(category)s)."
 
 msgid "Click the link below to start your review:"
-msgstr "Über den folgenden Link geht es zur Beurteilung:"
+msgstr "Über den folgenden Link geht es zum Feedback:"
 
 #, python-format
 msgid "This questionnaire covers: %(questionnaire_name)s"
@@ -6365,10 +6365,10 @@ msgid "Your feedback is important and will help %(reviewee_name)s grow professio
 msgstr "Ihr Feedback ist wichtig und hilft %(reviewee_name)s, sich beruflich weiterzuentwickeln. Wenn Sie schon begonnen haben, können Sie dort weitermachen, wo Sie aufgehört haben."
 
 msgid "Continue Your Review"
-msgstr "Beurteilung fortsetzen"
+msgstr "Feedback fortsetzen"
 
 msgid "Your progress is saved automatically, so you can complete the review at your convenience."
-msgstr "Ihr Fortschritt wird automatisch gespeichert, Sie können die Beurteilung also jederzeit abschließen."
+msgstr "Ihr Fortschritt wird automatisch gespeichert, Sie können das Feedback also jederzeit abschließen."
 
 msgid "Thank you for your time."
 msgstr "Vielen Dank für Ihre Zeit."
@@ -6385,7 +6385,7 @@ msgid "This is a friendly reminder that you have a pending %(category)s feedback
 msgstr "Eine freundliche Erinnerung: Ihre Feedbackanfrage für %(reviewee_name)s (%(category)s) ist noch offen."
 
 msgid "Click the link below to continue your review:"
-msgstr "Über den folgenden Link geht es mit der Beurteilung weiter:"
+msgstr "Über den folgenden Link geht es mit dem Feedback weiter:"
 
 msgid "You're Invited!"
 msgstr "Sie sind eingeladen!"
@@ -6442,10 +6442,10 @@ msgid "Login to your dashboard using the credentials above"
 msgstr "Mit den Zugangsdaten oben im Dashboard anmelden"
 
 msgid "Add reviewees (employees) to your organization"
-msgstr "Beurteilte (Beschäftigte) zur Organisation hinzufügen"
+msgstr "Feedbacknehmende (Beschäftigte) zur Organisation hinzufügen"
 
 msgid "Create a review cycle and invite reviewers"
-msgstr "Feedbackrunde anlegen und Beurteilende einladen"
+msgstr "Feedbackrunde anlegen und Feedbackgebende einladen"
 
 msgid "Monitor progress and generate reports"
 msgstr "Fortschritt verfolgen und Berichte erstellen"
@@ -6713,7 +6713,7 @@ msgstr[0] "%(selected)s von %(counter)s befragten Person"
 msgstr[1] "%(selected)s von %(counter)s Befragten"
 
 msgid "Based on feedback from peers, managers, and direct reports"
-msgstr "Basierend auf Feedback von Kolleg:innen, Führungskräften und Unterstellten"
+msgstr "Basierend auf Feedback von Kolleg:innen, Führungskräften und direkten Mitarbeitenden"
 
 #, python-format
 msgid "Compared to %(date)s"
@@ -6839,7 +6839,7 @@ msgid "Privacy Notice:"
 msgstr "Datenschutzhinweis:"
 
 msgid "All responses are anonymous and aggregated. Individual reviewers cannot be identified."
-msgstr "Alle Antworten sind anonym und zusammengefasst. Einzelne Beurteilende lassen sich nicht identifizieren."
+msgstr "Alle Antworten sind anonym und zusammengefasst. Einzelne Feedbackgebende lassen sich nicht identifizieren."
 
 #, python-format
 msgid "Results are only shown when there are at least %(counter)s response per category to protect anonymity."
@@ -6872,7 +6872,7 @@ msgid "Toggle Theme"
 msgstr "Farbschema wechseln"
 
 msgid "Review Date"
-msgstr "Datum der Beurteilung"
+msgstr "Datum der Feedbackrunde"
 
 msgid "Total Responses"
 msgstr "Antworten gesamt"
@@ -6902,16 +6902,16 @@ msgid "Unable to Claim Token"
 msgstr "Einladungslink kann nicht eingelöst werden"
 
 msgid "Unable to Access Review"
-msgstr "Zugriff auf die Beurteilung nicht möglich"
+msgstr "Zugriff auf das Feedback nicht möglich"
 
 msgid "If you believe this is an error, please contact your administrator."
 msgstr "Falls Sie das für einen Fehler halten, wenden Sie sich bitte an die Admins Ihrer Organisation."
 
 msgid "Loading Review..."
-msgstr "Beurteilung wird geladen..."
+msgstr "Feedback wird geladen..."
 
 msgid "Checking for existing review..."
-msgstr "Suche nach bestehender Beurteilung..."
+msgstr "Suche nach bestehendem Feedback..."
 
 msgid "Please wait while we locate your feedback session."
 msgstr "Einen Moment bitte, die Feedbacksitzung wird gesucht."
@@ -7012,10 +7012,10 @@ msgstr "Admin-Dashboard öffnen:"
 
 #, python-format
 msgid "<a href=\"%(dashboard_url)s\" target=\"_blank\">Go to Admin Dashboard</a> to manage reviewees, questionnaires, and review cycles"
-msgstr "<a href=\"%(dashboard_url)s\" target=\"_blank\">Zum Admin-Dashboard</a>, um Beurteilte, Fragebögen und Feedbackrunden zu verwalten"
+msgstr "<a href=\"%(dashboard_url)s\" target=\"_blank\">Zum Admin-Dashboard</a>, um Feedbacknehmende, Fragebögen und Feedbackrunden zu verwalten"
 
 msgid "Create your first reviewee:"
-msgstr "Erste beurteilte Person anlegen:"
+msgstr "Erste feedbacknehmende Person anlegen:"
 
 msgid "Add people who will receive 360-degree feedback from the dashboard"
 msgstr "Personen, die 360°-Feedback erhalten sollen, im Dashboard hinzufügen"
@@ -7024,13 +7024,13 @@ msgid "Start a review cycle:"
 msgstr "Feedbackrunde starten:"
 
 msgid "Create a new review cycle and send invitations to reviewers"
-msgstr "Neue Feedbackrunde anlegen und Einladungen an Beurteilende senden"
+msgstr "Neue Feedbackrunde anlegen und Einladungen an Feedbackgebende senden"
 
 msgid "Want to explore first?"
 msgstr "Erst einmal ausprobieren?"
 
 msgid "Generate test data to explore the system without affecting your production data. This creates sample reviewees and a review cycle with tokens."
-msgstr "Mit Testdaten lässt sich das System ausprobieren, ohne die Produktivdaten zu verändern. Dabei entstehen Beispiel-Beurteilte und eine Feedbackrunde mit Tokens."
+msgstr "Mit Testdaten lässt sich das System ausprobieren, ohne die Produktivdaten zu verändern. Dabei entstehen Beispiel-Feedbacknehmende und eine Feedbackrunde mit Tokens."
 
 msgid "Generate Test Data"
 msgstr "Testdaten erzeugen"

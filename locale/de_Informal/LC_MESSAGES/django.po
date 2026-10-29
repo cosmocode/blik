@@ -849,7 +849,7 @@ msgid "No organization found. Please run setup first."
 msgstr ""
 
 msgid "You can only create a reviewee profile for yourself."
-msgstr "Du kannst nur für dich selbst ein Profil als Beurteilte:r anlegen."
+msgstr "Du kannst nur für dich selbst ein Profil als feedbacknehmende Person anlegen."
 
 #, python-format
 msgid "Reviewee \"%(name)s\" created successfully."
@@ -1941,7 +1941,7 @@ msgid "Written feedback"
 msgstr ""
 
 msgid "Read comments and examples from reviewers."
-msgstr "Lies Kommentare und Beispiele der Beurteilenden."
+msgstr "Lies Kommentare und Beispiele der Feedbackgebenden."
 
 msgid "Name"
 msgstr ""
@@ -2912,7 +2912,7 @@ msgstr "Dein Abonnement ist nicht aktiv. Bitte aktualisiere deine Zahlungsdaten.
 
 #, python-format
 msgid "You've reached your plan limit of %(max_employees)s reviewees. Please upgrade your plan."
-msgstr "Du hast die Grenze deines Tarifs von %(max_employees)s Beurteilten erreicht. Bitte wechsle in einen größeren Tarif."
+msgstr "Du hast die Grenze deines Tarifs von %(max_employees)s Feedbacknehmenden erreicht. Bitte wechsle in einen größeren Tarif."
 
 msgid "Unknown plan"
 msgstr ""
@@ -3234,7 +3234,7 @@ msgid "No emails have been sent yet."
 msgstr ""
 
 msgid "Review the list below and click <em>Send invitations now</em> to notify every reviewee."
-msgstr "Prüfe die Liste unten und klicke auf <em>Einladungen jetzt senden</em>, um alle Beurteilten zu benachrichtigen."
+msgstr "Prüfe die Liste unten und klicke auf <em>Einladungen jetzt senden</em>, um alle Feedbacknehmenden zu benachrichtigen."
 
 msgid "You can also skip for now and send individual invitations later from the cycles list."
 msgstr "Du kannst diesen Schritt auch überspringen und Einladungen später einzeln aus der Liste der Feedbackrunden senden."
@@ -3310,7 +3310,7 @@ msgstr ""
 
 #, python-format
 msgid "You're nearing your plan limit of %(max_employees)s reviewees. Contact us to upgrade your plan."
-msgstr "Du näherst dich der Grenze deines Tarifs von %(max_employees)s Beurteilten. Kontaktiere uns für einen größeren Tarif."
+msgstr "Du näherst dich der Grenze deines Tarifs von %(max_employees)s Feedbacknehmenden. Kontaktiere uns für einen größeren Tarif."
 
 msgid "Quick Actions"
 msgstr ""
@@ -3859,7 +3859,7 @@ msgid "Reviewers are copied from the previous cycle. Invitations are sent to rev
 msgstr ""
 
 msgid "The cycle starts with space for a self-assessment, three peers and one manager. You can assign reviewers in the next step."
-msgstr "Die Runde beginnt mit Plätzen für eine Selbsteinschätzung, drei Kolleg:innen und eine Führungskraft. Im nächsten Schritt kannst du Beurteilende zuweisen."
+msgstr "Die Runde beginnt mit Plätzen für eine Selbsteinschätzung, drei Kolleg:innen und eine Führungskraft. Im nächsten Schritt kannst du Feedbackgebende zuweisen."
 
 msgid "The reviewee is notified by email right away."
 msgstr ""
@@ -6136,7 +6136,7 @@ msgid "If everyone has submitted their feedback, you can close the cycle and gen
 msgstr "Wenn alle ihr Feedback abgegeben haben, kannst du die Feedbackrunde im Dashboard abschließen und deinen Bericht erstellen."
 
 msgid "Your cycle will stay open until you manually close it, so additional reviewers can still submit feedback via the invite link."
-msgstr "Deine Feedbackrunde bleibt offen, bis du sie selbst abschließt. Weitere Beurteilende können also noch über den Einladungslink Feedback abgeben."
+msgstr "Deine Feedbackrunde bleibt offen, bis du sie selbst abschließt. Weitere Feedbackgebende können also noch über den Einladungslink Feedback abgeben."
 
 msgid "This is an automated email from your feedback system."
 msgstr ""
@@ -6250,13 +6250,13 @@ msgid "Share Your Review Links"
 msgstr "Deine Links für das Feedback teilen"
 
 msgid "Your 360-degree feedback cycle has been created. Please share the following invitation links with your reviewers:"
-msgstr "Deine 360°-Feedbackrunde wurde angelegt. Bitte teile die folgenden Einladungslinks mit deinen Beurteilenden:"
+msgstr "Deine 360°-Feedbackrunde wurde angelegt. Bitte teile die folgenden Einladungslinks mit deinen Feedbackgebenden:"
 
 msgid "Peer Reviews"
 msgstr ""
 
 msgid "Share this link with your colleagues/peers. Each person who clicks will get their own unique review link."
-msgstr "Teile diesen Link mit deinen Kolleg:innen. Jede Person, die darauf klickt, erhält einen eigenen Link zur Beurteilung."
+msgstr "Teile diesen Link mit deinen Kolleg:innen. Jede Person, die darauf klickt, erhält einen eigenen Feedbacklink."
 
 msgid "Share this link with your manager."
 msgstr "Teile diesen Link mit deiner Führungskraft."
@@ -6265,7 +6265,7 @@ msgid "Direct Report Reviews"
 msgstr ""
 
 msgid "Share this link with your direct reports. Each person who clicks will get their own unique review link."
-msgstr "Teile diesen Link mit deinen Unterstellten. Jede Person, die darauf klickt, erhält einen eigenen Link zur Beurteilung."
+msgstr "Teile diesen Link mit deinen direkten Mitarbeitenden. Jede Person, die darauf klickt, erhält einen eigenen Feedbacklink."
 
 msgid "Important:"
 msgstr ""
@@ -6330,7 +6330,7 @@ msgid "Start Your Review"
 msgstr ""
 
 msgid "You can save your progress and return to complete it later - just bookmark the link above."
-msgstr "Du kannst deinen Fortschritt speichern und die Beurteilung später abschließen – setz einfach ein Lesezeichen auf den Link oben."
+msgstr "Du kannst deinen Fortschritt speichern und das Feedback später abschließen – setz einfach ein Lesezeichen auf den Link oben."
 
 msgid "Thank you for your participation."
 msgstr "Vielen Dank für deine Teilnahme."
@@ -6368,7 +6368,7 @@ msgid "Continue Your Review"
 msgstr ""
 
 msgid "Your progress is saved automatically, so you can complete the review at your convenience."
-msgstr "Dein Fortschritt wird automatisch gespeichert, du kannst die Beurteilung also jederzeit abschließen."
+msgstr "Dein Fortschritt wird automatisch gespeichert, du kannst das Feedback also jederzeit abschließen."
 
 msgid "Thank you for your time."
 msgstr "Vielen Dank für deine Zeit."
