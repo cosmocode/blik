@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 19:50+0000\n"
+"POT-Creation-Date: 2026-10-29 19:54+0000\n"
 "Language: de_Informal\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -773,9 +773,6 @@ msgstr ""
 msgid "Invalid password. Account deletion canceled."
 msgstr ""
 
-msgid "Your account has been deleted."
-msgstr "Dein Konto wurde gelöscht."
-
 #, python-format
 msgid "Error deleting account: %(error)s"
 msgstr ""
@@ -784,9 +781,6 @@ msgid "Invalid password. Organization deletion canceled."
 msgstr ""
 
 msgid "Organization name does not match. Deletion canceled."
-msgstr ""
-
-msgid "Organization and all data have been deleted."
 msgstr ""
 
 #, python-format
