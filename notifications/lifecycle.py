@@ -195,7 +195,7 @@ def _send_to_admins(organization, template, build):
 def send_no_cycle_nudge(organization):
     """Onboarding: signed up, but no review cycle yet."""
     def build():
-        return _('Start your first 360 in 5 minutes'), {
+        return _('Your account is ready. One step left.'), {
             'create_url': get_absolute_url('review_cycle_create'),
         }
     return _once(SentEmail.NO_CYCLE, organization,
