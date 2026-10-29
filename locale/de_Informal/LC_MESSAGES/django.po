@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-28 22:21+0000\n"
+"POT-Creation-Date: 2026-10-29 06:48+0000\n"
 "Language: de_Informal\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1421,6 +1421,22 @@ msgstr ""
 msgid "Welcome to %(site_name)s - Your Account is Ready"
 msgstr "Willkommen bei %(site_name)s – dein Konto ist bereit"
 
+#, python-format
+msgid "Your %(site_name)s password was changed"
+msgstr ""
+
+#, python-format
+msgid "The email address of your %(site_name)s account was changed"
+msgstr ""
+
+#, python-format
+msgid "Your organization was deleted from %(site_name)s"
+msgstr ""
+
+#, python-format
+msgid "Your %(site_name)s account was deleted"
+msgstr ""
+
 msgid "Email address for the administrator"
 msgstr ""
 
@@ -1627,6 +1643,58 @@ msgid "Failed to generate demo data: %(error)s"
 msgstr ""
 
 msgid "Notifications"
+msgstr ""
+
+msgid "Start your first 360 in 5 minutes"
+msgstr ""
+
+msgid "Invite reviewers to your review cycle"
+msgstr ""
+
+msgid "Time for the next round of 360 feedback"
+msgstr ""
+
+msgid "Revisit your 360 feedback report"
+msgstr ""
+
+#, python-format
+msgid "Review cycle closed: %(name)s"
+msgstr ""
+
+msgid "How to run the feedback conversation"
+msgstr ""
+
+msgid "No review cycle yet"
+msgstr ""
+
+msgid "No reviewers yet"
+msgstr ""
+
+msgid "Cycle summary"
+msgstr ""
+
+msgid "Next cycle reminder"
+msgstr ""
+
+msgid "Report ready"
+msgstr ""
+
+msgid "Report follow-up"
+msgstr ""
+
+msgid "kind"
+msgstr ""
+
+msgid "object id"
+msgstr ""
+
+msgid "sent at"
+msgstr ""
+
+msgid "sent email"
+msgstr ""
+
+msgid "sent emails"
 msgstr ""
 
 #, python-format
@@ -2774,6 +2842,42 @@ msgstr ""
 msgid "Subscriptions"
 msgstr ""
 
+#, python-format
+msgid "Last reminder: your %(site_name)s trial ends on %(date)s"
+msgstr ""
+
+#, python-format
+msgid "Your %(site_name)s trial ends on %(date)s"
+msgstr ""
+
+#, python-format
+msgid "Your %(site_name)s trial has ended"
+msgstr ""
+
+#, python-format
+msgid "Your %(site_name)s trial has started"
+msgstr ""
+
+#, python-format
+msgid "Your %(site_name)s plan is now %(plan)s"
+msgstr ""
+
+#, python-format
+msgid "Your %(site_name)s subscription continues"
+msgstr ""
+
+#, python-format
+msgid "Your %(site_name)s subscription is active"
+msgstr ""
+
+#, python-format
+msgid "Your %(site_name)s subscription has ended"
+msgstr ""
+
+#, python-format
+msgid "Your %(site_name)s subscription is canceled"
+msgstr ""
+
 msgid "You already have a Blik360 account"
 msgstr "Du hast bereits ein Blik360-Konto"
 
@@ -2845,6 +2949,12 @@ msgid "trial start"
 msgstr ""
 
 msgid "trial end"
+msgstr ""
+
+msgid "3-day trial reminder sent at"
+msgstr ""
+
+msgid "1-day trial reminder sent at"
 msgstr ""
 
 msgid "subscription"
@@ -6119,8 +6229,60 @@ msgstr ""
 msgid "Level 5"
 msgstr ""
 
+msgid "This is an automated message from Blik."
+msgstr ""
+
+msgid "Your organization was deleted"
+msgstr ""
+
+msgid "Your account was deleted"
+msgstr ""
+
+msgid "We have deleted the data, as you asked."
+msgstr ""
+
+msgid "Hello,"
+msgstr ""
+
+#, python-format
+msgid "On %(date)s, we deleted <strong>%(organization)s</strong> from %(site_name)s, as you asked."
+msgstr ""
+
+msgid "People, review cycles, questionnaires, feedback and reports"
+msgstr ""
+
+msgid "What we deleted"
+msgstr ""
+
+msgid "We have also canceled the subscription. You pay nothing more."
+msgstr ""
+
+#, python-format
+msgid "On %(date)s, we deleted your %(site_name)s account <strong>%(email)s</strong>, as you asked. You can no longer sign in with it."
+msgstr ""
+
+msgid "Feedback you gave as a reviewer is anonymous. It is not linked to your account, so it stays part of the reports it belongs to."
+msgstr ""
+
+msgid "We cannot undo this deletion. This is the last email we send you about it."
+msgstr ""
+
+#, python-format
+msgid "On %(date)s, we deleted %(organization)s from %(site_name)s, as you asked."
+msgstr ""
+
+msgid "We deleted all its data: people, review cycles, questionnaires, feedback and reports."
+msgstr ""
+
+#, python-format
+msgid "On %(date)s, we deleted your %(site_name)s account %(email)s, as you asked. You can no longer sign in with it."
+msgstr ""
+
 msgid "Review Check-In"
 msgstr ""
+
+msgid "If everyone has submitted their feedback, you can close the cycle and generate your report from your dashboard."
+msgstr "Wenn alle ihr Feedback abgegeben haben, kannst du die Feedbackrunde im Dashboard abschließen und deinen Bericht erstellen."
 
 #, python-format
 msgid "Hi <strong>%(name)s</strong>,"
@@ -6131,9 +6293,6 @@ msgid "<strong>%(counter)s</strong> review has been completed for your <strong>%
 msgid_plural "<strong>%(counter)s</strong> reviews have been completed for your <strong>%(questionnaire_name)s</strong> cycle."
 msgstr[0] ""
 msgstr[1] ""
-
-msgid "If everyone has submitted their feedback, you can close the cycle and generate your report from your dashboard."
-msgstr "Wenn alle ihr Feedback abgegeben haben, kannst du die Feedbackrunde im Dashboard abschließen und deinen Bericht erstellen."
 
 msgid "Your cycle will stay open until you manually close it, so additional reviewers can still submit feedback via the invite link."
 msgstr "Deine Feedbackrunde bleibt offen, bis du sie selbst abschließt. Weitere Beurteilende können also noch über den Einladungslink Feedback abgeben."
@@ -6161,6 +6320,116 @@ msgid "Your Feedback Team"
 msgstr "Dein Feedbackteam"
 
 #, python-format
+msgid "Review cycle closed: %(reviewee_name)s"
+msgstr ""
+
+msgid "The responses in numbers, and the next step."
+msgstr ""
+
+#, python-format
+msgid "The review cycle for %(reviewee_name)s is closed"
+msgstr ""
+
+#, python-format
+msgid "The report for <strong>%(reviewee_name)s</strong> is ready. These are the numbers."
+msgstr ""
+
+#, python-format
+msgid "%(responded)s of %(invited)s invited reviewers responded (%(response_rate)s%%)."
+msgstr ""
+
+#, python-format
+msgid "Fewer than %(counter)s reviewer responded. To keep the answers anonymous, the report does not show them."
+msgid_plural "Fewer than %(counter)s reviewers responded. To keep the answers anonymous, the report does not show them."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "Read the report. Then plan a feedback conversation with %(reviewee_name)s."
+msgstr ""
+
+#, python-format
+msgid "In the next cycle, invite more reviewers. The report shows the results of a group when at least %(counter)s reviewer in that group responds."
+msgid_plural "In the next cycle, invite more reviewers. The report shows the results of a group when at least %(counter)s reviewers in that group respond."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "View the review cycle"
+msgstr ""
+
+#, python-format
+msgid "All review cycles of %(organization)s"
+msgstr ""
+
+#, python-format
+msgid "%(counter)s review cycle is closed."
+msgid_plural "%(counter)s review cycles are closed."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%(counter)s review cycle is still open."
+msgid_plural "%(counter)s review cycles are still open."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "No review cycles are open."
+msgstr ""
+
+msgid "See all review cycles"
+msgstr ""
+
+#, python-format
+msgid "The review cycle for %(reviewee_name)s is closed. The report is ready. These are the numbers."
+msgstr ""
+
+msgid "View the review cycle:"
+msgstr ""
+
+msgid "Your email address was changed"
+msgstr ""
+
+msgid "If you did not change it, contact your organization administrator now."
+msgstr ""
+
+#, python-format
+msgid "Hello %(name)s,"
+msgstr ""
+
+#, python-format
+msgid "The email address of your %(site_name)s account was changed on %(date)s at %(time)s (UTC)."
+msgstr ""
+
+#, python-format
+msgid "Old address: <strong>%(old)s</strong><br> New address: <strong>%(new)s</strong>"
+msgstr ""
+
+msgid "From now on, we send all emails about your account to the new address. This is the last email to this address."
+msgstr ""
+
+msgid "Did you change it? Then you do not need to do anything."
+msgstr ""
+
+#, python-format
+msgid "Did you not change it? Then someone else may have access to your account. Contact your organization administrator now: <a href=\"mailto:%(email)s\">%(email)s</a>."
+msgstr ""
+
+msgid "Did you not change it? Then someone else may have access to your account. Contact your organization administrator now."
+msgstr ""
+
+#, python-format
+msgid "Old address: %(old)s"
+msgstr ""
+
+#, python-format
+msgid "New address: %(new)s"
+msgstr ""
+
+#, python-format
+msgid "Did you not change it? Then someone else may have access to your account. Contact your organization administrator now: %(email)s."
+msgstr ""
+
+#, python-format
 msgid "You started a new subscription with %(email)s, but this address already has a Blik360 account. We cancelled the new subscription and nothing was charged."
 msgstr "Du hast ein neues Abonnement mit %(email)s abgeschlossen, für diese Adresse gibt es aber bereits ein Blik360-Konto. Wir haben das neue Abonnement storniert, es wurde nichts berechnet."
 
@@ -6168,8 +6437,206 @@ msgstr "Du hast ein neues Abonnement mit %(email)s abgeschlossen, für diese Adr
 msgid "To choose a plan for your existing organization, sign in at %(site_url)s and open Settings."
 msgstr "Um einen Tarif für deine bestehende Organisation zu wählen, melde dich unter %(site_url)s an und öffne die Einstellungen."
 
+msgid "Five steps to turn the first report into a good conversation."
+msgstr ""
+
+#, python-format
+msgid "The first 360 report of %(organization)s is ready. A report helps most when the person talks about it with their manager. These steps help to prepare that conversation."
+msgstr ""
+
+msgid "<strong>Give time to read.</strong> The person reads the report first, one or two days before you meet."
+msgstr ""
+
+msgid "<strong>Ask before you tell.</strong> Start with questions: What surprised you? What do you agree with?"
+msgstr "<strong>Erst fragen, dann sagen.</strong> Mit Fragen beginnen: Was hat dich überrascht? Wo stimmst du zu?"
+
+msgid "<strong>Look for patterns.</strong> Talk about the themes that come back, not about one comment."
+msgstr ""
+
+msgid "<strong>Do not guess who wrote what.</strong> The feedback is anonymous. Keep the talk on behaviour, not on people."
+msgstr ""
+
+msgid "<strong>Agree on one or two goals.</strong> Write them down. Set a date to look at the progress together."
+msgstr ""
+
+msgid "The report compares the self-assessment with the scores from others. The largest gaps are a good place to start the conversation."
+msgstr ""
+
+msgid "Tip"
+msgstr ""
+
+msgid "Open the report"
+msgstr ""
+
+msgid "Give time to read. The person reads the report first, one or two days before you meet."
+msgstr ""
+
+msgid "Ask before you tell. Start with questions: What surprised you? What do you agree with?"
+msgstr "Erst fragen, dann sagen. Mit Fragen beginnen: Was hat dich überrascht? Wo stimmst du zu?"
+
+msgid "Look for patterns. Talk about the themes that come back, not about one comment."
+msgstr ""
+
+msgid "Do not guess who wrote what. The feedback is anonymous. Keep the talk on behaviour, not on people."
+msgstr ""
+
+msgid "Agree on one or two goals. Write them down. Set a date to look at the progress together."
+msgstr ""
+
+msgid "Open the report:"
+msgstr ""
+
+msgid "Time for the next round"
+msgstr ""
+
+msgid "A new round of 360 feedback shows how people have grown."
+msgstr ""
+
+#, python-format
+msgid "The last review cycle of %(organization)s closed about six months ago. A new round shows how people have grown since then."
+msgstr ""
+
+msgid "Each report places a person on the Dreyfus model, from novice to expert. It does this for two dimensions: <strong>skill</strong>, how well someone does the work, and <strong>agency</strong>, how much they take the initiative."
+msgstr ""
+
+msgid "Use the same questionnaire as last time. The new report then compares the results with the earlier round."
+msgstr ""
+
+#, python-format
+msgid "The last review cycle closed on %(date)s."
+msgstr ""
+
+msgid "Last round"
+msgstr ""
+
+msgid "Start the next round"
+msgstr ""
+
+msgid "Each report places a person on the Dreyfus model, from novice to expert. It does this for two dimensions: skill, how well someone does the work, and agency, how much they take the initiative."
+msgstr ""
+
+msgid "Start the next round:"
+msgstr ""
+
+msgid "Choose a person, choose a questionnaire and invite the reviewers."
+msgstr ""
+
+#, python-format
+msgid "The Blik account of %(organization)s is ready, but there is no review cycle yet. A review cycle collects feedback for one person. It has three steps:"
+msgstr ""
+
+msgid "Choose the person who gets the feedback."
+msgstr ""
+
+# Questionnaire overview and quick preview
+msgid "Choose a questionnaire. The default questionnaire is a good start."
+msgstr ""
+
+msgid "Invite the reviewers by email, or share the invite links."
+msgstr ""
+
+msgid "All feedback is anonymous. Nobody can see who gave which answer."
+msgstr ""
+
+msgid "Create a review cycle:"
+msgstr ""
+
+#, python-format
+msgid "The review cycle for %(reviewee_name)s has no reviewers yet."
+msgstr ""
+
+#, python-format
+msgid "The review cycle for <strong>%(reviewee_name)s</strong> has no reviewers yet. Feedback starts when you invite them. There are two ways:"
+msgstr ""
+
+msgid "<strong>By email.</strong> Enter the email address of each reviewer. Blik sends each one a personal link."
+msgstr ""
+
+msgid "<strong>With invite links.</strong> Copy the link for a group, such as peers, and share it yourself."
+msgstr ""
+
+#, python-format
+msgid "The report shows the results of a group when at least %(counter)s reviewer in that group responds."
+msgid_plural "The report shows the results of a group when at least %(counter)s reviewers in that group respond."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Anonymity"
+msgstr ""
+
+#, python-format
+msgid "The review cycle for %(reviewee_name)s has no reviewers yet. Feedback starts when you invite them. There are two ways:"
+msgstr ""
+
+msgid "By email. Enter the email address of each reviewer. Blik sends each one a personal link."
+msgstr ""
+
+msgid "With invite links. Copy the link for a group, such as peers, and share it yourself."
+msgstr ""
+
+msgid "Invite reviewers:"
+msgstr ""
+
+msgid "Your trial has started"
+msgstr ""
+
+#, python-format
+msgid "Your plan is now %(plan)s"
+msgstr ""
+
+msgid "Your subscription continues"
+msgstr ""
+
+msgid "Your subscription is active"
+msgstr ""
+
+#, python-format
+msgid "Thank you for choosing %(site_name)s for %(organization)s. Your free trial of the %(plan)s plan runs until %(date)s. We charge nothing before that date, and we remind you before the trial ends."
+msgstr ""
+
+#, python-format
+msgid "%(organization)s now uses the %(plan)s plan. The change applies now."
+msgstr ""
+
+#, python-format
+msgid "You have undone the cancellation. %(organization)s keeps the %(plan)s plan, and nothing else changes."
+msgstr ""
+
+#, python-format
+msgid "Thank you. %(organization)s is now on the paid %(plan)s plan. All your review cycles, reports and settings are in place."
+msgstr ""
+
+msgid "Your password was changed"
+msgstr ""
+
+msgid "If you did not change it, reset your password now."
+msgstr ""
+
+#, python-format
+msgid "The password of your %(site_name)s account <strong>%(email)s</strong> was changed on %(date)s at %(time)s (UTC)."
+msgstr ""
+
+msgid "Did you not change it? Then someone else may have access to your account. Reset your password now, and tell your organization administrator."
+msgstr ""
+
+msgid "Reset your password"
+msgstr ""
+
+msgid "We send this notice every time the password of your account changes."
+msgstr ""
+
+#, python-format
+msgid "The password of your %(site_name)s account %(email)s was changed on %(date)s at %(time)s (UTC)."
+msgstr ""
+
+msgid "Reset your password:"
+msgstr ""
+
 msgid "Reset Your Password"
 msgstr ""
+
+msgid "<strong>This link will expire in 1 hour.</strong> If you didn't request a password reset, you can safely ignore this email."
+msgstr "<strong>Dieser Link ist 1 Stunde gültig.</strong> Falls du kein neues Passwort angefordert hast, kannst du diese E-Mail ignorieren."
 
 msgid "Hi there,"
 msgstr ""
@@ -6177,9 +6644,6 @@ msgstr ""
 #, python-format
 msgid "We received a request to reset your password for your %(site_name)s account. Click the button below to set a new password:"
 msgstr "Wir haben eine Anfrage erhalten, das Passwort deines Kontos bei %(site_name)s zurückzusetzen. Klicke auf den Button unten, um ein neues Passwort festzulegen:"
-
-msgid "<strong>This link will expire in 1 hour.</strong> If you didn't request a password reset, you can safely ignore this email."
-msgstr "<strong>Dieser Link ist 1 Stunde gültig.</strong> Falls du kein neues Passwort angefordert hast, kannst du diese E-Mail ignorieren."
 
 msgid "If the button doesn't work, copy and paste this link into your browser:"
 msgstr "Falls der Button nicht funktioniert, kopiere diesen Link in deinen Browser:"
@@ -6201,6 +6665,49 @@ msgstr ""
 
 msgid "This link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email."
 msgstr "Dieser Link ist 1 Stunde gültig. Falls du kein neues Passwort angefordert hast, kannst du diese E-Mail ignorieren."
+
+msgid "One month later: a good moment to look at your goals again."
+msgstr ""
+
+msgid "Revisit your feedback"
+msgstr ""
+
+msgid "Your 360 feedback report has been ready for about a month. This is a good moment to read it again and to look at your progress."
+msgstr "Dein 360°-Feedbackbericht ist seit etwa einem Monat fertig. Jetzt ist ein guter Moment, ihn noch einmal zu lesen und auf deine Fortschritte zu schauen."
+
+msgid "Ask yourself three questions:"
+msgstr ""
+
+msgid "Which goals did you choose after you read the report?"
+msgstr "Welche Ziele hast du dir nach dem Lesen des Berichts gesetzt?"
+
+msgid "What do you do differently now?"
+msgstr "Was machst du jetzt anders?"
+
+msgid "What is your next small step?"
+msgstr "Was ist dein nächster kleiner Schritt?"
+
+msgid "Your report also has a development path. It shows what helps you reach the next stage."
+msgstr "Dein Bericht enthält auch einen Entwicklungsweg. Er zeigt, was dir hilft, die nächste Stufe zu erreichen."
+
+#, python-format
+msgid "%(questionnaire_name)s, ready since %(date)s"
+msgstr ""
+
+msgid "Your report"
+msgstr "Dein Bericht"
+
+msgid "Open your report"
+msgstr ""
+
+msgid "This link is personal. Do not forward this email."
+msgstr ""
+
+msgid "Your report:"
+msgstr "Dein Bericht:"
+
+msgid "Open your report:"
+msgstr ""
 
 msgid "Your Report is Ready!"
 msgstr "Dein Bericht ist fertig!"
@@ -6294,6 +6801,9 @@ msgstr ""
 msgid "360° Feedback Cycle Started"
 msgstr ""
 
+msgid "This is your opportunity to reflect on your own performance before receiving feedback from others."
+msgstr "Hier kannst du deine eigene Leistung reflektieren, bevor du Feedback von anderen erhältst."
+
 msgid "This is a friendly reminder that your self-assessment is still open."
 msgstr "Eine freundliche Erinnerung: Deine Selbsteinschätzung ist noch offen."
 
@@ -6306,25 +6816,19 @@ msgstr "Bitte fülle deine <strong>Selbsteinschätzung</strong> über den Button
 msgid "Complete Self-Assessment"
 msgstr ""
 
-msgid "This is your opportunity to reflect on your own performance before receiving feedback from others."
-msgstr "Hier kannst du deine eigene Leistung reflektieren, bevor du Feedback von anderen erhältst."
-
 msgid "Please complete your self-assessment by clicking the link below:"
 msgstr "Bitte fülle deine Selbsteinschätzung über den folgenden Link aus:"
 
 msgid "360 Feedback Request"
 msgstr ""
 
-msgid "Hello,"
-msgstr ""
+#, python-format
+msgid "Your feedback is anonymous and will help %(reviewee_name)s grow professionally."
+msgstr "Dein Feedback ist anonym und hilft %(reviewee_name)s, sich beruflich weiterzuentwickeln."
 
 #, python-format
 msgid "You have been invited to provide <strong>%(category)s</strong> feedback for <strong>%(reviewee_name)s</strong>."
 msgstr "Du wurdest um Feedback für <strong>%(reviewee_name)s</strong> gebeten (<strong>%(category)s</strong>)."
-
-#, python-format
-msgid "Your feedback is anonymous and will help %(reviewee_name)s grow professionally."
-msgstr "Dein Feedback ist anonym und hilft %(reviewee_name)s, sich beruflich weiterzuentwickeln."
 
 msgid "Start Your Review"
 msgstr ""
@@ -6387,6 +6891,131 @@ msgstr "Eine freundliche Erinnerung: Deine Feedbackanfrage für %(reviewee_name)
 msgid "Click the link below to continue your review:"
 msgstr ""
 
+msgid "Your subscription has ended"
+msgstr ""
+
+msgid "Your subscription is canceled"
+msgstr ""
+
+#, python-format
+msgid "Your data stays available until %(date)s. You pay nothing more."
+msgstr ""
+
+#, python-format
+msgid "We have canceled the %(plan)s plan for %(organization)s, as you asked. It has ended now. You pay nothing more."
+msgstr ""
+
+#, python-format
+msgid "We have canceled the %(plan)s plan for %(organization)s, as you asked. You keep full access until %(date)s. After that, you pay nothing more."
+msgstr ""
+
+#, python-format
+msgid "From %(end)s, your account is paused. You can still sign in and export your data.<br> On %(deletion)s, we delete your organization's data."
+msgstr ""
+
+#, python-format
+msgid "Until %(end)s, everything works as it does now.<br> From %(end)s, your account is paused. You can still sign in and export your data.<br> On %(deletion)s, we delete your organization's data."
+msgstr ""
+
+msgid "What happens to your data"
+msgstr ""
+
+msgid "Do you want to keep your reports? Download an export before your data is deleted."
+msgstr ""
+
+msgid "Export your data"
+msgstr ""
+
+#, python-format
+msgid "Did you change your mind? Keep your subscription before %(date)s, and nothing changes for your team."
+msgstr ""
+
+msgid "Keep my subscription"
+msgstr ""
+
+#, python-format
+msgid "Why I left %(site_name)s"
+msgstr ""
+
+#, python-format
+msgid "Why did you leave? One sentence helps us improve. <a href=\"mailto:%(email)s?subject=%(subject)s\">Tell us why</a>."
+msgstr ""
+
+#, python-format
+msgid "Until %(end)s, everything works as it does now."
+msgstr ""
+
+#, python-format
+msgid "From %(end)s, your account is paused. You can still sign in and export your data."
+msgstr ""
+
+#, python-format
+msgid "On %(deletion)s, we delete your organization's data."
+msgstr ""
+
+msgid "Do you want to keep your reports? Download an export before your data is deleted:"
+msgstr ""
+
+#, python-format
+msgid "Did you change your mind? Keep your subscription before %(date)s, and nothing changes for your team:"
+msgstr ""
+
+#, python-format
+msgid "Why did you leave? One sentence helps us improve. Write to %(email)s."
+msgstr ""
+
+#, python-format
+msgid "%(organization)s is on the %(plan)s plan."
+msgstr ""
+
+#, python-format
+msgid "Plan: <strong>%(plan)s</strong><br> Price: <strong>€%(price)s per month</strong><br> People to review: <strong>up to %(max)s</strong><br> Free trial until: <strong>%(date)s</strong>"
+msgstr ""
+
+#, python-format
+msgid "Plan: <strong>%(plan)s</strong><br> Price: <strong>€%(price)s per month</strong><br> People to review: <strong>up to %(max)s</strong><br> Next payment: <strong>%(date)s</strong>"
+msgstr ""
+
+msgid "What you have now"
+msgstr ""
+
+msgid "Team members are free on every plan. Stripe sends a receipt for each payment."
+msgstr ""
+
+msgid "Go to your dashboard"
+msgstr ""
+
+#, python-format
+msgid "Questions about your plan? Write to <a href=\"mailto:%(email)s\">%(email)s</a>."
+msgstr ""
+
+#, python-format
+msgid "Plan: %(plan)s"
+msgstr ""
+
+#, python-format
+msgid "Price: €%(price)s per month"
+msgstr ""
+
+#, python-format
+msgid "People to review: up to %(max)s"
+msgstr ""
+
+#, python-format
+msgid "Free trial until: %(date)s"
+msgstr ""
+
+#, python-format
+msgid "Next payment: %(date)s"
+msgstr ""
+
+msgid "Go to your dashboard:"
+msgstr ""
+
+#, python-format
+msgid "Questions about your plan? Write to %(email)s."
+msgstr ""
+
 msgid "You're Invited!"
 msgstr "Du bist eingeladen!"
 
@@ -6411,9 +7040,114 @@ msgstr "Du wurdest eingeladen, %(organization)s auf der 360°-Feedbackplattform 
 msgid "Click the link below to accept this invitation and create your account:"
 msgstr ""
 
+msgid "Your trial has ended"
+msgstr ""
+
+msgid "Your account is paused. Your data is safe. Reactivate it in one step."
+msgstr ""
+
+#, python-format
+msgid "The free trial for %(organization)s has ended. We could not take the first payment for your %(plan)s plan, so your account is paused."
+msgstr ""
+
+msgid "Your data is safe. Your review cycles, reports and settings stay as they are. While the account is paused, you cannot add new people to review."
+msgstr ""
+
+#, python-format
+msgid "Review cycles: <strong>%(cycles)s</strong><br> People to review: <strong>%(people)s</strong><br> Completed reviews: <strong>%(reviews)s</strong><br> Team members: <strong>%(members)s</strong>"
+msgstr ""
+
+msgid "Waiting for you"
+msgstr ""
+
+msgid "To continue, add a payment method that works. Your account is then active again, with everything in place."
+msgstr ""
+
+msgid "Reactivate your account"
+msgstr ""
+
+#, python-format
+msgid "Is something wrong with the payment? Write to <a href=\"mailto:%(email)s\">%(email)s</a>. We will help."
+msgstr ""
+
+#, python-format
+msgid "Review cycles: %(cycles)s"
+msgstr ""
+
+#, python-format
+msgid "People to review: %(people)s"
+msgstr ""
+
+#, python-format
+msgid "Completed reviews: %(reviews)s"
+msgstr ""
+
+#, python-format
+msgid "Team members: %(members)s"
+msgstr ""
+
+msgid "Reactivate your account:"
+msgstr ""
+
+#, python-format
+msgid "Is something wrong with the payment? Write to %(email)s. We will help."
+msgstr ""
+
+#, python-format
+msgid "Your trial ends on %(date)s"
+msgstr ""
+
+#, python-format
+msgid "Your %(plan)s plan starts on %(date)s. Change or cancel it before then."
+msgstr ""
+
+msgid "Last reminder"
+msgstr ""
+
+msgid "Trial reminder"
+msgstr ""
+
+#, python-format
+msgid "The free trial for %(organization)s ends on %(date)s. This is what your team has set up so far."
+msgstr ""
+
+msgid "Your account so far"
+msgstr ""
+
+#, python-format
+msgid "You have not started a review cycle yet. There is still time. <a href=\"%(url)s\">Start your first cycle</a>. It takes a few minutes."
+msgstr ""
+
+#, python-format
+msgid "What happens on %(date)s"
+msgstr ""
+
+#, python-format
+msgid "Your %(plan)s plan starts, for up to %(max)s people. We charge €%(price)s per month to the card you gave at checkout."
+msgstr ""
+
+msgid "Your review cycles, reports and settings stay as they are. You do not need to do anything."
+msgstr ""
+
+#, python-format
+msgid "Do you want a different plan, or do you want to stop? Choose before %(date)s. If you cancel before then, we do not charge you."
+msgstr ""
+
+msgid "Choose your plan"
+msgstr ""
+
+msgid "You have not started a review cycle yet. There is still time. Start your first cycle here. It takes a few minutes:"
+msgstr ""
+
+msgid "Choose your plan:"
+msgstr ""
+
 #, python-format
 msgid "Welcome to %(site_name)s"
 msgstr ""
+
+msgid "Your Login Credentials"
+msgstr "Deine Zugangsdaten"
 
 #, python-format
 msgid "Hello %(username)s,"
@@ -6422,9 +7156,6 @@ msgstr ""
 #, python-format
 msgid "Your %(site_name)s account has been created and is ready to use. You can now start creating 360-degree feedback cycles for your organization."
 msgstr "Dein Konto bei %(site_name)s wurde angelegt und ist einsatzbereit. Du kannst jetzt 360°-Feedbackrunden für deine Organisation anlegen."
-
-msgid "Your Login Credentials"
-msgstr "Deine Zugangsdaten"
 
 msgid "Password:"
 msgstr ""
