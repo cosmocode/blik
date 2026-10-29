@@ -1,38 +1,33 @@
 {% extends 'emails/_base.html' %}
 {% load i18n %}
-{% block title %}{% trans 'Share Your Review Links' %}{% endblock %}
-{% block preheader %}{% trans 'Your 360-degree feedback cycle has been created. Please share the following invitation links with your reviewers:' %}{% endblock %}
+{% block title %}{% trans 'Your links to share' %}{% endblock %}
+{% block preheader %}{% trans 'Share these links with the people you want feedback from.' %}{% endblock %}
 {% block eyebrow %}<div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; margin-bottom:8px;">{{ questionnaire_name }}</div>{% endblock %}
-{% block heading %}{% trans 'Share Your Review Links' %}{% endblock %}
+{% block heading %}{% trans 'Your links to share' %}{% endblock %}
 {% block content %}
 <p>{% blocktrans trimmed with name=reviewee.name %}Hi <strong>{{ name }}</strong>,{% endblocktrans %}</p>
-<p>{% trans 'Your 360-degree feedback cycle has been created. Please share the following invitation links with your reviewers:' %}</p>
+<p>{% trans 'Your 360 feedback cycle has started. Share these links with the people you want feedback from.' %}</p>
+<p>{% trans 'It helps to ask a few colleagues personally before you share the link.' %}</p>
 {% if peer_url %}
 <div style="margin:20px 0; padding:16px 20px; background:#f8fafc; border-left:3px solid #4f46e5; border-radius:4px;">
   <div style="font-weight:600; color:#0f172a;">{% trans 'Peer Reviews' %}</div>
   <div style="margin:8px 0; padding:8px 10px; background:#ffffff; border:1px solid #e2e8f0; border-radius:4px; font-family:ui-monospace, Menlo, Consolas, monospace; font-size:13px; word-break:break-all;"><a href="{{ peer_url }}" style="color:#4f46e5; text-decoration:none;">{{ peer_url }}</a></div>
-  <div style="font-size:14px; color:#64748b;">{% trans 'Share this link with your colleagues/peers. Each person who clicks will get their own unique review link.' %}</div>
+  <div style="font-size:14px; color:#64748b;">{% trans 'For your colleagues. Each person who opens it gets their own review.' %}</div>
 </div>
 {% endif %}
 {% if manager_url %}
 <div style="margin:20px 0; padding:16px 20px; background:#f8fafc; border-left:3px solid #4f46e5; border-radius:4px;">
   <div style="font-weight:600; color:#0f172a;">{% trans 'Manager Review' %}</div>
   <div style="margin:8px 0; padding:8px 10px; background:#ffffff; border:1px solid #e2e8f0; border-radius:4px; font-family:ui-monospace, Menlo, Consolas, monospace; font-size:13px; word-break:break-all;"><a href="{{ manager_url }}" style="color:#4f46e5; text-decoration:none;">{{ manager_url }}</a></div>
-  <div style="font-size:14px; color:#64748b;">{% trans 'Share this link with your manager.' %}</div>
+  <div style="font-size:14px; color:#64748b;">{% trans 'For your manager.' %}</div>
 </div>
 {% endif %}
 {% if direct_report_url %}
 <div style="margin:20px 0; padding:16px 20px; background:#f8fafc; border-left:3px solid #4f46e5; border-radius:4px;">
   <div style="font-weight:600; color:#0f172a;">{% trans 'Direct Report Reviews' %}</div>
   <div style="margin:8px 0; padding:8px 10px; background:#ffffff; border:1px solid #e2e8f0; border-radius:4px; font-family:ui-monospace, Menlo, Consolas, monospace; font-size:13px; word-break:break-all;"><a href="{{ direct_report_url }}" style="color:#4f46e5; text-decoration:none;">{{ direct_report_url }}</a></div>
-  <div style="font-size:14px; color:#64748b;">{% trans 'Share this link with your direct reports. Each person who clicks will get their own unique review link.' %}</div>
+  <div style="font-size:14px; color:#64748b;">{% trans 'For the people who report to you. Each person who opens it gets their own review.' %}</div>
 </div>
 {% endif %}
-<p style="margin-bottom:4px;"><strong>{% trans 'Important:' %}</strong></p>
-<ul style="margin:0 0 16px; padding-left:20px;">
-  <li>{% trans 'Each link can be shared with multiple people' %}</li>
-  <li>{% trans 'Reviewers remain anonymous' %}</li>
-  <li>{% trans 'They can save their progress and return later' %}</li>
-</ul>
+<p>{% trans 'You can share each link with more than one person. Reviewers stay anonymous. They can stop and continue later.' %}</p>
 {% endblock %}
-{% block footer %}{% trans 'This is an automated email from your feedback system.' %}{% endblock %}

@@ -1,15 +1,12 @@
 {% extends 'emails/_base.html' %}
 {% load i18n %}
-{% block title %}{% trans 'Review Check-In' %}{% endblock %}
-{% block preheader %}{% trans 'If everyone has submitted their feedback, you can close the cycle and generate your report from your dashboard.' %}{% endblock %}
-{% block heading %}{% trans 'Review Check-In' %}{% endblock %}
+{% block title %}{% trans 'Is your feedback cycle complete?' %}{% endblock %}
+{% block preheader %}{% trans 'When everyone has responded, close the cycle on your dashboard. This makes your report.' %}{% endblock %}
+{% block heading %}{% trans 'Is your feedback cycle complete?' %}{% endblock %}
 {% block content %}
 <p>{% blocktrans trimmed with name=reviewee.name %}Hi <strong>{{ name }}</strong>,{% endblocktrans %}</p>
-<p>{% blocktrans trimmed count counter=completed_count %}<strong>{{ counter }}</strong> review has been completed for your <strong>{{ questionnaire_name }}</strong> cycle.{% plural %}<strong>{{ counter }}</strong> reviews have been completed for your <strong>{{ questionnaire_name }}</strong> cycle.{% endblocktrans %}</p>
-<p>{% trans 'If everyone has submitted their feedback, you can close the cycle and generate your report from your dashboard.' %}</p>
-{% trans 'View Cycle' as cta %}{% include 'emails/_button.html' with url=dashboard_url label=cta %}
-<div style="margin:24px 0; padding:16px 20px; background:#f8fafc; border-left:3px solid #4f46e5; border-radius:4px; font-size:14px;">
-  <strong>{% trans 'Note:' %}</strong> {% trans 'Your cycle will stay open until you manually close it, so additional reviewers can still submit feedback via the invite link.' %}
-</div>
+<p>{% blocktrans trimmed count counter=completed_count %}<strong>{{ counter }}</strong> review is complete for your <strong>{{ questionnaire_name }}</strong> cycle.{% plural %}<strong>{{ counter }}</strong> reviews are complete for your <strong>{{ questionnaire_name }}</strong> cycle.{% endblocktrans %}</p>
+<p>{% trans 'When everyone has responded, close the cycle on your dashboard. This makes your report.' %}</p>
+{% trans 'View the cycle' as cta %}{% include 'emails/_button.html' with url=dashboard_url label=cta %}
+<p style="font-size:14px; color:#64748b;">{% trans 'The cycle stays open until you close it. Until then, others can still respond with the invite links.' %}</p>
 {% endblock %}
-{% block footer %}{% trans 'This is an automated email from your feedback system.' %}{% endblock %}
