@@ -93,3 +93,15 @@ class ActionItemKeyTests(TestCase):
 
         for question in Question.objects.get(question_text='Notes'), Question.objects.get(id=self.question.id):
             self.assertEqual([item['text'] for item in question.action_items], texts)
+
+    def test_the_dreyfus_dialog_replaces_keys_the_question_does_not_have(self):
+        self.edit(**{
+            'action': 'update_dreyfus_config',
+            'question_id': self.question.id,
+            'action_items[0][key]': '"><img src=x onerror=alert(1)>',
+            'action_items[0][text]': 'Pair weekly',
+        })
+
+        self.question.refresh_from_db()
+        [item] = self.question.action_items
+        self.assertRegex(item['key'], r'^[A-Za-z0-9]{8}$')

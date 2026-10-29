@@ -1326,6 +1326,8 @@ def questionnaire_edit(request, questionnaire_uuid):
                     # Parse action items from form
                     action_items = []
                     action_item_indices = set()
+                    # A posted key may only name an item the question has, so the client cannot set keys of its own
+                    known_keys = {item.get('key') for item in question.action_items if isinstance(item, dict)}
 
                     # Extract all action item indices from the POST data
                     for key in request.POST.keys():
@@ -1347,7 +1349,7 @@ def questionnaire_edit(request, questionnaire_uuid):
                                 'threshold': float(threshold)
                             }
 
-                            if key:
+                            if key in known_keys:
                                 item['key'] = key
 
                             # Add stages if any are selected
