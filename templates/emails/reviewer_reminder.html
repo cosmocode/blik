@@ -1,15 +1,12 @@
 {% extends 'emails/_base.html' %}
 {% load i18n %}
-{% block title %}{% trans 'Reminder: Feedback Request' %}{% endblock %}
-{% block preheader %}{% blocktrans trimmed %}This is a friendly reminder that you have a pending <strong>{{ category }}</strong> feedback request for <strong>{{ reviewee_name }}</strong>.{% endblocktrans %}{% endblock %}
+{% block title %}{% blocktrans trimmed %}Your feedback for {{ reviewee_name }} is still open{% endblocktrans %}{% endblock %}
+{% block preheader %}{% trans 'Your answers are anonymous.' %}{% if estimated_minutes %} {% blocktrans trimmed count minutes=estimated_minutes %}It takes about {{ minutes }} minute.{% plural %}It takes about {{ minutes }} minutes.{% endblocktrans %}{% endif %}{% endblock %}
 {% block eyebrow %}<div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; margin-bottom:8px;">{{ questionnaire_name }}</div>{% endblock %}
-{% block heading %}{% trans 'Reminder: Feedback Request' %}{% endblock %}
+{% block heading %}{% blocktrans trimmed %}Your feedback for {{ reviewee_name }} is still open{% endblocktrans %}{% endblock %}
 {% block content %}
 <p>{% trans 'Hello,' %}</p>
-<p>{% blocktrans trimmed %}This is a friendly reminder that you have a pending <strong>{{ category }}</strong> feedback request for <strong>{{ reviewee_name }}</strong>.{% endblocktrans %}</p>
-<p>{% blocktrans trimmed %}Your feedback is important and will help {{ reviewee_name }} grow professionally. If you've already started, you can continue where you left off.{% endblocktrans %}</p>
-{% trans 'Continue Your Review' as cta %}{% include 'emails/_button.html' with url=feedback_url label=cta %}
-<p style="font-size:14px; color:#64748b;">{% trans 'Your progress is saved automatically, so you can complete the review at your convenience.' %}</p>
-<p>{% trans 'Thank you for your time.' %}</p>
+<p>{% blocktrans trimmed %}Your <strong>{{ category }}</strong> for <strong>{{ reviewee_name }}</strong> is still open.{% endblocktrans %}{% if responded_count %} {% blocktrans trimmed count counter=responded_count %}{{ counter }} colleague already responded.{% plural %}{{ counter }} colleagues already responded.{% endblocktrans %}{% endif %}{% if estimated_minutes %} {% blocktrans trimmed count minutes=estimated_minutes %}It takes about {{ minutes }} minute.{% plural %}It takes about {{ minutes }} minutes.{% endblocktrans %}{% endif %} {% trans 'Your answers are anonymous.' %}</p>
+{% trans 'Open the review' as cta %}{% include 'emails/_button.html' with url=feedback_url label=cta %}
+<p style="font-size:14px; color:#64748b;">{% trans 'If you started in this browser, your answers are still there.' %}</p>
 {% endblock %}
-{% block footer %}{% trans 'This is an automated reminder from the Blik 360 Feedback System.' %}{% endblock %}

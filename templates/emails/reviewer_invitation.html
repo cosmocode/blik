@@ -1,15 +1,14 @@
 {% extends 'emails/_base.html' %}
 {% load i18n %}
-{% block title %}{% trans '360 Feedback Request' %}{% endblock %}
-{% block preheader %}{% blocktrans trimmed %}Your feedback is anonymous and will help {{ reviewee_name }} grow professionally.{% endblocktrans %}{% endblock %}
+{% block title %}{% blocktrans trimmed %}Your feedback for {{ reviewee_name }}{% endblocktrans %}{% endblock %}
+{% block preheader %}{% blocktrans trimmed %}{{ organization_name }} asks for your honest feedback about {{ reviewee_name }}. Your answers are anonymous.{% endblocktrans %}{% endblock %}
 {% block eyebrow %}<div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; margin-bottom:8px;">{{ questionnaire_name }}</div>{% endblock %}
-{% block heading %}{% trans '360 Feedback Request' %}{% endblock %}
+{% block heading %}{% blocktrans trimmed %}Your feedback for {{ reviewee_name }}{% endblocktrans %}{% endblock %}
 {% block content %}
 <p>{% trans 'Hello,' %}</p>
-<p>{% blocktrans trimmed %}You have been invited to provide <strong>{{ category }}</strong> feedback for <strong>{{ reviewee_name }}</strong>.{% endblocktrans %}</p>
-<p>{% blocktrans trimmed %}Your feedback is anonymous and will help {{ reviewee_name }} grow professionally.{% endblocktrans %}</p>
-{% trans 'Start Your Review' as cta %}{% include 'emails/_button.html' with url=feedback_url label=cta %}
-<p style="font-size:14px; color:#64748b;">{% trans 'You can save your progress and return to complete it later - just bookmark the link above.' %}</p>
-<p>{% trans 'Thank you for your participation.' %}</p>
+<p>{% blocktrans trimmed %}{{ organization_name }} asks for your honest feedback about <strong>{{ reviewee_name }}</strong>. This is a <strong>{{ category }}</strong>.{% endblocktrans %}{% if estimated_minutes %} {% blocktrans trimmed count minutes=estimated_minutes %}It takes about {{ minutes }} minute.{% plural %}It takes about {{ minutes }} minutes.{% endblocktrans %}{% endif %}</p>
+<p>{% blocktrans trimmed %}Your answers are anonymous. {{ reviewee_name }} never sees your name with them. So you can be honest.{% endblocktrans %}</p>
+{% trans 'Start the review' as cta %}{% include 'emails/_button.html' with url=feedback_url label=cta %}
+<p style="font-size:14px; color:#64748b;">{% trans 'You can stop and continue later in the same browser. Your answers stay there until you submit them.' %}</p>
+<p>{% trans 'Thank you.' %}</p>
 {% endblock %}
-{% block footer %}{% trans 'This is an automated message from the Blik 360 Feedback System.' %}{% endblock %}
