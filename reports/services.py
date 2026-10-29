@@ -959,7 +959,7 @@ def send_report_ready_notification(report, request=None):
             text_message = render_to_string('emails/report_ready.txt', context)
 
             send_email(
-                subject=_('Your 360 Feedback Report is Ready!'),
+                subject=_('Your 360 feedback report is ready'),
                 message=text_message,
                 recipient_list=[reviewee.email],
                 html_message=html_message,

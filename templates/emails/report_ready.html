@@ -1,24 +1,13 @@
 {% extends 'emails/_base.html' %}
 {% load i18n %}
-{% block title %}{% trans 'Your Report is Ready!' %}{% endblock %}
-{% block preheader %}{% trans 'Your 360-degree feedback report is now ready!' %}{% endblock %}
+{% block title %}{% trans 'Your feedback report is ready' %}{% endblock %}
+{% block preheader %}{% trans 'Feedback can feel personal. Read it once now, then again in two days.' %}{% endblock %}
 {% block eyebrow %}<div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; margin-bottom:8px;">{{ questionnaire_name }}</div>{% endblock %}
-{% block heading %}{% trans 'Your Report is Ready!' %}{% endblock %}
+{% block heading %}{% trans 'Your feedback report is ready' %}{% endblock %}
 {% block content %}
 <p>{% blocktrans trimmed with name=reviewee.name %}Hi <strong>{{ name }}</strong>,{% endblocktrans %}</p>
-<p>{% trans 'Your 360-degree feedback report is now ready!' %}</p>
-{% trans 'View Your Report' as cta %}{% include 'emails/_button.html' with url=report_url label=cta %}
-<div style="margin:24px 0; padding:16px 20px; background:#f8fafc; border-left:3px solid #4f46e5; border-radius:4px;">
-  <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; margin-bottom:6px;">{% trans 'Report Summary' %}</div>
-  {% blocktrans trimmed %}This report contains feedback from <strong>{{ response_count }} reviewer(s)</strong> across different categories.{% endblocktrans %}
-</div>
-<p style="margin-bottom:4px;"><strong>{% trans 'The report includes:' %}</strong></p>
-<ul style="margin:0 0 16px; padding-left:20px;">
-  <li>{% trans 'Overall performance insights' %}</li>
-  <li>{% trans 'Strength areas and development opportunities' %}</li>
-  <li>{% trans 'Perception gap analysis (if applicable)' %}</li>
-  <li>{% trans 'Detailed feedback by competency area' %}</li>
-</ul>
-<p style="font-size:14px; color:#64748b;"><strong>{% trans 'Privacy:' %}</strong> {% trans 'Your report is completely confidential and accessible only through the secure link above.' %}</p>
+<p>{% blocktrans trimmed count counter=response_count %}Your 360 feedback report is ready. It is based on <strong>{{ counter }}</strong> response.{% plural %}Your 360 feedback report is ready. It is based on <strong>{{ counter }}</strong> responses.{% endblocktrans %}</p>
+<p>{% trans 'Feedback can feel personal. Read it once now, then again in two days. The second reading is usually the useful one.' %}</p>
+{% trans 'View your report' as cta %}{% include 'emails/_button.html' with url=report_url label=cta %}
+<p style="font-size:14px; color:#64748b;"><strong>{% trans 'Privacy:' %}</strong> {% trans 'Your report is confidential. The secure link above opens it.' %}</p>
 {% endblock %}
-{% block footer %}{% trans 'This is an automated email from your feedback system.' %}{% endblock %}

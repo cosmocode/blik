@@ -1,14 +1,12 @@
 {% extends 'emails/_base.html' %}
 {% load i18n %}
-{% block title %}{% if is_reminder %}{% trans 'Self-Assessment Reminder' %}{% else %}{% trans '360° Feedback Cycle Started' %}{% endif %}{% endblock %}
-{% block preheader %}{% trans 'This is your opportunity to reflect on your own performance before receiving feedback from others.' %}{% endblock %}
+{% block title %}{% if is_reminder %}{% trans 'Your self-assessment is still open' %}{% else %}{% trans 'Your self-assessment' %}{% endif %}{% endblock %}
+{% block preheader %}{% trans 'Write down how you see yourself before you see what others think.' %}{% endblock %}
 {% block eyebrow %}<div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; margin-bottom:8px;">{{ questionnaire_name }}</div>{% endblock %}
-{% block heading %}{% if is_reminder %}{% trans 'Self-Assessment Reminder' %}{% else %}{% trans '360° Feedback Cycle Started' %}{% endif %}{% endblock %}
+{% block heading %}{% if is_reminder %}{% trans 'Your self-assessment is still open' %}{% else %}{% trans 'Your self-assessment' %}{% endif %}{% endblock %}
 {% block content %}
 <p>{% blocktrans trimmed with name=reviewee.name %}Hi <strong>{{ name }}</strong>,{% endblocktrans %}</p>
-<p>{% if is_reminder %}{% trans 'This is a friendly reminder that your self-assessment is still open.' %}{% else %}{% trans 'A new 360-degree feedback cycle has been created for you!' %}{% endif %}</p>
-<p>{% trans 'Please complete your <strong>self-assessment</strong> by clicking the button below:' %}</p>
-{% trans 'Complete Self-Assessment' as cta %}{% include 'emails/_button.html' with url=self_assessment_url label=cta %}
-<p>{% trans 'This is your opportunity to reflect on your own performance before receiving feedback from others.' %}</p>
+<p>{% if not is_reminder %}{% trans 'Your 360 feedback cycle has started.' %} {% endif %}{% trans 'Write down how you see yourself before you see what others think.' %}{% if estimated_minutes %} {% blocktrans trimmed count minutes=estimated_minutes %}It takes about {{ minutes }} minute.{% plural %}It takes about {{ minutes }} minutes.{% endblocktrans %}{% endif %}</p>
+<p>{% trans 'Your report puts your view next to theirs. The differences are often the most useful part.' %}</p>
+{% trans 'Start the self-assessment' as cta %}{% include 'emails/_button.html' with url=self_assessment_url label=cta %}
 {% endblock %}
-{% block footer %}{% trans 'This is an automated email from your feedback system.' %}{% endblock %}
