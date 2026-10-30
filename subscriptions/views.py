@@ -126,28 +126,17 @@ def stripe_webhook(request):
     payload = request.body
     sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
 
-    # Log incoming webhook
-    logger.info(f"[STRIPE WEBHOOK] Received webhook request")
-    logger.info(f"[STRIPE WEBHOOK] Signature header present: {bool(sig_header)}")
-    logger.info(f"[STRIPE WEBHOOK] Payload size: {len(payload)} bytes")
-    logger.info(f"[STRIPE WEBHOOK] Webhook secret configured: {bool(settings.STRIPE_WEBHOOK_SECRET)}")
-    logger.info(f"[STRIPE WEBHOOK] Webhook secret length: {len(settings.STRIPE_WEBHOOK_SECRET) if settings.STRIPE_WEBHOOK_SECRET else 0}")
-
     try:
         # ponytail: .to_dict() because StripeObject stopped being a dict in stripe>=8
         event = stripe.Webhook.construct_event(
             payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
         ).to_dict()
-        logger.info(f"[STRIPE WEBHOOK] ✓ Signature verification successful")
-        logger.info(f"[STRIPE WEBHOOK] Event type: {event['type']}")
-        logger.info(f"[STRIPE WEBHOOK] Event ID: {event.get('id', 'N/A')}")
+        logger.info("[STRIPE WEBHOOK] Received %s (%s)", event['type'], event.get('id'))
     except ValueError as e:
         logger.error(f"[STRIPE WEBHOOK] ✗ Invalid payload: {str(e)}")
         return HttpResponse(status=400)
     except stripe._error.SignatureVerificationError as e:
         logger.error(f"[STRIPE WEBHOOK] ✗ Signature verification failed: {str(e)}")
-        logger.error(f"[STRIPE WEBHOOK] Signature header: {sig_header[:50] if sig_header else 'None'}...")
-        logger.error(f"[STRIPE WEBHOOK] Secret starts with: {settings.STRIPE_WEBHOOK_SECRET[:10] if settings.STRIPE_WEBHOOK_SECRET else 'None'}...")
         return HttpResponse(status=400)
 
     # Handle the event
@@ -157,30 +146,26 @@ def stripe_webhook(request):
         # idempotent and ignores unpaid sessions, so both events go through it.
         if event['type'] in ('checkout.session.completed',
                              'checkout.session.async_payment_succeeded'):
-            logger.info("[STRIPE WEBHOOK] Processing %s", event['type'])
             session = event['data']['object']
             fulfil_checkout(session)
             logger.info("[STRIPE WEBHOOK] ✓ Successfully processed %s", event['type'])
 
         elif event['type'] == 'customer.subscription.updated':
-            logger.info(f"[STRIPE WEBHOOK] Processing customer.subscription.updated")
             subscription = event['data']['object']
             handle_subscription_updated(subscription)
             logger.info(f"[STRIPE WEBHOOK] ✓ Successfully processed customer.subscription.updated")
 
         elif event['type'] == 'customer.subscription.deleted':
-            logger.info(f"[STRIPE WEBHOOK] Processing customer.subscription.deleted")
             subscription = event['data']['object']
             handle_subscription_deleted(subscription)
             logger.info(f"[STRIPE WEBHOOK] ✓ Successfully processed customer.subscription.deleted")
 
         elif event['type'] == 'invoice.payment_failed':
-            logger.info(f"[STRIPE WEBHOOK] Processing invoice.payment_failed")
             invoice = event['data']['object']
             handle_payment_failed(invoice)
             logger.info(f"[STRIPE WEBHOOK] ✓ Successfully processed invoice.payment_failed")
         else:
-            logger.warning(f"[STRIPE WEBHOOK] Unhandled event type: {event['type']}")
+            logger.info("[STRIPE WEBHOOK] Ignored event type: %s", event['type'])
 
     except Exception:
         logger.exception("[STRIPE WEBHOOK] ✗ Error processing event %s", event['type'])
@@ -188,7 +173,6 @@ def stripe_webhook(request):
         # fulfilment leaves nothing behind.
         return HttpResponse(status=500)
 
-    logger.info(f"[STRIPE WEBHOOK] ✓ Webhook processing complete")
     return HttpResponse(status=200)
 
 
