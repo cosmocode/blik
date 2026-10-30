@@ -847,7 +847,7 @@ msgid "No organization found. Please run setup first."
 msgstr ""
 
 msgid "You can only create a reviewee profile for yourself."
-msgstr "Du kannst nur für dich selbst ein Profil als Beurteilte:r anlegen."
+msgstr "Du kannst nur für dich selbst ein Profil als feedbacknehmende Person anlegen."
 
 #, python-format
 msgid "Reviewee \"%(name)s\" created successfully."
@@ -2010,7 +2010,7 @@ msgid "Written feedback"
 msgstr ""
 
 msgid "Read comments and examples from reviewers."
-msgstr "Lies Kommentare und Beispiele der Beurteilenden."
+msgstr "Lies Kommentare und Beispiele der Feedbackgebenden."
 
 msgid "Name"
 msgstr ""
@@ -3061,7 +3061,7 @@ msgstr "Dein Abonnement ist nicht aktiv. Bitte aktualisiere deine Zahlungsdaten.
 
 #, python-format
 msgid "You've reached your plan limit of %(max_employees)s reviewees. Please upgrade your plan."
-msgstr "Du hast die Grenze deines Tarifs von %(max_employees)s Beurteilten erreicht. Bitte wechsle in einen größeren Tarif."
+msgstr "Du hast die Grenze deines Tarifs von %(max_employees)s Feedbacknehmenden erreicht. Bitte wechsle in einen größeren Tarif."
 
 msgid "Unknown plan"
 msgstr ""
@@ -3383,7 +3383,7 @@ msgid "No emails have been sent yet."
 msgstr ""
 
 msgid "Review the list below and click <em>Send invitations now</em> to notify every reviewee."
-msgstr "Prüfe die Liste unten und klicke auf <em>Einladungen jetzt senden</em>, um alle Beurteilten zu benachrichtigen."
+msgstr "Prüfe die Liste unten und klicke auf <em>Einladungen jetzt senden</em>, um alle Feedbacknehmenden zu benachrichtigen."
 
 msgid "You can also skip for now and send individual invitations later from the cycles list."
 msgstr "Du kannst diesen Schritt auch überspringen und Einladungen später einzeln aus der Liste der Feedbackrunden senden."
@@ -3459,7 +3459,7 @@ msgstr ""
 
 #, python-format
 msgid "You're nearing your plan limit of %(max_employees)s reviewees. Contact us to upgrade your plan."
-msgstr "Du näherst dich der Grenze deines Tarifs von %(max_employees)s Beurteilten. Kontaktiere uns für einen größeren Tarif."
+msgstr "Du näherst dich der Grenze deines Tarifs von %(max_employees)s Feedbacknehmenden. Kontaktiere uns für einen größeren Tarif."
 
 msgid "Quick Actions"
 msgstr ""
@@ -4008,7 +4008,7 @@ msgid "Reviewers are copied from the previous cycle. Invitations are sent to rev
 msgstr ""
 
 msgid "The cycle starts with space for a self-assessment, three peers and one manager. You can assign reviewers in the next step."
-msgstr "Die Runde beginnt mit Plätzen für eine Selbsteinschätzung, drei Kolleg:innen und eine Führungskraft. Im nächsten Schritt kannst du Beurteilende zuweisen."
+msgstr "Die Runde beginnt mit Plätzen für eine Selbsteinschätzung, drei Kolleg:innen und eine Führungskraft. Im nächsten Schritt kannst du Feedbackgebende zuweisen."
 
 msgid "The reviewee is notified by email right away."
 msgstr ""

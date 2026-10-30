@@ -101,23 +101,25 @@ back to `de` (`core/languages.py`).
 
 ## German terms
 
-German texts are gender-neutral. A neutral phrase that sounds natural comes first ("Die
-eingeladene Person erhält …"). Where there is none, use a colon: "Benutzer:innen",
-"Kolleg:innen".
+German texts are gender-neutral. A form without a gender sign comes first, in labels too ("Die
+eingeladene Person erhält …", "Feedbacknehmende Person hinzufügen"). Where there is none, use a
+colon: "Benutzer:innen", "Kolleg:innen".
 
 Use the same term throughout:
 
 | English | German | Notes |
 |---|---|---|
 | Review cycle, cycle | Feedbackrunde | |
-| Reviewee | Beurteilte:r | plural Beurteilte; also "beurteilte Person" |
-| Reviewer | Beurteilende:r | plural Beurteilende |
+| Review (what a reviewer gives) | Feedback | neuter, plural Feedbacks |
+| Reviewee | feedbacknehmende Person | plural Feedbacknehmende |
+| Reviewer | feedbackgebende Person | plural Feedbackgebende |
+| Department | Bereich | |
 | Questionnaire | Fragebogen | |
 | Report | Bericht | |
 | Self-assessment, self | Selbsteinschätzung, Selbst | |
 | Peer | Kolleg:in | plural Kolleg:innen |
 | Manager | Führungskraft | |
-| Direct report | Unterstellte:r | plural Unterstellte |
+| Direct report | direkte Mitarbeitende | plural only; as a label "Direkte Mitarbeitende" |
 | Others' average | Durchschnitt der anderen | |
 | User | Benutzer:in | |
 | Team member | Teammitglied | |
