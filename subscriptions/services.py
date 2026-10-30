@@ -2,6 +2,7 @@
 import stripe
 from django.conf import settings
 from django.utils import timezone
+from . import emails
 from .models import Subscription
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -26,9 +27,11 @@ def cancel_subscription(subscription):
         cancel_at_period_end=True
     )
 
-    # Update local subscription
+    # Update local subscription. The webhook then sees no change, so the email goes out here.
+    before = emails.snapshot(subscription)
     subscription.cancel_at_period_end = True
     subscription.save()
+    emails.notify_change(before, subscription)
 
     return subscription
 
@@ -76,8 +79,10 @@ def reactivate_subscription(subscription):
         cancel_at_period_end=False
     )
 
-    # Update local subscription
+    # Update local subscription. The webhook then sees no change, so the email goes out here.
+    before = emails.snapshot(subscription)
     subscription.cancel_at_period_end = False
     subscription.save()
+    emails.notify_change(before, subscription)
 
     return subscription

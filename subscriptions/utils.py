@@ -36,6 +36,18 @@ def entitlement(organization):
     return 'lapsed' if subscription else 'self_hosted'
 
 
+def billing_enabled():
+    """True when this instance runs the hosted SaaS: it can charge in Stripe and receives Stripe's webhooks.
+
+    ponytail: checks the configuration, not the live Stripe account; a revoked key still passes.
+    """
+    return bool(
+        settings.STRIPE_SECRET_KEY.startswith(('sk_', 'rk_'))
+        and settings.STRIPE_WEBHOOK_SECRET
+        and (settings.STRIPE_PRICE_ID_SAAS or settings.STRIPE_PRICE_ID_ENTERPRISE)
+    )
+
+
 def is_hosted_customer(organization):
     """True for anyone who ever paid us, whatever their status or balance."""
     return (

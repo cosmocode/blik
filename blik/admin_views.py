@@ -55,6 +55,7 @@ from questionnaires.translations import (
     has_translation,
     save_text_translations,
 )
+from notifications.lifecycle import cycle_summary, send_cycle_summary
 from reports.dreyfus_service import (
     agency_profile_with_texts,
     calculate_dreyfus_quadrant,
@@ -2004,6 +2005,9 @@ def close_cycle(request, cycle_uuid):
         messages.error(request, _('Cannot close cycle: No reviews have been completed yet.'))
         return redirect('review_cycle_detail', cycle_uuid=cycle_uuid)
 
+    # Count the responses for the admins' summary before the unused tokens go
+    summary = cycle_summary(cycle)
+
     # Remove unclaimed tokens (tokens that are still active but not claimed)
     # Keep claimed tokens as an indication that the report was closed while people were still working
     unclaimed_tokens = cycle.tokens.filter(claimed_at__isnull=True, completed_at__isnull=True)
@@ -2028,6 +2032,8 @@ def close_cycle(request, cycle_uuid):
         messages.success(request, success_msg)
     except Exception as e:
         messages.error(request, _('Cycle closed but error generating report: %(error)s') % {'error': str(e)})
+
+    send_cycle_summary(cycle, summary)
 
     return redirect('review_cycle_detail', cycle_uuid=cycle_uuid)
 
@@ -2336,6 +2342,8 @@ def remove_reviewer_token(request, cycle_uuid, token_id):
                     # Log error but don't fail the removal
                     logger.exception("Error auto-generating report for cycle %s", cycle.id)
                     messages.warning(request, _('Cycle closed but error generating report: %(error)s') % {'error': str(e)})
+
+                send_cycle_summary(cycle)
 
     except ReviewerToken.DoesNotExist:
         messages.error(request, _('Reviewer token not found.'))

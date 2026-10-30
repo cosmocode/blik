@@ -14,7 +14,8 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import gettext as _
 from django_ratelimit.decorators import ratelimit
-from .models import Subscription, OneTimeLoginToken
+from . import emails
+from .models import OneTimeLoginToken, Plan, Subscription
 from .fulfilment import _period, _ts, fulfil_checkout
 from .utils import price_id_for
 from core.url import get_absolute_url
@@ -125,28 +126,17 @@ def stripe_webhook(request):
     payload = request.body
     sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
 
-    # Log incoming webhook
-    logger.info(f"[STRIPE WEBHOOK] Received webhook request")
-    logger.info(f"[STRIPE WEBHOOK] Signature header present: {bool(sig_header)}")
-    logger.info(f"[STRIPE WEBHOOK] Payload size: {len(payload)} bytes")
-    logger.info(f"[STRIPE WEBHOOK] Webhook secret configured: {bool(settings.STRIPE_WEBHOOK_SECRET)}")
-    logger.info(f"[STRIPE WEBHOOK] Webhook secret length: {len(settings.STRIPE_WEBHOOK_SECRET) if settings.STRIPE_WEBHOOK_SECRET else 0}")
-
     try:
         # ponytail: .to_dict() because StripeObject stopped being a dict in stripe>=8
         event = stripe.Webhook.construct_event(
             payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
         ).to_dict()
-        logger.info(f"[STRIPE WEBHOOK] ✓ Signature verification successful")
-        logger.info(f"[STRIPE WEBHOOK] Event type: {event['type']}")
-        logger.info(f"[STRIPE WEBHOOK] Event ID: {event.get('id', 'N/A')}")
+        logger.info("[STRIPE WEBHOOK] Received %s (%s)", event['type'], event.get('id'))
     except ValueError as e:
         logger.error(f"[STRIPE WEBHOOK] ✗ Invalid payload: {str(e)}")
         return HttpResponse(status=400)
     except stripe._error.SignatureVerificationError as e:
         logger.error(f"[STRIPE WEBHOOK] ✗ Signature verification failed: {str(e)}")
-        logger.error(f"[STRIPE WEBHOOK] Signature header: {sig_header[:50] if sig_header else 'None'}...")
-        logger.error(f"[STRIPE WEBHOOK] Secret starts with: {settings.STRIPE_WEBHOOK_SECRET[:10] if settings.STRIPE_WEBHOOK_SECRET else 'None'}...")
         return HttpResponse(status=400)
 
     # Handle the event
@@ -156,30 +146,26 @@ def stripe_webhook(request):
         # idempotent and ignores unpaid sessions, so both events go through it.
         if event['type'] in ('checkout.session.completed',
                              'checkout.session.async_payment_succeeded'):
-            logger.info("[STRIPE WEBHOOK] Processing %s", event['type'])
             session = event['data']['object']
             fulfil_checkout(session)
             logger.info("[STRIPE WEBHOOK] ✓ Successfully processed %s", event['type'])
 
         elif event['type'] == 'customer.subscription.updated':
-            logger.info(f"[STRIPE WEBHOOK] Processing customer.subscription.updated")
             subscription = event['data']['object']
             handle_subscription_updated(subscription)
             logger.info(f"[STRIPE WEBHOOK] ✓ Successfully processed customer.subscription.updated")
 
         elif event['type'] == 'customer.subscription.deleted':
-            logger.info(f"[STRIPE WEBHOOK] Processing customer.subscription.deleted")
             subscription = event['data']['object']
             handle_subscription_deleted(subscription)
             logger.info(f"[STRIPE WEBHOOK] ✓ Successfully processed customer.subscription.deleted")
 
         elif event['type'] == 'invoice.payment_failed':
-            logger.info(f"[STRIPE WEBHOOK] Processing invoice.payment_failed")
             invoice = event['data']['object']
             handle_payment_failed(invoice)
             logger.info(f"[STRIPE WEBHOOK] ✓ Successfully processed invoice.payment_failed")
         else:
-            logger.warning(f"[STRIPE WEBHOOK] Unhandled event type: {event['type']}")
+            logger.info("[STRIPE WEBHOOK] Ignored event type: %s", event['type'])
 
     except Exception:
         logger.exception("[STRIPE WEBHOOK] ✗ Error processing event %s", event['type'])
@@ -187,37 +173,66 @@ def stripe_webhook(request):
         # fulfilment leaves nothing behind.
         return HttpResponse(status=500)
 
-    logger.info(f"[STRIPE WEBHOOK] ✓ Webhook processing complete")
     return HttpResponse(status=200)
 
 
+def _plan_for(stripe_subscription):
+    """The Plan of the subscription's price, or None for a price we do not sell."""
+    item = ((stripe_subscription.get('items') or {}).get('data') or [{}])[0]
+    price_id = (item.get('price') or {}).get('id')
+    for plan_type in ('saas', 'enterprise'):
+        try:
+            if price_id and price_id == price_id_for(plan_type):
+                return Plan.objects.filter(plan_type=plan_type).first()
+        except ValueError:
+            continue
+    return None
+
+
 def handle_subscription_updated(stripe_subscription):
-    """Update subscription status"""
+    """Update subscription status and plan, and email the customer about the change."""
     try:
         subscription = Subscription.objects.get(
             stripe_subscription_id=stripe_subscription['id']
         )
+        before = emails.snapshot(subscription)
         start, end = _period(stripe_subscription)
         subscription.status = stripe_subscription['status']
         subscription.current_period_start = _ts(start)
         subscription.current_period_end = _ts(end)
         subscription.cancel_at_period_end = stripe_subscription.get('cancel_at_period_end', False)
+        subscription.plan = _plan_for(stripe_subscription) or subscription.plan
         subscription.save()
+        emails.notify_change(before, subscription)
     except Subscription.DoesNotExist:
         pass
 
 
 def handle_subscription_deleted(stripe_subscription):
-    """Mark subscription as canceled"""
+    """Mark subscription as canceled. Confirm it when the customer asked for it and was not told yet."""
     try:
         subscription = Subscription.objects.get(
             stripe_subscription_id=stripe_subscription['id']
         )
-        subscription.status = 'canceled'
-        subscription.canceled_at = timezone.now()
-        subscription.save()
     except Subscription.DoesNotExist:
-        pass
+        return
+    if subscription.canceled_at:
+        return  # A retried event, or canceled here already
+
+    # A scheduled cancellation was confirmed when it was scheduled. An ended subscription after
+    # failed payments is Stripe's to report.
+    reason = (stripe_subscription.get('cancellation_details') or {}).get('reason')
+    confirm = reason == 'cancellation_requested' and not subscription.cancel_at_period_end
+
+    subscription.status = 'canceled'
+    subscription.canceled_at = timezone.now()
+    subscription.save()
+
+    if confirm:
+        try:
+            emails.send_cancellation_email(subscription)
+        except Exception:
+            logger.exception('Subscription %s ended but its email failed', subscription.pk)
 
 
 def handle_payment_failed(invoice):
@@ -225,9 +240,12 @@ def handle_payment_failed(invoice):
     stripe_customer_id = invoice['customer']
     try:
         subscription = Subscription.objects.get(stripe_customer_id=stripe_customer_id)
+        before = emails.snapshot(subscription)
         subscription.status = 'past_due'
         subscription.save()
-        # TODO: Send payment failed email
+        # Stripe emails the failed payment itself. This only covers the end of a trial, which can
+        # arrive here before customer.subscription.updated does.
+        emails.notify_change(before, subscription)
     except Subscription.DoesNotExist:
         pass
 
