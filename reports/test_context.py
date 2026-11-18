@@ -8,7 +8,7 @@ from core.models import Organization
 from questionnaires.models import Question, Questionnaire, QuestionSection
 from reviews.models import ReviewCycle, ReviewerToken, Response
 
-from .context import build_report_context
+from .context import MEDIAN, build_report_context
 from .services import generate_report
 
 
@@ -42,6 +42,30 @@ class BuildReportContextTests(TestCase):
         self.assertTrue(peer['insufficient'])
         self.assertNotIn('peer', context['report_data']['charts']['overall'])
         self.assertIs(context['display_data'], context['report_data'])
+
+    def test_the_median_changes_the_shown_score_and_nothing_derived(self):
+        question = Question.objects.get(section__questionnaire=self.cycle.questionnaire)
+        for rating in [1, 1, 4]:
+            token = ReviewerToken.objects.create(cycle=self.cycle, category='peer')
+            Response.objects.create(
+                cycle=self.cycle, question=question, token=token, category='peer', answer_data={'value': rating},
+            )
+        report = generate_report(self.cycle)  # the peers rated 4, 5, 1, 1 and 4
+
+        mean = build_report_context(report, is_admin_view=True)
+        median = build_report_context(report, is_admin_view=True, statistic=MEDIAN)
+
+        def peers(context):
+            section, = context['report_data']['by_section'].values()
+            question_data, = section['questions'].values()
+            return question_data['by_category']['peer']
+
+        self.assertEqual(peers(mean)['score'], 3.0)
+        self.assertEqual(peers(median)['score'], 4.0)
+        self.assertEqual(peers(median)['avg'], 3.0)
+        self.assertEqual(median['statistic'], MEDIAN)
+        self.assertEqual(mean['report_data']['section_summary'], median['report_data']['section_summary'])
+        self.assertEqual(mean['report_data']['insights'], median['report_data']['insights'])
 
     def test_admin_and_reviewee_context_differ_only_in_flag(self):
         admin = build_report_context(self.report, is_admin_view=True)

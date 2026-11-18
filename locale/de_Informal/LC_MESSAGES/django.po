@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 14:36+0000\n"
+"POT-Creation-Date: 2026-11-18 09:32+0000\n"
 "Language: de_Informal\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -9552,6 +9552,18 @@ msgstr[1] ""
 msgid "Detailed Feedback"
 msgstr ""
 
+msgid "Score per question:"
+msgstr ""
+
+msgid "Average"
+msgstr ""
+
+msgid "Median"
+msgstr ""
+
+msgid "Strengths, development areas, levels and trends are based on the average."
+msgstr ""
+
 msgid "If you have questions about this report, please contact your manager or HR department."
 msgstr "Bei Fragen zu diesem Bericht wende dich bitte an deine Führungskraft oder die Personalabteilung."
 
@@ -9580,9 +9592,6 @@ msgid "This report brings together the feedback from your reviewers: a summary, 
 msgstr "Dieser Bericht bündelt das Feedback deiner Feedbackgebenden: eine Zusammenfassung, deine Werte je Abschnitt und jede Antwort je Frage. Einzelne Feedbackgebende lassen sich nicht identifizieren."
 
 msgid "Scale:"
-msgstr ""
-
-msgid "Average"
 msgstr ""
 
 msgid "Positive"

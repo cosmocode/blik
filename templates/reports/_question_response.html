@@ -100,12 +100,12 @@
                         {% endblocktrans %}
                     </div>
                     {% endif %}
-                    {# RATING QUESTIONS - Show average and distribution #}
+                    {# RATING QUESTIONS - Show the mean or median and the distribution #}
                     {% if question_data.question_type == 'rating' and cat_data.avg %}
                         <div class="rating-display">
-                            <span class="rating-score">{{ cat_data.avg }}</span>
+                            <span class="rating-score">{{ cat_data.score }}</span>
                             <div class="rating-bar-container">
-                                <div class="rating-bar-fill" style="width: {% widthratio cat_data.avg 5 100 %}%"></div>
+                                <div class="rating-bar-fill" style="width: {% widthratio cat_data.score 5 100 %}%"></div>
                             </div>
                             <span class="response-count">/ 5.0</span>
                         </div>
@@ -140,10 +140,10 @@
                     {# SCALE QUESTIONS #}
                     {% elif question_data.question_type == 'scale' and cat_data.avg %}
                         <div class="rating-display">
-                            <span class="rating-score">{{ cat_data.avg|floatformat:1 }}</span>
+                            <span class="rating-score">{{ cat_data.score|floatformat:1 }}</span>
                             <div class="rating-bar-container">
                                 {% with min_val=question_data.question_config.min|default:1 max_val=question_data.question_config.max|default:100 %}
-                                    {% widthratio cat_data.avg max_val 100 as bar_width %}
+                                    {% widthratio cat_data.score max_val 100 as bar_width %}
                                     <div class="rating-bar-fill" style="width: {{ bar_width }}%"></div>
                                 {% endwith %}
                             </div>

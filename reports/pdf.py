@@ -19,7 +19,7 @@ from reviews.templatetags.feedback_tags import distribution_key, likert_positive
 from .report_texts import RATING_RANGES, RATINGS
 from .services import _hidden_groups, get_rating_key
 
-from .context import build_report_context
+from .context import MEAN, MEDIAN, MEDIAN_QUESTION_TYPES, answers_median, build_report_context
 from .dreyfus_service import AGENCY_STAGES, QUADRANTS
 from .pdf_charts import radar_chart
 from .pdf_summary import executive_summary
@@ -96,20 +96,20 @@ def pdf_filename(report):
     return f'{name}-360-feedback-{report.generated_at:%Y-%m-%d}.pdf'
 
 
-def report_pdf_html(report, language):
+def report_pdf_html(report, language, statistic=MEAN):
     with translation.override(language):
-        return render_to_string('reports/pdf/report.html', _pdf_context(report))
+        return render_to_string('reports/pdf/report.html', _pdf_context(report, statistic))
 
 
-def report_pdf_document(report, language):
-    html = report_pdf_html(report, language)
+def report_pdf_document(report, language, statistic=MEAN):
+    html = report_pdf_html(report, language, statistic)
     # Fonts and everything else come from local files: a render never touches the network.
     fetcher = URLFetcher(allowed_protocols={'file', 'data'})
     return weasyprint.HTML(string=html, base_url=str(settings.BASE_DIR), url_fetcher=fetcher).render()
 
 
-def render_report_pdf(report, language):
-    return report_pdf_document(report, language).write_pdf()
+def render_report_pdf(report, language, statistic=MEAN):
+    return report_pdf_document(report, language, statistic).write_pdf()
 
 
 def store_report_pdf(report):
@@ -145,8 +145,8 @@ def drop_report_pdf(report):
     report.save(update_fields=['pdf_file', 'pdf_generated_at', 'pdf_attempts'])
 
 
-def _pdf_context(report):
-    context = build_report_context(report, is_admin_view=False)
+def _pdf_context(report, statistic=MEAN):
+    context = build_report_context(report, is_admin_view=False, statistic=statistic)
     threshold = context['cycle'].organization.min_responses_for_anonymity
     data = context['report_data']
     insights = data.get('insights') or {}
@@ -173,7 +173,7 @@ def _pdf_context(report):
         'rating_ranges': list(RATING_RANGES.items()),
         'agency': _agency(insights.get('agency_profile')),
         'matrix': _matrix(insights.get('dreyfus_quadrant')),
-        'detail_sections': _detail_sections(data),
+        'detail_sections': _detail_sections(data, statistic),
         'font_dir': FONT_DIR.as_uri(),
     })
     return context
@@ -334,15 +334,15 @@ def _two_lines(name):
     return [name[:split], name[split + 1:]]
 
 
-def _detail_sections(data):
+def _detail_sections(data, statistic):
     sections = []
     for section in (data.get('by_section') or {}).values():
-        questions = [_detail_question(question) for question in (section.get('questions') or {}).values()]
+        questions = [_detail_question(question, statistic) for question in (section.get('questions') or {}).values()]
         sections.append({'title': section.get('title'), 'questions': questions})
     return sections
 
 
-def _detail_question(question):
+def _detail_question(question, statistic=MEAN):
     """A question with one row per reviewer group; a column per answer holds how many gave it."""
     by_category = question.get('by_category') or {}
     order = [c for c in (question.get('category_order') or list(by_category)) if c in by_category]
@@ -357,12 +357,15 @@ def _detail_question(question):
     has_avg = qtype in ('rating', 'scale') or (
         qtype in ('single_choice', 'multiple_choice') and (question.get('question_config') or {}).get('scoring_enabled')
     )
+    shows_median = statistic == MEDIAN and qtype in MEDIAN_QUESTION_TYPES
 
     rows = []
     for category in order:
         group = by_category[category]
         count = group.get('count') or 0
         row = {'category': category, 'group': group, 'count': count, 'avg': group.get('avg') if has_avg else None}
+        if shows_median and row['avg'] is not None:
+            row['avg'] = answers_median(group.get('responses') or [])
         if not group.get('insufficient'):
             distribution = group.get('distribution') or {}
             row['cells'] = [_cell(distribution.get(key, 0), count) for key, _label in columns]
@@ -374,14 +377,17 @@ def _detail_question(question):
     # As on the web, the self-assessment is compared with the others: it is not one more reviewer group
     own = next((row for row in rows if row['category'] == 'self'), None)
     others = [row for row in rows if row['category'] != 'self']
-    others_avg = _others_avg(others) if has_avg else None
+    if shows_median:
+        others_avg = _others_median(others)
+    else:
+        others_avg = _others_avg(others) if has_avg else None
     if own and own['avg'] is not None and others_avg is not None:
         own['gap'] = round(own['avg'] - others_avg, 2)
     return {
         'data': question, 'type': qtype, 'columns': [label for _key, label in columns],
         'has_avg': has_avg, 'has_positive': qtype == 'likert', 'rows': others, 'self': own,
         'others_avg': others_avg, 'span': len(columns) + bool(has_avg) + (qtype == 'likert'),
-        'answer_span': len(columns) + (qtype == 'likert'),
+        'answer_span': len(columns) + (qtype == 'likert'), 'shows_median': shows_median,
     }
 
 
@@ -392,6 +398,12 @@ def _others_avg(rows):
         if row['category'] != 'self' and not row['group'].get('insufficient') and row['avg'] is not None
     ]
     return round(sum(scores) / len(scores), 2) if scores else None
+
+
+def _others_median(rows):
+    """The median of all answers in the shown reviewer groups; never the self-assessment."""
+    shown = [row['group'] for row in rows if not row['group'].get('insufficient')]
+    return answers_median([answer for group in shown for answer in group.get('responses') or []])
 
 
 def _cell(count, total):
