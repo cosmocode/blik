@@ -264,6 +264,15 @@
 
 <h2 id="detailed-feedback" style="font-size: 1.75rem; font-weight: 600; margin: 2rem 0 1rem; color: var(--text-primary);">{% trans 'Detailed Feedback' %}</h2>
 
+<div class="statistic-toggle" style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+    <span style="color: var(--text-secondary);">{% trans 'Score per question:' %}</span>
+    <a href="?statistic=mean#detailed-feedback" class="btn btn-sm {% if statistic == 'median' %}btn-secondary{% else %}btn-primary{% endif %}"{% if statistic != 'median' %} aria-current="true"{% endif %}>{% trans 'Average' %}</a>
+    <a href="?statistic=median#detailed-feedback" class="btn btn-sm {% if statistic == 'median' %}btn-primary{% else %}btn-secondary{% endif %}"{% if statistic == 'median' %} aria-current="true"{% endif %}>{% trans 'Median' %}</a>
+</div>
+{% if statistic == 'median' %}
+<p style="color: var(--text-secondary); margin-bottom: 1.5rem;">{% trans 'Strengths, development areas, levels and trends are based on the average.' %}</p>
+{% endif %}
+
 {% for section_id, section_data in display_data.by_section.items %}
 <div class="section-report">
     <h2 class="section-title">{{ section_data.title }}</h2>

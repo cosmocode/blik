@@ -11,6 +11,7 @@ from core.models import Organization
 from questionnaires.models import AnswerOption, Question, Questionnaire, QuestionSection
 from reviews.models import ReviewCycle, ReviewerToken, Response
 
+from .context import MEDIAN
 from .models import Report
 from .pdf import _detail_question, _feedback_groups, _section_table, drop_report_pdf, pdf_filename, render_report_pdf, \
     report_pdf_document, report_pdf_html, reviewee_language, store_report_pdf
@@ -165,6 +166,19 @@ class ReportPdfTests(TestCase):
         self.assertIn('Top 1% in organization', html)
         self.assertRegex(html, r'higher than \d+% of peers')
 
+    def test_pdf_with_medians_shows_them_per_question(self):
+        report = self.full_report()
+
+        html = report_pdf_html(report, 'en', MEDIAN)
+
+        rows = table_rows(html)
+        # Solves problems: the peers rated 5, 5 and 4, the manager 5
+        self.assertIn(['Peer', '3', '5.0', '', '', '', '1', '2'], rows)
+        self.assertIn(['Others', '', '5.0', ''], rows)
+        self.assertIn('(-2.0 compared to others)', html)
+        self.assertIn('<th class="n">Median</th>', html)
+        self.assertIn('Strengths, development areas, levels and trends are based on the average.', html)
+
     def test_store_and_drop_report_pdf(self):
         self.add_questions(MAPPED)
         report = generate_report(self.cycle('Anna de Vries', {'manager': [{self.craft: 4}]}))
@@ -245,6 +259,25 @@ class SectionTableTests(SimpleTestCase):
 
 
 class DetailQuestionTests(SimpleTestCase):
+    def test_median_of_each_group_and_of_all_answers_of_the_shown_others(self):
+        question = {
+            'question_type': 'rating', 'category_order': ['self', 'peer', 'manager', 'direct_report'],
+            'by_category': {
+                'self': {'count': 1, 'avg': 2.0, 'responses': [2]},
+                'peer': {'count': 5, 'avg': 2.8, 'responses': [1, 1, 4, 4, 4]},
+                'manager': {'count': 1, 'avg': 5.0, 'responses': [5]},
+                'direct_report': {'count': 2, 'avg': 1.0, 'responses': [1, 1], 'insufficient': True},
+            },
+        }
+
+        detail = _detail_question(question, MEDIAN)
+
+        self.assertTrue(detail['shows_median'])
+        self.assertEqual(detail['rows'][0]['avg'], 4.0)
+        self.assertEqual(detail['others_avg'], 4.0)  # 1, 1, 4, 4, 4 and 5; the hidden 1, 1 would make it 2.5
+        self.assertEqual(detail['self']['gap'], -2.0)
+
+
     def test_rating_counts_per_answer_and_hidden_group_has_no_cells(self):
         question = {
             'question_type': 'rating', 'category_order': ['peer', 'manager'],

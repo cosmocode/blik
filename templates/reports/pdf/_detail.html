@@ -1,6 +1,7 @@
 {% load i18n feedback_tags %}
 <section class="page detail-pages">
     <h2>{% trans 'Detailed Feedback' %}</h2>
+    {% if statistic == 'median' %}<p class="muted small">{% trans 'Strengths, development areas, levels and trends are based on the average.' %}</p>{% endif %}
     {% for section in detail_sections %}
     <div class="detail-section">
         <h3 class="section-title">{{ section.title }}</h3>
@@ -23,7 +24,7 @@
                 <thead><tr>
                     <th class="who"></th>
                     <th class="n">{% trans 'Responses' %}</th>
-                    {% if question.has_avg %}<th class="n">{% trans 'Average' %}</th>{% endif %}
+                    {% if question.has_avg %}<th class="n">{% if question.shows_median %}{% trans 'Median' %}{% else %}{% trans 'Average' %}{% endif %}</th>{% endif %}
                     {% for column in question.columns %}<th class="c">{{ column }}</th>{% endfor %}
                     {% if question.has_positive %}<th class="n">{% trans 'Positive' %}</th>{% endif %}
                 </tr></thead>

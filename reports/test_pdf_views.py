@@ -11,9 +11,14 @@ from accounts.models import UserProfile
 from accounts.permissions import assign_organization_admin
 from reviews.factories import ReviewCycleFactory
 
+from .context import MEAN, MEDIAN
 from .models import Report
 from .pdf import pdf_filename, store_report_pdf, stored_pdf_bytes
 from .services import generate_report
+
+
+def fake_render(report, language, statistic=MEAN):
+    return b'%PDF ' + language.encode()
 
 
 @override_settings(LANGUAGE_CODE='en')
@@ -24,12 +29,12 @@ class ReportPdfViewTests(TestCase):
         override = override_settings(PRIVATE_MEDIA_ROOT=tmp.name)
         override.enable()
         self.addCleanup(override.disable)
-        render = mock.patch('reports.pdf.render_report_pdf', side_effect=lambda r, language: b'%PDF ' + language.encode())
+        render = mock.patch('reports.pdf.render_report_pdf', side_effect=fake_render)
         render.start()
         self.addCleanup(render.stop)
         # views.py holds its own reference to the function
-        view_render = mock.patch('reports.views.render_report_pdf', side_effect=lambda r, language: b'%PDF ' + language.encode())
-        view_render.start()
+        view_render = mock.patch('reports.views.render_report_pdf', side_effect=fake_render)
+        self.view_render = view_render.start()
         self.addCleanup(view_render.stop)
 
         self.cycle = ReviewCycleFactory(status='completed')
@@ -108,6 +113,21 @@ class ReportPdfViewTests(TestCase):
         self.assertEqual(response.content, b'%PDF en')
         self.report.refresh_from_db()
         self.assertEqual(stored_pdf_bytes(self.report), b'%PDF de')
+
+    def test_reviewee_pdf_with_medians_is_a_fresh_render(self):
+        """The stored PDF shows the means."""
+        store_report_pdf(self.report)
+        self.client.get(self.token_url, {'statistic': MEDIAN})
+        self.view_render.assert_called_once_with(self.report, 'en', statistic=MEDIAN)
+
+    def test_report_page_keeps_the_chosen_statistic_for_the_pdf(self):
+        page = reverse('reports:reviewee_report', args=[self.report.access_token])
+
+        response = self.client.get(page, {'statistic': MEDIAN})
+
+        self.assertEqual(response.context['statistic'], MEDIAN)
+        self.assertContains(response, f'{self.token_url}?statistic=median')
+        self.assertEqual(self.client.get(page, {'statistic': 'mode'}).context['statistic'], MEAN)
 
     def test_admin_pdf_other_language_not_stored(self):
         self.admin()

@@ -8,10 +8,16 @@ from django_ratelimit.decorators import ratelimit
 from accounts.permissions import can_view_all_reports, direct_report_emails
 from reviews.models import ReviewCycle
 from .models import Report
-from .context import build_report_context
+from .context import MEAN, STATISTICS, build_report_context
 from .pdf import pdf_response, render_report_pdf, reviewee_language, store_report_pdf, stored_pdf_bytes
 from .services import generate_report
 import uuid
+
+
+def requested_statistic(request):
+    """The number per question the reader chose to see, the mean unless the median is asked for."""
+    statistic = request.GET.get('statistic')
+    return statistic if statistic in STATISTICS else MEAN
 
 
 def get_cycle_or_404(request, cycle_uuid):
@@ -70,7 +76,7 @@ def view_report(request, cycle_uuid):
     except Report.DoesNotExist:
         report = generate_report(cycle)
 
-    context = build_report_context(report, is_admin_view=True)
+    context = build_report_context(report, is_admin_view=True, statistic=requested_statistic(request))
     context['pdf_valid'] = report.has_valid_pdf()
     # A manager reads the report but does not run the cycle.
     context['is_manager_view'] = not can_view_all_reports(request.user)
@@ -132,7 +138,7 @@ def reviewee_report(request, access_token):
     if refusal:
         return refusal
 
-    context = build_report_context(report, is_admin_view=False)
+    context = build_report_context(report, is_admin_view=False, statistic=requested_statistic(request))
     context['is_public_view'] = True
     context['pdf_valid'] = report.has_valid_pdf()
 
@@ -146,10 +152,12 @@ def reviewee_report_pdf(request, access_token):
     if refusal:
         return refusal
 
-    # The stored file is in the reviewee's language; a reader in another one gets a fresh render
+    # The stored file is in the reviewee's language and shows the means; a reader in another language or
+    # asking for the medians gets a fresh render
     language = translation.get_language()
-    if language != reviewee_language(report):
-        return pdf_response(report, render_report_pdf(report, language))
+    statistic = requested_statistic(request)
+    if language != reviewee_language(report) or statistic != MEAN:
+        return pdf_response(report, render_report_pdf(report, language, statistic=statistic))
 
     if request.method == 'POST':
         store_report_pdf(report)
@@ -178,10 +186,12 @@ def report_pdf(request, cycle_uuid):
     except Report.DoesNotExist:
         report = generate_report(cycle)
 
-    # A stored file is in the reviewee's language; an admin in another one gets a fresh render
+    # A stored file is in the reviewee's language and shows the means; an admin in another language or
+    # asking for the medians gets a fresh render
     language = translation.get_language()
-    if language != reviewee_language(report):
-        return pdf_response(report, render_report_pdf(report, language))
+    statistic = requested_statistic(request)
+    if language != reviewee_language(report) or statistic != MEAN:
+        return pdf_response(report, render_report_pdf(report, language, statistic=statistic))
 
     if request.method == 'POST':
         store_report_pdf(report)
